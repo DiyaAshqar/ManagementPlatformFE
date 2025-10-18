@@ -1,17 +1,12 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component } from '@angular/core';
 import { TranslateModule } from '@ngx-translate/core';
-import { CardModule } from 'primeng/card';
 
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, TranslateModule, CardModule],
-  template: `
-   
-  `,
-  styles: [`
-
-  `]
+  imports: [CommonModule, TranslateModule],
+  templateUrl: './dashboard.component.html',
+  styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {}

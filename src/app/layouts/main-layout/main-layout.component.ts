@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
-import { ButtonModule } from 'primeng/button';
 import { AuthService } from '../../core/auth/services/auth.service';
 import { LanguageService } from '../../core/services/language.service';
 import { ThemeService } from '../../core/services/theme.service';
@@ -9,16 +9,11 @@ import { ThemeService } from '../../core/services/theme.service';
 @Component({
   selector: 'app-main-layout',
   standalone: true,
-  imports: [CommonModule, TranslateModule, ButtonModule],
-  template: `
-    
-  `,
-  styles: [`
-    
-  `]
+  imports: [CommonModule, RouterOutlet, TranslateModule],
+  templateUrl: './main-layout.component.html',
+  styleUrls: ['./main-layout.component.scss']
 })
 export class MainLayoutComponent implements OnInit {
-  
   constructor(
     public authService: AuthService,
     public languageService: LanguageService,
