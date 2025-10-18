@@ -1,0 +1,37 @@
+{
+  "app": {
+    "title": "البناء",
+    "welcome": "مرحبا"
+  },
+  "auth": {
+    "login": "تسجيل الدخول",
+    "logout": "تسجيل الخروج",
+    "register": "التسجيل",
+    "email": "البريد الإلكتروني",
+    "password": "كلمة المرور",
+    "forgotPassword": "نسيت كلمة المرور؟",
+    "rememberMe": "تذكرني"
+  },
+  "common": {
+    "save": "حفظ",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "edit": "تعديل",
+    "add": "إضافة",
+    "search": "بحث",
+    "actions": "الإجراءات",
+    "confirm": "تأكيد",
+    "yes": "نعم",
+    "no": "لا",
+    "loading": "جاري التحميل...",
+    "success": "نجح",
+    "error": "خطأ",
+    "warning": "تحذير"
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "email": "صيغة البريد الإلكتروني غير صحيحة",
+    "minLength": "الحد الأدنى للطول هو {{value}}",
+    "maxLength": "الحد الأقصى للطول هو {{value}}"
+  }
+}

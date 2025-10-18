@@ -1,0 +1,37 @@
+{
+  "app": {
+    "title": "Construction",
+    "welcome": "Welcome"
+  },
+  "auth": {
+    "login": "Login",
+    "logout": "Logout",
+    "register": "Register",
+    "email": "Email",
+    "password": "Password",
+    "forgotPassword": "Forgot Password?",
+    "rememberMe": "Remember Me"
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "add": "Add",
+    "search": "Search",
+    "actions": "Actions",
+    "confirm": "Confirm",
+    "yes": "Yes",
+    "no": "No",
+    "loading": "Loading...",
+    "success": "Success",
+    "error": "Error",
+    "warning": "Warning"
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Invalid email format",
+    "minLength": "Minimum length is {{value}}",
+    "maxLength": "Maximum length is {{value}}"
+  }
+}

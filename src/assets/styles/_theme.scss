@@ -1,0 +1,12 @@
+// PrimeNG Theme Customization
+.p-component {
+  font-family: var(--font-family);
+  font-size: var(--font-size-base);
+}
+
+.p-button {
+  border-radius: var(--border-radius);
+  transition: all var(--transition-duration);
+}
+
+// Add more theme customizations as needed

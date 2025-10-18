@@ -1,3 +1,52 @@
 import { Routes } from '@angular/router';
+import { AuthGuard, GuestGuard } from './core/auth/guards/auth.guard';
 
-export const routes: Routes = [];
+export const routes: Routes = [
+  // Root redirect
+  {
+    path: '',
+    redirectTo: '/dashboard',
+    pathMatch: 'full'
+  },
+
+  // Authentication routes (public - guest only)
+  {
+    path: 'auth',
+    canActivate: [GuestGuard],
+    loadComponent: () => import('./layouts/auth-layout/auth-layout.component')
+      .then(m => m.AuthLayoutComponent),
+    children: [
+      {
+        path: '',
+        redirectTo: 'login',
+        pathMatch: 'full'
+      },
+      {
+        path: 'login',
+        loadComponent: () => import('./features/auth/pages/login/login.component')
+          .then(m => m.LoginComponent)
+      }
+    ]
+  },
+
+  // Protected routes with main layout
+  {
+    path: '',
+    canActivate: [AuthGuard],
+    loadComponent: () => import('./layouts/main-layout/main-layout.component')
+      .then(m => m.MainLayoutComponent),
+    children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/dashboard/dashboard.component')
+          .then(m => m.DashboardComponent)
+      }
+    ]
+  },
+
+  // Wildcard route (404)
+  {
+    path: '**',
+    redirectTo: '/dashboard'
+  }
+];

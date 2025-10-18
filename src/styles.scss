@@ -1,1 +1,25 @@
-/* You can add global styles to this file, and also import other style files */
+/* Import custom styles first (Sass modules) */
+@use './assets/styles/variables';
+@use './assets/styles/theme';
+@use './assets/styles/global';
+
+/* Import PrimeNG styles */
+@import 'primeicons/primeicons.css';
+@import 'primeflex/primeflex.css';
+
+/* Base styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  font-family: var(--font-family);
+}
+
+body {
+  margin: 0;
+  font-family: Roboto, "Helvetica Neue", sans-serif;
+}
