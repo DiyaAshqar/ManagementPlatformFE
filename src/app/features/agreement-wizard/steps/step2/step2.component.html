@@ -1,0 +1,105 @@
+<div class="p-4">
+    <form [formGroup]="step2Form" (ngSubmit)="onSubmit()">
+        @if (isLoading()) {
+        <div class="flex justify-center align-items-center p-6">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+        }
+
+        <!-- Contract Details -->
+        <div class="col-12">
+            <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step2.contractDetails' | translate }}</h3>
+
+            <div class="grid">
+                <div class="col-12 md:col-6 mb-3">
+                    <div class="field">
+                        <p-floatlabel variant="in">
+                            <p-select inputId="contractTypeId" formControlName="contractTypeId"
+                                [options]="contractTypes()" optionLabel="name" optionValue="id" styleClass="w-full"
+                                [class]="isFieldInvalid('contractTypeId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'"></p-select>
+                            <label for="contractTypeId">{{ 'wizard.step2.contractType' | translate }}</label>
+                        </p-floatlabel>
+                    </div>
+                </div>
+
+                <div class="col-12 md:col-6 mb-3">
+                    <div class="field">
+                        <p-floatlabel variant="in">
+                            <p-select inputId="contractModelId" formControlName="contractModelId"
+                                [options]="contractModels()" optionLabel="name" optionValue="id" styleClass="w-full"
+                                [class]="isFieldInvalid('contractModelId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'"></p-select>
+                            <label for="contractModelId">{{ 'wizard.step2.contractModel' | translate }}</label>
+                        </p-floatlabel>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Payment Details -->
+        <div class="col-12">
+            <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step2.paymentDetails' | translate }}</h3>
+
+            <div class="grid">
+                <div class="col-12 md:col-6 mb-3">
+                    <div class="field">
+                        <p-floatlabel variant="in">
+                            <p-select inputId="paymentMethodId" formControlName="paymentMethodId"
+                                [options]="paymentMethods()" optionLabel="name" optionValue="id" styleClass="w-full"
+                                (onChange)="onPaymentMethodChange()"
+                                 [class]="isFieldInvalid('paymentMethodId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'">
+                            </p-select>
+                            <label for="paymentMethodId">{{ 'wizard.step2.paymentMethod' | translate }}</label>
+                        </p-floatlabel>
+                    </div>
+                </div>
+
+                <div class="col-12 md:col-6 mb-3">
+                    <div class="field">
+                        <p-floatlabel variant="in">
+                            <p-inputNumber inputId="amount" formControlName="amount" [min]="0" [showButtons]="false"
+                                mode="currency" currency="USD" locale="en-US"
+                                [ngClass]="{'ng-invalid': isFieldInvalid('amount')}"
+                                inputStyleClass="w-full"></p-inputNumber>
+                            <label for="amount">{{ 'wizard.step2.monthlyPayment' | translate }}</label>
+                        </p-floatlabel>
+                        <small class="text-color-secondary">{{ 'wizard.step2.monthlyPaymentHint' | translate }}</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Services -->
+        <div class="col-12">
+            <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step2.services' | translate }}</h3>
+
+            <div class="field">
+                <label class="block mb-2">{{ 'wizard.step2.selectServices' | translate }}</label>
+                <div class="grid">
+                    @for (service of services(); track service.id) {
+                    <div class="col-12 md:col-6 lg:col-4 mb-2">
+                        <div class="service-item p-3 border-2 border-round cursor-pointer transition-all transition-duration-200"
+                            [class.border-primary]="isServiceSelected(service.id)"
+                            [class.bg-primary-50]="isServiceSelected(service.id)"
+                            [class.border-surface-200]="!isServiceSelected(service.id)"
+                            (click)="toggleService(service.id)">
+                            <div class="flex align-items-center gap-2">
+                                <i class="pi transition-all" [class.pi-check-circle]="isServiceSelected(service.id)"
+                                    [class.pi-circle]="!isServiceSelected(service.id)"
+                                    [class.text-primary]="isServiceSelected(service.id)"
+                                    [class.text-500]="!isServiceSelected(service.id)"></i>
+                                <span [class.font-semibold]="isServiceSelected(service.id)">{{ service.name }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    }
+                </div>
+                @if (isFieldInvalid('selectedServices')) {
+                <small class="text-red-500 block mt-2">{{ getFieldError('selectedServices') }}</small>
+                }
+            </div>
+        </div>
+
+        <!-- Submit Button (will be triggered by parent) -->
+        <button type="button" (click)="onSubmit()" style="display: none;"></button>
+    </form>
+</div>

@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
+import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -27,7 +28,8 @@ interface Lookup {
     InputNumberModule,
     InputTextModule,
     ButtonModule,
-    TranslateModule
+    TranslateModule,
+    FloatLabelModule
   ],
   templateUrl: './step1.component.html'
 })
@@ -198,13 +200,7 @@ export class Step1Component implements OnInit, OnDestroy {
 
   isFieldInvalid(fieldName: string): boolean {
     const field = this.step1Form.get(fieldName);
-    const isFieldInvalid = !!(field && field.invalid && (field.dirty || field.touched));
-
-    const agreementGroup = this.step1Form.get('agreementDto');
-    const hasDateRangeError = agreementGroup?.errors?.['dateRange'] &&
-      (fieldName === 'agreementDto.estimatedStartDate' || fieldName === 'agreementDto.estimatedEndDate');
-
-    return isFieldInvalid || hasDateRangeError;
+    return !!(field && field.invalid && (field.touched || field.dirty));
   }
 
   getFieldError(fieldName: string): string {

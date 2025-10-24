@@ -1,5 +1,5 @@
 <div class="p-4">
-  <form [formGroup]="step1Form" class="gap-4">
+  <form [formGroup]="step1Form" (ngSubmit)="onSubmit()">
     @if (isLoading()) {
     <div class="flex justify-center align-items-center p-6">
       <p-progressSpinner></p-progressSpinner>
@@ -13,134 +13,142 @@
       <div formGroupName="agreementDto">
         <div class="grid">
           <div class="col-12 md:col-6 mb-3">
-            <label for="projectNumber" class="block mb-2 font-medium">{{ 'wizard.step1.projectNumber' | translate
-              }}*</label>
-            <input pInputText id="projectNumber" formControlName="projectNumber" readonly class="w-full" />
-            <small class="text-color-secondary">{{ 'wizard.step1.projectNumberHint' | translate }}</small>
+            <div class="field">
+              <p-floatlabel variant="in">
+                <input  pInputText id="projectNumber" formControlName="projectNumber" readonly class="w-full" />
+                <label for="projectNumber">{{ 'wizard.step1.projectNumber' | translate }}</label>
+              </p-floatlabel>
+              <small class="text-color-secondary">{{ 'wizard.step1.projectNumberHint' | translate }}</small>
+            </div>
           </div>
 
           <div class="col-12 md:col-6 mb-3">
-            <label for="agreementDate" class="block mb-2 font-medium">{{ 'wizard.step1.createdAt' | translate
-              }}*</label>
-            <p-datepicker inputId="agreementDate" formControlName="agreementDate" dateFormat="mm/dd/yy"
-              [showIcon]="true" [readonlyInput]="true" styleClass="w-full"></p-datepicker>
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="col-12 md:col-6 mb-3">
-            <label for="projectName" class="block mb-2 font-medium">{{ 'wizard.step1.projectName' | translate
-              }}*</label>
-            <input pInputText id="projectName" formControlName="projectName"
-              [class.ng-invalid]="isFieldInvalid('agreementDto.projectName')"
-              [class.ng-dirty]="isFieldInvalid('agreementDto.projectName')" class="w-full" />
-            @if (isFieldInvalid('agreementDto.projectName')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('agreementDto.projectName') | translate }}</small>
-            }
-          </div>
-
-          <div class="col-12 md:col-6 mb-3">
-            <label for="businessSector" class="block mb-2 font-medium">{{ 'wizard.step1.businessSector' | translate
-              }}*</label>
-            <input pInputText id="businessSector" formControlName="businessSector"
-              [class.ng-invalid]="isFieldInvalid('agreementDto.businessSector')"
-              [class.ng-dirty]="isFieldInvalid('agreementDto.businessSector')" class="w-full" />
-            @if (isFieldInvalid('agreementDto.businessSector')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('agreementDto.businessSector') | translate
-              }}</small>
-            }
+            <div class="field">
+              <p-floatlabel variant="in">
+                <p-datepicker inputId="agreementDate" formControlName="agreementDate" dateFormat="mm/dd/yy"
+                  [showIcon]="true" [readonlyInput]="true" styleClass="w-full"></p-datepicker>
+                <label for="agreementDate">{{ 'wizard.step1.createdAt' | translate }} </label>
+              </p-floatlabel>
+            </div>
           </div>
         </div>
 
         <div class="grid">
           <div class="col-12 md:col-6 mb-3">
-            <label for="estimatedStartDate" class="block mb-2 font-medium">{{ 'wizard.step1.estimatedStartDate' |
-              translate
-              }}*</label>
-            <p-datepicker inputId="estimatedStartDate" formControlName="estimatedStartDate" dateFormat="mm/dd/yy"
-              [showIcon]="true" [maxDate]="maxStartDate()" (onSelect)="onStartDateChange($event)"
-              [ngClass]="{'ng-invalid ng-dirty': isFieldInvalid('agreementDto.estimatedStartDate')}"
-              styleClass="w-full"></p-datepicker>
-            @if (isFieldInvalid('agreementDto.estimatedStartDate')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('agreementDto.estimatedStartDate') | translate
-              }}</small>
-            }
+            <div class="field">
+              <p-floatlabel variant="in">
+                <input pInputText  class="ng-dirty ng-invalid" id="projectName" formControlName="projectName" class="w-full"
+                  [class.ng-invalid]="isFieldInvalid('agreementDto.projectName')" />
+                <label for="projectName">{{ 'wizard.step1.projectName' | translate }} </label>
+              </p-floatlabel>
+            </div>
           </div>
 
           <div class="col-12 md:col-6 mb-3">
-            <label for="estimatedEndDate" class="block mb-2 font-medium">{{ 'wizard.step1.estimatedEndDate' | translate
-              }}*</label>
-            <p-datepicker inputId="estimatedEndDate" formControlName="estimatedEndDate" dateFormat="mm/dd/yy"
-              [showIcon]="true" [minDate]="minEndDate()" (onSelect)="onEndDateChange($event)"
-              [ngClass]="{'ng-invalid ng-dirty': isFieldInvalid('agreementDto.estimatedEndDate')}"
-              styleClass="w-full"></p-datepicker>
-            @if (isFieldInvalid('agreementDto.estimatedEndDate')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('agreementDto.estimatedEndDate') | translate
-              }}</small>
-            }
+            <div class="field">
+              <p-floatlabel variant="in">
+                <input pInputText id="businessSector" formControlName="businessSector" class="w-full"
+                  [class.ng-invalid]="isFieldInvalid('agreementDto.businessSector')" />
+                <label for="businessSector">{{ 'wizard.step1.businessSector' | translate }} </label>
+              </p-floatlabel>
+            </div>
           </div>
         </div>
 
         <div class="grid">
           <div class="col-12 md:col-6 mb-3">
-            <label for="countryId" class="block mb-2 font-medium">{{ 'wizard.step1.country' | translate }}*</label>
-            <p-select inputId="countryId" formControlName="countryId" [options]="countries()" optionLabel="name"
-              optionValue="id" [placeholder]="'wizard.step1.selectCountry' | translate"
-              [ngClass]="{'ng-invalid ng-dirty': isFieldInvalid('agreementDto.countryId')}"
-              styleClass="w-full"></p-select>
-            @if (isFieldInvalid('agreementDto.countryId')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('agreementDto.countryId') | translate }}</small>
-            }
+            <div class="field">
+              <p-floatlabel variant="in">
+                <p-datepicker inputId="estimatedStartDate" formControlName="estimatedStartDate" dateFormat="mm/dd/yy"
+                  [showIcon]="true" [maxDate]="maxStartDate()" (onSelect)="onStartDateChange($event)"
+                  [ngClass]="{'ng-invalid': isFieldInvalid('agreementDto.estimatedStartDate')}"
+                  styleClass="w-full"></p-datepicker>
+                <label for="estimatedStartDate">{{ 'wizard.step1.estimatedStartDate' | translate }} </label>
+              </p-floatlabel>
+              @if (isFieldInvalid('agreementDto.estimatedStartDate')) {
+              <small class="text-red-500 block mt-1">{{ getFieldError('agreementDto.estimatedStartDate') | translate
+                }}</small>
+              }
+            </div>
           </div>
 
           <div class="col-12 md:col-6 mb-3">
-            <label for="cityId" class="block mb-2 font-medium">{{ 'wizard.step1.city' | translate }}*</label>
-            <p-select inputId="cityId" formControlName="cityId" [options]="cities()" optionLabel="name" optionValue="id"
-              [placeholder]="'wizard.step1.selectCity' | translate"
-              [ngClass]="{'ng-invalid ng-dirty': isFieldInvalid('agreementDto.cityId')}" styleClass="w-full"></p-select>
-            @if (isFieldInvalid('agreementDto.cityId')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('agreementDto.cityId') | translate }}</small>
-            }
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="col-12 md:col-6 mb-3">
-            <label for="agreementTypeId" class="block mb-2 font-medium">{{ 'wizard.step1.agreementType' | translate
-              }}*</label>
-            <p-select inputId="agreementTypeId" formControlName="agreementTypeId" [options]="agreementTypes()"
-              optionLabel="name" optionValue="id" [placeholder]="'wizard.step1.selectAgreementType' | translate"
-              [ngClass]="{'ng-invalid ng-dirty': isFieldInvalid('agreementDto.agreementTypeId')}"
-              styleClass="w-full"></p-select>
-            @if (isFieldInvalid('agreementDto.agreementTypeId')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('agreementDto.agreementTypeId') | translate
-              }}</small>
-            }
-          </div>
-
-          <div class="col-12 md:col-6 mb-3">
-            <label for="projectArea" class="block mb-2 font-medium">{{ 'wizard.step1.projectArea' | translate
-              }}*</label>
-            <p-inputNumber inputId="projectArea" formControlName="projectArea" [min]="0"
-              [ngClass]="{'ng-invalid ng-dirty': isFieldInvalid('agreementDto.projectArea')}" styleClass="w-full"
-              inputStyleClass="w-full"></p-inputNumber>
-            @if (isFieldInvalid('agreementDto.projectArea')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('agreementDto.projectArea') | translate }}</small>
-            }
+            <div class="field">
+              <p-floatlabel variant="in">
+                <p-datepicker inputId="estimatedEndDate" formControlName="estimatedEndDate" dateFormat="mm/dd/yy"
+                  [showIcon]="true" [minDate]="minEndDate()" (onSelect)="onEndDateChange($event)"
+                  [ngClass]="{'ng-invalid': isFieldInvalid('agreementDto.estimatedEndDate')}"
+                  styleClass="w-full"></p-datepicker>
+                <label for="estimatedEndDate">{{ 'wizard.step1.estimatedEndDate' | translate }} </label>
+              </p-floatlabel>
+              @if (isFieldInvalid('agreementDto.estimatedEndDate')) {
+              <small class="text-red-500 block mt-1">{{ getFieldError('agreementDto.estimatedEndDate') | translate
+                }}</small>
+              }
+            </div>
           </div>
         </div>
 
         <div class="grid">
           <div class="col-12 md:col-6 mb-3">
-            <label for="drillingQuantity" class="block mb-2 font-medium">{{ 'wizard.step1.drillingQuantity' | translate
-              }}*</label>
-            <p-inputNumber inputId="drillingQuantity" formControlName="drillingQuantity" [min]="0"
-              [ngClass]="{'ng-invalid ng-dirty': isFieldInvalid('agreementDto.drillingQuantity')}" styleClass="w-full"
-              inputStyleClass="w-full"></p-inputNumber>
-            @if (isFieldInvalid('agreementDto.drillingQuantity')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('agreementDto.drillingQuantity') | translate
-              }}</small>
-            }
+            <div class="field">
+              <p-floatlabel variant="in">
+                <p-select inputId="countryId" formControlName="countryId" [options]="countries()" optionLabel="name"
+                  optionValue="id" [placeholder]="'wizard.step1.selectCountry' | translate"
+                  [ngClass]="{'ng-invalid': isFieldInvalid('agreementDto.countryId')}"
+                  styleClass="w-full"></p-select>
+                <label for="countryId">{{ 'wizard.step1.country' | translate }} </label>
+              </p-floatlabel>
+            </div>
+          </div>
+
+          <div class="col-12 md:col-6 mb-3">
+            <div class="field">
+              <p-floatlabel variant="in">
+                <p-select inputId="cityId" formControlName="cityId" [options]="cities()" optionLabel="name" optionValue="id"
+                  [placeholder]="'wizard.step1.selectCity' | translate"
+                  [ngClass]="{'ng-invalid': isFieldInvalid('agreementDto.cityId')}" styleClass="w-full"></p-select>
+                <label for="cityId">{{ 'wizard.step1.city' | translate }} </label>
+              </p-floatlabel>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col-12 md:col-6 mb-3">
+            <div class="field">
+              <p-floatlabel variant="in">
+                <p-select inputId="agreementTypeId" formControlName="agreementTypeId" [options]="agreementTypes()"
+                  optionLabel="name" optionValue="id" [placeholder]="'wizard.step1.selectAgreementType' | translate"
+                  [ngClass]="{'ng-invalid': isFieldInvalid('agreementDto.agreementTypeId')}"
+                  styleClass="w-full"></p-select>
+                <label for="agreementTypeId">{{ 'wizard.step1.agreementType' | translate }} </label>
+              </p-floatlabel>
+            </div>
+          </div>
+
+          <div class="col-12 md:col-6 mb-3">
+            <div class="field">
+              <p-floatlabel variant="in">
+                <p-inputNumber inputId="projectArea" formControlName="projectArea" [min]="0" [showButtons]="false"
+                  [ngClass]="{'ng-invalid': isFieldInvalid('agreementDto.projectArea')}" styleClass="w-full"
+                  inputStyleClass="w-full"></p-inputNumber>
+                <label for="projectArea">{{ 'wizard.step1.projectArea' | translate }} </label>
+              </p-floatlabel>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col-12 md:col-6 mb-3">
+            <div class="field">
+              <p-floatlabel variant="in">
+                <p-inputNumber inputId="drillingQuantity" formControlName="drillingQuantity" [min]="0" [showButtons]="false"
+                  [ngClass]="{'ng-invalid': isFieldInvalid('agreementDto.drillingQuantity')}" styleClass="w-full"
+                  inputStyleClass="w-full"></p-inputNumber>
+                <label for="drillingQuantity">{{ 'wizard.step1.drillingQuantity' | translate }} </label>
+              </p-floatlabel>
+            </div>
           </div>
         </div>
       </div>
@@ -153,53 +161,45 @@
       <div formGroupName="clientDto">
         <div class="grid">
           <div class="col-12 md:col-6 mb-3">
-            <label for="contactPerson" class="block mb-2 font-medium">{{ 'wizard.step1.contactPerson' | translate
-              }}*</label>
-            <input pInputText id="contactPerson" formControlName="contactPerson"
-              [class.ng-invalid]="isFieldInvalid('clientDto.contactPerson')"
-              [class.ng-dirty]="isFieldInvalid('clientDto.contactPerson')" class="w-full" />
-            @if (isFieldInvalid('clientDto.contactPerson')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('clientDto.contactPerson') | translate }}</small>
-            }
+            <div class="field">
+              <p-floatlabel variant="in">
+                <input pInputText id="contactPerson" formControlName="contactPerson" class="w-full"
+                  [class.ng-invalid]="isFieldInvalid('clientDto.contactPerson')" />
+                <label for="contactPerson">{{ 'wizard.step1.contactPerson' | translate }} </label>
+              </p-floatlabel>
+            </div>
           </div>
 
           <div class="col-12 md:col-6 mb-3">
-            <label for="contactPersonNumber" class="block mb-2 font-medium">{{ 'wizard.step1.contactPersonNumber' |
-              translate
-              }}*</label>
-            <input pInputText id="contactPersonNumber" formControlName="contactPersonNumber"
-              [class.ng-invalid]="isFieldInvalid('clientDto.contactPersonNumber')"
-              [class.ng-dirty]="isFieldInvalid('clientDto.contactPersonNumber')" class="w-full" />
-            @if (isFieldInvalid('clientDto.contactPersonNumber')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('clientDto.contactPersonNumber') | translate
-              }}</small>
-            }
+            <div class="field">
+              <p-floatlabel variant="in">
+                <input pInputText id="contactPersonNumber" formControlName="contactPersonNumber" class="w-full"
+                  [class.ng-invalid]="isFieldInvalid('clientDto.contactPersonNumber')" />
+                <label for="contactPersonNumber">{{ 'wizard.step1.contactPersonNumber' | translate }} </label>
+              </p-floatlabel>
+            </div>
           </div>
         </div>
 
         <div class="grid">
           <div class="col-12 md:col-6 mb-3">
-            <label for="representerName" class="block mb-2 font-medium">{{ 'wizard.step1.representerName' | translate
-              }}*</label>
-            <input pInputText id="representerName" formControlName="representerName"
-              [class.ng-invalid]="isFieldInvalid('clientDto.representerName')"
-              [class.ng-dirty]="isFieldInvalid('clientDto.representerName')" class="w-full" />
-            @if (isFieldInvalid('clientDto.representerName')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('clientDto.representerName') | translate }}</small>
-            }
+            <div class="field">
+              <p-floatlabel variant="in">
+                <input pInputText id="representerName" formControlName="representerName" class="w-full"
+                  [class.ng-invalid]="isFieldInvalid('clientDto.representerName')" />
+                <label for="representerName">{{ 'wizard.step1.representerName' | translate }} </label>
+              </p-floatlabel>
+            </div>
           </div>
 
           <div class="col-12 md:col-6 mb-3">
-            <label for="representerNameNumber" class="block mb-2 font-medium">{{ 'wizard.step1.representerNameNumber' |
-              translate
-              }}*</label>
-            <input pInputText id="representerNameNumber" formControlName="representerNameNumber"
-              [class.ng-invalid]="isFieldInvalid('clientDto.representerNameNumber')"
-              [class.ng-dirty]="isFieldInvalid('clientDto.representerNameNumber')" class="w-full" />
-            @if (isFieldInvalid('clientDto.representerNameNumber')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('clientDto.representerNameNumber') | translate
-              }}</small>
-            }
+            <div class="field">
+              <p-floatlabel variant="in">
+                <input pInputText id="representerNameNumber" formControlName="representerNameNumber" class="w-full"
+                  [class.ng-invalid]="isFieldInvalid('clientDto.representerNameNumber')" />
+                <label for="representerNameNumber">{{ 'wizard.step1.representerNameNumber' | translate }} </label>
+              </p-floatlabel>
+            </div>
           </div>
         </div>
       </div>
@@ -212,75 +212,67 @@
       <div formGroupName="landInformationDto">
         <div class="grid">
           <div class="col-12 md:col-6 mb-3">
-            <label for="basinName" class="block mb-2 font-medium">{{ 'wizard.step1.basinName' | translate }}*</label>
-            <input pInputText id="basinName" formControlName="basinName"
-              [class.ng-invalid]="isFieldInvalid('landInformationDto.basinName')"
-              [class.ng-dirty]="isFieldInvalid('landInformationDto.basinName')" class="w-full" />
-            @if (isFieldInvalid('landInformationDto.basinName')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('landInformationDto.basinName') | translate
-              }}</small>
-            }
+            <div class="field">
+              <p-floatlabel variant="in">
+                <input pInputText id="basinName" formControlName="basinName" class="w-full"
+                  [class.ng-invalid]="isFieldInvalid('landInformationDto.basinName')" />
+                <label for="basinName">{{ 'wizard.step1.basinName' | translate }} </label>
+              </p-floatlabel>
+            </div>
           </div>
 
           <div class="col-12 md:col-6 mb-3">
-            <label for="village" class="block mb-2 font-medium">{{ 'wizard.step1.village' | translate }}*</label>
-            <input pInputText id="village" formControlName="village"
-              [class.ng-invalid]="isFieldInvalid('landInformationDto.village')"
-              [class.ng-dirty]="isFieldInvalid('landInformationDto.village')" class="w-full" />
-            @if (isFieldInvalid('landInformationDto.village')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('landInformationDto.village') | translate }}</small>
-            }
-          </div>
-        </div>
-
-        <div class="grid">
-          <div class="col-12 md:col-6 mb-3">
-            <label for="directorate" class="block mb-2 font-medium">{{ 'wizard.step1.directorate' | translate
-              }}*</label>
-            <input pInputText id="directorate" formControlName="directorate"
-              [class.ng-invalid]="isFieldInvalid('landInformationDto.directorate')"
-              [class.ng-dirty]="isFieldInvalid('landInformationDto.directorate')" class="w-full" />
-            @if (isFieldInvalid('landInformationDto.directorate')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('landInformationDto.directorate') | translate
-              }}</small>
-            }
-          </div>
-
-          <div class="col-12 md:col-6 mb-3">
-            <label for="plotNumber" class="block mb-2 font-medium">{{ 'wizard.step1.plotNumber' | translate }}*</label>
-            <input pInputText id="plotNumber" formControlName="plotNumber"
-              [class.ng-invalid]="isFieldInvalid('landInformationDto.plotNumber')"
-              [class.ng-dirty]="isFieldInvalid('landInformationDto.plotNumber')" class="w-full" />
-            @if (isFieldInvalid('landInformationDto.plotNumber')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('landInformationDto.plotNumber') | translate
-              }}</small>
-            }
+            <div class="field">
+              <p-floatlabel variant="in">
+                <input pInputText id="village" formControlName="village" class="w-full"
+                  [class.ng-invalid]="isFieldInvalid('landInformationDto.village')" />
+                <label for="village">{{ 'wizard.step1.village' | translate }} </label>
+              </p-floatlabel>
+            </div>
           </div>
         </div>
 
         <div class="grid">
           <div class="col-12 md:col-6 mb-3">
-            <label for="basinNumber" class="block mb-2 font-medium">{{ 'wizard.step1.basinNumber' | translate
-              }}*</label>
-            <input pInputText id="basinNumber" formControlName="basinNumber"
-              [class.ng-invalid]="isFieldInvalid('landInformationDto.basinNumber')"
-              [class.ng-dirty]="isFieldInvalid('landInformationDto.basinNumber')" class="w-full" />
-            @if (isFieldInvalid('landInformationDto.basinNumber')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('landInformationDto.basinNumber') | translate
-              }}</small>
-            }
+            <div class="field">
+              <p-floatlabel variant="in">
+                <input pInputText id="directorate" formControlName="directorate" class="w-full"
+                  [class.ng-invalid]="isFieldInvalid('landInformationDto.directorate')" />
+                <label for="directorate">{{ 'wizard.step1.directorate' | translate }} </label>
+              </p-floatlabel>
+            </div>
           </div>
 
           <div class="col-12 md:col-6 mb-3">
-            <label for="floorNumber" class="block mb-2 font-medium">{{ 'wizard.step1.floorNumber' | translate
-              }}*</label>
-            <input pInputText id="floorNumber" formControlName="floorNumber"
-              [class.ng-invalid]="isFieldInvalid('landInformationDto.floorNumber')"
-              [class.ng-dirty]="isFieldInvalid('landInformationDto.floorNumber')" class="w-full" />
-            @if (isFieldInvalid('landInformationDto.floorNumber')) {
-            <small class="text-red-500 block mt-1">{{ getFieldError('landInformationDto.floorNumber') | translate
-              }}</small>
-            }
+            <div class="field">
+              <p-floatlabel variant="in">
+                <input pInputText id="plotNumber" formControlName="plotNumber" class="w-full"
+                  [class.ng-invalid]="isFieldInvalid('landInformationDto.plotNumber')" />
+                <label for="plotNumber">{{ 'wizard.step1.plotNumber' | translate }} </label>
+              </p-floatlabel>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid">
+          <div class="col-12 md:col-6 mb-3">
+            <div class="field">
+              <p-floatlabel variant="in">
+                <input pInputText id="basinNumber" formControlName="basinNumber" class="w-full"
+                  [class.ng-invalid]="isFieldInvalid('landInformationDto.basinNumber')" />
+                <label for="basinNumber">{{ 'wizard.step1.basinNumber' | translate }} </label>
+              </p-floatlabel>
+            </div>
+          </div>
+
+          <div class="col-12 md:col-6 mb-3">
+            <div class="field">
+              <p-floatlabel variant="in">
+                <input pInputText id="floorNumber" formControlName="floorNumber" class="w-full"
+                  [class.ng-invalid]="isFieldInvalid('landInformationDto.floorNumber')" />
+                <label for="floorNumber">{{ 'wizard.step1.floorNumber' | translate }} </label>
+              </p-floatlabel>
+            </div>
           </div>
         </div>
       </div>

@@ -88,7 +88,16 @@
       "floorNumber": "Floor Number"
     },
     "step2": {
-      "title": "Step 2",
+      "title": "Contract & Payment Details",
+      "contractDetails": "Contract Information",
+      "paymentDetails": "Payment Information",
+      "services": "Services",
+      "contractType": "Contract Type",
+      "contractModel": "Type of Contracting",
+      "paymentMethod": "Payment Method",
+      "monthlyPayment": "Monthly Payment Value",
+      "monthlyPaymentHint": "Only activated when Monthly Fees payment method is selected",
+      "selectServices": "Select Services",
       "description": "This is step 2 - Content to be implemented",
       "placeholder": "Step 2 content will be added here",
       "validate": "Validate Step 2"

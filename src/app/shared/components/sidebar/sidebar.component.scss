@@ -43,7 +43,7 @@
   @media (max-width: 991px) {
     transform: translateX(-100%);
     width: 16rem;
-    
+
     &.mobile-open {
       transform: translateX(0);
     }
@@ -62,10 +62,21 @@
   border-bottom: 1px solid var(--surface-border);
 }
 
+.sidebar-logo {
+  height: 2rem;
+  width: auto;
+  object-fit: contain;
+}
+
+.sidebar-logo-collapsed {
+  height: 2rem;
+  width: 2rem;
+  object-fit: contain;
+}
+
 .sidebar-content {
   flex: 1;
-  overflow-y: auto;
-  padding: 1rem;
+  padding: 4px;
 
   &::-webkit-scrollbar {
     width: 4px;

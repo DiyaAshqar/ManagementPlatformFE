@@ -100,3 +100,42 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+// Form Validation Styles
+input.ng-invalid.ng-touched,
+input.ng-invalid.ng-dirty,
+textarea.ng-invalid.ng-touched,
+textarea.ng-invalid.ng-dirty {
+  border-color: #ef4444 !important;
+  border-width: 1px !important;
+}
+
+// PrimeNG Input Text with invalid state
+.p-inputtext.ng-invalid.ng-touched,
+.p-inputtext.ng-invalid.ng-dirty {
+  border-color: #ef4444 !important;
+}
+
+// PrimeNG InputNumber with invalid state
+p-inputnumber.ng-invalid.ng-touched,
+p-inputnumber.ng-invalid.ng-dirty {
+  .p-inputtext {
+    border-color: #ef4444 !important;
+  }
+}
+
+// PrimeNG Select (Dropdown) with invalid state
+p-select.ng-invalid.ng-touched,
+p-select.ng-invalid.ng-dirty {
+  .p-select {
+    border-color: #ef4444 !important;
+  }
+}
+
+// PrimeNG DatePicker with invalid state
+p-datepicker.ng-invalid.ng-touched,
+p-datepicker.ng-invalid.ng-dirty {
+  .p-datepicker-input {
+    border-color: #ef4444 !important;
+  }
+}
+

@@ -88,7 +88,16 @@
       "floorNumber": "رقم الطابق"
     },
     "step2": {
-      "title": "الخطوة 2",
+      "title": "تفاصيل العقد والدفع",
+      "contractDetails": "معلومات العقد",
+      "paymentDetails": "معلومات الدفع",
+      "services": "الخدمات",
+      "contractType": "نوع العقد",
+      "contractModel": "نوع التعاقد",
+      "paymentMethod": "طريقة الدفع",
+      "monthlyPayment": "قيمة الدفع الشهري",
+      "monthlyPaymentHint": "يتم تفعيله فقط عند اختيار طريقة الدفع الشهرية",
+      "selectServices": "اختر الخدمات",
       "description": "هذه هي الخطوة 2 - سيتم تنفيذ المحتوى",
       "placeholder": "سيتم إضافة محتوى الخطوة 2 هنا",
       "validate": "التحقق من الخطوة 2"

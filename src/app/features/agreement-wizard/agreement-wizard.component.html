@@ -54,7 +54,7 @@
                 [label]="'wizard.next' | translate" 
                 icon="pi pi-arrow-right" 
                 iconPos="right"
-                (onClick)="step2Component.validateStep(); step2Data() && activateCallback(3)"
+                (onClick)="step2Component.onSubmit(); step2Data() && activateCallback(3)"
               />
             </div>
           </div>
