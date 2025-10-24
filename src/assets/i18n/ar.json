@@ -33,5 +33,23 @@
     "email": "صيغة البريد الإلكتروني غير صحيحة",
     "minLength": "الحد الأدنى للطول هو {{value}}",
     "maxLength": "الحد الأقصى للطول هو {{value}}"
+  },
+  "dashboard": {
+    "title": "لوحة التحكم",
+    "multiSelectDemo": "عرض تجريبي متعدد الاختيار",
+    "selectItems": "اختر العناصر",
+    "selectItemsPlaceholder": "اختر العناصر",
+    "selected": "المحدد",
+    "itemsSelected": "عنصر محدد",
+    "none": "لا شيء",
+    "upcomingEvents": "الفعاليات القادمة",
+    "recentTransactions": "المعاملات الأخيرة",
+    "teamMeeting": "اجتماع الفريق",
+    "projectDeadline": "موعد تسليم المشروع",
+    "clientPresentation": "عرض تقديمي للعميل",
+    "salaryDeposit": "إيداع الراتب",
+    "rentPayment": "دفع الإيجار",
+    "groceries": "البقالة",
+    "freelanceIncome": "دخل العمل الحر"
   }
 }

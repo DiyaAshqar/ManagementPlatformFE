@@ -33,5 +33,23 @@
     "email": "Invalid email format",
     "minLength": "Minimum length is {{value}}",
     "maxLength": "Maximum length is {{value}}"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "multiSelectDemo": "MultiSelect Demo",
+    "selectItems": "Select Items",
+    "selectItemsPlaceholder": "Select items",
+    "selected": "Selected",
+    "itemsSelected": "item(s) selected",
+    "none": "None",
+    "upcomingEvents": "Upcoming Events",
+    "recentTransactions": "Recent Transactions",
+    "teamMeeting": "Team Meeting",
+    "projectDeadline": "Project Deadline",
+    "clientPresentation": "Client Presentation",
+    "salaryDeposit": "Salary Deposit",
+    "rentPayment": "Rent Payment",
+    "groceries": "Groceries",
+    "freelanceIncome": "Freelance Income"
   }
 }

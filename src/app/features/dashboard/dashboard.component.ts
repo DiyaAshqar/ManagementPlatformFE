@@ -7,8 +7,11 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { MultiSelectModule } from 'primeng/multiselect';
+import { TagModule } from 'primeng/tag';
+import { DividerModule } from 'primeng/divider';
 
-// Custom Components
+// Services
+import { LanguageService } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -19,12 +22,16 @@ import { MultiSelectModule } from 'primeng/multiselect';
     TranslateModule,
     CardModule,
     ButtonModule,
-    MultiSelectModule
+    MultiSelectModule,
+    TagModule,
+    DividerModule
   ],
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent {
+  
+  constructor(public languageService: LanguageService) {}
   // MultiSelect sample data
   selectedItems: any[] = [];
   items = [

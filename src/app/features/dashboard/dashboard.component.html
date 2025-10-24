@@ -1,25 +1,71 @@
 <div class="p-4">
-  <h1 class="text-3xl font-bold mb-4">Dashboard</h1>
+  <!-- Language Indicator -->
+  <div class="flex justify-content-between align-items-center mb-4">
+    <h1 class="text-3xl font-bold">{{ 'dashboard.title' | translate }}</h1>
+    <div class="flex align-items-center gap-2">
+      <span class="text-sm text-600">Current Language:</span>
+      <p-tag 
+        [value]="languageService.currentLanguage() === 'en' ? 'English' : 'العربية'" 
+        [severity]="languageService.currentLanguage() === 'en' ? 'info' : 'success'">
+      </p-tag>
+      <span class="text-xs text-500" *ngIf="languageService.isRTL()">
+        (RTL Mode)
+      </span>
+    </div>
+  </div>
   
   <!-- MultiSelect Demo Section -->
   <div class="mb-4">
-    <p-card header="MultiSelect Demo" styleClass="mb-4">
+    <p-card [header]="'dashboard.multiSelectDemo' | translate" styleClass="mb-4">
       <div class="flex flex-column gap-3">
-        <label for="multiselect" class="font-semibold">Select Items</label>
+        <label for="multiselect" class="font-semibold">{{ 'dashboard.selectItems' | translate }}</label>
         <p-multiSelect 
           id="multiselect"
           [options]="items" 
           [(ngModel)]="selectedItems" 
           optionLabel="name"
-          placeholder="Select items"
+          [placeholder]="'dashboard.selectItemsPlaceholder' | translate"
           [maxSelectedLabels]="3"
           styleClass="w-full md:w-20rem"
         />
         <div class="mt-2">
-          <strong>Selected:</strong> 
-          <span class="ml-2">{{ selectedItems.length > 0 ? selectedItems.length + ' item(s) selected' : 'None' }}</span>
+          <strong>{{ 'dashboard.selected' | translate }}:</strong> 
+          <span class="ml-2">{{ selectedItems.length > 0 ? selectedItems.length + ' ' + ('dashboard.itemsSelected' | translate) : ('dashboard.none' | translate) }}</span>
         </div>
       </div>
     </p-card>
   </div>
+
+  <!-- Translation Test Card -->
+  <p-card header="Translation Test" styleClass="mb-4">
+    <div class="flex flex-column gap-3">
+      <div class="grid">
+        <div class="col-12 md:col-6">
+          <h3 class="mb-2">Common Translations:</h3>
+          <ul class="list-none p-0">
+            <li class="mb-2"><strong>{{ 'common.save' | translate }}</strong></li>
+            <li class="mb-2"><strong>{{ 'common.cancel' | translate }}</strong></li>
+            <li class="mb-2"><strong>{{ 'common.edit' | translate }}</strong></li>
+            <li class="mb-2"><strong>{{ 'common.delete' | translate }}</strong></li>
+            <li class="mb-2"><strong>{{ 'common.add' | translate }}</strong></li>
+          </ul>
+        </div>
+        <div class="col-12 md:col-6">
+          <h3 class="mb-2">Auth Translations:</h3>
+          <ul class="list-none p-0">
+            <li class="mb-2"><strong>{{ 'auth.login' | translate }}</strong></li>
+            <li class="mb-2"><strong>{{ 'auth.register' | translate }}</strong></li>
+            <li class="mb-2"><strong>{{ 'auth.email' | translate }}</strong></li>
+            <li class="mb-2"><strong>{{ 'auth.password' | translate }}</strong></li>
+            <li class="mb-2"><strong>{{ 'auth.rememberMe' | translate }}</strong></li>
+          </ul>
+        </div>
+      </div>
+      <p-divider></p-divider>
+      <div class="text-center">
+        <p class="text-600 mb-2">Click the globe icon (🌐) in the top navigation to switch languages</p>
+        <p class="text-sm text-500">The page should switch between English and Arabic (with RTL support)</p>
+      </div>
+    </div>
+  </p-card>
 </div>
