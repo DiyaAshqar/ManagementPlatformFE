@@ -47,27 +47,20 @@ export class SidebarComponent implements OnInit {
       title: 'Overview',
       items: [
         { label: 'Dashboard', icon: 'pi pi-home', route: '/dashboard' },
-        { label: 'Analytics', icon: 'pi pi-chart-bar', route: '/analytics' },
         { label: 'Theme Showcase', icon: 'pi pi-palette', route: '/theme-showcase' },
-        { label: 'Organization', icon: 'pi pi-building', route: '/organization' },
-        { label: 'Projects', icon: 'pi pi-folder', route: '/projects' }
+        { label: 'Agreement Wizard', icon: 'pi pi-briefcase', route: '/agreement-wizard' },
       ]
     },
     {
       title: 'Finance',
       items: [
         { label: 'Transactions', icon: 'pi pi-wallet', route: '/transactions' },
-        { label: 'Invoices', icon: 'pi pi-file', route: '/invoices' },
-        { label: 'Payments', icon: 'pi pi-credit-card', route: '/payments' }
       ]
     },
     {
       title: 'Team',
       items: [
         { label: 'Members', icon: 'pi pi-users', route: '/members' },
-        { label: 'Permissions', icon: 'pi pi-shield', route: '/permissions' },
-        { label: 'Chat', icon: 'pi pi-comments', route: '/chat' },
-        { label: 'Meetings', icon: 'pi pi-video', route: '/meetings' }
       ]
     }
   ];

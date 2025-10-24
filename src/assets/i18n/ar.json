@@ -51,5 +51,77 @@
     "rentPayment": "دفع الإيجار",
     "groceries": "البقالة",
     "freelanceIncome": "دخل العمل الحر"
+  },
+  "wizard": {
+    "next": "التالي",
+    "back": "رجوع",
+    "submit": "إرسال",
+    "step1": {
+      "title": "تفاصيل الاتفاقية",
+      "agreementDetails": "معلومات الاتفاقية",
+      "clientInfo": "معلومات العميل",
+      "landInfo": "معلومات الأرض",
+      "projectNumber": "رقم المشروع",
+      "projectNumberHint": "سيتم إعادة تعيين الفهرس حسب السنة",
+      "createdAt": "تاريخ الإنشاء",
+      "projectName": "اسم المشروع",
+      "businessSector": "القطاع التجاري",
+      "estimatedStartDate": "تاريخ البدء المتوقع",
+      "estimatedEndDate": "تاريخ الانتهاء المتوقع",
+      "country": "الدولة",
+      "selectCountry": "اختر الدولة",
+      "city": "المدينة",
+      "selectCity": "اختر المدينة",
+      "agreementType": "نوع الاتفاقية",
+      "selectAgreementType": "اختر نوع الاتفاقية",
+      "projectArea": "مساحة المشروع",
+      "drillingQuantity": "كمية الحفر",
+      "contactPerson": "شخص الاتصال",
+      "contactPersonNumber": "رقم شخص الاتصال",
+      "representerName": "اسم الممثل",
+      "representerNameNumber": "رقم هاتف الممثل",
+      "basinName": "اسم الحوض",
+      "village": "القرية",
+      "directorate": "المديرية",
+      "plotNumber": "رقم القطعة",
+      "basinNumber": "رقم الحوض",
+      "floorNumber": "رقم الطابق"
+    },
+    "step2": {
+      "title": "الخطوة 2",
+      "description": "هذه هي الخطوة 2 - سيتم تنفيذ المحتوى",
+      "placeholder": "سيتم إضافة محتوى الخطوة 2 هنا",
+      "validate": "التحقق من الخطوة 2"
+    },
+    "step3": {
+      "title": "الخطوة 3",
+      "description": "هذه هي الخطوة 3 - سيتم تنفيذ المحتوى",
+      "placeholder": "سيتم إضافة محتوى الخطوة 3 هنا",
+      "validate": "التحقق من الخطوة 3"
+    },
+    "step4": {
+      "title": "الخطوة 4",
+      "description": "هذه هي الخطوة 4 - سيتم تنفيذ المحتوى",
+      "placeholder": "سيتم إضافة محتوى الخطوة 4 هنا",
+      "validate": "التحقق من الخطوة 4"
+    },
+    "step5": {
+      "title": "الخطوة 5",
+      "description": "هذه هي الخطوة 5 - سيتم تنفيذ المحتوى",
+      "placeholder": "سيتم إضافة محتوى الخطوة 5 هنا",
+      "validate": "التحقق من الخطوة 5"
+    },
+    "step6": {
+      "title": "الخطوة 6",
+      "description": "هذه هي الخطوة 6 - سيتم تنفيذ المحتوى",
+      "placeholder": "سيتم إضافة محتوى الخطوة 6 هنا",
+      "validate": "التحقق من الخطوة 6"
+    },
+    "step7": {
+      "title": "الخطوة 7 - المراجعة",
+      "description": "هذه هي الخطوة 7 - المراجعة النهائية والإرسال",
+      "placeholder": "سيتم إضافة محتوى الخطوة 7 هنا",
+      "validate": "التحقق والإكمال"
+    }
   }
 }

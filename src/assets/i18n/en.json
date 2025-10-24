@@ -51,5 +51,77 @@
     "rentPayment": "Rent Payment",
     "groceries": "Groceries",
     "freelanceIncome": "Freelance Income"
+  },
+  "wizard": {
+    "next": "Next",
+    "back": "Back",
+    "submit": "Submit",
+    "step1": {
+      "title": "Agreement Details",
+      "agreementDetails": "Agreement Information",
+      "clientInfo": "Client Information",
+      "landInfo": "Land Information",
+      "projectNumber": "Project Number",
+      "projectNumberHint": "The index will reset by year",
+      "createdAt": "Created At",
+      "projectName": "Project Name",
+      "businessSector": "Business Sector",
+      "estimatedStartDate": "Estimated Start Date",
+      "estimatedEndDate": "Estimated End Date",
+      "country": "Country",
+      "selectCountry": "Select Country",
+      "city": "City",
+      "selectCity": "Select City",
+      "agreementType": "Agreement Type",
+      "selectAgreementType": "Select Agreement Type",
+      "projectArea": "Project Area",
+      "drillingQuantity": "Excavation Quantity",
+      "contactPerson": "Contact Person",
+      "contactPersonNumber": "Contact Person Number",
+      "representerName": "Representative Name",
+      "representerNameNumber": "Representative Phone Number",
+      "basinName": "Basin Name",
+      "village": "Village",
+      "directorate": "Directorate",
+      "plotNumber": "Plot Number",
+      "basinNumber": "Basin Number",
+      "floorNumber": "Floor Number"
+    },
+    "step2": {
+      "title": "Step 2",
+      "description": "This is step 2 - Content to be implemented",
+      "placeholder": "Step 2 content will be added here",
+      "validate": "Validate Step 2"
+    },
+    "step3": {
+      "title": "Step 3",
+      "description": "This is step 3 - Content to be implemented",
+      "placeholder": "Step 3 content will be added here",
+      "validate": "Validate Step 3"
+    },
+    "step4": {
+      "title": "Step 4",
+      "description": "This is step 4 - Content to be implemented",
+      "placeholder": "Step 4 content will be added here",
+      "validate": "Validate Step 4"
+    },
+    "step5": {
+      "title": "Step 5",
+      "description": "This is step 5 - Content to be implemented",
+      "placeholder": "Step 5 content will be added here",
+      "validate": "Validate Step 5"
+    },
+    "step6": {
+      "title": "Step 6",
+      "description": "This is step 6 - Content to be implemented",
+      "placeholder": "Step 6 content will be added here",
+      "validate": "Validate Step 6"
+    },
+    "step7": {
+      "title": "Step 7 - Review",
+      "description": "This is step 7 - Final review and submission",
+      "placeholder": "Step 7 content will be added here",
+      "validate": "Validate & Complete"
+    }
   }
 }

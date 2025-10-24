@@ -49,6 +49,11 @@ export const routes: Routes = [
         path: 'theme-showcase',
         loadComponent: () => import('./features/theme-showcase/theme-showcase.component')
           .then(m => m.ThemeShowcaseComponent)
+      },
+      {
+        path: 'agreement-wizard',
+        loadComponent: () => import('./features/agreement-wizard/agreement-wizard.component')
+          .then(m => m.AgreementWizardComponent)
       }
     ]
   },

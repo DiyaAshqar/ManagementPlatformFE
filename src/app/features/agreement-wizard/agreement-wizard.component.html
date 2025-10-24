@@ -1,0 +1,210 @@
+<div class="card flex justify-center p-4">
+  <p-stepper [value]="currentStep()" class="w-full" [linear]="true">
+    <p-step-list>
+      @for (label of stepLabels; track $index) {
+        <p-step [value]="$index + 1">
+          {{ label | translate }}
+        </p-step>
+      }
+    </p-step-list>
+
+    <p-step-panels>
+      <!-- Step 1: Agreement Details -->
+      <p-step-panel [value]="1">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="gap-4">
+            <app-step1
+              #step1Component
+              [currentStep]="currentStep()"
+              [agreementId]="agreementId()"
+              (stepData)="onStep1Data($event)"
+            ></app-step1>
+            
+            <div class="flex pt-4 justify-end gap-2">
+              <p-button 
+                [label]="'wizard.next' | translate" 
+                icon="pi pi-arrow-right" 
+                iconPos="right"
+                (onClick)="step1Component.onSubmit(); step1Data() && activateCallback(2)"
+              />
+            </div>
+          </div>
+        </ng-template>
+      </p-step-panel>
+
+      <!-- Step 2: Placeholder -->
+      <p-step-panel [value]="2">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="gap-4">
+            <app-step2
+              #step2Component
+              [currentStep]="currentStep()"
+              [agreementId]="agreementId()"
+              (stepData)="onStep2Data($event)"
+            ></app-step2>
+            
+            <div class="flex pt-4 justify-between gap-2">
+              <p-button 
+                [label]="'wizard.back' | translate" 
+                severity="secondary" 
+                icon="pi pi-arrow-left"
+                (onClick)="activateCallback(1)"
+              />
+              <p-button 
+                [label]="'wizard.next' | translate" 
+                icon="pi pi-arrow-right" 
+                iconPos="right"
+                (onClick)="step2Component.validateStep(); step2Data() && activateCallback(3)"
+              />
+            </div>
+          </div>
+        </ng-template>
+      </p-step-panel>
+
+      <!-- Step 3: Placeholder -->
+      <p-step-panel [value]="3">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="gap-4">
+            <app-step3
+              #step3Component
+              [currentStep]="currentStep()"
+              [agreementId]="agreementId()"
+              (stepData)="onStep3Data($event)"
+            ></app-step3>
+            
+            <div class="flex pt-4 justify-between gap-2">
+              <p-button 
+                [label]="'wizard.back' | translate" 
+                severity="secondary" 
+                icon="pi pi-arrow-left"
+                (onClick)="activateCallback(2)"
+              />
+              <p-button 
+                [label]="'wizard.next' | translate" 
+                icon="pi pi-arrow-right" 
+                iconPos="right"
+                (onClick)="step3Component.validateStep(); step3Data() && activateCallback(4)"
+              />
+            </div>
+          </div>
+        </ng-template>
+      </p-step-panel>
+
+      <!-- Step 4: Placeholder -->
+      <p-step-panel [value]="4">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="gap-4">
+            <app-step4
+              #step4Component
+              [currentStep]="currentStep()"
+              [agreementId]="agreementId()"
+              (stepData)="onStep4Data($event)"
+            ></app-step4>
+            
+            <div class="flex pt-4 justify-between gap-2">
+              <p-button 
+                [label]="'wizard.back' | translate" 
+                severity="secondary" 
+                icon="pi pi-arrow-left"
+                (onClick)="activateCallback(3)"
+              />
+              <p-button 
+                [label]="'wizard.next' | translate" 
+                icon="pi pi-arrow-right" 
+                iconPos="right"
+                (onClick)="step4Component.validateStep(); step4Data() && activateCallback(5)"
+              />
+            </div>
+          </div>
+        </ng-template>
+      </p-step-panel>
+
+      <!-- Step 5: Placeholder -->
+      <p-step-panel [value]="5">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="gap-4">
+            <app-step5
+              #step5Component
+              [currentStep]="currentStep()"
+              [agreementId]="agreementId()"
+              (stepData)="onStep5Data($event)"
+            ></app-step5>
+            
+            <div class="flex pt-4 justify-between gap-2">
+              <p-button 
+                [label]="'wizard.back' | translate" 
+                severity="secondary" 
+                icon="pi pi-arrow-left"
+                (onClick)="activateCallback(4)"
+              />
+              <p-button 
+                [label]="'wizard.next' | translate" 
+                icon="pi pi-arrow-right" 
+                iconPos="right"
+                (onClick)="step5Component.validateStep(); step5Data() && activateCallback(6)"
+              />
+            </div>
+          </div>
+        </ng-template>
+      </p-step-panel>
+
+      <!-- Step 6: Placeholder -->
+      <p-step-panel [value]="6">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="gap-4">
+            <app-step6
+              #step6Component
+              [currentStep]="currentStep()"
+              [agreementId]="agreementId()"
+              (stepData)="onStep6Data($event)"
+            ></app-step6>
+            
+            <div class="flex pt-4 justify-between gap-2">
+              <p-button 
+                [label]="'wizard.back' | translate" 
+                severity="secondary" 
+                icon="pi pi-arrow-left"
+                (onClick)="activateCallback(5)"
+              />
+              <p-button 
+                [label]="'wizard.next' | translate" 
+                icon="pi pi-arrow-right" 
+                iconPos="right"
+                (onClick)="step6Component.validateStep(); step6Data() && activateCallback(7)"
+              />
+            </div>
+          </div>
+        </ng-template>
+      </p-step-panel>
+
+      <!-- Step 7: Final Step -->
+      <p-step-panel [value]="7">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="gap-4">
+            <app-step7
+              #step7Component
+              [currentStep]="currentStep()"
+              [agreementId]="agreementId()"
+              (stepData)="onStep7Data($event)"
+            ></app-step7>
+            
+            <div class="flex pt-4 justify-between gap-2">
+              <p-button 
+                [label]="'wizard.back' | translate" 
+                severity="secondary" 
+                icon="pi pi-arrow-left"
+                (onClick)="activateCallback(6)"
+              />
+              <p-button 
+                [label]="'wizard.submit' | translate" 
+                icon="pi pi-check" 
+                iconPos="right"
+                (onClick)="step7Component.validateStep(); step7Data() && submitWizard()"
+              />
+            </div>
+          </div>
+        </ng-template>
+      </p-step-panel>
+    </p-step-panels>
+  </p-stepper>
+</div>
