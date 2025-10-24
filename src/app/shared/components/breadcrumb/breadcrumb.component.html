@@ -1,0 +1,18 @@
+<nav class="breadcrumb" aria-label="Breadcrumb">
+  <ol class="breadcrumb-list">
+    <li *ngFor="let item of items; let last = last" class="breadcrumb-item">
+      <a 
+        *ngIf="item.url && !last" 
+        [routerLink]="item.url"
+        class="breadcrumb-link">
+        <i *ngIf="item.icon" [class]="'pi ' + item.icon"></i>
+        <span>{{ item.label }}</span>
+      </a>
+      <span *ngIf="!item.url || last" class="breadcrumb-current">
+        <i *ngIf="item.icon" [class]="'pi ' + item.icon"></i>
+        <span>{{ item.label }}</span>
+      </span>
+      <i *ngIf="!last" class="pi pi-angle-right breadcrumb-separator"></i>
+    </li>
+  </ol>
+</nav>

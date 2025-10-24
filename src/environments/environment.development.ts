@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://localhost:5000/api',
-  nSwagUrl: 'http://localhost:5000',
+  apiUrl: 'http://62.84.178.178:93/api',
+  nSwagUrl: 'http://62.84.178.178:93',
   appName: 'Construction',
   version: '1.0.0-dev',
   enableLogging: true,

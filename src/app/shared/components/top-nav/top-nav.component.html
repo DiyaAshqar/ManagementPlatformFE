@@ -1,0 +1,63 @@
+<nav class="top-nav">
+  <div class="top-nav-content">
+    <!-- Sidebar Toggle Buttons -->
+    <div class="sidebar-toggle-section">
+      <!-- Mobile Menu Toggle (< 992px) -->
+      <button pButton type="button" icon="pi pi-bars" class="p-button-text p-button-rounded mobile-toggle lg:hidden"
+        (click)="toggleMobileSidebar()" [attr.aria-label]="'TOGGLE_MENU' | translate">
+      </button>
+
+      <!-- Desktop Sidebar Toggle (>= 992px) -->
+      <button pButton type="button" icon="pi pi-bars"
+        class="p-button-text p-button-rounded desktop-toggle hidden lg:inline-flex" (click)="toggleSidebar()"
+        [attr.aria-label]="'TOGGLE_SIDEBAR' | translate"></button>
+
+    </div>
+
+    <!-- Breadcrumbs -->
+    <div class="breadcrumbs hidden sm:flex">
+      <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
+        <a *ngIf="crumb.url && !last" [href]="crumb.url" class="breadcrumb-item">
+          {{ crumb.label }}
+        </a>
+        <span *ngIf="!crumb.url || last" class="breadcrumb-item current">
+          {{ crumb.label }}
+        </span>
+        <i *ngIf="!last" class="pi pi-angle-right breadcrumb-separator">
+        </i>
+      </ng-container>
+    </div>
+
+    <!-- Actions -->
+    <div class="top-nav-actions">
+      <!-- Notifications -->
+      <div class="notification-wrapper">
+        <button pButton type="button" icon="pi pi-bell" class="p-button-text p-button-rounded"
+          (click)="showNotifications()" [attr.aria-label]="'NOTIFICATIONS' | translate">
+        </button>
+        <span *ngIf="notificationsCount > 0" class="notification-badge">
+          {{ notificationsCount }}
+        </span>
+      </div>
+
+      <!-- Theme Toggle -->
+      <button pButton type="button" [icon]="themeService.isDarkTheme() ? 'pi pi-sun' : 'pi pi-moon'"
+        class="p-button-text p-button-rounded" (click)="toggleTheme()" [attr.aria-label]="'TOGGLE_THEME' | translate">
+      </button>
+
+      <!-- Language Toggle -->
+      <button pButton type="button" icon="pi pi-globe" class="p-button-text p-button-rounded" (click)="toggleLanguage()"
+        [attr.aria-label]="'TOGGLE_LANGUAGE' | translate">
+      </button>
+
+      <!-- User Profile -->
+      <button pButton type="button" icon="pi pi-user" class="p-button-rounded p-button-text"
+        (click)="profileMenu.toggle($event)" [attr.aria-label]="'USER_MENU' | translate">
+      </button>
+
+      <!-- Profile Menu -->
+      <p-menu #profileMenu [model]="profileMenuItems" [popup]="true" styleClass="profile-menu">
+      </p-menu>
+    </div>
+  </div>
+</nav>

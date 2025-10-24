@@ -1,0 +1,59 @@
+<!-- Sidebar Navigation -->
+<nav 
+  class="sidebar" 
+  [class.mobile-open]="sidebarService.isMobileOpen()"
+  [class.collapsed]="!sidebarService.isOpen()">
+  
+  <!-- Logo Section -->
+  <div class="sidebar-header">
+    <div class="flex align-items-center gap-3" *ngIf="sidebarService.isOpen()">
+      <i class="pi pi-building text-4xl text-primary"></i>
+      <span class="text-xl font-semibold">Management</span>
+    </div>
+    <div class="flex align-items-center justify-content-center" *ngIf="!sidebarService.isOpen()">
+      <i class="pi pi-building text-3xl text-primary"></i>
+    </div>
+  </div>
+
+  <!-- Navigation Sections -->
+  <div class="sidebar-content">
+    <div class="nav-sections">
+      <div *ngFor="let section of navSections" class="nav-section">
+        <div class="section-title">{{ section.title }}</div>
+        <div class="nav-items">
+          <a 
+            *ngFor="let item of section.items"
+            class="nav-item"
+            [class.active]="isActiveRoute(item.route)"
+            (click)="navigateTo(item.route)"
+            [attr.aria-label]="item.label">
+            <i [class]="item.icon + ' nav-icon'"></i>
+            <span class="nav-label" *ngIf="sidebarService.isOpen()">{{ item.label }}</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Footer Navigation -->
+  <div class="sidebar-footer">
+    <div class="nav-items">
+      <a 
+        *ngFor="let item of footerItems"
+        class="nav-item"
+        [class.active]="isActiveRoute(item.route)"
+        (click)="navigateTo(item.route)"
+        [attr.aria-label]="item.label">
+        <i [class]="item.icon + ' nav-icon'"></i>
+        <span class="nav-label" *ngIf="sidebarService.isOpen()">{{ item.label }}</span>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<!-- Mobile Overlay -->
+<div 
+  *ngIf="sidebarService.isMobileOpen()"
+  class="sidebar-overlay lg:hidden"
+  (click)="closeMobileMenu()">
+</div>

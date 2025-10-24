@@ -1,1 +1,15 @@
-<router-outlet></router-outlet>
+<div class="main-layout" [class.sidebar-collapsed]="!sidebarService.isOpen()">
+  <!-- Sidebar -->
+  <app-sidebar></app-sidebar>
+
+  <!-- Main Content Area -->
+  <div class="main-content-wrapper">
+    <!-- Top Navigation -->
+    <app-top-nav></app-top-nav>
+
+    <!-- Page Content -->
+    <main class="page-content">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

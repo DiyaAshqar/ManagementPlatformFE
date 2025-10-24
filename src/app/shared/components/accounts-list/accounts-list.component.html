@@ -1,0 +1,82 @@
+<div class="accounts-card">
+  <!-- Total Balance Section -->
+  <div class="balance-section">
+    <p class="balance-label">Total Balance</p>
+    <h1 class="balance-amount">{{ totalBalance }}</h1>
+  </div>
+
+  <!-- Accounts List -->
+  <div class="accounts-section">
+    <div class="accounts-header">
+      <h2 class="accounts-title">Your Accounts</h2>
+    </div>
+
+    <div class="accounts-list">
+      <div 
+        *ngFor="let account of accounts"
+        class="account-item"
+        (click)="onAccountClick(account)">
+        
+        <div class="account-info">
+          <div 
+            class="account-icon-wrapper"
+            [ngClass]="getAccountIconClass(account.type)">
+            <i [class]="'pi ' + getAccountIcon(account.type) + ' account-icon'"></i>
+          </div>
+          
+          <div class="account-details">
+            <h3 class="account-title">{{ account.title }}</h3>
+            <p *ngIf="account.description" class="account-description">
+              {{ account.description }}
+            </p>
+          </div>
+        </div>
+
+        <div class="account-balance">
+          <span class="balance-text">{{ account.balance }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="actions-section">
+    <div class="actions-grid">
+      <button 
+        pButton 
+        type="button"
+        icon="pi pi-plus"
+        label="Add"
+        class="p-button-sm action-btn"
+        (click)="onAddAccount()">
+      </button>
+      
+      <button 
+        pButton 
+        type="button"
+        icon="pi pi-send"
+        label="Send"
+        class="p-button-sm action-btn"
+        (click)="onSendMoney()">
+      </button>
+      
+      <button 
+        pButton 
+        type="button"
+        icon="pi pi-arrow-down-left"
+        label="Top-up"
+        class="p-button-sm action-btn"
+        (click)="onTopUp()">
+      </button>
+      
+      <button 
+        pButton 
+        type="button"
+        icon="pi pi-arrow-right"
+        label="More"
+        class="p-button-sm action-btn"
+        (click)="onMore()">
+      </button>
+    </div>
+  </div>
+</div>

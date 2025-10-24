@@ -1,0 +1,25 @@
+<div class="p-4">
+  <h1 class="text-3xl font-bold mb-4">Dashboard</h1>
+  
+  <!-- MultiSelect Demo Section -->
+  <div class="mb-4">
+    <p-card header="MultiSelect Demo" styleClass="mb-4">
+      <div class="flex flex-column gap-3">
+        <label for="multiselect" class="font-semibold">Select Items</label>
+        <p-multiSelect 
+          id="multiselect"
+          [options]="items" 
+          [(ngModel)]="selectedItems" 
+          optionLabel="name"
+          placeholder="Select items"
+          [maxSelectedLabels]="3"
+          styleClass="w-full md:w-20rem"
+        />
+        <div class="mt-2">
+          <strong>Selected:</strong> 
+          <span class="ml-2">{{ selectedItems.length > 0 ? selectedItems.length + ' item(s) selected' : 'None' }}</span>
+        </div>
+      </div>
+    </p-card>
+  </div>
+</div>

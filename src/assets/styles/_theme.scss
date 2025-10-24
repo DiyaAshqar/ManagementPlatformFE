@@ -1,12 +1,48 @@
 // PrimeNG Theme Customization
-.p-component {
-  font-family: var(--font-family);
-  font-size: var(--font-size-base);
+
+// Light Theme Variables
+:root,
+.light-theme {
+  // Surface Colors
+  --surface-ground: #f8f9fa;
+  --surface-card: #ffffff;
+  --surface-border: #e5e7eb;
+  --surface-hover: #f3f4f6;
+  
+  // Text Colors
+  --text-color: #1f2937;
+  --text-color-secondary: #6b7280;
+  
+  // Primary Colors
+  --primary-color: #3b82f6;
+  --primary-color-text: #ffffff;
+  
+  // Additional Colors
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --info-color: #3b82f6;
 }
 
-.p-button {
-  border-radius: var(--border-radius);
-  transition: all var(--transition-duration);
+// Dark Theme Variables
+.dark-theme {
+  // Surface Colors
+  --surface-ground: #0f0f12;
+  --surface-card: #18181b;
+  --surface-border: #27272a;
+  --surface-hover: #27272a;
+  
+  // Text Colors
+  --text-color: #f9fafb;
+  --text-color-secondary: #9ca3af;
+  
+  // Primary Colors
+  --primary-color: #3b82f6;
+  --primary-color-text: #ffffff;
+  
+  // Additional Colors
+  --success-color: #10b981;
+  --warning-color: #f59e0b;
+  --danger-color: #ef4444;
+  --info-color: #3b82f6;
 }
-
-// Add more theme customizations as needed
