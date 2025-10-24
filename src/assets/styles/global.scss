@@ -1,4 +1,4 @@
-// Global Styles
+// Neuro Code Global Styles
 
 // Base Body Styles
 body {
@@ -6,9 +6,27 @@ body {
   padding: 0;
   background: var(--surface-ground);
   color: var(--text-color);
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-family: var(--font-family);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+// Arabic RTL Support
+[dir="rtl"] {
+  font-family: var(--font-family-ar);
+}
+
+// Gradient Text for Headers (Neuro Code style)
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-family);
+  font-weight: 700;
+  
+  &.gradient-text {
+    background: var(--primary-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }
 
 // Utility classes
@@ -80,10 +98,5 @@ body {
   &:hover {
     background: var(--text-color-secondary);
   }
-}
-
-// Dark theme transitions
-* {
-  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 

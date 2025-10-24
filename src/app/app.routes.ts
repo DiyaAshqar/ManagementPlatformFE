@@ -44,6 +44,11 @@ export const routes: Routes = [
         path: 'analytics',
         loadComponent: () => import('./features/analytics/analytics.component')
           .then(m => m.AnalyticsComponent)
+      },
+      {
+        path: 'theme-showcase',
+        loadComponent: () => import('./features/theme-showcase/theme-showcase.component')
+          .then(m => m.ThemeShowcaseComponent)
       }
     ]
   },

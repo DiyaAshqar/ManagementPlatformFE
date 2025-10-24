@@ -1,27 +1,30 @@
-// PrimeNG Theme Customization
+// Neuro Code Theme Customization
+// Brand: Where intelligence meets clarity
 
 // Light Theme Variables
 :root,
 .light-theme {
   // Surface Colors
-  --surface-ground: #f8f9fa;
+  --surface-ground: #F5F9FF;
   --surface-card: #ffffff;
   --surface-border: #e5e7eb;
   --surface-hover: #f3f4f6;
   
   // Text Colors
-  --text-color: #1f2937;
+  --text-color: #1A1A1A;
   --text-color-secondary: #6b7280;
   
-  // Primary Colors
-  --primary-color: #3b82f6;
+  // Primary Colors (Neuro Code Blue Gradient)
+  --primary-color: #0052CC;
+  --primary-color-hover: #0A84FF;
+  --primary-gradient: linear-gradient(90deg, #0052CC, #0A84FF);
   --primary-color-text: #ffffff;
   
   // Additional Colors
   --success-color: #10b981;
   --warning-color: #f59e0b;
   --danger-color: #ef4444;
-  --info-color: #3b82f6;
+  --info-color: #0052CC;
 }
 
 // Dark Theme Variables
@@ -36,13 +39,15 @@
   --text-color: #f9fafb;
   --text-color-secondary: #9ca3af;
   
-  // Primary Colors
-  --primary-color: #3b82f6;
+  // Primary Colors (Neuro Code Blue Gradient)
+  --primary-color: #0052CC;
+  --primary-color-hover: #0A84FF;
+  --primary-gradient: linear-gradient(90deg, #0052CC, #0A84FF);
   --primary-color-text: #ffffff;
   
   // Additional Colors
   --success-color: #10b981;
   --warning-color: #f59e0b;
   --danger-color: #ef4444;
-  --info-color: #3b82f6;
+  --info-color: #0052CC;
 }

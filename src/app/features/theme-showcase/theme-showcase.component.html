@@ -1,0 +1,238 @@
+<div class="theme-showcase">
+  <!-- Hero Section with Gradient -->
+  <div class="hero-section">
+    <h1 class="gradient-text">Neuro Code Theme Showcase</h1>
+    <p class="subtitle">Where intelligence meets clarity</p>
+  </div>
+
+  <!-- Color Palette Section -->
+  <section class="section">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <h2>🎨 Color Palette</h2>
+          <p>Primary, Secondary, and Accent Colors</p>
+        </div>
+      </ng-template>
+
+      <div class="color-grid">
+        <div *ngFor="let color of colors" class="color-card">
+          <div class="color-swatch" [style.background]="'var(' + color.var + ')'"></div>
+          <div class="color-info">
+            <h4>{{ color.name }}</h4>
+            <code>{{ color.var }}</code>
+          </div>
+        </div>
+      </div>
+
+      <!-- Gradient Demo -->
+      <p-divider></p-divider>
+      <div class="gradient-demo">
+        <h3>Primary Gradient</h3>
+        <div class="gradient-box"></div>
+        <code>background: var(--primary-gradient);</code>
+      </div>
+    </p-card>
+  </section>
+
+  <!-- Buttons Section -->
+  <section class="section">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <h2>🔘 Buttons</h2>
+          <p>All button variants using theme colors</p>
+        </div>
+      </ng-template>
+
+      <div class="button-showcase">
+        <div class="button-group">
+          <h4>Primary Buttons</h4>
+          <div class="buttons">
+            <p-button label="Primary" icon="pi pi-check"></p-button>
+            <p-button label="Primary Outlined" icon="pi pi-check" [outlined]="true"></p-button>
+            <p-button label="Primary Text" icon="pi pi-check" [text]="true"></p-button>
+          </div>
+        </div>
+
+        <p-divider></p-divider>
+
+        <div class="button-group">
+          <h4>Severity Buttons</h4>
+          <div class="buttons">
+            <p-button label="Success" icon="pi pi-check" severity="success"></p-button>
+            <p-button label="Warning" icon="pi pi-exclamation-triangle" severity="warn"></p-button>
+            <p-button label="Danger" icon="pi pi-times" severity="danger"></p-button>
+            <p-button label="Info" icon="pi pi-info-circle" severity="info"></p-button>
+          </div>
+        </div>
+
+        <p-divider></p-divider>
+
+        <div class="button-group">
+          <h4>Sizes</h4>
+          <div class="buttons align-center">
+            <p-button label="Small" size="small"></p-button>
+            <p-button label="Normal"></p-button>
+            <p-button label="Large" size="large"></p-button>
+          </div>
+        </div>
+      </div>
+    </p-card>
+  </section>
+
+  <!-- Tags & Chips Section -->
+  <section class="section">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <h2>🏷️ Tags & Chips</h2>
+          <p>Status indicators and labels</p>
+        </div>
+      </ng-template>
+
+      <div class="tags-showcase">
+        <div class="tag-group">
+          <h4>Tags</h4>
+          <div class="tags">
+            <p-tag value="Primary"></p-tag>
+            <p-tag value="Success" severity="success"></p-tag>
+            <p-tag value="Warning" severity="warning"></p-tag>
+            <p-tag value="Danger" severity="danger"></p-tag>
+            <p-tag value="Info" severity="info"></p-tag>
+          </div>
+        </div>
+
+        <p-divider></p-divider>
+
+        <div class="tag-group">
+          <h4>Chips</h4>
+          <div class="tags">
+            <p-chip label="Primary" styleClass="custom-chip"></p-chip>
+            <p-chip label="With Icon" icon="pi pi-star" styleClass="custom-chip"></p-chip>
+            <p-chip label="Removable" [removable]="true" styleClass="custom-chip"></p-chip>
+          </div>
+        </div>
+      </div>
+    </p-card>
+  </section>
+
+  <!-- Typography Section -->
+  <section class="section">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <h2>📝 Typography</h2>
+          <p>Inter font family with gradient effects</p>
+        </div>
+      </ng-template>
+
+      <div class="typography-showcase">
+        <h1>Heading 1 - Bold & Clear</h1>
+        <h2>Heading 2 - Modern Style</h2>
+        <h3>Heading 3 - Professional</h3>
+        <h4>Heading 4 - Clean Look</h4>
+        <p class="large-text">Large paragraph text for important messages and descriptions.</p>
+        <p>Regular paragraph text with good readability and proper spacing for content.</p>
+        <p class="small-text">Small text for footnotes, captions, and secondary information.</p>
+        
+        <p-divider></p-divider>
+        
+        <h3 class="gradient-text">Gradient Text Effect</h3>
+        <p>Add class <code>.gradient-text</code> to any heading for the Neuro Code signature look!</p>
+      </div>
+    </p-card>
+  </section>
+
+  <!-- Messages Section -->
+  <section class="section">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <h2>💬 Messages</h2>
+          <p>Feedback and notification styles</p>
+        </div>
+      </ng-template>
+
+      <div class="messages-showcase">
+        <p-message severity="success" text="Success message - Operation completed successfully!"></p-message>
+        <p-message severity="info" text="Info message - Here's some helpful information."></p-message>
+        <p-message severity="warn" text="Warning message - Please review this action."></p-message>
+        <p-message severity="error" text="Error message - Something went wrong."></p-message>
+      </div>
+    </p-card>
+  </section>
+
+  <!-- Surface Colors Section -->
+  <section class="section">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <h2>🎭 Surface & Text Colors</h2>
+          <p>Background and text color system</p>
+        </div>
+      </ng-template>
+
+      <div class="surfaces-showcase">
+        <div class="surface-group">
+          <h4>Surface Colors</h4>
+          <div class="surface-grid">
+            <div *ngFor="let surface of surfaces" class="surface-item">
+              <div class="surface-box" [style.background]="'var(' + surface.var + ')'"></div>
+              <div class="surface-label">
+                <span>{{ surface.name }}</span>
+                <code>{{ surface.var }}</code>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <p-divider></p-divider>
+
+        <div class="text-group">
+          <h4>Text Colors</h4>
+          <div class="text-samples">
+            <div *ngFor="let text of textColors" class="text-sample">
+              <p [style.color]="'var(' + text.var + ')'">{{ text.name }} - Sample Text</p>
+              <code>{{ text.var }}</code>
+            </div>
+          </div>
+        </div>
+      </div>
+    </p-card>
+  </section>
+
+  <!-- Forms Section -->
+  <section class="section">
+    <p-card>
+      <ng-template pTemplate="header">
+        <div class="card-header">
+          <h2>📋 Form Elements</h2>
+          <p>Input fields with theme styling</p>
+        </div>
+      </ng-template>
+
+      <div class="forms-showcase">
+        <div class="form-group">
+          <label for="username">Username</label>
+          <input pInputText id="username" placeholder="Enter username" />
+        </div>
+        
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input pInputText id="email" type="email" placeholder="Enter email" />
+        </div>
+        
+        <div class="form-group">
+          <label for="disabled">Disabled Input</label>
+          <input pInputText id="disabled" placeholder="Disabled field" [disabled]="true" />
+        </div>
+      </div>
+    </p-card>
+  </section>
+
+  <!-- Footer -->
+  <div class="footer">
+    <p>© 2025 <strong>Neuro Code</strong> - Where intelligence meets clarity</p>
+  </div>
+</div>
