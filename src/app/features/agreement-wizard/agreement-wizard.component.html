@@ -83,7 +83,7 @@
                 [label]="'wizard.next' | translate" 
                 icon="pi pi-arrow-right" 
                 iconPos="right"
-                (onClick)="step3Component.validateStep(); step3Data() && activateCallback(4)"
+                (onClick)="step3Component.onSubmit(); step3Data() && activateCallback(4)"
               />
             </div>
           </div>
@@ -112,14 +112,14 @@
                 [label]="'wizard.next' | translate" 
                 icon="pi pi-arrow-right" 
                 iconPos="right"
-                (onClick)="step4Component.validateStep(); step4Data() && activateCallback(5)"
+                (onClick)="step4Component.onSubmit(); step4Data() && activateCallback(5)"
               />
             </div>
           </div>
         </ng-template>
       </p-step-panel>
 
-      <!-- Step 5: Placeholder -->
+      <!-- Step 5: Supplier Services -->
       <p-step-panel [value]="5">
         <ng-template #content let-activateCallback="activateCallback">
           <div class="gap-4">
@@ -141,14 +141,14 @@
                 [label]="'wizard.next' | translate" 
                 icon="pi pi-arrow-right" 
                 iconPos="right"
-                (onClick)="step5Component.validateStep(); step5Data() && activateCallback(6)"
+                (onClick)="step5Component.onSubmit(); step5Data() && activateCallback(6)"
               />
             </div>
           </div>
         </ng-template>
       </p-step-panel>
 
-      <!-- Step 6: Placeholder -->
+      <!-- Step 6: Quantity Bill -->
       <p-step-panel [value]="6">
         <ng-template #content let-activateCallback="activateCallback">
           <div class="gap-4">
@@ -170,7 +170,7 @@
                 [label]="'wizard.next' | translate" 
                 icon="pi pi-arrow-right" 
                 iconPos="right"
-                (onClick)="step6Component.validateStep(); step6Data() && activateCallback(7)"
+                (onClick)="step6Component.onSubmit(); step6Data() && activateCallback(7)"
               />
             </div>
           </div>

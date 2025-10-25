@@ -1,0 +1,176 @@
+<div class="p-4">
+    @if (isLoading()) {
+    <div class="flex justify-center align-items-center p-6">
+        <p-progressSpinner></p-progressSpinner>
+    </div>
+    }
+
+    <!-- File Upload Section -->
+    <div class="col-12 mb-4">
+        <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step7.title' | translate }}</h3>
+        <p class="text-color-secondary mb-4">{{ 'wizard.step7.description' | translate }}</p>
+
+        <form [formGroup]="attachmentForm">
+            <div class="grid">
+                <!-- File Upload Field -->
+                <div class="col-12 md:col-6 mb-3">
+                    <div class="field">
+                        <label for="fileInput" class="block mb-2 font-semibold">{{ 'wizard.step7.file' | translate }} *</label>
+                        <div class="file-upload-wrapper">
+                            <input
+                                type="file"
+                                #fileInput
+                                id="fileInput"
+                                class="file-input-hidden"
+                                accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
+                                (change)="onFileChange($event)"
+                            />
+                            <button
+                                type="button"
+                                class="p-button p-button-outlined w-full"
+                                (click)="onFileInputClick()"
+                                pButton
+                            >
+                                <i class="pi pi-upload mr-2"></i>
+                                <span>{{ selectedFile() ? selectedFile()!.name : ('wizard.step7.chooseFile' | translate) }}</span>
+                            </button>
+                        </div>
+                        @if (selectedFile()) {
+                        <small class="block mt-2 text-color-secondary">
+                            <i class="pi pi-file mr-1"></i>
+                            {{ selectedFile()!.name }} ({{ getFileSize(selectedFile()) }})
+                        </small>
+                        }
+                        @if (isFieldInvalid('file')) {
+                        <small class="text-red-500 block mt-1">{{ getFieldError('file') }}</small>
+                        }
+
+                        <!-- Upload Progress -->
+                        @if (isUploading()) {
+                        <div class="mt-3 p-3 border-1 border-primary border-round bg-primary-50">
+                            <div class="flex align-items-center justify-between mb-2">
+                                <span class="font-semibold text-primary">{{ 'wizard.step7.uploading' | translate }}...</span>
+                                <span class="font-semibold text-primary">{{ uploadProgress() }}%</span>
+                            </div>
+                            <p-progressBar [value]="uploadProgress()" [showValue]="false"></p-progressBar>
+                        </div>
+                        }
+
+                        <!-- Upload Success -->
+                        @if (uploadSuccess()) {
+                        <div class="mt-3 p-3 border-1 border-green-500 border-round bg-green-50 flex align-items-center">
+                            <i class="pi pi-check-circle text-green-500 text-2xl mr-2"></i>
+                            <span class="text-green-700 font-semibold">{{ 'wizard.step7.uploadSuccess' | translate }}</span>
+                        </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Attachment Name Field -->
+                <div class="col-12 md:col-6 mb-3">
+                    <div class="field">
+                        <label for="attachmentName" class="block mb-2 font-semibold">{{ 'wizard.step7.attachmentName' | translate }} *</label>
+                        <input
+                            pInputText
+                            id="attachmentName"
+                            formControlName="attachmentName"
+                            class="w-full"
+                            [placeholder]="'wizard.step7.attachmentNamePlaceholder' | translate"
+                            [class.ng-invalid]="isFieldInvalid('attachmentName')"
+                        />
+                        @if (isFieldInvalid('attachmentName')) {
+                        <small class="text-red-500 block mt-1">{{ getFieldError('attachmentName') }}</small>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex justify-end gap-2">
+                <p-button
+                    [label]="'common.cancel' | translate"
+                    severity="secondary"
+                    icon="pi pi-times"
+                    (onClick)="clearForm()">
+                </p-button>
+                <p-button
+                    [label]="'common.add' | translate"
+                    icon="pi pi-plus"
+                    (onClick)="addAttachment()"
+                    [disabled]="attachmentForm.invalid || isUploading()">
+                </p-button>
+            </div>
+        </form>
+    </div>
+
+    <!-- Attachments List -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header border-b border-gray-200 pb-3 mb-3">
+                <h4 class="text-lg font-semibold">{{ 'wizard.step7.attachmentsList' | translate }}</h4>
+            </div>
+
+            @if (attachments().length > 0) {
+            <div class="attachments-grid">
+                @for (attachment of attachments(); track $index) {
+                <div class="attachment-card border-1 border-round p-3 mb-2 hover:surface-hover transition-duration-150">
+                    <div class="flex align-items-center justify-between">
+                        <!-- File Info -->
+                        <div class="flex align-items-center gap-3 flex-1">
+                            <div class="file-icon-wrapper bg-primary-100 text-primary border-round p-3">
+                                <i class="pi pi-file text-2xl"></i>
+                            </div>
+                            <div class="flex-1">
+                                <div class="font-semibold text-lg mb-1">{{ attachment.name }}</div>
+                                <div class="text-color-secondary text-sm">
+                                    <span class="file-type-badge bg-surface-100 px-2 py-1 border-round">{{ attachment.type }}</span>
+                                    @if (attachment.file) {
+                                    <span class="ml-2">{{ getFileSize(attachment.file) }}</span>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex gap-2">
+                            @if (isPdfFile(attachment)) {
+                            <button
+                                type="button"
+                                class="p-button-rounded p-button-text p-button-info"
+                                (click)="viewAttachment(attachment)"
+                                pButton
+                                icon="pi pi-eye"
+                                [pTooltip]="'wizard.step7.view' | translate">
+                            </button>
+                            }
+                            <button
+                                type="button"
+                                class="p-button-rounded p-button-text p-button-success"
+                                (click)="downloadAttachment(attachment)"
+                                pButton
+                                icon="pi pi-download"
+                                [pTooltip]="'wizard.step7.download' | translate">
+                            </button>
+                            <button
+                                type="button"
+                                class="p-button-rounded p-button-text p-button-danger"
+                                (click)="deleteAttachment($index)"
+                                pButton
+                                icon="pi pi-trash"
+                                [pTooltip]="'common.delete' | translate">
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                }
+            </div>
+            } @else {
+            <div class="text-center p-6">
+                <i class="pi pi-inbox text-6xl mb-3 block text-gray-400"></i>
+                <p class="text-gray-500 text-lg">{{ 'wizard.step7.noAttachments' | translate }}</p>
+                <p class="text-gray-400 text-sm mt-2">{{ 'wizard.step7.addFirstAttachment' | translate }}</p>
+            </div>
+            }
+        </div>
+    </div>
+</div>

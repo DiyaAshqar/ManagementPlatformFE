@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, OnDestroy, OnInit, output, signal } from '@angular/core';
+import { MessageService } from 'primeng/api';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
@@ -50,7 +51,7 @@ export class Step1Component implements OnInit, OnDestroy {
 
   private destroy$ = new Subject<void>();
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private messageService: MessageService) {}
 
   ngOnInit(): void {
     this.initializeForm();
@@ -121,6 +122,13 @@ export class Step1Component implements OnInit, OnDestroy {
   onSubmit(): void {
     if (this.step1Form.invalid) {
       this.step1Form.markAllAsTouched();
+      // show toast for validation errors
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Please fix validation errors before submitting.',
+        life: 5000
+      });
       return;
     }
 

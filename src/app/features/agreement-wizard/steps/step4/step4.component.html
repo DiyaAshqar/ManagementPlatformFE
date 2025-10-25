@@ -1,0 +1,173 @@
+<div class="p-4">
+    @if (isLoading()) {
+    <div class="flex justify-center align-items-center p-6">
+        <p-progressSpinner></p-progressSpinner>
+    </div>
+    }
+
+    <!-- Form Section -->
+    <div class="col-12 mb-4">
+        <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step4.title' | translate }}</h3>
+
+        <form [formGroup]="mainContractForm">
+            <div class="grid">
+                <!-- Main Contract Type -->
+                <div class="col-12 md:col-6 mb-3">
+                    <div class="field">
+                        <p-floatlabel variant="in">
+                            <p-select inputId="typeId" formControlName="typeId" [options]="mainContractTypes()"
+                                optionLabel="name" optionValue="id"
+                                [class]="isFieldInvalid('typeId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'"></p-select>
+                            <label for="typeId">{{ 'wizard.step4.contractType' | translate }}</label>
+                        </p-floatlabel>
+                        @if (isFieldInvalid('typeId')) {
+                        <small class="text-red-500 block mt-1">{{ getFieldError('typeId') }}</small>
+                        }
+                    </div>
+                </div>
+
+                <!-- Contractor -->
+                <div class="col-12 md:col-6 mb-3">
+                    <div class="field">
+                        <p-floatlabel variant="in">
+                            <p-select inputId="constructorId" formControlName="constructorId"
+                                [options]="constructors()" optionLabel="name" optionValue="id"
+                                [class]="isFieldInvalid('constructorId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'"></p-select>
+                            <label for="constructorId">{{ 'wizard.step4.contractor' | translate }}</label>
+                        </p-floatlabel>
+                        @if (isFieldInvalid('constructorId')) {
+                        <small class="text-red-500 block mt-1">{{ getFieldError('constructorId') }}</small>
+                        }
+                    </div>
+                </div>
+
+                <!-- Total Amount -->
+                <div class="col-12 md:col-6 mb-3">
+                    <div class="field">
+                        <p-floatlabel variant="in">
+                            <p-inputNumber inputId="total" formControlName="total" [min]="0.01" [showButtons]="false"
+                                mode="currency" currency="USD" locale="en-US"
+                                [ngClass]="{'ng-invalid': isFieldInvalid('total')}"
+                                inputStyleClass="w-full"></p-inputNumber>
+                            <label for="total">{{ 'wizard.step4.totalAmount' | translate }}</label>
+                        </p-floatlabel>
+                        @if (isFieldInvalid('total')) {
+                        <small class="text-red-500 block mt-1">{{ getFieldError('total') }}</small>
+                        }
+                    </div>
+                </div>
+
+                <!-- Start Date -->
+                <div class="col-12 md:col-6 mb-3">
+                    <div class="field">
+                        <p-floatlabel variant="in">
+                            <p-datepicker inputId="startDate" formControlName="startDate" [showIcon]="true"
+                                dateFormat="yy-mm-dd" [maxDate]="maxStartDate()"
+                                (onSelect)="onStartDateChange($event)"
+                                [ngClass]="{'ng-invalid': isFieldInvalid('startDate')}"
+                                styleClass="w-full"></p-datepicker>
+                            <label for="startDate">{{ 'wizard.step4.startDate' | translate }}</label>
+                        </p-floatlabel>
+                        @if (isFieldInvalid('startDate')) {
+                        <small class="text-red-500 block mt-1">{{ getFieldError('startDate') }}</small>
+                        }
+                    </div>
+                </div>
+
+                <!-- End Date -->
+                <div class="col-12 md:col-6 mb-3">
+                    <div class="field">
+                        <p-floatlabel variant="in">
+                            <p-datepicker inputId="endDate" formControlName="endDate" [showIcon]="true"
+                                dateFormat="yy-mm-dd" [minDate]="minEndDate()" (onSelect)="onEndDateChange($event)"
+                                [ngClass]="{'ng-invalid': isFieldInvalid('endDate')}"
+                                styleClass="w-full"></p-datepicker>
+                            <label for="endDate">{{ 'wizard.step4.endDate' | translate }}</label>
+                        </p-floatlabel>
+                        @if (isFieldInvalid('endDate')) {
+                        <small class="text-red-500 block mt-1">{{ getFieldError('endDate') }}</small>
+                        }
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="col-12 flex justify-end gap-2">
+                    <p-button [label]="'common.cancel' | translate" severity="secondary" icon="pi pi-times"
+                        (onClick)="clearForm()"></p-button>
+                    <p-button [label]="editingIndex() !== null ? ('common.edit' | translate) : ('common.add' | translate)"
+                        icon="pi pi-check" (onClick)="addContract()"
+                        [disabled]="mainContractForm.invalid"></p-button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <!-- Table Section -->
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header border-b border-gray-200 pb-3 mb-3">
+                <h4 class="text-lg font-semibold">{{ 'wizard.step4.contractsList' | translate }}</h4>
+            </div>
+
+            <!-- PrimeNG Table -->
+            <p-table 
+                [value]="mainContracts()" 
+                [paginator]="true" 
+                [rows]="5" 
+                [showCurrentPageReport]="true"
+                currentPageReportTemplate="{{ 'wizard.step4.showingContracts' | translate }}"
+                [rowsPerPageOptions]="[5, 10, 25, 50]"
+                [tableStyle]="{ 'min-width': '50rem' }"
+                styleClass="p-datatable-striped">
+                
+                <ng-template pTemplate="header">
+                    <tr>
+                        <th>{{ 'wizard.step4.contractType' | translate }}</th>
+                        <th>{{ 'wizard.step4.contractor' | translate }}</th>
+                        <th>{{ 'wizard.step4.totalAmount' | translate }}</th>
+                        <th>{{ 'wizard.step4.startDate' | translate }}</th>
+                        <th>{{ 'wizard.step4.endDate' | translate }}</th>
+                        <th class="text-center" style="width: 150px">{{ 'common.actions' | translate }}</th>
+                    </tr>
+                </ng-template>
+                
+                <ng-template pTemplate="body" let-contract let-rowIndex="rowIndex">
+                    <tr>
+                        <td>{{ getMainContractTypeName(contract.typeId) }}</td>
+                        <td>{{ getConstructorName(contract.constructorId) }}</td>
+                        <td>{{ contract.total | currency:'USD':'symbol':'1.2-2' }}</td>
+                        <td>{{ contract.startDate }}</td>
+                        <td>{{ contract.endDate }}</td>
+                        <td class="text-center">
+                            <button 
+                                type="button"
+                                class="p-button-rounded p-button-text p-button-info mr-2"
+                                (click)="editContract(rowIndex)"
+                                pButton
+                                icon="pi pi-pencil"
+                                [pTooltip]="'common.edit' | translate">
+                            </button>
+                            <button 
+                                type="button"
+                                class="p-button-rounded p-button-text p-button-danger"
+                                (click)="deleteContract(rowIndex)"
+                                pButton
+                                icon="pi pi-trash"
+                                [pTooltip]="'common.delete' | translate">
+                            </button>
+                        </td>
+                    </tr>
+                </ng-template>
+                
+                <ng-template pTemplate="emptymessage">
+                    <tr>
+                        <td colspan="6" class="text-center p-6">
+                            <i class="pi pi-inbox text-4xl mb-3 block text-gray-400"></i>
+                            <p class="text-gray-500">{{ 'wizard.step4.noContracts' | translate }}</p>
+                        </td>
+                    </tr>
+                </ng-template>
+            </p-table>
+        </div>
+    </div>
+</div>

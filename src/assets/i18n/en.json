@@ -18,6 +18,7 @@
     "delete": "Delete",
     "edit": "Edit",
     "add": "Add",
+    "update": "Update",
     "search": "Search",
     "actions": "Actions",
     "confirm": "Confirm",
@@ -103,34 +104,76 @@
       "validate": "Validate Step 2"
     },
     "step3": {
-      "title": "Step 3",
-      "description": "This is step 3 - Content to be implemented",
-      "placeholder": "Step 3 content will be added here",
-      "validate": "Validate Step 3"
+      "title": "Material & Quality Specifications",
+      "projectAreaUnits": "Project Area Units",
+      "annexName": "Floor/Annex Name",
+      "selectAnnex": "Select an annex",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "selectUnit": "Select a unit",
+      "cancel": "Cancel",
+      "add": "Add",
+      "update": "Update",
+      "entriesList": "Entries List",
+      "actions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete",
+      "noData": "No data to display. Add entries using the form above.",
+      "rowsPerPage": "Rows per page",
+      "showingEntries": "Showing {first} to {last} of {totalRecords} entries"
     },
     "step4": {
-      "title": "Step 4",
-      "description": "This is step 4 - Content to be implemented",
-      "placeholder": "Step 4 content will be added here",
-      "validate": "Validate Step 4"
+      "title": "Main Contracts",
+      "contractType": "Main Contract Type",
+      "contractor": "Contractor",
+      "totalAmount": "Total Amount",
+      "startDate": "Expected Start Date",
+      "endDate": "Expected End Date",
+      "contractsList": "Main Contracts List",
+      "noContracts": "No contracts added yet. Add your first main contract above.",
+      "showingContracts": "Showing {first} to {last} of {totalRecords} contracts"
     },
     "step5": {
-      "title": "Step 5",
-      "description": "This is step 5 - Content to be implemented",
-      "placeholder": "Step 5 content will be added here",
-      "validate": "Validate Step 5"
+      "title": "Supplier Services",
+      "material": "Material",
+      "selectMaterial": "Select a material",
+      "supplier": "Supplier",
+      "selectSupplier": "Select a supplier",
+      "representativeName": "Representative Name",
+      "enterRepresentativeName": "Enter representative name",
+      "entriesList": "Supplier Services List",
+      "noData": "No supplier services added yet. Add your first entry above.",
+      "showingEntries": "Showing {first} to {last} of {totalRecords} entries"
     },
     "step6": {
-      "title": "Step 6",
-      "description": "This is step 6 - Content to be implemented",
-      "placeholder": "Step 6 content will be added here",
-      "validate": "Validate Step 6"
+      "title": "Quantity Bill of Materials",
+      "material": "Material",
+      "selectMaterial": "Select a material",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "selectUnit": "Select a unit",
+      "milestone": "Milestone",
+      "selectMilestone": "Select a milestone",
+      "price": "Unit Price",
+      "total": "Total",
+      "entriesList": "Quantity Bill List",
+      "noData": "No quantity bills added yet. Add your first entry above.",
+      "showingEntries": "Showing {first} to {last} of {totalRecords} entries"
     },
     "step7": {
-      "title": "Step 7 - Review",
-      "description": "This is step 7 - Final review and submission",
-      "placeholder": "Step 7 content will be added here",
-      "validate": "Validate & Complete"
+      "title": "Attachments",
+      "description": "Upload and manage project attachments (documents, drawings, specifications)",
+      "file": "File",
+      "chooseFile": "Choose File",
+      "attachmentName": "Attachment Name",
+      "attachmentNamePlaceholder": "e.g., Site Plan, Construction Drawings",
+      "uploading": "Uploading",
+      "uploadSuccess": "File uploaded successfully!",
+      "attachmentsList": "Attachments List",
+      "noAttachments": "No attachments added yet",
+      "addFirstAttachment": "Add your first document using the form above",
+      "view": "View",
+      "download": "Download"
     }
   }
 }

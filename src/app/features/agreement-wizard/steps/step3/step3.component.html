@@ -1,0 +1,169 @@
+<div class="p-4">
+    <form [formGroup]="step3Form" (ngSubmit)="onSubmit()">
+        @if (isLoading()) {
+        <div class="flex justify-center align-items-center p-6">
+            <p-progressSpinner></p-progressSpinner>
+        </div>
+        }
+
+        <!-- Input Form Section -->
+        <div class="col-12 mb-4">
+            <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step3.projectAreaUnits' | translate }}</h3>
+
+            <div formGroupName="projectAreaUnitDto">
+                <div class="grid">
+                    <!-- Annex field -->
+                    <div class="col-12 md:col-4 mb-3">
+                        <div class="field">
+                            <p-floatlabel variant="in">
+                                <p-select 
+                                    inputId="annexId" 
+                                    formControlName="annexId"
+                                    [options]="annexes()" 
+                                    optionLabel="name" 
+                                    optionValue="id"
+                                    placeholder="{{ 'wizard.step3.selectAnnex' | translate }}"
+                                    [class]="isFieldInvalid('annexId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
+                                </p-select>
+                                <label for="annexId">{{ 'wizard.step3.annexName' | translate }}*</label>
+                            </p-floatlabel>
+                            @if (isFieldInvalid('annexId')) {
+                            <small class="text-red-500">{{ getFieldError('annexId') }}</small>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Amount field -->
+                    <div class="col-12 md:col-4 mb-3">
+                        <div class="field">
+                            <p-floatlabel variant="in">
+                                <p-inputNumber 
+                                    inputId="amount" 
+                                    formControlName="amount" 
+                                    [min]="0"
+                                    [showButtons]="true"
+                                    [ngClass]="{'ng-invalid': isFieldInvalid('amount')}"
+                                    inputStyleClass="w-full">
+                                </p-inputNumber>
+                                <label for="amount">{{ 'wizard.step3.quantity' | translate }}*</label>
+                            </p-floatlabel>
+                            @if (isFieldInvalid('amount')) {
+                            <small class="text-red-500">{{ getFieldError('amount') }}</small>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Unit field -->
+                    <div class="col-12 md:col-4 mb-3">
+                        <div class="field">
+                            <p-floatlabel variant="in">
+                                <p-select 
+                                    inputId="unitId" 
+                                    formControlName="unitId"
+                                    [options]="units()" 
+                                    optionLabel="name" 
+                                    optionValue="id"
+                                    placeholder="{{ 'wizard.step3.selectUnit' | translate }}"
+                                    [class]="isFieldInvalid('unitId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
+                                </p-select>
+                                <label for="unitId">{{ 'wizard.step3.unit' | translate }}*</label>
+                            </p-floatlabel>
+                            @if (isFieldInvalid('unitId')) {
+                            <small class="text-red-500">{{ getFieldError('unitId') }}</small>
+                            }
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action buttons -->
+                <div class="flex gap-2 justify-end mt-2">
+                    <button 
+                        type="button"
+                        class="p-button p-button-secondary"
+                        (click)="clearForm()"
+                        pButton
+                        [label]="'wizard.step3.cancel' | translate">
+                        <i class="pi pi-times mr-2"></i>
+                    </button>
+                    <button 
+                        type="button"
+                        class="p-button p-button-success"
+                        (click)="addEntry()"
+                        pButton
+                        [disabled]="step3Form.get('projectAreaUnitDto')?.invalid"
+                        [label]="editingIndex() !== null ? ('wizard.step3.update' | translate) : ('wizard.step3.add' | translate)">
+                        <i class="pi pi-check mr-2"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Data Table Section -->
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header border-b border-gray-200 pb-3 mb-3">
+                    <h4 class="text-lg font-semibold">{{ 'wizard.step3.entriesList' | translate }}</h4>
+                </div>
+
+                <!-- PrimeNG Table -->
+                <p-table 
+                    [value]="getActiveEntries()" 
+                    [paginator]="true" 
+                    [rows]="5" 
+                    [showCurrentPageReport]="true"
+                    currentPageReportTemplate="{{ 'wizard.step3.showingEntries' | translate }}"
+                    [rowsPerPageOptions]="[5, 10, 25, 50]"
+                    [tableStyle]="{ 'min-width': '50rem' }"
+                    styleClass="p-datatable-striped">
+                    
+                    <ng-template pTemplate="header">
+                        <tr>
+                            <th>{{ 'wizard.step3.annexName' | translate }}</th>
+                            <th>{{ 'wizard.step3.quantity' | translate }}</th>
+                            <th>{{ 'wizard.step3.unit' | translate }}</th>
+                            <th class="text-center" style="width: 150px">{{ 'wizard.step3.actions' | translate }}</th>
+                        </tr>
+                    </ng-template>
+                    
+                    <ng-template pTemplate="body" let-entry let-rowIndex="rowIndex">
+                        <tr>
+                            <td>{{ getAnnexName(entry.annexId) }}</td>
+                            <td>{{ entry.amount | number }}</td>
+                            <td>{{ getUnitName(entry.unitId) }}</td>
+                            <td class="text-center">
+                                <button 
+                                    type="button"
+                                    class="p-button-rounded p-button-text p-button-warning mr-2"
+                                    (click)="editEntry(rowIndex)"
+                                    pButton
+                                    icon="pi pi-pencil"
+                                    [pTooltip]="'wizard.step3.edit' | translate">
+                                </button>
+                                <button 
+                                    type="button"
+                                    class="p-button-rounded p-button-text p-button-danger"
+                                    (click)="deleteEntry(rowIndex)"
+                                    pButton
+                                    icon="pi pi-trash"
+                                    [pTooltip]="'wizard.step3.delete' | translate">
+                                </button>
+                            </td>
+                        </tr>
+                    </ng-template>
+                    
+                    <ng-template pTemplate="emptymessage">
+                        <tr>
+                            <td colspan="4" class="text-center p-6">
+                                <i class="pi pi-inbox text-4xl mb-3 block text-gray-400"></i>
+                                <p class="text-gray-500">{{ 'wizard.step3.noData' | translate }}</p>
+                            </td>
+                        </tr>
+                    </ng-template>
+                </p-table>
+            </div>
+        </div>
+
+        <!-- Hidden Submit Button (will be triggered by parent) -->
+        <button type="button" (click)="onSubmit()" style="display: none;"></button>
+    </form>
+</div>

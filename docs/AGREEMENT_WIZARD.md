@@ -28,15 +28,18 @@ features/agreement-wizard/
 ├── agreement-wizard.component.ts    # Main wizard container
 ├── agreement-wizard.component.html  # Stepper layout
 └── steps/
-    ├── step1/                       # Agreement Details (Implemented)
+    ├── step1/                       # Agreement Details (✅ Implemented)
     │   ├── step1.component.ts
     │   └── step1.component.html
-    ├── step2/                       # Placeholder (To be implemented)
-    │   └── step2.component.ts
-    ├── step3/                       # Placeholder (To be implemented)
-    │   └── step3.component.ts
-    ├── step4/                       # Placeholder (To be implemented)
-    │   └── step4.component.ts
+    ├── step2/                       # Contract & Payment (✅ Implemented)
+    │   ├── step2.component.ts
+    │   └── step2.component.html
+    ├── step3/                       # Material & Quality (✅ Implemented)
+    │   ├── step3.component.ts
+    │   └── step3.component.html
+    ├── step4/                       # Main Contracts (✅ Implemented)
+    │   ├── step4.component.ts
+    │   └── step4.component.html
     ├── step5/                       # Placeholder (To be implemented)
     │   └── step5.component.ts
     ├── step6/                       # Placeholder (To be implemented)
@@ -79,6 +82,92 @@ The first step collects comprehensive information about the agreement:
 - Date range validation (end date must be after start date)
 - Number format validation for phone numbers and IDs
 - Min/Max length validation
+
+## Step 2: Contract & Payment Details
+
+The second step handles contract configuration and payment setup:
+
+### 📜 Contract Information
+- Contract Type (Fixed Price, Time & Materials, Cost Plus)
+- Contract Model (Lump Sum, Unit Price, Percentage)
+
+### 💰 Payment Information
+- Payment Method (Monthly Fees, Milestone Based, Upon Completion)
+- Monthly Payment Amount (enabled only for Monthly Fees method)
+
+### 🔧 Services Selection
+- Multiple service selection with visual feedback
+- Services include: Engineering Design, Construction Management, Quality Control, Safety Management, Equipment Rental, Material Supply
+- Interactive service cards with click-to-select functionality
+
+### Validation
+- All contract and payment fields are required
+- Services array must not be empty
+- Monthly payment amount required only when Monthly Fees method is selected
+
+## Step 3: Material & Quality Specifications
+
+The third step collects material, equipment, and quality control information:
+
+### 🏗️ Material Specifications
+- Material Type (Concrete, Steel, Cement, Aggregates, Pipes)
+- Specifications (detailed description)
+- Estimated Quantity
+- Unit of Measure
+- Notes (optional)
+
+### 🚜 Equipment Details
+- Equipment Type (Excavator, Bulldozer, Crane, Mixer, Drilling Machine)
+- Equipment Description
+- Quantity
+- Rental Duration (in days)
+- Remarks (optional)
+
+### ✅ Quality Control
+- Quality Standard (ISO 9001, ASTM Standards, Local Building Code, etc.)
+- Inspection Frequency
+- Compliance Requirements
+- Testing Procedures
+
+### Validation
+- All material specification fields are required except notes
+- All equipment fields are required except remarks and rental duration
+- All quality control fields are required
+- Quantity validations (min values)
+- Max length validation for text areas
+
+## Step 4: Main Contracts
+
+The fourth step manages main contracts with contractors:
+
+### 📋 Main Contract Information
+- Main Contract Type (Fixed Price, Time & Materials, Cost Plus, Unit Price)
+- Contractor selection
+- Total Amount (with currency formatting)
+- Expected Start Date
+- Expected End Date (must be after start date)
+
+### 📊 Contract Management
+- Add multiple main contracts
+- Edit existing contracts
+- Delete contracts
+- Paginated table view (6 contracts per page)
+- Real-time validation
+
+### Features
+- Dynamic form with add/edit modes
+- Inline table editing
+- Date range validation
+- Currency input with proper formatting
+- Responsive pagination
+- Empty state when no contracts added
+
+### Validation
+- All contract fields are required
+- Total amount must be greater than 0
+- Start date and end date required
+- End date must be after start date
+- At least one main contract must be added before proceeding
 
 ## Usage
 

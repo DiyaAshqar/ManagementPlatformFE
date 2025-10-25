@@ -18,6 +18,7 @@
     "delete": "حذف",
     "edit": "تعديل",
     "add": "إضافة",
+    "update": "تحديث",
     "search": "بحث",
     "actions": "الإجراءات",
     "confirm": "تأكيد",
@@ -103,34 +104,76 @@
       "validate": "التحقق من الخطوة 2"
     },
     "step3": {
-      "title": "الخطوة 3",
-      "description": "هذه هي الخطوة 3 - سيتم تنفيذ المحتوى",
-      "placeholder": "سيتم إضافة محتوى الخطوة 3 هنا",
-      "validate": "التحقق من الخطوة 3"
+      "title": "مواصفات المواد والجودة",
+      "projectAreaUnits": "وحدات مساحة المشروع",
+      "annexName": "اسم الطابق / الملحق",
+      "selectAnnex": "اختر ملحقاً",
+      "quantity": "الكمية",
+      "unit": "الوحدة",
+      "selectUnit": "اختر وحدة",
+      "cancel": "إلغاء",
+      "add": "إضافة",
+      "update": "تحديث",
+      "entriesList": "قائمة الإدخالات",
+      "actions": "الإجراءات",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "noData": "لا توجد بيانات للعرض. أضف إدخالات باستخدام النموذج أعلاه.",
+      "rowsPerPage": "صفوف في الصفحة",
+      "showingEntries": "عرض {first} إلى {last} من {totalRecords} إدخالات"
     },
     "step4": {
-      "title": "الخطوة 4",
-      "description": "هذه هي الخطوة 4 - سيتم تنفيذ المحتوى",
-      "placeholder": "سيتم إضافة محتوى الخطوة 4 هنا",
-      "validate": "التحقق من الخطوة 4"
+      "title": "العقود الرئيسية",
+      "contractType": "نوع العقد الرئيسي",
+      "contractor": "المقاول",
+      "totalAmount": "المبلغ الإجمالي",
+      "startDate": "تاريخ البداية المتوقع",
+      "endDate": "تاريخ النهاية المتوقع",
+      "contractsList": "قائمة العقود الرئيسية",
+      "noContracts": "لم تتم إضافة أي عقود بعد. أضف أول عقد رئيسي أعلاه.",
+      "showingContracts": "عرض {first} إلى {last} من {totalRecords} عقود"
     },
     "step5": {
-      "title": "الخطوة 5",
-      "description": "هذه هي الخطوة 5 - سيتم تنفيذ المحتوى",
-      "placeholder": "سيتم إضافة محتوى الخطوة 5 هنا",
-      "validate": "التحقق من الخطوة 5"
+      "title": "خدمات الموردين",
+      "material": "المادة",
+      "selectMaterial": "اختر مادة",
+      "supplier": "المورد",
+      "selectSupplier": "اختر مورداً",
+      "representativeName": "اسم المندوب",
+      "enterRepresentativeName": "أدخل اسم المندوب",
+      "entriesList": "قائمة خدمات الموردين",
+      "noData": "لم تتم إضافة أي خدمات موردين بعد. أضف أول إدخال أعلاه.",
+      "showingEntries": "عرض {first} إلى {last} من {totalRecords} إدخالات"
     },
     "step6": {
-      "title": "الخطوة 6",
-      "description": "هذه هي الخطوة 6 - سيتم تنفيذ المحتوى",
-      "placeholder": "سيتم إضافة محتوى الخطوة 6 هنا",
-      "validate": "التحقق من الخطوة 6"
+      "title": "كشف الكميات",
+      "material": "المادة",
+      "selectMaterial": "اختر مادة",
+      "quantity": "الكمية",
+      "unit": "الوحدة",
+      "selectUnit": "اختر وحدة",
+      "milestone": "المرحلة",
+      "selectMilestone": "اختر مرحلة",
+      "price": "سعر الوحدة",
+      "total": "الإجمالي",
+      "entriesList": "قائمة كشف الكميات",
+      "noData": "لم تتم إضافة أي كشف كميات بعد. أضف أول إدخال أعلاه.",
+      "showingEntries": "عرض {first} إلى {last} من {totalRecords} إدخالات"
     },
     "step7": {
-      "title": "الخطوة 7 - المراجعة",
-      "description": "هذه هي الخطوة 7 - المراجعة النهائية والإرسال",
-      "placeholder": "سيتم إضافة محتوى الخطوة 7 هنا",
-      "validate": "التحقق والإكمال"
+      "title": "المرفقات",
+      "description": "تحميل وإدارة مرفقات المشروع (المستندات، الرسومات، المواصفات)",
+      "file": "الملف",
+      "chooseFile": "اختر ملف",
+      "attachmentName": "اسم المرفق",
+      "attachmentNamePlaceholder": "مثال: مخطط الموقع، الرسومات الإنشائية",
+      "uploading": "جاري الرفع",
+      "uploadSuccess": "تم رفع الملف بنجاح!",
+      "attachmentsList": "قائمة المرفقات",
+      "noAttachments": "لم تتم إضافة أي مرفقات بعد",
+      "addFirstAttachment": "أضف أول مستند باستخدام النموذج أعلاه",
+      "view": "عرض",
+      "download": "تحميل"
     }
   }
 }
