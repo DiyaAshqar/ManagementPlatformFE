@@ -52,8 +52,28 @@ export const routes: Routes = [
       },
       {
         path: 'agreement-wizard',
-        loadComponent: () => import('./features/agreement-wizard/components/agreement-wizard.component')
-          .then(m => m.AgreementWizardComponent)
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/agreement-wizard/pages/agreement-list/agreement-list.component')
+              .then(m => m.AgreementListComponent)
+          },
+          {
+            path: 'create',
+            loadComponent: () => import('./features/agreement-wizard/components/agreement-wizard.component')
+              .then(m => m.AgreementWizardComponent)
+          },
+          {
+            path: 'edit/:id',
+            loadComponent: () => import('./features/agreement-wizard/components/agreement-wizard.component')
+              .then(m => m.AgreementWizardComponent)
+          },
+          {
+            path: 'view/:id',
+            loadComponent: () => import('./features/agreement-wizard/components/agreement-wizard.component')
+              .then(m => m.AgreementWizardComponent)
+          }
+        ]
       }
     ]
   },

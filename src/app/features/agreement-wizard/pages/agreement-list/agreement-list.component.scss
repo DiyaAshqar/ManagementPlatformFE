@@ -1,0 +1,157 @@
+.agreement-list-container {
+  padding: 1.5rem;
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--surface-border);
+
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      i {
+        font-size: 2rem;
+        color: var(--primary-color);
+      }
+
+      h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: var(--text-color);
+      }
+
+      .subtitle {
+        margin: 0.25rem 0 0 0;
+        font-size: 0.875rem;
+        color: var(--text-color-secondary);
+      }
+    }
+  }
+
+  .table-container {
+    padding: 0;
+
+    ::ng-deep {
+      .p-datatable {
+        .p-datatable-thead > tr > th {
+          background: var(--surface-section);
+          color: var(--text-color);
+          font-weight: 600;
+          padding: 1rem;
+          border-bottom: 2px solid var(--surface-border);
+
+          input {
+            margin-top: 0.5rem;
+          }
+        }
+
+        .p-datatable-tbody > tr {
+          &:hover {
+            background: var(--surface-hover);
+          }
+
+          > td {
+            padding: 1rem;
+            border-bottom: 1px solid var(--surface-border);
+          }
+        }
+
+        .p-paginator {
+          padding: 1rem;
+          border-top: 1px solid var(--surface-border);
+          background: var(--surface-section);
+        }
+      }
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 0.25rem;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .empty-state {
+      padding: 3rem 1rem;
+      text-align: center;
+
+      i {
+        font-size: 4rem;
+        color: var(--text-color-secondary);
+        margin-bottom: 1rem;
+      }
+
+      p {
+        margin: 0.5rem 0;
+        color: var(--text-color-secondary);
+
+        &:first-of-type {
+          font-size: 1.25rem;
+          font-weight: 500;
+          color: var(--text-color);
+        }
+      }
+    }
+
+    .loading-state {
+      padding: 3rem 1rem;
+      text-align: center;
+
+      i {
+        font-size: 3rem;
+        color: var(--primary-color);
+        margin-bottom: 1rem;
+      }
+
+      p {
+        margin: 0;
+        color: var(--text-color-secondary);
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .agreement-list-container {
+    padding: 1rem;
+
+    .card-header {
+      flex-direction: column;
+      gap: 1rem;
+      align-items: flex-start;
+
+      .header-content {
+        h2 {
+          font-size: 1.25rem;
+        }
+      }
+
+      p-button {
+        width: 100%;
+      }
+    }
+
+    ::ng-deep {
+      .p-datatable {
+        font-size: 0.875rem;
+
+        .p-datatable-thead > tr > th,
+        .p-datatable-tbody > tr > td {
+          padding: 0.75rem 0.5rem;
+        }
+      }
+    }
+
+    .action-buttons {
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+  }
+}

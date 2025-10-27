@@ -29,6 +29,27 @@
     "error": "خطأ",
     "warning": "تحذير"
   },
+  "agreements": {
+    "title": "الاتفاقيات",
+    "subtitle": "إدارة جميع اتفاقيات المشاريع",
+    "addNew": "إضافة اتفاقية جديدة",
+    "addFirst": "إضافة أول اتفاقية",
+    "noData": "لم يتم العثور على اتفاقيات",
+    "loading": "جاري تحميل الاتفاقيات...",
+    "search": "بحث...",
+    "pagination": "عرض {first} إلى {last} من {totalRecords} اتفاقية",
+    "columns": {
+      "projectNumber": "رقم المشروع",
+      "projectName": "اسم المشروع",
+      "agreementDate": "تاريخ الاتفاقية",
+      "actions": "الإجراءات"
+    },
+    "actions": {
+      "view": "عرض الاتفاقية",
+      "edit": "تعديل الاتفاقية",
+      "delete": "حذف الاتفاقية"
+    }
+  },
   "validation": {
     "required": "هذا الحقل مطلوب",
     "email": "صيغة البريد الإلكتروني غير صحيحة",

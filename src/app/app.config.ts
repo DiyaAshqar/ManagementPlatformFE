@@ -12,15 +12,12 @@ import { providePrimeNG } from 'primeng/config';
 import { DialogService } from 'primeng/dynamicdialog';
 
 import { environment } from '../environments/environment';
-import { AgreementClient, AttachmentClient, LookupClient } from '../nswag/api-client';
+import { AgreementClient, AttachmentClient, LookupClient, API_BASE_URL } from '../nswag/api-client';
 import { routes } from './app.routes';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { ErrorInterceptor } from './core/interceptors/error.interceptor';
 import { LoadingInterceptor } from './core/interceptors/loading.interceptor';
 import { SuccessInterceptor } from './core/interceptors/success.interceptor';
-
-// API Base URL Token
-export const API_BASE_URL = 'API_BASE_URL';
 
 // Factory function for TranslateHttpLoader
 export function createTranslateLoader(http: HttpClient) {

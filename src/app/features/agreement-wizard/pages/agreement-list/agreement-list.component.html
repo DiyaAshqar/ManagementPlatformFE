@@ -1,0 +1,155 @@
+<div class="agreement-list-container">
+  <p-toast />
+  <p-confirmDialog />
+
+  <p-card>
+    <ng-template pTemplate="header">
+      <div class="card-header">
+        <div class="header-content">
+          <i class="pi pi-file-edit"></i>
+          <div>
+            <h2>{{ 'agreements.title' | translate }}</h2>
+            <p class="subtitle">{{ 'agreements.subtitle' | translate }}</p>
+          </div>
+        </div>
+        <p-button 
+          [label]="'agreements.addNew' | translate"
+          icon="pi pi-plus" 
+          severity="primary"
+          (onClick)="addNewAgreement()"
+        />
+      </div>
+    </ng-template>
+
+    <div class="table-container">
+      <p-table 
+        [value]="agreements()" 
+        [loading]="loading()"
+        [paginator]="true"
+        [rows]="rows"
+        [totalRecords]="totalRecords()"
+        [lazy]="true"
+        (onLazyLoad)="onPageChange($event)"
+        [first]="first"
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{{ 'agreements.pagination' | translate }}"
+        [rowsPerPageOptions]="[5, 10, 25, 50]"
+        [globalFilterFields]="['projectNumber', 'projectName']"
+        styleClass="p-datatable-gridlines"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        responsiveLayout="scroll"
+      >
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 5rem">#</th>
+            <th pSortableColumn="projectNumber">
+              {{ 'agreements.columns.projectNumber' | translate }}
+              <p-sortIcon field="projectNumber" />
+            </th>
+            <th pSortableColumn="projectName">
+              {{ 'agreements.columns.projectName' | translate }}
+              <p-sortIcon field="projectName" />
+            </th>
+            <th pSortableColumn="agreementDate">
+              {{ 'agreements.columns.agreementDate' | translate }}
+              <p-sortIcon field="agreementDate" />
+            </th>
+            <th style="width: 12rem">{{ 'agreements.columns.actions' | translate }}</th>
+          </tr>
+          <tr>
+            <th></th>
+            <th>
+              <input 
+                pInputText 
+                type="text" 
+                [placeholder]="'agreements.search' | translate"
+                class="w-full"
+              />
+            </th>
+            <th>
+              <input 
+                pInputText 
+                type="text" 
+                [placeholder]="'agreements.search' | translate"
+                class="w-full"
+              />
+            </th>
+            <th></th>
+            <th></th>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="body" let-agreement let-rowIndex="rowIndex">
+          <tr>
+            <td>{{ first + rowIndex + 1 }}</td>
+            <td>
+              <span class="font-semibold">{{ agreement.projectNumber || '-' }}</span>
+            </td>
+            <td>{{ agreement.projectName || '-' }}</td>
+            <td>{{ formatDate(agreement.agreementDate) }}</td>
+            <td>
+              <div class="action-buttons">
+                <p-button 
+                  icon="pi pi-eye" 
+                  [rounded]="true"
+                  [text]="true"
+                  severity="info"
+                  [pTooltip]="'agreements.actions.view' | translate"
+                  tooltipPosition="top"
+                  (onClick)="viewAgreement(agreement)"
+                />
+                <p-button 
+                  icon="pi pi-pencil" 
+                  [rounded]="true"
+                  [text]="true"
+                  severity="success"
+                  [pTooltip]="'agreements.actions.edit' | translate"
+                  tooltipPosition="top"
+                  (onClick)="editAgreement(agreement)"
+                />
+                <p-button 
+                  icon="pi pi-trash" 
+                  [rounded]="true"
+                  [text]="true"
+                  severity="danger"
+                  [pTooltip]="'agreements.actions.delete' | translate"
+                  tooltipPosition="top"
+                  (onClick)="deleteAgreement(agreement)"
+                />
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="5" class="text-center">
+              <div class="empty-state">
+                <i class="pi pi-inbox"></i>
+                <p>{{ 'agreements.noData' | translate }}</p>
+                <p-button 
+                  [label]="'agreements.addFirst' | translate"
+                  icon="pi pi-plus" 
+                  severity="primary"
+                  [text]="true"
+                  (onClick)="addNewAgreement()"
+                />
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+
+        <ng-template pTemplate="loadingbody">
+          <tr>
+            <td colspan="5">
+              <div class="loading-state">
+                <i class="pi pi-spin pi-spinner"></i>
+                <p>{{ 'agreements.loading' | translate }}</p>
+              </div>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </p-card>
+</div>

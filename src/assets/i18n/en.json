@@ -29,6 +29,27 @@
     "error": "Error",
     "warning": "Warning"
   },
+  "agreements": {
+    "title": "Agreements",
+    "subtitle": "Manage all project agreements",
+    "addNew": "Add New Agreement",
+    "addFirst": "Add First Agreement",
+    "noData": "No agreements found",
+    "loading": "Loading agreements...",
+    "search": "Search...",
+    "pagination": "Showing {first} to {last} of {totalRecords} agreements",
+    "columns": {
+      "projectNumber": "Project Number",
+      "projectName": "Project Name",
+      "agreementDate": "Agreement Date",
+      "actions": "Actions"
+    },
+    "actions": {
+      "view": "View Agreement",
+      "edit": "Edit Agreement",
+      "delete": "Delete Agreement"
+    }
+  },
   "validation": {
     "required": "This field is required",
     "email": "Invalid email format",
