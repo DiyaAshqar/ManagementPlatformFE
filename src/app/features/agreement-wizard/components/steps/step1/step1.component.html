@@ -15,7 +15,7 @@
           <div class="col-12 md:col-6 mb-3">
             <div class="field">
               <p-floatlabel variant="in">
-                <input  pInputText id="projectNumber" formControlName="projectNumber" readonly class="w-full" />
+                <input pInputText id="projectNumber" formControlName="projectNumber" readonly class="w-full" />
                 <label for="projectNumber">{{ 'wizard.step1.projectNumber' | translate }}</label>
               </p-floatlabel>
               <small class="text-color-secondary">{{ 'wizard.step1.projectNumberHint' | translate }}</small>
@@ -94,8 +94,9 @@
             <div class="field">
               <p-floatlabel variant="in">
                 <p-select inputId="countryId" formControlName="countryId" [options]="countries()" optionLabel="name"
-                  optionValue="id" [placeholder]="'wizard.step1.selectCountry' | translate"
-                  [ngClass]="{'ng-invalid': isFieldInvalid('agreementDto.countryId')}"
+                  optionValue="id" [showClear]="true"
+                  [class.ng-dirty]="isFieldInvalid('agreementDto.countryId')"
+                  [class.ng-invalid]="isFieldInvalid('agreementDto.countryId')"
                   styleClass="w-full"></p-select>
                 <label for="countryId">{{ 'wizard.step1.country' | translate }} </label>
               </p-floatlabel>
@@ -106,8 +107,9 @@
             <div class="field">
               <p-floatlabel variant="in">
                 <p-select inputId="cityId" formControlName="cityId" [options]="cities()" optionLabel="name" optionValue="id"
-                  [placeholder]="'wizard.step1.selectCity' | translate"
-                  [ngClass]="{'ng-invalid': isFieldInvalid('agreementDto.cityId')}" styleClass="w-full"></p-select>
+                  [showClear]="true"
+                  [class.ng-dirty]="isFieldInvalid('agreementDto.cityId')"
+                  [class.ng-invalid]="isFieldInvalid('agreementDto.cityId')" styleClass="w-full"></p-select>
                 <label for="cityId">{{ 'wizard.step1.city' | translate }} </label>
               </p-floatlabel>
             </div>
@@ -119,8 +121,9 @@
             <div class="field">
               <p-floatlabel variant="in">
                 <p-select inputId="agreementTypeId" formControlName="agreementTypeId" [options]="agreementTypes()"
-                  optionLabel="name" optionValue="id" [placeholder]="'wizard.step1.selectAgreementType' | translate"
-                  [ngClass]="{'ng-invalid': isFieldInvalid('agreementDto.agreementTypeId')}"
+                  optionLabel="name" optionValue="id" [showClear]="true"
+                  [class.ng-dirty]="isFieldInvalid('agreementDto.agreementTypeId')"
+                  [class.ng-invalid]="isFieldInvalid('agreementDto.agreementTypeId')"
                   styleClass="w-full"></p-select>
                 <label for="agreementTypeId">{{ 'wizard.step1.agreementType' | translate }} </label>
               </p-floatlabel>
@@ -278,7 +281,6 @@
       </div>
     </div>
 
-    <!-- Submit Button (will be triggered by parent) -->
-    <button type="button" (click)="onSubmit()" style="display: none;"></button>
+
   </form>
 </div>

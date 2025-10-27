@@ -80,6 +80,11 @@ export class AgreementWizardComponent {
     console.log('Step 1 data received:', data);
   }
 
+  onAgreementIdUpdate(newAgreementId: number) {
+    this.agreementId.set(newAgreementId);
+    console.log('Agreement ID updated to:', newAgreementId);
+  }
+
   onStep2Data(data: any) {
     this.step2Data.set(data);
     console.log('Step 2 data received:', data);

@@ -18,6 +18,7 @@
               [currentStep]="currentStep()"
               [agreementId]="agreementId()"
               (stepData)="onStep1Data($event)"
+              (agreementIdUpdate)="onAgreementIdUpdate($event)"
             ></app-step1>
             
             <div class="flex pt-4 justify-end gap-2">
@@ -25,6 +26,7 @@
                 [label]="'wizard.next' | translate" 
                 icon="pi pi-arrow-right" 
                 iconPos="right"
+                [disabled]="!step1Component.isFormValid()"
                 (onClick)="step1Component.onSubmit(); step1Data() && activateCallback(2)"
               />
             </div>
