@@ -1,24 +1,23 @@
-import { ApplicationConfig, provideZoneChangeDetection, importProvidersFrom } from '@angular/core';
-import { provideRouter } from '@angular/router';
-import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { DatePipe } from '@angular/common';
+import { HttpClient, provideHttpClient, withInterceptors } from '@angular/common/http';
+import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
-import { providePrimeNG } from 'primeng/config';
-import Aura from '@primeng/themes/aura';
-import { definePreset } from '@primeng/themes';
-import { ConfirmationService, MessageService } from 'primeng/api';
-import { DialogService } from 'primeng/dynamicdialog';
-import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
+import { provideRouter } from '@angular/router';
+import { TranslateLoader, TranslateModule } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
-import { HttpClient } from '@angular/common/http';
+import { definePreset } from '@primeng/themes';
+import Aura from '@primeng/themes/aura';
+import { ConfirmationService, MessageService } from 'primeng/api';
+import { providePrimeNG } from 'primeng/config';
+import { DialogService } from 'primeng/dynamicdialog';
 
+import { environment } from '../environments/environment';
+import { AgreementClient, AttachmentClient, LookupClient } from '../nswag/api-client';
 import { routes } from './app.routes';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
-import { LoadingInterceptor } from './core/interceptors/loading.interceptor';
 import { ErrorInterceptor } from './core/interceptors/error.interceptor';
+import { LoadingInterceptor } from './core/interceptors/loading.interceptor';
 import { SuccessInterceptor } from './core/interceptors/success.interceptor';
-import { environment } from '../environments/environment';
-import { Client } from '../nswag/api-client';
 
 // API Base URL Token
 export const API_BASE_URL = 'API_BASE_URL';
@@ -73,7 +72,9 @@ export const appConfig: ApplicationConfig = {
     MessageService,
     DialogService,
     DatePipe,
-    Client,
+    AgreementClient,
+    AttachmentClient,
+    LookupClient,
     {
       provide: API_BASE_URL, useValue: environment.nSwagUrl
     },

@@ -52,7 +52,7 @@ export const routes: Routes = [
       },
       {
         path: 'agreement-wizard',
-        loadComponent: () => import('./features/agreement-wizard/agreement-wizard.component')
+        loadComponent: () => import('./features/agreement-wizard/components/agreement-wizard.component')
           .then(m => m.AgreementWizardComponent)
       }
     ]
