@@ -15,7 +15,7 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 @Injectable()
-export class Client {
+export class AgreementClient {
     private http: HttpClient;
     private baseUrl: string;
     protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
@@ -29,7 +29,7 @@ export class Client {
      * @param body (optional) 
      * @return OK
      */
-    agreementPOST(body: FullAgreementDto | undefined): Observable<void> {
+    createAgreement(body: FullAgreementDto | undefined): Observable<Int32Response> {
         let url_ = this.baseUrl + "/api/Agreement";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -41,24 +41,25 @@ export class Client {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAgreementPOST(response_);
+            return this.processCreateAgreement(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAgreementPOST(response_ as any);
+                    return this.processCreateAgreement(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<Int32Response>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<Int32Response>;
         }));
     }
 
-    protected processAgreementPOST(response: HttpResponseBase): Observable<void> {
+    protected processCreateAgreement(response: HttpResponseBase): Observable<Int32Response> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -67,7 +68,10 @@ export class Client {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Int32Response.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -82,7 +86,7 @@ export class Client {
      * @param pageSize (optional) 
      * @return OK
      */
-    agreementGET(pageNumber: number | undefined, pageSize: number | undefined): Observable<void> {
+    getAllAgreements(pageNumber: number | undefined, pageSize: number | undefined): Observable<GetAllAgreementDtoListPagedResponseResponse> {
         let url_ = this.baseUrl + "/api/Agreement?";
         if (pageNumber === null)
             throw new globalThis.Error("The parameter 'pageNumber' cannot be null.");
@@ -98,24 +102,25 @@ export class Client {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAgreementGET(response_);
+            return this.processGetAllAgreements(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAgreementGET(response_ as any);
+                    return this.processGetAllAgreements(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<GetAllAgreementDtoListPagedResponseResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<GetAllAgreementDtoListPagedResponseResponse>;
         }));
     }
 
-    protected processAgreementGET(response: HttpResponseBase): Observable<void> {
+    protected processGetAllAgreements(response: HttpResponseBase): Observable<GetAllAgreementDtoListPagedResponseResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -124,7 +129,10 @@ export class Client {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAllAgreementDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -138,7 +146,7 @@ export class Client {
      * @param step (optional) 
      * @return OK
      */
-    agreementGET2(id: number, step: number | undefined): Observable<void> {
+    getAgreementById(id: number, step: number | undefined): Observable<FullAgreementDtoResponse> {
         let url_ = this.baseUrl + "/api/Agreement/{id}?";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -153,24 +161,25 @@ export class Client {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAgreementGET2(response_);
+            return this.processGetAgreementById(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAgreementGET2(response_ as any);
+                    return this.processGetAgreementById(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<FullAgreementDtoResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<FullAgreementDtoResponse>;
         }));
     }
 
-    protected processAgreementGET2(response: HttpResponseBase): Observable<void> {
+    protected processGetAgreementById(response: HttpResponseBase): Observable<FullAgreementDtoResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -179,7 +188,76 @@ export class Client {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = FullAgreementDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class AttachmentClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @return OK
+     */
+    getAttachmentById(id: number): Observable<GetAttachmentMetaDataResponse> {
+        let url_ = this.baseUrl + "/api/Attachment/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAttachmentById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAttachmentById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetAttachmentMetaDataResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetAttachmentMetaDataResponse>;
+        }));
+    }
+
+    protected processGetAttachmentById(response: HttpResponseBase): Observable<GetAttachmentMetaDataResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAttachmentMetaDataResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -192,7 +270,7 @@ export class Client {
     /**
      * @return OK
      */
-    attachmentGET(id: number): Observable<void> {
+    deleteAttachment(id: number): Observable<BooleanResponse> {
         let url_ = this.baseUrl + "/api/Attachment/{id}";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -203,74 +281,25 @@ export class Client {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
-            })
-        };
-
-        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAttachmentGET(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processAttachmentGET(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<void>;
-        }));
-    }
-
-    protected processAttachmentGET(response: HttpResponseBase): Observable<void> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    attachmentDELETE(id: number): Observable<void> {
-        let url_ = this.baseUrl + "/api/Attachment/{id}";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
         return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAttachmentDELETE(response_);
+            return this.processDeleteAttachment(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAttachmentDELETE(response_ as any);
+                    return this.processDeleteAttachment(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
         }));
     }
 
-    protected processAttachmentDELETE(response: HttpResponseBase): Observable<void> {
+    protected processDeleteAttachment(response: HttpResponseBase): Observable<BooleanResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -279,7 +308,10 @@ export class Client {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -292,7 +324,7 @@ export class Client {
     /**
      * @return OK
      */
-    agreement(agreementId: number): Observable<void> {
+    getAttachmentsByAgreementId(agreementId: number): Observable<GetAttachmentMetaDataListResponse> {
         let url_ = this.baseUrl + "/api/Attachment/agreement/{agreementId}";
         if (agreementId === undefined || agreementId === null)
             throw new globalThis.Error("The parameter 'agreementId' must be defined.");
@@ -303,24 +335,25 @@ export class Client {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
+                "Accept": "application/json"
             })
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processAgreement(response_);
+            return this.processGetAttachmentsByAgreementId(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processAgreement(response_ as any);
+                    return this.processGetAttachmentsByAgreementId(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<GetAttachmentMetaDataListResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<GetAttachmentMetaDataListResponse>;
         }));
     }
 
-    protected processAgreement(response: HttpResponseBase): Observable<void> {
+    protected processGetAttachmentsByAgreementId(response: HttpResponseBase): Observable<GetAttachmentMetaDataListResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -329,7 +362,10 @@ export class Client {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetAttachmentMetaDataListResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -342,7 +378,7 @@ export class Client {
     /**
      * @return OK
      */
-    download(id: number): Observable<void> {
+    downloadAttachment(id: number): Observable<void> {
         let url_ = this.baseUrl + "/api/Attachment/{id}/download";
         if (id === undefined || id === null)
             throw new globalThis.Error("The parameter 'id' must be defined.");
@@ -357,11 +393,11 @@ export class Client {
         };
 
         return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processDownload(response_);
+            return this.processDownloadAttachment(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processDownload(response_ as any);
+                    return this.processDownloadAttachment(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<void>;
                 }
@@ -370,7 +406,7 @@ export class Client {
         }));
     }
 
-    protected processDownload(response: HttpResponseBase): Observable<void> {
+    protected processDownloadAttachment(response: HttpResponseBase): Observable<void> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -388,12 +424,24 @@ export class Client {
         }
         return _observableOf(null as any);
     }
+}
+
+@Injectable()
+export class LookupClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
 
     /**
      * @param body (optional) 
      * @return OK
      */
-    lookup(body: string[] | undefined): Observable<void> {
+    getAllLookups(body: string[] | undefined): Observable<StringLookupDtoListDictionaryResponse> {
         let url_ = this.baseUrl + "/api/Lookup";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -405,24 +453,25 @@ export class Client {
             responseType: "blob",
             headers: new HttpHeaders({
                 "Content-Type": "application/json",
+                "Accept": "application/json"
             })
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processLookup(response_);
+            return this.processGetAllLookups(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processLookup(response_ as any);
+                    return this.processGetAllLookups(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<void>;
+                    return _observableThrow(e) as any as Observable<StringLookupDtoListDictionaryResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<void>;
+                return _observableThrow(response_) as any as Observable<StringLookupDtoListDictionaryResponse>;
         }));
     }
 
-    protected processLookup(response: HttpResponseBase): Observable<void> {
+    protected processGetAllLookups(response: HttpResponseBase): Observable<StringLookupDtoListDictionaryResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -431,7 +480,10 @@ export class Client {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return _observableOf(null as any);
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = StringLookupDtoListDictionaryResponse.fromJS(resultData200);
+            return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -688,6 +740,62 @@ export interface IAttachmentDto {
     base64Data?: string | undefined;
     contentType?: string | undefined;
     isDeleted?: boolean;
+}
+
+export class BooleanResponse implements IBooleanResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: boolean;
+
+    constructor(data?: IBooleanResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"];
+        }
+    }
+
+    static fromJS(data: any): BooleanResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new BooleanResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data;
+        return data;
+    }
+}
+
+export interface IBooleanResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: boolean;
 }
 
 export class ClientDto implements IClientDto {
@@ -1010,6 +1118,478 @@ export interface IFullAgreementDto {
     seventhStepDto?: SeventhStepDto;
 }
 
+export class FullAgreementDtoResponse implements IFullAgreementDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: FullAgreementDto;
+
+    constructor(data?: IFullAgreementDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? FullAgreementDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): FullAgreementDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new FullAgreementDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IFullAgreementDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: FullAgreementDto;
+}
+
+export class GetAllAgreementDto implements IGetAllAgreementDto {
+    id?: number;
+    projectNumber?: string | undefined;
+    projectName?: string | undefined;
+    agreementDate?: Date;
+
+    constructor(data?: IGetAllAgreementDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectNumber = _data["projectNumber"];
+            this.projectName = _data["projectName"];
+            this.agreementDate = _data["agreementDate"] ? new Date(_data["agreementDate"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetAllAgreementDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAllAgreementDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectNumber"] = this.projectNumber;
+        data["projectName"] = this.projectName;
+        data["agreementDate"] = this.agreementDate ? formatDate(this.agreementDate) : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetAllAgreementDto {
+    id?: number;
+    projectNumber?: string | undefined;
+    projectName?: string | undefined;
+    agreementDate?: Date;
+}
+
+export class GetAllAgreementDtoListPagedResponse implements IGetAllAgreementDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetAllAgreementDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IGetAllAgreementDtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetAllAgreementDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): GetAllAgreementDtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAllAgreementDtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IGetAllAgreementDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetAllAgreementDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class GetAllAgreementDtoListPagedResponseResponse implements IGetAllAgreementDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetAllAgreementDtoListPagedResponse;
+
+    constructor(data?: IGetAllAgreementDtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetAllAgreementDtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetAllAgreementDtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAllAgreementDtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetAllAgreementDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetAllAgreementDtoListPagedResponse;
+}
+
+export class GetAttachmentMetaData implements IGetAttachmentMetaData {
+    id?: number;
+    fileName!: string | undefined;
+    filePath!: string | undefined;
+    agreementId?: number;
+
+    constructor(data?: IGetAttachmentMetaData) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.fileName = _data["fileName"];
+            this.filePath = _data["filePath"];
+            this.agreementId = _data["agreementId"];
+        }
+    }
+
+    static fromJS(data: any): GetAttachmentMetaData {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAttachmentMetaData();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["fileName"] = this.fileName;
+        data["filePath"] = this.filePath;
+        data["agreementId"] = this.agreementId;
+        return data;
+    }
+}
+
+export interface IGetAttachmentMetaData {
+    id?: number;
+    fileName: string | undefined;
+    filePath: string | undefined;
+    agreementId?: number;
+}
+
+export class GetAttachmentMetaDataListResponse implements IGetAttachmentMetaDataListResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetAttachmentMetaData[] | undefined;
+
+    constructor(data?: IGetAttachmentMetaDataListResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetAttachmentMetaData.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GetAttachmentMetaDataListResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAttachmentMetaDataListResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IGetAttachmentMetaDataListResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetAttachmentMetaData[] | undefined;
+}
+
+export class GetAttachmentMetaDataResponse implements IGetAttachmentMetaDataResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetAttachmentMetaData;
+
+    constructor(data?: IGetAttachmentMetaDataResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetAttachmentMetaData.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetAttachmentMetaDataResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetAttachmentMetaDataResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetAttachmentMetaDataResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetAttachmentMetaData;
+}
+
+export class Int32Response implements IInt32Response {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: number;
+
+    constructor(data?: IInt32Response) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"];
+        }
+    }
+
+    static fromJS(data: any): Int32Response {
+        data = typeof data === 'object' ? data : {};
+        let result = new Int32Response();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data;
+        return data;
+    }
+}
+
+export interface IInt32Response {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: number;
+}
+
 export class LandInformationDto implements ILandInformationDto {
     id?: number | undefined;
     plotNumber!: number;
@@ -1072,6 +1652,46 @@ export interface ILandInformationDto {
     basinNumber: number;
     floorNumber: number;
     agreementId?: number | undefined;
+}
+
+export class LookupDto implements ILookupDto {
+    id?: number;
+    name?: string | undefined;
+
+    constructor(data?: ILookupDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): LookupDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new LookupDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface ILookupDto {
+    id?: number;
+    name?: string | undefined;
 }
 
 export class MainContractDto implements IMainContractDto {
@@ -1444,6 +2064,74 @@ export class SixthStepDto implements ISixthStepDto {
 
 export interface ISixthStepDto {
     quantityBillDto?: QuantityBillDto[] | undefined;
+}
+
+export class StringLookupDtoListDictionaryResponse implements IStringLookupDtoListDictionaryResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: { [key: string]: LookupDto[]; } | undefined;
+
+    constructor(data?: IStringLookupDtoListDictionaryResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (_data["data"]) {
+                this.data = {} as any;
+                for (let key in _data["data"]) {
+                    if (_data["data"].hasOwnProperty(key))
+                        (this.data as any)![key] = _data["data"][key] ? _data["data"][key].map((i: any) => LookupDto.fromJS(i)) : undefined as any;
+                }
+            }
+        }
+    }
+
+    static fromJS(data: any): StringLookupDtoListDictionaryResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new StringLookupDtoListDictionaryResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (this.data) {
+            data["data"] = {};
+            for (let key in this.data) {
+                if (this.data.hasOwnProperty(key))
+                    (data["data"] as any)[key] = (this.data as any)[key];
+            }
+        }
+        return data;
+    }
+}
+
+export interface IStringLookupDtoListDictionaryResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: { [key: string]: LookupDto[]; } | undefined;
 }
 
 export class SupplierServiceDto implements ISupplierServiceDto {
