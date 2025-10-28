@@ -10,23 +10,10 @@ import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
-
-interface Lookup {
-  id: number;
-  name: string;
-}
-
-interface QuantityBillDto {
-  id: number;
-  materialId: number;
-  unitId: number;
-  mileStoneId: number;
-  amount: number;
-  price: number;
-  agreementId: number;
-  isDeleted?: boolean;
-}
+import { AgreementWizardService } from '../../../services/agreement-wizard.service';
+import { LookupDto, QuantityBillDto, SixthStepDto, FullAgreementDto } from '../../../../../../nswag/api-client';
 
 @Component({
   selector: 'app-step6',
@@ -53,9 +40,9 @@ export class Step6Component implements OnInit, OnDestroy {
 
   step6Form!: FormGroup;
   quantityBills = signal<QuantityBillDto[]>([]);
-  materials = signal<Lookup[]>([]);
-  units = signal<Lookup[]>([]);
-  milestones = signal<Lookup[]>([]);
+  materials = signal<LookupDto[]>([]);
+  units = signal<LookupDto[]>([]);
+  milestones = signal<LookupDto[]>([]);
   isLoading = signal(false);
   
   // Editing state
@@ -65,12 +52,14 @@ export class Step6Component implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private agreementWizardService: AgreementWizardService
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookups();
+    this.loadAgreementData();
   }
 
   ngOnDestroy(): void {
@@ -85,7 +74,7 @@ export class Step6Component implements OnInit, OnDestroy {
         materialId: [null, [Validators.required, Validators.min(1)]],
         unitId: [null, [Validators.required, Validators.min(1)]],
         mileStoneId: [null, [Validators.required, Validators.min(1)]],
-        amount: [null, [Validators.required, Validators.min(0)]],
+        ammount: [null, [Validators.required, Validators.min(0)]],
         price: [null, [Validators.required, Validators.min(0)]],
         agreementId: [this.agreementId()]
       })
@@ -93,49 +82,110 @@ export class Step6Component implements OnInit, OnDestroy {
   }
 
   private loadLookups(): void {
-    // TODO: Replace with your actual service calls
-    // Mock data for now
-    this.materials.set([
-      { id: 1, name: 'Concrete' },
-      { id: 2, name: 'Steel Bars' },
-      { id: 3, name: 'Bricks' },
-      { id: 4, name: 'Cement' },
-      { id: 5, name: 'Sand' },
-      { id: 6, name: 'Gravel' }
-    ]);
+    this.isLoading.set(true);
     
-    this.units.set([
-      { id: 1, name: 'Cubic Meter (m³)' },
-      { id: 2, name: 'Square Meter (m²)' },
-      { id: 3, name: 'Ton' },
-      { id: 4, name: 'Piece' },
-      { id: 5, name: 'Kilogram (kg)' }
-    ]);
+    this.agreementWizardService.getStep6Lookups()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.materials.set(response.materials || []);
+          this.units.set(response.units || []);
+          this.milestones.set(response.milestones || []);
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Error loading lookups:', error);
+          this.isLoading.set(false);
+        }
+      });
+  }
 
-    this.milestones.set([
-      { id: 1, name: 'Foundation' },
-      { id: 2, name: 'Structure' },
-      { id: 3, name: 'Walls' },
-      { id: 4, name: 'Roofing' },
-      { id: 5, name: 'Finishing' }
-    ]);
+  private loadAgreementData(): void {
+    if (this.agreementId() !== 0) {
+      this.isLoading.set(true);
+      this.agreementWizardService.getAgreementById(this.agreementId(), 6)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            if (response.succeeded && response.data?.sixthStepDto) {
+              this.populateForm(response.data.sixthStepDto);
+            }
+            this.isLoading.set(false);
+          },
+          error: (error) => {
+            console.error('Error loading agreement data:', error);
+            this.isLoading.set(false);
+          }
+        });
+    }
+  }
+
+  private populateForm(data: SixthStepDto): void {
+    if (data.quantityBillDto && Array.isArray(data.quantityBillDto)) {
+      // Map the existing DTO objects directly since they already have the correct structure
+      this.quantityBills.set([...data.quantityBillDto]);
+    }
+    console.log('Loaded quantity bills:', this.quantityBills());
   }
 
   onSubmit(): void {
     const activeEntries = this.getActiveEntries();
     
     if (activeEntries.length === 0) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Validation Error',
-        detail: 'Please add at least one quantity bill entry',
-        life: 5000
-      });
+      // No entries to submit
       return;
     }
 
-    const formValue = this.buildFormData();
-    this.stepData.emit(formValue);
+    this.isLoading.set(true);
+    
+    // Prepare the FullAgreementDto payload
+    const fullAgreementDto = this.prepareFullAgreementDto();
+    
+    // Call the API
+    this.agreementWizardService.createAgreement(fullAgreementDto)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.succeeded && response.data !== undefined && response.data !== null) {
+            // Emit step data for parent component
+            this.stepData.emit(this.buildFormData());
+            this.isLoading.set(false);
+          } else {
+            // Log and stop loading on non-success response
+            console.error('Failed to save step 6 data:', response);
+            this.isLoading.set(false);
+          }
+        },
+        error: (error) => {
+          console.error('Error saving step 6:', error);
+          this.isLoading.set(false);
+        }
+      });
+  }
+
+  private prepareFullAgreementDto(): FullAgreementDto {
+    const fullAgreementDto = new FullAgreementDto();
+    fullAgreementDto.step = 6;
+    fullAgreementDto.agreementId = this.agreementId();
+    
+    const sixthStepDto = new SixthStepDto();
+    // Map to match the expected payload structure
+    sixthStepDto.quantityBillDto = this.quantityBills().map(entry => {
+      const dto = new QuantityBillDto();
+      dto.id = entry.id || 0;
+      dto.materialId = entry.materialId;
+      dto.unitId = entry.unitId;
+      dto.mileStoneId = entry.mileStoneId;
+      dto.ammount = entry.ammount;
+      dto.price = entry.price;
+      dto.agreementId = this.agreementId();
+      dto.isDeleted = entry.isDeleted || false;
+      return dto;
+    });
+    
+    fullAgreementDto.sixthStepDto = sixthStepDto;
+    
+    return fullAgreementDto;
   }
 
   private buildFormData(): any {
@@ -145,7 +195,7 @@ export class Step6Component implements OnInit, OnDestroy {
         materialId: entry.materialId,
         unitId: entry.unitId,
         mileStoneId: entry.mileStoneId,
-        amount: entry.amount,
+        ammount: entry.ammount,
         price: entry.price,
         agreementId: this.agreementId(),
         isDeleted: entry.isDeleted || false
@@ -156,28 +206,21 @@ export class Step6Component implements OnInit, OnDestroy {
   addEntry(): void {
     if (this.step6Form.get('quantityBillDto')?.invalid) {
       this.step6Form.markAllAsTouched();
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Validation Error',
-        detail: 'Please fill in all required fields correctly',
-        life: 5000
-      });
       return;
     }
 
     const formValue = this.step6Form.get('quantityBillDto')?.value;
     const editIndex = this.editingIndex();
     
-    const entryData: QuantityBillDto = {
-      id: formValue.id || 0,
-      materialId: formValue.materialId,
-      unitId: formValue.unitId,
-      mileStoneId: formValue.mileStoneId,
-      amount: formValue.amount,
-      price: formValue.price,
-      agreementId: this.agreementId(),
-      isDeleted: false
-    };
+    const entryData = new QuantityBillDto();
+    entryData.id = formValue.id || 0;
+    entryData.materialId = formValue.materialId;
+    entryData.unitId = formValue.unitId;
+    entryData.mileStoneId = formValue.mileStoneId;
+    entryData.ammount = formValue.ammount;
+    entryData.price = formValue.price;
+    entryData.agreementId = this.agreementId();
+    entryData.isDeleted = false;
 
     if (editIndex !== null) {
       // Update existing entry
@@ -186,22 +229,12 @@ export class Step6Component implements OnInit, OnDestroy {
       this.quantityBills.set(entries);
       this.editingIndex.set(null);
       
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Quantity bill updated successfully',
-        life: 3000
-      });
+      console.log('Quantity bill updated successfully');
     } else {
       // Add new entry
       this.quantityBills.set([...this.quantityBills(), entryData]);
       
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Quantity bill added successfully',
-        life: 3000
-      });
+      console.log('Quantity bill added successfully');
     }
 
     this.clearForm();
@@ -217,7 +250,7 @@ export class Step6Component implements OnInit, OnDestroy {
       e.materialId === entry.materialId &&
       e.unitId === entry.unitId && 
       e.mileStoneId === entry.mileStoneId &&
-      e.amount === entry.amount &&
+      e.ammount === entry.ammount &&
       e.price === entry.price
     );
     
@@ -228,7 +261,7 @@ export class Step6Component implements OnInit, OnDestroy {
         materialId: entry.materialId,
         unitId: entry.unitId,
         mileStoneId: entry.mileStoneId,
-        amount: entry.amount,
+        ammount: entry.ammount,
         price: entry.price,
         agreementId: entry.agreementId
       }
@@ -246,7 +279,7 @@ export class Step6Component implements OnInit, OnDestroy {
       e.materialId === entry.materialId &&
       e.unitId === entry.unitId && 
       e.mileStoneId === entry.mileStoneId &&
-      e.amount === entry.amount &&
+      e.ammount === entry.ammount &&
       e.price === entry.price
     );
 
@@ -256,21 +289,11 @@ export class Step6Component implements OnInit, OnDestroy {
     if (entry.id && entry.id > 0) {
       // Soft delete: mark as deleted
       entries[actualIndex].isDeleted = true;
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Quantity bill marked for deletion',
-        life: 3000
-      });
+      console.log('Quantity bill marked for deletion');
     } else {
       // Hard delete: remove from array (not yet in DB)
       entries.splice(actualIndex, 1);
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Success',
-        detail: 'Quantity bill deleted successfully',
-        life: 3000
-      });
+      console.log('Quantity bill deleted successfully');
     }
 
     this.quantityBills.set(entries);
@@ -283,7 +306,7 @@ export class Step6Component implements OnInit, OnDestroy {
         materialId: null,
         unitId: null,
         mileStoneId: null,
-        amount: null,
+        ammount: null,
         price: null,
         agreementId: this.agreementId()
       }
@@ -298,23 +321,23 @@ export class Step6Component implements OnInit, OnDestroy {
 
   // Calculate total for display
   calculateTotal(entry: QuantityBillDto): number {
-    return entry.amount * entry.price;
+    return entry.ammount * entry.price;
   }
 
   // Helper methods to get names
   getMaterialName(materialId: number): string {
     const material = this.materials().find(m => m.id === materialId);
-    return material ? material.name : 'Unknown';
+    return material ? (material.name || 'Unknown') : 'Unknown';
   }
 
   getUnitName(unitId: number): string {
     const unit = this.units().find(u => u.id === unitId);
-    return unit ? unit.name : 'Unknown';
+    return unit ? (unit.name || 'Unknown') : 'Unknown';
   }
 
   getMilestoneName(milestoneId: number): string {
     const milestone = this.milestones().find(m => m.id === milestoneId);
-    return milestone ? milestone.name : 'Unknown';
+    return milestone ? (milestone.name || 'Unknown') : 'Unknown';
   }
 
   // Validation methods

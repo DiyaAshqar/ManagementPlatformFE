@@ -7,9 +7,10 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TooltipModule } from 'primeng/tooltip';
-import { Subject } from 'rxjs';
+import { finalize, Subject, takeUntil } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { FileUploadModule } from 'primeng/fileupload';
+import { AgreementClient, AttachmentClient, AttachmentDto, SeventhStepDto, FullAgreementDto } from '../../../../../../nswag/api-client';
 
 interface Attachment {
   id?: number;
@@ -59,11 +60,14 @@ export class Step7Component implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private agreementClient: AgreementClient,
+    private attachmentClient: AttachmentClient
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
+    this.loadExistingAttachments();
   }
 
   ngOnDestroy(): void {
@@ -154,19 +158,6 @@ export class Step7Component implements OnInit, OnDestroy {
     this.clearForm();
   }
 
-  deleteAttachment(index: number): void {
-    const attachmentsList = [...this.attachments()];
-    attachmentsList.splice(index, 1);
-    this.attachments.set(attachmentsList);
-    
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Success',
-      detail: 'Attachment removed successfully',
-      life: 3000
-    });
-  }
-
   clearForm(): void {
     this.attachmentForm.reset();
     this.selectedFile.set(null);
@@ -189,14 +180,19 @@ export class Step7Component implements OnInit, OnDestroy {
     }
 
     if (attachment.file) {
+      // Local file
       const url = URL.createObjectURL(attachment.file);
       window.open(url, '_blank');
       setTimeout(() => URL.revokeObjectURL(url), 10000);
+    } else if (attachment.isFromServer && attachment.id) {
+      // Server file - download and open in new tab
+      this.downloadAttachment(attachment, true);
     }
   }
 
-  downloadAttachment(attachment: Attachment): void {
+  downloadAttachment(attachment: Attachment, openInNewTab: boolean = false): void {
     if (attachment.file) {
+      // Local file
       const url = URL.createObjectURL(attachment.file);
       const link = document.createElement('a');
       link.href = url;
@@ -205,6 +201,34 @@ export class Step7Component implements OnInit, OnDestroy {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+    } else if (attachment.isFromServer && attachment.id) {
+      // Server file
+      this.isLoading.set(true);
+      this.attachmentClient
+        .downloadAttachment(attachment.id)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => this.isLoading.set(false))
+        )
+        .subscribe({
+          next: () => {
+            this.messageService.add({
+              severity: 'success',
+              summary: 'Success',
+              detail: 'File downloaded successfully',
+              life: 3000
+            });
+          },
+          error: (error) => {
+            console.error('Error downloading attachment:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to download attachment',
+              life: 5000
+            });
+          }
+        });
     }
   }
 
@@ -219,31 +243,92 @@ export class Step7Component implements OnInit, OnDestroy {
       return;
     }
 
-    this.emitStepData();
+    this.submitStep();
   }
 
-  private async emitStepData(): Promise<void> {
+  private async submitStep(): Promise<void> {
     this.isLoading.set(true);
     
     try {
       const attachmentDto = await Promise.all(
         this.attachments()
           .filter(att => !att.isFromServer)
-          .map(async att => ({
-            id: 0,
-            fileName: att.name || att.file?.name || '',
-            filePath: '',
-            base64Data: att.file ? await this.convertFileToBase64(att.file) : '',
-            contentType: this.toMimeType(att.type || att.file?.type || att.file?.name || '')
-          }))
+          .map(async att => {
+            const dto = new AttachmentDto();
+            dto.id = 0;
+            dto.fileName = att.name || att.file?.name || '';
+            dto.filePath = '';
+            dto.base64Data = att.file ? await this.convertFileToBase64(att.file) : '';
+            dto.contentType = this.toMimeType(att.type || att.file?.type || att.file?.name || '');
+            return dto;
+          })
       );
 
-      const stepDataValue = {
-        agreementId: this.agreementId(),
-        attachmentDto
-      };
+      // Create SeventhStepDto
+      const stepDataValue = new SeventhStepDto();
+      stepDataValue.agreementId = this.agreementId();
+      stepDataValue.attachmentDto = attachmentDto;
 
-      this.stepData.emit(stepDataValue);
+      // Create FullAgreementDto with step 7 data
+      const fullAgreementDto = new FullAgreementDto();
+      fullAgreementDto.step = 7;
+      fullAgreementDto.agreementId = this.agreementId();
+      fullAgreementDto.seventhStepDto = stepDataValue;
+
+      // Log the payload for debugging
+      console.log('Step 7 Payload:', JSON.stringify({
+        step: fullAgreementDto.step,
+        agreementId: fullAgreementDto.agreementId,
+        seventhStepDto: {
+          agreementId: stepDataValue.agreementId,
+          attachmentDto: stepDataValue.attachmentDto?.map(att => ({
+            id: att.id,
+            fileName: att.fileName,
+            filePath: att.filePath,
+            base64Data: att.base64Data?.substring(0, 50) + '...', // Truncate for readability
+            contentType: att.contentType
+          }))
+        }
+      }, null, 2));
+
+      // Call the API
+      this.agreementClient
+        .createAgreement(fullAgreementDto)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => this.isLoading.set(false))
+        )
+        .subscribe({
+          next: (response) => {
+            if (response.succeeded) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: response.message || 'Step 7 completed successfully',
+                life: 3000
+              });
+
+              // Emit data to parent component for state management
+              this.stepData.emit(stepDataValue);
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: response.message || 'Failed to submit step 7',
+                life: 5000
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error submitting step 7:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to submit step 7. Please try again.',
+              life: 5000
+            });
+          }
+        });
     } catch (error) {
       console.error('Error processing attachments:', error);
       this.messageService.add({
@@ -252,8 +337,115 @@ export class Step7Component implements OnInit, OnDestroy {
         detail: 'Failed to process attachments',
         life: 5000
       });
-    } finally {
       this.isLoading.set(false);
+    }
+  }
+
+  private loadExistingAttachments(): void {
+    const agreementId = this.agreementId();
+    if (!agreementId || agreementId <= 0) {
+      return;
+    }
+
+    this.isLoading.set(true);
+    this.attachmentClient
+      .getAttachmentsByAgreementId(agreementId)
+      .pipe(
+        takeUntil(this.destroy$),
+        finalize(() => this.isLoading.set(false))
+      )
+      .subscribe({
+        next: (response) => {
+          if (response.succeeded && response.data) {
+            const loadedAttachments: Attachment[] = response.data.map(att => ({
+              id: att.id,
+              name: att.fileName || '',
+              type: this.getFileExtension(att.fileName || ''),
+              fileName: att.fileName,
+              filePath: att.filePath,
+              contentType: this.toMimeType(att.fileName || ''),
+              isFromServer: true
+            }));
+            
+            this.attachments.set(loadedAttachments);
+            
+            if (loadedAttachments.length > 0) {
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: `Loaded ${loadedAttachments.length} existing attachment(s)`,
+                life: 3000
+              });
+            }
+          }
+        },
+        error: (error) => {
+          console.error('Error loading attachments:', error);
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load existing attachments',
+            life: 5000
+          });
+        }
+      });
+  }
+
+  deleteAttachment(index: number): void {
+    const attachmentsList = [...this.attachments()];
+    const attachment = attachmentsList[index];
+
+    // If it's a server attachment, call the delete API
+    if (attachment.isFromServer && attachment.id) {
+      this.isLoading.set(true);
+      this.attachmentClient
+        .deleteAttachment(attachment.id)
+        .pipe(
+          takeUntil(this.destroy$),
+          finalize(() => this.isLoading.set(false))
+        )
+        .subscribe({
+          next: (response) => {
+            if (response.succeeded) {
+              attachmentsList.splice(index, 1);
+              this.attachments.set(attachmentsList);
+              
+              this.messageService.add({
+                severity: 'success',
+                summary: 'Success',
+                detail: 'Attachment deleted successfully',
+                life: 3000
+              });
+            } else {
+              this.messageService.add({
+                severity: 'error',
+                summary: 'Error',
+                detail: response.message || 'Failed to delete attachment',
+                life: 5000
+              });
+            }
+          },
+          error: (error) => {
+            console.error('Error deleting attachment:', error);
+            this.messageService.add({
+              severity: 'error',
+              summary: 'Error',
+              detail: 'Failed to delete attachment',
+              life: 5000
+            });
+          }
+        });
+    } else {
+      // Local attachment, just remove from array
+      attachmentsList.splice(index, 1);
+      this.attachments.set(attachmentsList);
+      
+      this.messageService.add({
+        severity: 'success',
+        summary: 'Success',
+        detail: 'Attachment removed successfully',
+        life: 3000
+      });
     }
   }
 

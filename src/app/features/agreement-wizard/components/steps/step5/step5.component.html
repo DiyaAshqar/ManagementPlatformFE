@@ -22,7 +22,6 @@
                                     [options]="materials()" 
                                     optionLabel="name" 
                                     optionValue="id"
-                                    placeholder="{{ 'wizard.step5.selectMaterial' | translate }}"
                                     [class]="isFieldInvalid('materialId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'">
                                 </p-select>
                                 <label for="materialId">{{ 'wizard.step5.material' | translate }}</label>
@@ -43,7 +42,6 @@
                                     [options]="suppliers()" 
                                     optionLabel="name" 
                                     optionValue="id"
-                                    placeholder="{{ 'wizard.step5.selectSupplier' | translate }}"
                                     [class]="isFieldInvalid('supplierId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'">
                                 </p-select>
                                 <label for="supplierId">{{ 'wizard.step5.supplier' | translate }}</label>
@@ -63,7 +61,6 @@
                                     inputId="representativeName" 
                                     formControlName="representativeName"
                                     class="w-full"
-                                    placeholder="{{ 'wizard.step5.enterRepresentativeName' | translate }}"
                                     [class.ng-invalid]="isFieldInvalid('representativeName')"
                                 />
                                 <label for="representativeName">{{ 'wizard.step5.representativeName' | translate }}</label>

@@ -30,9 +30,11 @@ import { TranslateModule } from '@ngx-translate/core';
   templateUrl: './agreement-wizard.component.html'
 })
 export class AgreementWizardComponent {
-  currentStep = signal(4); // Set to step 4 for debugging
+  currentStep = signal(7); // Set to step 4 for debugging
   agreementId = signal(1); // Set to test agreement ID 1 for debugging
-  
+  // currentStep = signal(1);
+  // agreementId = signal(0);
+
   // Store data from each step
   step1Data = signal<any>(null);
   step2Data = signal<any>(null);
@@ -111,11 +113,15 @@ export class AgreementWizardComponent {
   onStep5Data(data: any) {
     this.step5Data.set(data);
     console.log('Step 5 data received:', data);
+    // Move to next step after successful submission
+    this.goToStep(6);
   }
 
   onStep6Data(data: any) {
     this.step6Data.set(data);
     console.log('Step 6 data received:', data);
+    // Move to next step after successful submission
+    this.goToStep(7);
   }
 
   onStep7Data(data: any) {
@@ -137,7 +143,7 @@ export class AgreementWizardComponent {
       step6: this.step6Data(),
       step7: this.step7Data()
     };
-    
+
     console.log('Complete wizard data:', completeData);
     // TODO: Submit to backend
   }

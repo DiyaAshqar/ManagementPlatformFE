@@ -14,7 +14,9 @@ import {
   BooleanResponse,
   StringLookupDtoListDictionaryResponse,
   LookupDto,
-  FourthStepDto
+  FourthStepDto,
+  FifthStepDto,
+  SixthStepDto
 } from '../../../../nswag/api-client';
 
 @Injectable({

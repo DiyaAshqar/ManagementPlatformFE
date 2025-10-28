@@ -10,21 +10,10 @@ import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
-
-interface Lookup {
-  id: number;
-  name: string;
-}
-
-interface SupplierServiceDto {
-  id: number;
-  representativeName: string;
-  materialId: number;
-  supplierId: number;
-  agreementId: number;
-  isDeleted?: boolean;
-}
+import { AgreementWizardService } from '../../../services/agreement-wizard.service';
+import { LookupDto, SupplierServiceDto, FifthStepDto, FullAgreementDto } from '../../../../../../nswag/api-client';
 
 @Component({
   selector: 'app-step5',
@@ -51,8 +40,8 @@ export class Step5Component implements OnInit, OnDestroy {
 
   step5Form!: FormGroup;
   supplierServices = signal<SupplierServiceDto[]>([]);
-  materials = signal<Lookup[]>([]);
-  suppliers = signal<Lookup[]>([]);
+  materials = signal<LookupDto[]>([]);
+  suppliers = signal<LookupDto[]>([]);
   isLoading = signal(false);
   
   // Editing state
@@ -62,12 +51,14 @@ export class Step5Component implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private agreementWizardService: AgreementWizardService
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookups();
+    this.loadAgreementData();
   }
 
   ngOnDestroy(): void {
@@ -88,40 +79,107 @@ export class Step5Component implements OnInit, OnDestroy {
   }
 
   private loadLookups(): void {
-    // TODO: Replace with your actual service calls
-    // Mock data for now
-    this.materials.set([
-      { id: 1, name: 'Concrete' },
-      { id: 2, name: 'Steel' },
-      { id: 3, name: 'Bricks' },
-      { id: 4, name: 'Cement' },
-      { id: 5, name: 'Sand' },
-      { id: 6, name: 'Gravel' }
-    ]);
+    this.isLoading.set(true);
     
-    this.suppliers.set([
-      { id: 1, name: 'ABC Suppliers Ltd' },
-      { id: 2, name: 'XYZ Materials Co' },
-      { id: 3, name: 'Prime Building Supplies' },
-      { id: 4, name: 'Elite Construction Materials' }
-    ]);
+    this.agreementWizardService.getStep5Lookups()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.materials.set(response.materials || []);
+          this.suppliers.set(response.suppliers || []);
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Error loading lookups:', error);
+          this.isLoading.set(false);
+        }
+      });
+  }
+
+  private loadAgreementData(): void {
+    if (this.agreementId() !== 0) {
+      this.isLoading.set(true);
+      this.agreementWizardService.getAgreementById(this.agreementId(), 5)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            if (response.succeeded && response.data?.fifthStepDto) {
+              this.populateForm(response.data.fifthStepDto);
+            }
+            this.isLoading.set(false);
+          },
+          error: (error) => {
+            console.error('Error loading agreement data:', error);
+            this.isLoading.set(false);
+          }
+        });
+    }
+  }
+
+  private populateForm(data: FifthStepDto): void {
+    if (data.supplierServiceDto && Array.isArray(data.supplierServiceDto)) {
+      // Map the existing DTO objects directly since they already have the correct structure
+      this.supplierServices.set([...data.supplierServiceDto]);
+    }
+    console.log('Loaded supplier services:', this.supplierServices());
   }
 
   onSubmit(): void {
     const activeEntries = this.getActiveEntries();
     
     if (activeEntries.length === 0) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Validation Error',
-        detail: 'Please add at least one supplier service entry',
-        life: 5000
-      });
+      // No entries to submit
       return;
     }
 
-    const formValue = this.buildFormData();
-    this.stepData.emit(formValue);
+    this.isLoading.set(true);
+    
+    // Prepare the FullAgreementDto payload
+    const fullAgreementDto = this.prepareFullAgreementDto();
+    
+    // Call the API
+    this.agreementWizardService.createAgreement(fullAgreementDto)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.succeeded && response.data !== undefined && response.data !== null) {
+            // Emit step data for parent component
+            this.stepData.emit(this.buildFormData());
+            this.isLoading.set(false);
+          } else {
+            // Log and stop loading on non-success response
+            console.error('Failed to save step 5 data:', response);
+            this.isLoading.set(false);
+          }
+        },
+        error: (error) => {
+          console.error('Error saving step 5:', error);
+          this.isLoading.set(false);
+        }
+      });
+  }
+
+  private prepareFullAgreementDto(): FullAgreementDto {
+    const fullAgreementDto = new FullAgreementDto();
+    fullAgreementDto.step = 5;
+    fullAgreementDto.agreementId = this.agreementId();
+    
+    const fifthStepDto = new FifthStepDto();
+    // Map to match the expected payload structure (SupplierServiceDto with capital S)
+    fifthStepDto.supplierServiceDto = this.supplierServices().map(entry => {
+      const dto = new SupplierServiceDto();
+      dto.id = entry.id || 0;
+      dto.representativeName = entry.representativeName;
+      dto.materialId = entry.materialId;
+      dto.supplierId = entry.supplierId;
+      dto.agreementId = this.agreementId();
+      dto.isDeleted = entry.isDeleted || false;
+      return dto;
+    });
+    
+    fullAgreementDto.fifthStepDto = fifthStepDto;
+    
+    return fullAgreementDto;
   }
 
   private buildFormData(): any {
@@ -152,14 +210,13 @@ export class Step5Component implements OnInit, OnDestroy {
     const formValue = this.step5Form.get('supplierServiceDto')?.value;
     const editIndex = this.editingIndex();
     
-    const entryData: SupplierServiceDto = {
-      id: formValue.id || 0,
-      representativeName: formValue.representativeName,
-      materialId: formValue.materialId,
-      supplierId: formValue.supplierId,
-      agreementId: this.agreementId(),
-      isDeleted: false
-    };
+    const entryData = new SupplierServiceDto();
+    entryData.id = formValue.id || 0;
+    entryData.representativeName = formValue.representativeName;
+    entryData.materialId = formValue.materialId;
+    entryData.supplierId = formValue.supplierId;
+    entryData.agreementId = this.agreementId();
+    entryData.isDeleted = false;
 
     if (editIndex !== null) {
       // Update existing entry
@@ -273,12 +330,12 @@ export class Step5Component implements OnInit, OnDestroy {
   // Helper methods to get names
   getMaterialName(materialId: number): string {
     const material = this.materials().find(m => m.id === materialId);
-    return material ? material.name : 'Unknown';
+    return material ? (material.name || 'Unknown') : 'Unknown';
   }
 
   getSupplierName(supplierId: number): string {
     const supplier = this.suppliers().find(s => s.id === supplierId);
-    return supplier ? supplier.name : 'Unknown';
+    return supplier ? (supplier.name || 'Unknown') : 'Unknown';
   }
 
   // Validation methods
