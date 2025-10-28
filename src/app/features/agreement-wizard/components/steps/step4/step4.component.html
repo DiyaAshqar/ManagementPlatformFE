@@ -127,7 +127,7 @@
                         <th>{{ 'wizard.step4.totalAmount' | translate }}</th>
                         <th>{{ 'wizard.step4.startDate' | translate }}</th>
                         <th>{{ 'wizard.step4.endDate' | translate }}</th>
-                        <th class="text-center" style="width: 150px">{{ 'common.actions' | translate }}</th>
+                        <th class="text-center" style="width: 250px">{{ 'common.actions' | translate }}</th>
                     </tr>
                 </ng-template>
                 
@@ -136,9 +136,17 @@
                         <td>{{ getMainContractTypeName(contract.typeId) }}</td>
                         <td>{{ getConstructorName(contract.constructorId) }}</td>
                         <td>{{ contract.total | currency:'USD':'symbol':'1.2-2' }}</td>
-                        <td>{{ contract.startDate }}</td>
-                        <td>{{ contract.endDate }}</td>
+                        <td>{{ formatDate(contract.startDate) }}</td>
+                        <td>{{ formatDate(contract.endDate) }}</td>
                         <td class="text-center">
+                            <button 
+                                type="button"
+                                class="p-button-rounded p-button-text p-button-secondary mr-2"
+                                (click)="showContractorDuties(rowIndex)"
+                                    pButton
+                                    icon="pi pi-briefcase"
+                                    [pTooltip]="'wizard.step4.contractorDuties' | translate">
+                            </button>
                             <button 
                                 type="button"
                                 class="p-button-rounded p-button-text p-button-info mr-2"
@@ -170,4 +178,14 @@
             </p-table>
         </div>
     </div>
+
+    <!-- Contractor Duties Dialog -->
+    <app-contractor-duties-dialog
+        [visible]="showContractorDutiesDialog()"
+        [agreementId]="agreementId()"
+        [mainContractId]="selectedMainContractId()"
+        [existingContractorDuties]="getSelectedContractorDuties()"
+        (closeDialog)="onContractorDutiesDialogClose()"
+        (contractorDutyData)="onContractorDutyDataReceived($event)">
+    </app-contractor-duties-dialog>
 </div>

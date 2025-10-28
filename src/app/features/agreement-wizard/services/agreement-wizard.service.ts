@@ -13,7 +13,8 @@ import {
   GetAttachmentMetaDataListResponse,
   BooleanResponse,
   StringLookupDtoListDictionaryResponse,
-  LookupDto
+  LookupDto,
+  FourthStepDto
 } from '../../../../nswag/api-client';
 
 @Injectable({
@@ -202,5 +203,18 @@ export class AgreementWizardService {
         return { materials: [], units: [], milestones: [] };
       })
     );
+  }
+
+  // Create individual main contract for Step 4
+  createMainContract(agreementId: number, mainContractData: any): Observable<Int32Response> {
+    const fourthStepDto = new FullAgreementDto();
+    fourthStepDto.step = 4;
+    fourthStepDto.agreementId = agreementId;
+    
+    const fourthStep = new FourthStepDto();
+    fourthStep.mainContractDto = [mainContractData];
+    fourthStepDto.fourthStepDto = fourthStep;
+    
+    return this.agreementClient.createAgreement(fourthStepDto);
   }
 }

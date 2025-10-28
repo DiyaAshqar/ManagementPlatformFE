@@ -2,29 +2,24 @@ import { CommonModule } from '@angular/common';
 import { Component, input, OnDestroy, OnInit, output, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
+import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
-import { TooltipModule } from 'primeng/tooltip';
 import { TableModule } from 'primeng/table';
-import { finalize, Subject, takeUntil } from 'rxjs';
-import { MessageService } from 'primeng/api';
-
-interface Lookup {
-  id: number;
-  name: string;
-}
-
-interface ProjectAreaUnitDto {
-  id?: number;
-  annexId: number;
-  amount: number;
-  unitId: number;
-  isDeleted?: boolean;
-}
+import { TooltipModule } from 'primeng/tooltip';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+import { AgreementWizardService } from '../../../services/agreement-wizard.service';
+import { 
+  FullAgreementDto, 
+  ThirdStepDto, 
+  ProjectAreaUnitDto,
+  LookupDto 
+} from '../../../../../../nswag/api-client';
 
 @Component({
   selector: 'app-step3',
@@ -52,16 +47,18 @@ export class Step3Component implements OnInit, OnDestroy {
 
   step3Form!: FormGroup;
   projectAreaUnits = signal<ProjectAreaUnitDto[]>([]);
-  units = signal<Lookup[]>([]);
-  annexes = signal<Lookup[]>([]);
+  units = signal<LookupDto[]>([]);
+  annexes = signal<LookupDto[]>([]);
   isLoading = signal(false);
+  isFormValid = signal(false);
   editingIndex = signal<number | null>(null);
 
   private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private agreementWizardService: AgreementWizardService
   ) {}
 
   ngOnInit(): void {
@@ -84,32 +81,34 @@ export class Step3Component implements OnInit, OnDestroy {
         unitId: [null, [Validators.required, Validators.min(1)]]
       })
     });
+
+    // Track form validity changes
+    this.step3Form.statusChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.isFormValid.set(this.step3Form.valid);
+      });
+    
+    // Set initial validity
+    this.isFormValid.set(this.step3Form.valid);
   }
 
   private loadLookups(): void {
-    // TODO: Replace with actual lookup service call
-    // Mock data for now
     this.isLoading.set(true);
     
-    setTimeout(() => {
-      this.units.set([
-        { id: 1, name: 'Square Meter' },
-        { id: 2, name: 'Cubic Meter' },
-        { id: 3, name: 'Linear Meter' },
-        { id: 4, name: 'Unit' },
-        { id: 5, name: 'Piece' }
-      ]);
-      
-      this.annexes.set([
-        { id: 1, name: 'Ground Floor' },
-        { id: 2, name: 'First Floor' },
-        { id: 3, name: 'Second Floor' },
-        { id: 4, name: 'Basement' },
-        { id: 5, name: 'Roof' }
-      ]);
-      
-      this.isLoading.set(false);
-    }, 500);
+    this.agreementWizardService.getStep3Lookups()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (lookups) => {
+          this.units.set(lookups.units);
+          this.annexes.set(lookups.annexes);
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          console.error('Error loading lookups:', error);
+          this.isLoading.set(false);
+        }
+      });
   }
 
   private loadAgreementData(): void {
@@ -136,11 +135,57 @@ export class Step3Component implements OnInit, OnDestroy {
       return;
     }
 
-    const formData = {
-      projectAreaUnitDto: entries
-    };
+    this.isLoading.set(true);
+    
+    // Prepare the FullAgreementDto payload
+    const fullAgreementDto = this.prepareFullAgreementDto();
+    
+    // Call the API
+    this.agreementWizardService.createAgreement(fullAgreementDto)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.succeeded && response.data !== undefined && response.data !== null) {
+            // Emit step data for parent component
+            this.stepData.emit(this.step3Form.getRawValue());
+            this.isLoading.set(false);
+          } else {
+            this.isLoading.set(false);
+          }
+        },
+        error: (error) => {
+          console.error('Error saving step 3:', error);
+          this.isLoading.set(false);
+        }
+      });
+  }
 
-    this.stepData.emit(formData);
+  private prepareFullAgreementDto(): FullAgreementDto {
+    const entries = this.projectAreaUnits();
+    
+    // Create the ThirdStepDto
+    const thirdStepDto = new ThirdStepDto();
+    
+    // Map ProjectAreaUnitDto array
+    const projectAreaUnitDtos = entries.map(entry => {
+      const dto = new ProjectAreaUnitDto();
+      dto.id = entry.id || 0;
+      dto.annexId = entry.annexId!;
+      dto.amount = entry.amount!;
+      dto.unitId = entry.unitId!;
+      dto.isDeleted = entry.isDeleted || false;
+      return dto;
+    });
+    
+    thirdStepDto.projectAreaUnitDto = projectAreaUnitDtos;
+    
+    // Create the FullAgreementDto
+    const fullAgreementDto = new FullAgreementDto();
+    fullAgreementDto.step = 3;
+    fullAgreementDto.agreementId = this.agreementId() || 0;
+    fullAgreementDto.thirdStepDto = thirdStepDto;
+    
+    return fullAgreementDto;
   }
 
   addEntry(): void {
@@ -156,27 +201,27 @@ export class Step3Component implements OnInit, OnDestroy {
 
     if (currentEditingIndex !== null) {
       // Update existing entry
-      currentEntries[currentEditingIndex] = {
-        id: currentEntries[currentEditingIndex].id,
-        annexId: formValue.annexId,
-        amount: formValue.amount,
-        unitId: formValue.unitId,
-        isDeleted: currentEntries[currentEditingIndex].isDeleted ?? false
-      };
+      const updatedDto = new ProjectAreaUnitDto();
+      updatedDto.id = currentEntries[currentEditingIndex].id;
+      updatedDto.annexId = formValue.annexId;
+      updatedDto.amount = formValue.amount;
+      updatedDto.unitId = formValue.unitId;
+      updatedDto.isDeleted = currentEntries[currentEditingIndex].isDeleted ?? false;
+      
+      currentEntries[currentEditingIndex] = updatedDto;
       this.projectAreaUnits.set(currentEntries);
-      this.showSuccess('Entry updated successfully');
       this.editingIndex.set(null);
     } else {
       // Add new entry
-      currentEntries.push({
-        id: 0,
-        annexId: formValue.annexId,
-        amount: formValue.amount,
-        unitId: formValue.unitId,
-        isDeleted: false
-      });
+      const newDto = new ProjectAreaUnitDto();
+      newDto.id = 0;
+      newDto.annexId = formValue.annexId;
+      newDto.amount = formValue.amount;
+      newDto.unitId = formValue.unitId;
+      newDto.isDeleted = false;
+      
+      currentEntries.push(newDto);
       this.projectAreaUnits.set(currentEntries);
-      this.showSuccess('Entry added successfully');
     }
 
     this.clearForm();
@@ -224,11 +269,9 @@ export class Step3Component implements OnInit, OnDestroy {
     if (entry.id && entry.id > 0) {
       // Soft delete: mark as deleted
       currentEntries[actualIndex].isDeleted = true;
-      this.showSuccess('Entry marked for deletion');
     } else {
       // Hard delete: remove from array (not yet in DB)
       currentEntries.splice(actualIndex, 1);
-      this.showSuccess('Entry deleted successfully');
     }
 
     this.projectAreaUnits.set(currentEntries);
@@ -254,12 +297,12 @@ export class Step3Component implements OnInit, OnDestroy {
   // Helper methods to get names
   getAnnexName(annexId: number): string {
     const annex = this.annexes().find(a => a.id === annexId);
-    return annex ? annex.name : 'Unknown';
+    return annex?.name || 'Unknown';
   }
 
   getUnitName(unitId: number): string {
     const unit = this.units().find(u => u.id === unitId);
-    return unit ? unit.name : 'Unknown';
+    return unit?.name || 'Unknown';
   }
 
   // Validation methods
@@ -276,15 +319,6 @@ export class Step3Component implements OnInit, OnDestroy {
       if (field.errors['maxLength']) return 'Value is too long';
     }
     return '';
-  }
-
-  private showSuccess(message: string): void {
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Success',
-      detail: message,
-      life: 3000
-    });
   }
 
   private showError(message: string): void {

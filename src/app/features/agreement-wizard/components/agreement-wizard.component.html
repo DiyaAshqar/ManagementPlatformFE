@@ -27,14 +27,14 @@
                 icon="pi pi-arrow-right" 
                 iconPos="right"
                 [disabled]="!step1Component.isFormValid()"
-                (onClick)="step1Component.onSubmit(); step1Data() && activateCallback(2)"
+                (onClick)="step1Component.onSubmit()"
               />
             </div>
           </div>
         </ng-template>
       </p-step-panel>
 
-      <!-- Step 2: Placeholder -->
+      <!-- Step 2: Payment & Services -->
       <p-step-panel [value]="2">
         <ng-template #content let-activateCallback="activateCallback">
           <div class="gap-4">
@@ -56,14 +56,15 @@
                 [label]="'wizard.next' | translate" 
                 icon="pi pi-arrow-right" 
                 iconPos="right"
-                (onClick)="step2Component.onSubmit(); step2Data() && activateCallback(3)"
+                [disabled]="!step2Component.isFormValid()"
+                (onClick)="step2Component.onSubmit()"
               />
             </div>
           </div>
         </ng-template>
       </p-step-panel>
 
-      <!-- Step 3: Placeholder -->
+      <!-- Step 3: Material & Quality Specifications -->
       <p-step-panel [value]="3">
         <ng-template #content let-activateCallback="activateCallback">
           <div class="gap-4">
@@ -85,14 +86,15 @@
                 [label]="'wizard.next' | translate" 
                 icon="pi pi-arrow-right" 
                 iconPos="right"
-                (onClick)="step3Component.onSubmit(); step3Data() && activateCallback(4)"
+                [disabled]="step3Component.projectAreaUnits().length === 0"
+                (onClick)="step3Component.onSubmit()"
               />
             </div>
           </div>
         </ng-template>
       </p-step-panel>
 
-      <!-- Step 4: Placeholder -->
+      <!-- Step 4: Main Contracts -->
       <p-step-panel [value]="4">
         <ng-template #content let-activateCallback="activateCallback">
           <div class="gap-4">
@@ -114,7 +116,8 @@
                 [label]="'wizard.next' | translate" 
                 icon="pi pi-arrow-right" 
                 iconPos="right"
-                (onClick)="step4Component.onSubmit(); step4Data() && activateCallback(5)"
+                [disabled]="step4Component.mainContracts().length === 0"
+                (onClick)="step4Component.onSubmit()"
               />
             </div>
           </div>

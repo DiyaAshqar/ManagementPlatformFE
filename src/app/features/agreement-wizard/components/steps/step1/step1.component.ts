@@ -113,7 +113,6 @@ export class Step1Component implements OnInit, OnDestroy {
     this.step1Form.statusChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => {
-        console.log('Form validity changed:', this.step1Form.valid);
         this.isFormValid.set(this.step1Form.valid);
       });
     

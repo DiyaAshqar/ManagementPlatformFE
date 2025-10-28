@@ -30,8 +30,8 @@ import { TranslateModule } from '@ngx-translate/core';
   templateUrl: './agreement-wizard.component.html'
 })
 export class AgreementWizardComponent {
-  currentStep = signal(1);
-  agreementId = signal(0);
+  currentStep = signal(4); // Set to step 4 for debugging
+  agreementId = signal(1); // Set to test agreement ID 1 for debugging
   
   // Store data from each step
   step1Data = signal<any>(null);
@@ -78,6 +78,8 @@ export class AgreementWizardComponent {
   onStep1Data(data: any) {
     this.step1Data.set(data);
     console.log('Step 1 data received:', data);
+    // Move to next step after successful submission
+    this.goToStep(2);
   }
 
   onAgreementIdUpdate(newAgreementId: number) {
@@ -88,16 +90,22 @@ export class AgreementWizardComponent {
   onStep2Data(data: any) {
     this.step2Data.set(data);
     console.log('Step 2 data received:', data);
+    // Move to next step after successful submission
+    this.goToStep(3);
   }
 
   onStep3Data(data: any) {
     this.step3Data.set(data);
     console.log('Step 3 data received:', data);
+    // Move to next step after successful submission
+    this.goToStep(4);
   }
 
   onStep4Data(data: any) {
     this.step4Data.set(data);
     console.log('Step 4 data received:', data);
+    // Move to next step after successful submission
+    this.goToStep(5);
   }
 
   onStep5Data(data: any) {

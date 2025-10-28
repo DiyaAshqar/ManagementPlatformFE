@@ -14,6 +14,7 @@
   },
   "common": {
     "save": "Save",
+    "saveAll": "Save All",
     "cancel": "Cancel",
     "delete": "Delete",
     "edit": "Edit",
@@ -152,7 +153,18 @@
       "endDate": "Expected End Date",
       "contractsList": "Main Contracts List",
       "noContracts": "No contracts added yet. Add your first main contract above.",
-      "showingContracts": "Showing {first} to {last} of {totalRecords} contracts"
+      "showingContracts": "Showing {first} to {last} of {totalRecords} contracts",
+      "contractorDuties": "Contractor Duties",
+      "addContractorDuty": "Add Contractor Duty",
+      "contractorDutiesList": "Contractor Duties List",
+      "noContractorDuties": "No contractor duties added yet. Add your first duty above.",
+      "showingDuties": "Showing {first} to {last} of {totalRecords} duties",
+      "quantity": "Quantity",
+      "price": "Price",
+      "subTotal": "Sub Total",
+      "unit": "Unit",
+      "dutyType": "Duty Type",
+      "dutyResponsibility": "Duty Responsibility"
     },
     "step5": {
       "title": "Supplier Services",

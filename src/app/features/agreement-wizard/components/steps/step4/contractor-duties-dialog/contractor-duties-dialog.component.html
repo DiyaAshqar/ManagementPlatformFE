@@ -1,0 +1,252 @@
+<p-dialog 
+  [header]="'wizard.step4.contractorDuties' | translate" 
+  [visible]="visible()" 
+  (onHide)="onDialogHide()"
+  [modal]="true"
+  [style]="{ width: '90vw', maxWidth: '1200px' }"
+  [dismissableMask]="false"
+  [closeOnEscape]="true">
+  
+  @if (isLoading()) {
+    <div class="flex justify-center align-items-center p-6">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+  }
+
+  <!-- Form Section -->
+  <div class="mb-4">
+    <h4 class="text-lg font-semibold mb-4">{{ 'wizard.step4.addContractorDuty' | translate }}</h4>
+
+    <form [formGroup]="contractorDutyForm">
+      <div class="grid">
+        <!-- Quantity -->
+        <div class="col-12 md:col-6 lg:col-4 mb-3">
+          <div class="field">
+            <p-floatlabel variant="in">
+              <p-inputNumber 
+                inputId="quantity" 
+                formControlName="quantity" 
+                [min]="0.01" 
+                [showButtons]="false"
+                mode="decimal" 
+                [minFractionDigits]="2"
+                [ngClass]="{'ng-invalid': isFieldInvalid('quantity')}"
+                inputStyleClass="w-full">
+              </p-inputNumber>
+              <label for="quantity">{{ 'wizard.step4.quantity' | translate }}</label>
+            </p-floatlabel>
+            @if (isFieldInvalid('quantity')) {
+              <small class="text-red-500 block mt-1">{{ getFieldError('quantity') }}</small>
+            }
+          </div>
+        </div>
+
+        <!-- Price -->
+        <div class="col-12 md:col-6 lg:col-4 mb-3">
+          <div class="field">
+            <p-floatlabel variant="in">
+              <p-inputNumber 
+                inputId="price" 
+                formControlName="price" 
+                [min]="0.01" 
+                [showButtons]="false"
+                mode="currency" 
+                currency="USD" 
+                locale="en-US"
+                [ngClass]="{'ng-invalid': isFieldInvalid('price')}"
+                inputStyleClass="w-full">
+              </p-inputNumber>
+              <label for="price">{{ 'wizard.step4.price' | translate }}</label>
+            </p-floatlabel>
+            @if (isFieldInvalid('price')) {
+              <small class="text-red-500 block mt-1">{{ getFieldError('price') }}</small>
+            }
+          </div>
+        </div>
+
+        <!-- Sub Total (readonly) -->
+        <div class="col-12 md:col-6 lg:col-4 mb-3">
+          <div class="field">
+            <p-floatlabel variant="in">
+              <p-inputNumber 
+                inputId="subTotal" 
+                formControlName="subTotal" 
+                [readonly]="true"
+                mode="currency" 
+                currency="USD" 
+                locale="en-US"
+                inputStyleClass="w-full">
+              </p-inputNumber>
+              <label for="subTotal">{{ 'wizard.step4.subTotal' | translate }}</label>
+            </p-floatlabel>
+          </div>
+        </div>
+
+        <!-- Unit -->
+        <div class="col-12 md:col-6 lg:col-4 mb-3">
+          <div class="field">
+            <p-floatlabel variant="in">
+              <p-select 
+                inputId="unitId" 
+                formControlName="unitId" 
+                [options]="units()"
+                optionLabel="name" 
+                optionValue="id"
+                [class]="isFieldInvalid('unitId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
+              </p-select>
+              <label for="unitId">{{ 'wizard.step4.unit' | translate }}</label>
+            </p-floatlabel>
+            @if (isFieldInvalid('unitId')) {
+              <small class="text-red-500 block mt-1">{{ getFieldError('unitId') }}</small>
+            }
+          </div>
+        </div>
+
+        <!-- Duty Type -->
+        <div class="col-12 md:col-6 lg:col-4 mb-3">
+          <div class="field">
+            <p-floatlabel variant="in">
+              <p-select 
+                inputId="dutyTypeId" 
+                formControlName="dutyTypeId" 
+                [options]="dutyTypes()"
+                optionLabel="name" 
+                optionValue="id"
+                [class]="isFieldInvalid('dutyTypeId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
+              </p-select>
+              <label for="dutyTypeId">{{ 'wizard.step4.dutyType' | translate }}</label>
+            </p-floatlabel>
+            @if (isFieldInvalid('dutyTypeId')) {
+              <small class="text-red-500 block mt-1">{{ getFieldError('dutyTypeId') }}</small>
+            }
+          </div>
+        </div>
+
+        <!-- Duty Responsibility -->
+        <div class="col-12 md:col-6 lg:col-4 mb-3">
+          <div class="field">
+            <p-floatlabel variant="in">
+              <p-select 
+                inputId="dutyResponsibilityId" 
+                formControlName="dutyResponsibilityId" 
+                [options]="dutyResponsibilities()"
+                optionLabel="name" 
+                optionValue="id"
+                [class]="isFieldInvalid('dutyResponsibilityId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
+              </p-select>
+              <label for="dutyResponsibilityId">{{ 'wizard.step4.dutyResponsibility' | translate }}</label>
+            </p-floatlabel>
+            @if (isFieldInvalid('dutyResponsibilityId')) {
+              <small class="text-red-500 block mt-1">{{ getFieldError('dutyResponsibilityId') }}</small>
+            }
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="col-12 flex justify-end gap-2 mt-3">
+          <p-button 
+            [label]="'common.cancel' | translate" 
+            severity="secondary" 
+            icon="pi pi-times"
+            (onClick)="clearForm()">
+          </p-button>
+          <p-button 
+            [label]="editingIndex() !== null ? ('common.edit' | translate) : ('common.add' | translate)"
+            icon="pi pi-check" 
+            (onClick)="addContractorDuty()"
+            [disabled]="contractorDutyForm.invalid">
+          </p-button>
+        </div>
+      </div>
+    </form>
+  </div>
+
+  <!-- Table Section -->
+  <div class="mb-4">
+    <div class="card">
+      <div class="card-header border-b border-gray-200 pb-3 mb-3">
+        <h4 class="text-lg font-semibold">{{ 'wizard.step4.contractorDutiesList' | translate }}</h4>
+      </div>
+
+      <!-- PrimeNG Table -->
+      <p-table 
+        [value]="contractorDuties()" 
+        [paginator]="true" 
+        [rows]="5" 
+        [showCurrentPageReport]="true"
+        currentPageReportTemplate="{{ 'wizard.step4.showingDuties' | translate }}"
+        [rowsPerPageOptions]="[5, 10, 25]"
+        [tableStyle]="{ 'min-width': '50rem' }"
+        styleClass="p-datatable-striped">
+        
+        <ng-template pTemplate="header">
+          <tr>
+            <th>{{ 'wizard.step4.quantity' | translate }}</th>
+            <th>{{ 'wizard.step4.price' | translate }}</th>
+            <th>{{ 'wizard.step4.subTotal' | translate }}</th>
+            <th>{{ 'wizard.step4.unit' | translate }}</th>
+            <th>{{ 'wizard.step4.dutyType' | translate }}</th>
+            <th>{{ 'wizard.step4.dutyResponsibility' | translate }}</th>
+            <th class="text-center" style="width: 120px">{{ 'common.actions' | translate }}</th>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="body" let-duty let-rowIndex="rowIndex">
+          <tr>
+            <td>{{ duty.quantity | number:'1.2-2' }}</td>
+            <td>{{ duty.price | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td>{{ duty.subTotal | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td>{{ getUnitName(duty.unitId) }}</td>
+            <td>{{ getDutyTypeName(duty.dutyTypeId) }}</td>
+            <td>{{ getDutyResponsibilityName(duty.dutyResponsibilityId) }}</td>
+            <td class="text-center">
+              <button 
+                type="button"
+                class="p-button-rounded p-button-text p-button-info mr-2"
+                (click)="editContractorDuty(rowIndex)"
+                pButton
+                icon="pi pi-pencil"
+                [pTooltip]="'common.edit' | translate">
+              </button>
+              <button 
+                type="button"
+                class="p-button-rounded p-button-text p-button-danger"
+                (click)="deleteContractorDuty(rowIndex)"
+                pButton
+                icon="pi pi-trash"
+                [pTooltip]="'common.delete' | translate">
+              </button>
+            </td>
+          </tr>
+        </ng-template>
+        
+        <ng-template pTemplate="emptymessage">
+          <tr>
+            <td colspan="7" class="text-center p-6">
+              <i class="pi pi-inbox text-4xl mb-3 block text-gray-400"></i>
+              <p class="text-gray-500">{{ 'wizard.step4.noContractorDuties' | translate }}</p>
+            </td>
+          </tr>
+        </ng-template>
+      </p-table>
+    </div>
+  </div>
+
+  <!-- Dialog Footer -->
+  <ng-template pTemplate="footer">
+    <div class="flex justify-end gap-2">
+      <p-button 
+        [label]="'common.cancel' | translate" 
+        severity="secondary" 
+        icon="pi pi-times"
+        (onClick)="onDialogHide()">
+      </p-button>
+      <p-button 
+        [label]="'common.saveAll' | translate" 
+        icon="pi pi-save" 
+        (onClick)="saveAllContractorDuties()"
+        [disabled]="contractorDuties().length === 0">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>

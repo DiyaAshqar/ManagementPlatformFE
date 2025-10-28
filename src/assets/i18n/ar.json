@@ -14,6 +14,7 @@
   },
   "common": {
     "save": "حفظ",
+    "saveAll": "حفظ الكل",
     "cancel": "إلغاء",
     "delete": "حذف",
     "edit": "تعديل",
@@ -152,7 +153,18 @@
       "endDate": "تاريخ النهاية المتوقع",
       "contractsList": "قائمة العقود الرئيسية",
       "noContracts": "لم تتم إضافة أي عقود بعد. أضف أول عقد رئيسي أعلاه.",
-      "showingContracts": "عرض {first} إلى {last} من {totalRecords} عقود"
+      "showingContracts": "عرض {first} إلى {last} من {totalRecords} عقود",
+      "contractorDuties": "واجبات المقاول",
+      "addContractorDuty": "إضافة واجب مقاول",
+      "contractorDutiesList": "قائمة واجبات المقاول",
+      "noContractorDuties": "لم تتم إضافة أي واجبات مقاول بعد. أضف أول واجب أعلاه.",
+      "showingDuties": "عرض {first} إلى {last} من {totalRecords} واجبات",
+      "quantity": "الكمية",
+      "price": "السعر",
+      "subTotal": "المجموع الفرعي",
+      "unit": "الوحدة",
+      "dutyType": "نوع الواجب",
+      "dutyResponsibility": "مسؤولية الواجب"
     },
     "step5": {
       "title": "خدمات الموردين",

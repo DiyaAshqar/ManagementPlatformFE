@@ -8,11 +8,17 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
 import { Subject } from 'rxjs';
-
-interface Lookup {
-  id: number;
-  name: string;
-}
+import { takeUntil } from 'rxjs/operators';
+import { MessageService } from 'primeng/api';
+import { AgreementWizardService } from '../../../services/agreement-wizard.service';
+import {
+  FullAgreementDto,
+  SecondStepDto,
+  AgreementPaymentDto,
+  AgreementServiceDto,
+  MonthlyPaymentDto,
+  LookupDto
+} from '../../../../../../nswag/api-client';
 
 @Component({
   selector: 'app-step2',
@@ -36,15 +42,20 @@ export class Step2Component implements OnInit, OnDestroy {
   stepData = output<any>();
 
   step2Form!: FormGroup;
-  contractTypes = signal<Lookup[]>([]);
-  contractModels = signal<Lookup[]>([]);
-  paymentMethods = signal<Lookup[]>([]);
-  services = signal<Lookup[]>([]);
+  contractTypes = signal<LookupDto[]>([]);
+  contractModels = signal<LookupDto[]>([]);
+  paymentMethods = signal<LookupDto[]>([]);
+  services = signal<LookupDto[]>([]);
   isLoading = signal(false);
+  isFormValid = signal(false);
 
   private destroy$ = new Subject<void>();
 
-  constructor(private fb: FormBuilder) {}
+  constructor(
+    private fb: FormBuilder,
+    private messageService: MessageService,
+    private agreementWizardService: AgreementWizardService
+  ) { }
 
   ngOnInit(): void {
     this.initializeForm();
@@ -64,44 +75,43 @@ export class Step2Component implements OnInit, OnDestroy {
       amount: [{ value: null, disabled: true }],
       selectedServices: this.fb.array([], Validators.required)
     });
+
+    // Track form validity changes
+    this.step2Form.statusChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        this.isFormValid.set(this.step2Form.valid);
+      });
+
+    // Set initial validity
+    this.isFormValid.set(this.step2Form.valid);
   }
 
   private loadLookups(): void {
-    // TODO: Replace with your actual service calls
-    // Mock data for now
-    this.contractTypes.set([
-      { id: 1, name: 'Fixed Price' },
-      { id: 2, name: 'Time & Materials' },
-      { id: 3, name: 'Cost Plus' }
-    ]);
-    
-    this.contractModels.set([
-      { id: 1, name: 'Lump Sum' },
-      { id: 2, name: 'Unit Price' },
-      { id: 3, name: 'Percentage' }
-    ]);
-    
-    this.paymentMethods.set([
-      { id: 1, name: 'Monthly Fees' },
-      { id: 2, name: 'Milestone Based' },
-      { id: 3, name: 'Upon Completion' }
-    ]);
-    
-    this.services.set([
-      { id: 1, name: 'Engineering Design' },
-      { id: 2, name: 'Construction Management' },
-      { id: 3, name: 'Quality Control' },
-      { id: 4, name: 'Safety Management' },
-      { id: 5, name: 'Equipment Rental' },
-      { id: 6, name: 'Material Supply' }
-    ]);
+    this.isLoading.set(true);
+
+    this.agreementWizardService.getStep2Lookups()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (lookups) => {
+          this.contractTypes.set(lookups.contractTypes);
+          this.contractModels.set(lookups.contractModels);
+          this.paymentMethods.set(lookups.paymentMethods);
+          this.services.set(lookups.services);
+          this.isLoading.set(false);
+        },
+        error: (error) => {
+          this.isLoading.set(false);
+        }
+      });
   }
 
   get selectedServicesArray(): FormArray {
     return this.step2Form.get('selectedServices') as FormArray;
   }
 
-  toggleService(serviceId: number): void {
+  toggleService(serviceId?: number): void {
+    if (serviceId === undefined || serviceId === null) return;
     const selectedServices = this.selectedServicesArray;
     const index = selectedServices.value.indexOf(serviceId);
 
@@ -112,18 +122,87 @@ export class Step2Component implements OnInit, OnDestroy {
     }
   }
 
-  isServiceSelected(serviceId: number): boolean {
+  isServiceSelected(serviceId?: number): boolean {
+    if (serviceId === undefined || serviceId === null) return false;
     return this.selectedServicesArray.value.includes(serviceId);
   }
 
   onSubmit(): void {
     if (this.step2Form.invalid) {
       this.step2Form.markAllAsTouched();
+      this.messageService.add({
+        severity: 'error',
+        summary: 'Validation Error',
+        detail: 'Please fix validation errors before submitting.',
+        life: 5000
+      });
       return;
     }
 
-    const formValue = this.buildFormData();
-    this.stepData.emit(formValue);
+    this.isLoading.set(true);
+
+    // Prepare the FullAgreementDto payload
+    const fullAgreementDto = this.prepareFullAgreementDto();
+
+    // Call the API
+    this.agreementWizardService.createAgreement(fullAgreementDto)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          if (response.succeeded && response.data !== undefined && response.data !== null) {
+            // Emit step data for parent component
+            this.stepData.emit(this.step2Form.getRawValue());
+            this.isLoading.set(false);
+          } else {
+            this.isLoading.set(false);
+          }
+        },
+        error: (error) => {
+          console.error('Error saving step 2:', error);
+          this.isLoading.set(false);
+        }
+      });
+  }
+
+  private prepareFullAgreementDto(): FullAgreementDto {
+    const formValue = this.step2Form.getRawValue();
+
+    // Create the SecondStepDto
+    const secondStepDto = new SecondStepDto();
+
+    // Map AgreementPaymentDto
+    const agreementPaymentDto = new AgreementPaymentDto();
+    agreementPaymentDto.id = 0;
+    agreementPaymentDto.contractTypeId = formValue.contractTypeId || 0;
+    agreementPaymentDto.contractModelId = formValue.contractModelId || 0;
+    agreementPaymentDto.paymentMethodId = formValue.paymentMethodId || 0;
+    agreementPaymentDto.monthlyPaymentId = 0;
+    agreementPaymentDto.agreementId = this.agreementId() || 0;
+
+    // Map MonthlyPaymentDto (only if amount is provided)
+    const monthlyPaymentDto = new MonthlyPaymentDto();
+    monthlyPaymentDto.id = 0;
+    monthlyPaymentDto.amount = formValue.amount ? parseFloat(formValue.amount) : 0;
+    agreementPaymentDto.monthlyPaymentDto = monthlyPaymentDto;
+
+    // Map AgreementServiceDto array
+    const agreementServiceDtos = this.selectedServicesArray.value.map((serviceId: number) => {
+      const agreementServiceDto = new AgreementServiceDto();
+      agreementServiceDto.agreementId = this.agreementId() || 0;
+      agreementServiceDto.serviceId = serviceId;
+      return agreementServiceDto;
+    });
+
+    secondStepDto.agreementPaymentDto = agreementPaymentDto;
+    secondStepDto.agreementServiceDto = agreementServiceDtos;
+
+    // Create the FullAgreementDto
+    const fullAgreementDto = new FullAgreementDto();
+    fullAgreementDto.step = 2;
+    fullAgreementDto.agreementId = this.agreementId() || 0;
+    fullAgreementDto.secondStepDto = secondStepDto;
+
+    return fullAgreementDto;
   }
 
   private buildFormData(): any {
