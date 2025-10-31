@@ -112,18 +112,32 @@ export class Step3Component implements OnInit, OnDestroy {
   }
 
   private loadAgreementData(): void {
-    if (this.agreementId() === 0) {
-      return;
+    // Only load data in edit mode (when agreementId > 0)
+    if (this.agreementId() > 0) {
+      this.isLoading.set(true);
+      this.agreementWizardService.getAgreementById(this.agreementId(), 3)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            if (response.succeeded && response.data?.thirdStepDto) {
+              this.populateForm(response.data.thirdStepDto);
+            }
+            this.isLoading.set(false);
+          },
+          error: (error) => {
+            console.error('Error loading agreement data:', error);
+            this.isLoading.set(false);
+          }
+        });
     }
+  }
 
-    this.isLoading.set(true);
-    
-    // TODO: Replace with actual API call to load agreement data
-    // Mock implementation
-    setTimeout(() => {
-      // Example: this.projectAreaUnits.set(response.data.projectAreaUnitDto || []);
-      this.isLoading.set(false);
-    }, 500);
+  private populateForm(data: ThirdStepDto): void {
+    if (data.projectAreaUnitDto && Array.isArray(data.projectAreaUnitDto)) {
+      // Map the existing DTO objects directly since they already have the correct structure
+      this.projectAreaUnits.set([...data.projectAreaUnitDto]);
+    }
+    console.log('Loaded step 3 data:', data);
   }
 
   onSubmit(): void {

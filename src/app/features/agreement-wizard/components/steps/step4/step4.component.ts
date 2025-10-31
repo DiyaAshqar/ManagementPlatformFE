@@ -77,6 +77,7 @@ export class Step4Component implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookups();
+    this.loadAgreementData();
   }
 
   ngOnDestroy(): void {
@@ -126,6 +127,35 @@ export class Step4Component implements OnInit, OnDestroy {
           this.isLoading.set(false);
         }
       });
+  }
+
+  private loadAgreementData(): void {
+    // Only load data in edit mode (when agreementId > 0)
+    if (this.agreementId() > 0) {
+      this.isLoading.set(true);
+      this.agreementWizardService.getAgreementById(this.agreementId(), 4)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            if (response.succeeded && response.data?.fourthStepDto) {
+              this.populateForm(response.data.fourthStepDto);
+            }
+            this.isLoading.set(false);
+          },
+          error: (error) => {
+            console.error('Error loading agreement data:', error);
+            this.isLoading.set(false);
+          }
+        });
+    }
+  }
+
+  private populateForm(data: FourthStepDto): void {
+    if (data.mainContractDto && Array.isArray(data.mainContractDto)) {
+      // Map the existing DTO objects directly since they already have the correct structure
+      this.mainContracts.set([...data.mainContractDto]);
+    }
+    console.log('Loaded step 4 data:', data);
   }
 
   onSubmit(): void {

@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, ElementRef, input, OnDestroy, OnInit, output, signal, ViewChild } from '@angular/core';
+import { Component, ElementRef, input, OnDestroy, OnInit, output, signal, ViewChild, inject } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -47,6 +48,8 @@ export class Step7Component implements OnInit, OnDestroy {
   currentStep = input.required<number>();
   agreementId = input.required<number>();
   stepData = output<any>();
+
+  private router = inject(Router);
 
   attachmentForm!: FormGroup;
   selectedFile = signal<File | null>(null);
@@ -304,12 +307,14 @@ export class Step7Component implements OnInit, OnDestroy {
               this.messageService.add({
                 severity: 'success',
                 summary: 'Success',
-                detail: response.message || 'Step 7 completed successfully',
+                detail: response.message || 'Agreement completed successfully',
                 life: 3000
               });
 
               // Emit data to parent component for state management
               this.stepData.emit(stepDataValue);
+
+              this.router.navigate(['/agreement-wizard/success']);
             } else {
               this.messageService.add({
                 severity: 'error',
@@ -343,6 +348,7 @@ export class Step7Component implements OnInit, OnDestroy {
 
   private loadExistingAttachments(): void {
     const agreementId = this.agreementId();
+    // Only load attachments in edit mode (when agreementId > 0)
     if (!agreementId || agreementId <= 0) {
       return;
     }

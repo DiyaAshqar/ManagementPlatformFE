@@ -64,6 +64,11 @@ export const routes: Routes = [
               .then(m => m.AgreementWizardComponent)
           },
           {
+            path: 'success',
+            loadComponent: () => import('./features/agreement-wizard/pages/agreement-success/agreement-success.component')
+              .then(m => m.AgreementSuccessComponent)
+          },
+          {
             path: 'edit/:id',
             loadComponent: () => import('./features/agreement-wizard/components/agreement-wizard.component')
               .then(m => m.AgreementWizardComponent)

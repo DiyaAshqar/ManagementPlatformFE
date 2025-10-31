@@ -49,6 +49,10 @@ export class Step2Component implements OnInit, OnDestroy {
   isLoading = signal(false);
   isFormValid = signal(false);
 
+  // Store IDs for update mode
+  private agreementPaymentId: number = 0;
+  private monthlyPaymentId: number = 0;
+
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -60,6 +64,7 @@ export class Step2Component implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookups();
+    this.loadAgreementData();
   }
 
   ngOnDestroy(): void {
@@ -104,6 +109,62 @@ export class Step2Component implements OnInit, OnDestroy {
           this.isLoading.set(false);
         }
       });
+  }
+
+  private loadAgreementData(): void {
+    // Only load data in edit mode (when agreementId > 0)
+    if (this.agreementId() > 0) {
+      this.isLoading.set(true);
+      this.agreementWizardService.getAgreementById(this.agreementId(), 2)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            if (response.succeeded && response.data?.secondStepDto) {
+              this.populateForm(response.data.secondStepDto);
+            }
+            this.isLoading.set(false);
+          },
+          error: (error) => {
+            console.error('Error loading agreement data:', error);
+            this.isLoading.set(false);
+          }
+        });
+    }
+  }
+
+  private populateForm(data: SecondStepDto): void {
+    if (data.agreementPaymentDto) {
+      // Store the IDs for update mode
+      this.agreementPaymentId = data.agreementPaymentDto.id || 0;
+      this.monthlyPaymentId = data.agreementPaymentDto.monthlyPaymentDto?.id || 0;
+
+      this.step2Form.patchValue({
+        contractTypeId: data.agreementPaymentDto.contractTypeId,
+        contractModelId: data.agreementPaymentDto.contractModelId,
+        paymentMethodId: data.agreementPaymentDto.paymentMethodId,
+        amount: data.agreementPaymentDto.monthlyPaymentDto?.amount
+      });
+      
+      // Enable/disable amount field based on payment method
+      if (data.agreementPaymentDto.paymentMethodId === 1) {
+        this.step2Form.get('amount')?.enable();
+      }
+    }
+    
+    if (data.agreementServiceDto && Array.isArray(data.agreementServiceDto)) {
+      // Clear existing services
+      this.selectedServicesArray.clear();
+      
+      // Add selected services
+      data.agreementServiceDto.forEach(service => {
+        if (service.serviceId) {
+          this.selectedServicesArray.push(this.fb.control(service.serviceId));
+        }
+      });
+    }
+    
+    console.log('Loaded step 2 data:', data);
+    console.log('Stored IDs - Payment:', this.agreementPaymentId, 'Monthly:', this.monthlyPaymentId);
   }
 
   get selectedServicesArray(): FormArray {
@@ -172,16 +233,19 @@ export class Step2Component implements OnInit, OnDestroy {
 
     // Map AgreementPaymentDto
     const agreementPaymentDto = new AgreementPaymentDto();
-    agreementPaymentDto.id = 0;
+    // Use stored ID if in edit mode, otherwise 0 for create
+    agreementPaymentDto.id = this.agreementPaymentId;
     agreementPaymentDto.contractTypeId = formValue.contractTypeId || 0;
     agreementPaymentDto.contractModelId = formValue.contractModelId || 0;
     agreementPaymentDto.paymentMethodId = formValue.paymentMethodId || 0;
-    agreementPaymentDto.monthlyPaymentId = 0;
+    // Use stored monthly payment ID if in edit mode
+    agreementPaymentDto.monthlyPaymentId = this.monthlyPaymentId;
     agreementPaymentDto.agreementId = this.agreementId() || 0;
 
     // Map MonthlyPaymentDto (only if amount is provided)
     const monthlyPaymentDto = new MonthlyPaymentDto();
-    monthlyPaymentDto.id = 0;
+    // Use stored ID if in edit mode, otherwise 0 for create
+    monthlyPaymentDto.id = this.monthlyPaymentId;
     monthlyPaymentDto.amount = formValue.amount ? parseFloat(formValue.amount) : 0;
     agreementPaymentDto.monthlyPaymentDto = monthlyPaymentDto;
 
@@ -201,6 +265,8 @@ export class Step2Component implements OnInit, OnDestroy {
     fullAgreementDto.step = 2;
     fullAgreementDto.agreementId = this.agreementId() || 0;
     fullAgreementDto.secondStepDto = secondStepDto;
+
+    console.log('Submitting FullAgreementDto:', JSON.stringify(fullAgreementDto, null, 2));
 
     return fullAgreementDto;
   }

@@ -1,5 +1,6 @@
-import { Component, signal, computed } from '@angular/core';
+import { Component, signal, computed, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute, Router } from '@angular/router';
 import { StepperModule } from 'primeng/stepper';
 import { ButtonModule } from 'primeng/button';
 import { Step1Component } from './steps/step1/step1.component';
@@ -29,11 +30,12 @@ import { TranslateModule } from '@ngx-translate/core';
   ],
   templateUrl: './agreement-wizard.component.html'
 })
-export class AgreementWizardComponent {
-  currentStep = signal(7); // Set to step 4 for debugging
-  agreementId = signal(1); // Set to test agreement ID 1 for debugging
-  // currentStep = signal(1);
-  // agreementId = signal(0);
+export class AgreementWizardComponent implements OnInit {
+  private route = inject(ActivatedRoute);
+  private router = inject(Router);
+  
+  currentStep = signal(1);
+  agreementId = signal(0);
 
   // Store data from each step
   step1Data = signal<any>(null);
@@ -76,6 +78,25 @@ export class AgreementWizardComponent {
     'wizard.step6.title',
     'wizard.step7.title'
   ];
+
+  ngOnInit(): void {
+    // Get the agreement ID from route params if in edit/view mode
+    this.route.params.subscribe(params => {
+      const id = params['id'];
+      if (id) {
+        const parsedId = parseInt(id, 10);
+        if (!isNaN(parsedId)) {
+          this.agreementId.set(parsedId);
+          console.log('Edit/View mode - Agreement ID:', parsedId);
+        }
+      } else {
+        // Create mode
+        this.agreementId.set(0);
+        this.currentStep.set(1);
+        console.log('Create mode - Agreement ID: 0');
+      }
+    });
+  }
 
   onStep1Data(data: any) {
     this.step1Data.set(data);
@@ -145,6 +166,8 @@ export class AgreementWizardComponent {
     };
 
     console.log('Complete wizard data:', completeData);
-    // TODO: Submit to backend
+    
+    // Navigate to success page
+    this.router.navigate(['/agreement-wizard/success']);
   }
 }

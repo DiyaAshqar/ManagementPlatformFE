@@ -64,6 +64,7 @@ export class Step1Component implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookups();
+    this.loadAgreementData();
   }
 
   ngOnDestroy(): void {
@@ -137,6 +138,76 @@ export class Step1Component implements OnInit, OnDestroy {
           this.isLoading.set(false);
         }
       });
+  }
+
+  private loadAgreementData(): void {
+    // Only load data in edit mode (when agreementId > 0)
+    if (this.agreementId() > 0) {
+      this.isLoading.set(true);
+      this.agreementWizardService.getAgreementById(this.agreementId(), 1)
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (response) => {
+            if (response.succeeded && response.data?.firstStepDto) {
+              this.populateForm(response.data.firstStepDto);
+            }
+            this.isLoading.set(false);
+          },
+          error: (error) => {
+            console.error('Error loading agreement data:', error);
+            this.isLoading.set(false);
+          }
+        });
+    }
+  }
+
+  private populateForm(data: FirstStepDto): void {
+    if (data.agreementDto) {
+      this.step1Form.patchValue({
+        agreementDto: {
+          id: data.agreementDto.id,
+          projectNumber: data.agreementDto.projectNumber,
+          agreementDate: data.agreementDto.agreementDate ? new Date(data.agreementDto.agreementDate) : new Date(),
+          projectName: data.agreementDto.projectName,
+          businessSector: data.agreementDto.businessSector,
+          estimatedStartDate: data.agreementDto.estimatedStartDate ? new Date(data.agreementDto.estimatedStartDate) : new Date(),
+          estimatedEndDate: data.agreementDto.estimatedEndDate ? new Date(data.agreementDto.estimatedEndDate) : new Date(),
+          countryId: data.agreementDto.countryId,
+          cityId: data.agreementDto.cityId,
+          projectArea: data.agreementDto.projectArea,
+          drillingQuantity: data.agreementDto.drillingQuantity,
+          agreementTypeId: data.agreementDto.agreementTypeId
+        }
+      });
+    }
+    
+    if (data.clientDto) {
+      this.step1Form.patchValue({
+        clientDto: {
+          id: data.clientDto.id,
+          contactPerson: data.clientDto.contactPerson,
+          contactPersonNumber: data.clientDto.contactPersonNumber?.toString(),
+          representerName: data.clientDto.representerName,
+          representerNameNumber: data.clientDto.representerNameNumber?.toString()
+        }
+      });
+    }
+    
+    if (data.landInformationDto) {
+      this.step1Form.patchValue({
+        landInformationDto: {
+          id: data.landInformationDto.id,
+          basinName: data.landInformationDto.basinName,
+          village: data.landInformationDto.village,
+          directorate: data.landInformationDto.directorate,
+          plotNumber: data.landInformationDto.plotNumber?.toString(),
+          basinNumber: data.landInformationDto.basinNumber?.toString(),
+          floorNumber: data.landInformationDto.floorNumber?.toString()
+        }
+      });
+    }
+    
+    console.log('Loaded step 1 data:', data);
   }
 
   onSubmit(): void {

@@ -1,0 +1,32 @@
+<div class="success-container">
+  <div class="success-card">
+    <div class="success-icon">
+      <i class="pi pi-check-circle"></i>
+    </div>
+    
+    <h1 class="success-title">
+      {{ 'wizard.success.title' | translate }}
+    </h1>
+    
+    <p class="success-message">
+      {{ 'wizard.success.message' | translate }}
+    </p>
+    
+    <div class="success-actions">
+      <p-button 
+        [label]="'wizard.success.viewList' | translate"
+        icon="pi pi-list"
+        (onClick)="goToAgreementList()"
+        styleClass="p-button-lg"
+      />
+      
+      <p-button 
+        [label]="'wizard.success.createNew' | translate"
+        icon="pi pi-plus"
+        (onClick)="createNewAgreement()"
+        severity="secondary"
+        styleClass="p-button-lg"
+      />
+    </div>
+  </div>
+</div>

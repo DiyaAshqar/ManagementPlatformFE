@@ -50,7 +50,7 @@
                 [label]="'wizard.back' | translate" 
                 severity="secondary" 
                 icon="pi pi-arrow-left"
-                (onClick)="activateCallback(1)"
+                (onClick)="goToStep(1)"
               />
               <p-button 
                 [label]="'wizard.next' | translate" 
@@ -80,7 +80,7 @@
                 [label]="'wizard.back' | translate" 
                 severity="secondary" 
                 icon="pi pi-arrow-left"
-                (onClick)="activateCallback(2)"
+                (onClick)="goToStep(2)"
               />
               <p-button 
                 [label]="'wizard.next' | translate" 
@@ -110,7 +110,7 @@
                 [label]="'wizard.back' | translate" 
                 severity="secondary" 
                 icon="pi pi-arrow-left"
-                (onClick)="activateCallback(3)"
+                (onClick)="goToStep(3)"
               />
               <p-button 
                 [label]="'wizard.next' | translate" 
@@ -140,7 +140,7 @@
                 [label]="'wizard.back' | translate" 
                 severity="secondary" 
                 icon="pi pi-arrow-left"
-                (onClick)="activateCallback(4)"
+                (onClick)="goToStep(4)"
               />
               <p-button 
                 [label]="'wizard.next' | translate" 
@@ -169,7 +169,7 @@
                 [label]="'wizard.back' | translate" 
                 severity="secondary" 
                 icon="pi pi-arrow-left"
-                (onClick)="activateCallback(5)"
+                (onClick)="goToStep(5)"
               />
               <p-button 
                 [label]="'wizard.next' | translate" 
@@ -198,13 +198,13 @@
                 [label]="'wizard.back' | translate" 
                 severity="secondary" 
                 icon="pi pi-arrow-left"
-                (onClick)="activateCallback(6)"
+                (onClick)="goToStep(6)"
               />
               <p-button 
                 [label]="'wizard.submit' | translate" 
                 icon="pi pi-check" 
                 iconPos="right"
-                (onClick)="step7Component.validateStep(); step7Data() && submitWizard()"
+                (onClick)="step7Component.validateStep()"
               />
             </div>
           </div>

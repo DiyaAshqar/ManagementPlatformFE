@@ -79,6 +79,12 @@
     "next": "Next",
     "back": "Back",
     "submit": "Submit",
+    "success": {
+      "title": "Agreement Created Successfully!",
+      "message": "Your agreement has been submitted and saved successfully. You can now view it in the agreements list or create a new one.",
+      "viewList": "View Agreements List",
+      "createNew": "Create New Agreement"
+    },
     "step1": {
       "title": "Agreement Details",
       "agreementDetails": "Agreement Information",

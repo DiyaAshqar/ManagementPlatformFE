@@ -97,7 +97,8 @@ export class Step5Component implements OnInit, OnDestroy {
   }
 
   private loadAgreementData(): void {
-    if (this.agreementId() !== 0) {
+    // Only load data in edit mode (when agreementId > 0)
+    if (this.agreementId() > 0) {
       this.isLoading.set(true);
       this.agreementWizardService.getAgreementById(this.agreementId(), 5)
         .pipe(takeUntil(this.destroy$))
