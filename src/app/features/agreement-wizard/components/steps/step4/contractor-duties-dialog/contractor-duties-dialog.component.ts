@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, input, OnDestroy, OnInit, output, signal } from '@angular/core';
+import { Component, input, OnDestroy, OnInit, output, signal, effect } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
@@ -44,6 +44,7 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
   agreementId = input.required<number>();
   mainContractId = input.required<number>();
   existingContractorDuties = input<ContractorDutyDto[]>([]);
+  isViewMode = input<boolean>(false);
   
   closeDialog = output<void>();
   contractorDutyData = output<ContractorDutyDto[]>();
@@ -64,12 +65,18 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private messageService: MessageService,
     private agreementWizardService: AgreementWizardService
-  ) {}
+  ) {
+    // Watch for changes in existingContractorDuties and reload when dialog opens
+    effect(() => {
+      if (this.visible() && this.existingContractorDuties()) {
+        this.loadExistingContractorDuties();
+      }
+    });
+  }
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookups();
-    this.loadExistingContractorDuties();
   }
 
   ngOnDestroy(): void {

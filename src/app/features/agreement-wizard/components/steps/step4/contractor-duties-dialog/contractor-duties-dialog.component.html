@@ -14,6 +14,7 @@
   }
 
   <!-- Form Section -->
+  @if (!isViewMode()) {
   <div class="mb-4">
     <h4 class="text-lg font-semibold mb-4">{{ 'wizard.step4.addContractorDuty' | translate }}</h4>
 
@@ -160,6 +161,7 @@
       </div>
     </form>
   </div>
+  }
 
   <!-- Table Section -->
   <div class="mb-4">
@@ -187,7 +189,9 @@
             <th>{{ 'wizard.step4.unit' | translate }}</th>
             <th>{{ 'wizard.step4.dutyType' | translate }}</th>
             <th>{{ 'wizard.step4.dutyResponsibility' | translate }}</th>
+            @if (!isViewMode()) {
             <th class="text-center" style="width: 120px">{{ 'common.actions' | translate }}</th>
+            }
           </tr>
         </ng-template>
         
@@ -199,6 +203,7 @@
             <td>{{ getUnitName(duty.unitId) }}</td>
             <td>{{ getDutyTypeName(duty.dutyTypeId) }}</td>
             <td>{{ getDutyResponsibilityName(duty.dutyResponsibilityId) }}</td>
+            @if (!isViewMode()) {
             <td class="text-center">
               <button 
                 type="button"
@@ -217,6 +222,7 @@
                 [pTooltip]="'common.delete' | translate">
               </button>
             </td>
+            }
           </tr>
         </ng-template>
         
@@ -236,17 +242,19 @@
   <ng-template pTemplate="footer">
     <div class="flex justify-end gap-2">
       <p-button 
-        [label]="'common.cancel' | translate" 
+        [label]="isViewMode() ? ('common.close' | translate) : ('common.cancel' | translate)" 
         severity="secondary" 
-        icon="pi pi-times"
+        [icon]="isViewMode() ? 'pi pi-check' : 'pi pi-times'"
         (onClick)="onDialogHide()">
       </p-button>
+      @if (!isViewMode()) {
       <p-button 
         [label]="'common.saveAll' | translate" 
         icon="pi pi-save" 
         (onClick)="saveAllContractorDuties()"
         [disabled]="contractorDuties().length === 0">
       </p-button>
+      }
     </div>
   </ng-template>
 </p-dialog>

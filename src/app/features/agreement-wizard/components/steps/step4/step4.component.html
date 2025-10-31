@@ -129,9 +129,7 @@
                         <th>{{ 'wizard.step4.totalAmount' | translate }}</th>
                         <th>{{ 'wizard.step4.startDate' | translate }}</th>
                         <th>{{ 'wizard.step4.endDate' | translate }}</th>
-                        @if (!isViewMode()) {
-                        <th class="text-center" style="width: 250px">{{ 'common.actions' | translate }}</th>
-                        }
+                        <th class="text-center" [style.width]="isViewMode() ? '150px' : '250px'">{{ 'common.actions' | translate }}</th>
                     </tr>
                 </ng-template>
                 
@@ -142,7 +140,6 @@
                         <td>{{ contract.total | currency:'USD':'symbol':'1.2-2' }}</td>
                         <td>{{ formatDate(contract.startDate) }}</td>
                         <td>{{ formatDate(contract.endDate) }}</td>
-                        @if (!isViewMode()) {
                         <td class="text-center">
                             <button 
                                 type="button"
@@ -152,6 +149,7 @@
                                     icon="pi pi-briefcase"
                                     [pTooltip]="'wizard.step4.contractorDuties' | translate">
                             </button>
+                            @if (!isViewMode()) {
                             <button 
                                 type="button"
                                 class="p-button-rounded p-button-text p-button-info mr-2"
@@ -168,8 +166,8 @@
                                 icon="pi pi-trash"
                                 [pTooltip]="'common.delete' | translate">
                             </button>
+                            }
                         </td>
-                        }
                     </tr>
                 </ng-template>
                 
@@ -191,6 +189,7 @@
         [agreementId]="agreementId()"
         [mainContractId]="selectedMainContractId()"
         [existingContractorDuties]="getSelectedContractorDuties()"
+        [isViewMode]="isViewMode()"
         (closeDialog)="onContractorDutiesDialogClose()"
         (contractorDutyData)="onContractorDutyDataReceived($event)">
     </app-contractor-duties-dialog>
