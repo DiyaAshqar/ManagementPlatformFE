@@ -6,6 +6,7 @@
     }
 
     <!-- Form Section -->
+    @if (!isViewMode()) {
     <div class="col-12 mb-4">
         <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step4.title' | translate }}</h3>
 
@@ -101,6 +102,7 @@
             </div>
         </form>
     </div>
+    }
 
     <!-- Table Section -->
     <div class="col-12">
@@ -127,7 +129,9 @@
                         <th>{{ 'wizard.step4.totalAmount' | translate }}</th>
                         <th>{{ 'wizard.step4.startDate' | translate }}</th>
                         <th>{{ 'wizard.step4.endDate' | translate }}</th>
+                        @if (!isViewMode()) {
                         <th class="text-center" style="width: 250px">{{ 'common.actions' | translate }}</th>
+                        }
                     </tr>
                 </ng-template>
                 
@@ -138,6 +142,7 @@
                         <td>{{ contract.total | currency:'USD':'symbol':'1.2-2' }}</td>
                         <td>{{ formatDate(contract.startDate) }}</td>
                         <td>{{ formatDate(contract.endDate) }}</td>
+                        @if (!isViewMode()) {
                         <td class="text-center">
                             <button 
                                 type="button"
@@ -164,6 +169,7 @@
                                 [pTooltip]="'common.delete' | translate">
                             </button>
                         </td>
+                        }
                     </tr>
                 </ng-template>
                 

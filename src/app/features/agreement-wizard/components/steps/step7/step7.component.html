@@ -6,6 +6,7 @@
     }
 
     <!-- File Upload Section -->
+    @if (!isViewMode()) {
     <div class="col-12 mb-4">
         <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step7.title' | translate }}</h3>
         <p class="text-color-secondary mb-4">{{ 'wizard.step7.description' | translate }}</p>
@@ -102,6 +103,7 @@
             </div>
         </form>
     </div>
+    }
 
     <!-- Attachments List -->
     <div class="col-12">
@@ -151,6 +153,7 @@
                                 icon="pi pi-download"
                                 [pTooltip]="'wizard.step7.download' | translate">
                             </button>
+                            @if (!isViewMode()) {
                             <button
                                 type="button"
                                 class="p-button-rounded p-button-text p-button-danger"
@@ -159,6 +162,7 @@
                                 icon="pi pi-trash"
                                 [pTooltip]="'common.delete' | translate">
                             </button>
+                            }
                         </div>
                     </div>
                 </div>

@@ -36,6 +36,7 @@ export class AgreementWizardComponent implements OnInit {
   
   currentStep = signal(1);
   agreementId = signal(0);
+  isViewMode = signal(false);
 
   // Store data from each step
   step1Data = signal<any>(null);
@@ -87,10 +88,15 @@ export class AgreementWizardComponent implements OnInit {
         const parsedId = parseInt(id, 10);
         if (!isNaN(parsedId)) {
           this.agreementId.set(parsedId);
+          
+          // Detect view mode from URL
+          const urlPath = this.router.url.split('?')[0];
+          this.isViewMode.set(urlPath.includes('/view/'));
         }
       } else {
         // Create mode
         this.agreementId.set(0);
+        this.isViewMode.set(false);
       }
     });
 

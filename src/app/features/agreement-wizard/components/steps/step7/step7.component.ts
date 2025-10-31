@@ -47,6 +47,7 @@ export class Step7Component implements OnInit, OnDestroy {
   // Angular 19 signals for inputs/outputs
   currentStep = input.required<number>();
   agreementId = input.required<number>();
+  isViewMode = input<boolean>(false);
   stepData = output<any>();
 
   private router = inject(Router);
@@ -71,6 +72,11 @@ export class Step7Component implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeForm();
     this.loadExistingAttachments();
+    
+    // Disable all fields if in view mode
+    if (this.isViewMode()) {
+      this.attachmentForm.disable();
+    }
   }
 
   ngOnDestroy(): void {

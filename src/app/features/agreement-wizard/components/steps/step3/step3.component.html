@@ -7,6 +7,7 @@
         }
 
         <!-- Input Form Section -->
+        @if (!isViewMode()) {
         <div class="col-12 mb-4">
             <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step3.projectAreaUnits' | translate }}</h3>
 
@@ -97,6 +98,7 @@
                 </div>
             </div>
         </div>
+        }
 
         <!-- Data Table Section -->
         <div class="col-12">
@@ -121,7 +123,9 @@
                             <th>{{ 'wizard.step3.annexName' | translate }}</th>
                             <th>{{ 'wizard.step3.quantity' | translate }}</th>
                             <th>{{ 'wizard.step3.unit' | translate }}</th>
+                            @if (!isViewMode()) {
                             <th class="text-center" style="width: 150px">{{ 'wizard.step3.actions' | translate }}</th>
+                            }
                         </tr>
                     </ng-template>
                     
@@ -130,6 +134,7 @@
                             <td>{{ getAnnexName(entry.annexId) }}</td>
                             <td>{{ entry.amount | number }}</td>
                             <td>{{ getUnitName(entry.unitId) }}</td>
+                            @if (!isViewMode()) {
                             <td class="text-center">
                                 <button 
                                     type="button"
@@ -148,6 +153,7 @@
                                     [pTooltip]="'wizard.step3.delete' | translate">
                                 </button>
                             </td>
+                            }
                         </tr>
                     </ng-template>
                     

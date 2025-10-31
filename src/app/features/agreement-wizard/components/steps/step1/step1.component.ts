@@ -40,6 +40,7 @@ export class Step1Component implements OnInit, OnDestroy {
   // Angular 19 signals for inputs/outputs
   currentStep = input.required<number>();
   agreementId = input.required<number>();
+  isViewMode = input<boolean>(false);
   stepData = output<any>();
   agreementIdUpdate = output<number>();
 
@@ -65,6 +66,11 @@ export class Step1Component implements OnInit, OnDestroy {
     this.initializeForm();
     this.loadLookups();
     this.loadAgreementData();
+    
+    // Disable all fields if in view mode
+    if (this.isViewMode()) {
+      this.step1Form.disable();
+    }
   }
 
   ngOnDestroy(): void {
@@ -95,9 +101,9 @@ export class Step1Component implements OnInit, OnDestroy {
       clientDto: this.fb.group({
         id: [0],
         contactPerson: ['', [Validators.required, Validators.maxLength(100)]],
-        contactPersonNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
+        contactPersonNumber: ['', [Validators.required]],
         representerName: ['', [Validators.required, Validators.maxLength(100)]],
-        representerNameNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]]
+        representerNameNumber: ['', [Validators.required]]
       }),
       landInformationDto: this.fb.group({
         id: [0],

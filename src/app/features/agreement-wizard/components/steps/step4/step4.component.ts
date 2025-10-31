@@ -46,6 +46,7 @@ export class Step4Component implements OnInit, OnDestroy {
   // Angular 19 signals for inputs/outputs
   currentStep = input.required<number>();
   agreementId = input.required<number>();
+  isViewMode = input<boolean>(false);
   stepData = output<any>();
 
   mainContractForm!: FormGroup;
@@ -78,6 +79,11 @@ export class Step4Component implements OnInit, OnDestroy {
     this.initializeForm();
     this.loadLookups();
     this.loadAgreementData();
+    
+    // Disable all fields if in view mode
+    if (this.isViewMode()) {
+      this.mainContractForm.disable();
+    }
   }
 
   ngOnDestroy(): void {

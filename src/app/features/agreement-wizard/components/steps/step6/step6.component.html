@@ -6,6 +6,7 @@
     }
 
     <!-- Form Section -->
+    @if (!isViewMode()) {
     <div class="col-12 mb-4">
         <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step6.title' | translate }}</h3>
 
@@ -136,6 +137,7 @@
             </div>
         </form>
     </div>
+    }
 
     <!-- Table Section -->
     <div class="col-12">
@@ -163,7 +165,9 @@
                         <th>{{ 'wizard.step6.milestone' | translate }}</th>
                         <th>{{ 'wizard.step6.price' | translate }}</th>
                         <th>{{ 'wizard.step6.total' | translate }}</th>
+                        @if (!isViewMode()) {
                         <th class="text-center" style="width: 150px">{{ 'common.actions' | translate }}</th>
+                        }
                     </tr>
                 </ng-template>
                 
@@ -175,6 +179,7 @@
                         <td>{{ getMilestoneName(entry.mileStoneId) }}</td>
                         <td>{{ entry.price | currency:'USD':'symbol':'1.2-2' }}</td>
                         <td class="font-semibold">{{ calculateTotal(entry) | currency:'USD':'symbol':'1.2-2' }}</td>
+                        @if (!isViewMode()) {
                         <td class="text-center">
                             <button 
                                 type="button"
@@ -193,6 +198,7 @@
                                 [pTooltip]="'common.delete' | translate">
                             </button>
                         </td>
+                        }
                     </tr>
                 </ng-template>
                 

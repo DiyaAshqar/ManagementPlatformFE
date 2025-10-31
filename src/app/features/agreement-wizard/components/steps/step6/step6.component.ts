@@ -36,6 +36,7 @@ export class Step6Component implements OnInit, OnDestroy {
   // Angular 19 signals for inputs/outputs
   currentStep = input.required<number>();
   agreementId = input.required<number>();
+  isViewMode = input<boolean>(false);
   stepData = output<any>();
 
   step6Form!: FormGroup;
@@ -60,6 +61,11 @@ export class Step6Component implements OnInit, OnDestroy {
     this.initializeForm();
     this.loadLookups();
     this.loadAgreementData();
+    
+    // Disable all fields if in view mode
+    if (this.isViewMode()) {
+      this.step6Form.disable();
+    }
   }
 
   ngOnDestroy(): void {

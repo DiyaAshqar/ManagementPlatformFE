@@ -1,8 +1,12 @@
 <div class="card flex justify-center p-4">
-  <p-stepper [value]="currentStep()" class="w-full" [linear]="true">
+  <p-stepper [value]="currentStep()" class="w-full" [linear]="!isViewMode()">
     <p-step-list>
       @for (label of stepLabels; track $index) {
-        <p-step [value]="$index + 1">
+        <p-step 
+          [value]="$index + 1"
+          (click)="isViewMode() && goToStep($index + 1)"
+          [style.cursor]="isViewMode() ? 'pointer' : 'default'"
+        >
           {{ label | translate }}
         </p-step>
       }
@@ -17,19 +21,22 @@
               #step1Component
               [currentStep]="currentStep()"
               [agreementId]="agreementId()"
+              [isViewMode]="isViewMode()"
               (stepData)="onStep1Data($event)"
               (agreementIdUpdate)="onAgreementIdUpdate($event)"
             ></app-step1>
             
-            <div class="flex pt-4 justify-end gap-2">
-              <p-button 
-                [label]="'wizard.next' | translate" 
-                icon="pi pi-arrow-right" 
-                iconPos="right"
-                [disabled]="!step1Component.isFormValid()"
-                (onClick)="step1Component.onSubmit()"
-              />
-            </div>
+            @if (!isViewMode()) {
+              <div class="flex pt-4 justify-end gap-2">
+                <p-button 
+                  [label]="'wizard.next' | translate" 
+                  icon="pi pi-arrow-right" 
+                  iconPos="right"
+                  [disabled]="!step1Component.isFormValid()"
+                  (onClick)="step1Component.onSubmit()"
+                />
+              </div>
+            }
           </div>
         </ng-template>
       </p-step-panel>
@@ -42,24 +49,27 @@
               #step2Component
               [currentStep]="currentStep()"
               [agreementId]="agreementId()"
+              [isViewMode]="isViewMode()"
               (stepData)="onStep2Data($event)"
             ></app-step2>
             
-            <div class="flex pt-4 justify-between gap-2">
-              <p-button 
-                [label]="'wizard.back' | translate" 
-                severity="secondary" 
-                icon="pi pi-arrow-left"
-                (onClick)="goToStep(1)"
-              />
-              <p-button 
-                [label]="'wizard.next' | translate" 
-                icon="pi pi-arrow-right" 
-                iconPos="right"
-                [disabled]="!step2Component.isFormValid()"
-                (onClick)="step2Component.onSubmit()"
-              />
-            </div>
+            @if (!isViewMode()) {
+              <div class="flex pt-4 justify-between gap-2">
+                <p-button 
+                  [label]="'wizard.back' | translate" 
+                  severity="secondary" 
+                  icon="pi pi-arrow-left"
+                  (onClick)="goToStep(1)"
+                />
+                <p-button 
+                  [label]="'wizard.next' | translate" 
+                  icon="pi pi-arrow-right" 
+                  iconPos="right"
+                  [disabled]="!step2Component.isFormValid()"
+                  (onClick)="step2Component.onSubmit()"
+                />
+              </div>
+            }
           </div>
         </ng-template>
       </p-step-panel>
@@ -72,24 +82,27 @@
               #step3Component
               [currentStep]="currentStep()"
               [agreementId]="agreementId()"
+              [isViewMode]="isViewMode()"
               (stepData)="onStep3Data($event)"
             ></app-step3>
             
-            <div class="flex pt-4 justify-between gap-2">
-              <p-button 
-                [label]="'wizard.back' | translate" 
-                severity="secondary" 
-                icon="pi pi-arrow-left"
-                (onClick)="goToStep(2)"
-              />
-              <p-button 
-                [label]="'wizard.next' | translate" 
-                icon="pi pi-arrow-right" 
-                iconPos="right"
-                [disabled]="step3Component.projectAreaUnits().length === 0"
-                (onClick)="step3Component.onSubmit()"
-              />
-            </div>
+            @if (!isViewMode()) {
+              <div class="flex pt-4 justify-between gap-2">
+                <p-button 
+                  [label]="'wizard.back' | translate" 
+                  severity="secondary" 
+                  icon="pi pi-arrow-left"
+                  (onClick)="goToStep(2)"
+                />
+                <p-button 
+                  [label]="'wizard.next' | translate" 
+                  icon="pi pi-arrow-right" 
+                  iconPos="right"
+                  [disabled]="step3Component.projectAreaUnits().length === 0"
+                  (onClick)="step3Component.onSubmit()"
+                />
+              </div>
+            }
           </div>
         </ng-template>
       </p-step-panel>
@@ -102,24 +115,27 @@
               #step4Component
               [currentStep]="currentStep()"
               [agreementId]="agreementId()"
+              [isViewMode]="isViewMode()"
               (stepData)="onStep4Data($event)"
             ></app-step4>
             
-            <div class="flex pt-4 justify-between gap-2">
-              <p-button 
-                [label]="'wizard.back' | translate" 
-                severity="secondary" 
-                icon="pi pi-arrow-left"
-                (onClick)="goToStep(3)"
-              />
-              <p-button 
-                [label]="'wizard.next' | translate" 
-                icon="pi pi-arrow-right" 
-                iconPos="right"
-                [disabled]="step4Component.mainContracts().length === 0"
-                (onClick)="step4Component.onSubmit()"
-              />
-            </div>
+            @if (!isViewMode()) {
+              <div class="flex pt-4 justify-between gap-2">
+                <p-button 
+                  [label]="'wizard.back' | translate" 
+                  severity="secondary" 
+                  icon="pi pi-arrow-left"
+                  (onClick)="goToStep(3)"
+                />
+                <p-button 
+                  [label]="'wizard.next' | translate" 
+                  icon="pi pi-arrow-right" 
+                  iconPos="right"
+                  [disabled]="step4Component.mainContracts().length === 0"
+                  (onClick)="step4Component.onSubmit()"
+                />
+              </div>
+            }
           </div>
         </ng-template>
       </p-step-panel>
@@ -132,23 +148,26 @@
               #step5Component
               [currentStep]="currentStep()"
               [agreementId]="agreementId()"
+              [isViewMode]="isViewMode()"
               (stepData)="onStep5Data($event)"
             ></app-step5>
             
-            <div class="flex pt-4 justify-between gap-2">
-              <p-button 
-                [label]="'wizard.back' | translate" 
-                severity="secondary" 
-                icon="pi pi-arrow-left"
-                (onClick)="goToStep(4)"
-              />
-              <p-button 
-                [label]="'wizard.next' | translate" 
-                icon="pi pi-arrow-right" 
-                iconPos="right"
-                (onClick)="step5Component.onSubmit()"
-              />
-            </div>
+            @if (!isViewMode()) {
+              <div class="flex pt-4 justify-between gap-2">
+                <p-button 
+                  [label]="'wizard.back' | translate" 
+                  severity="secondary" 
+                  icon="pi pi-arrow-left"
+                  (onClick)="goToStep(4)"
+                />
+                <p-button 
+                  [label]="'wizard.next' | translate" 
+                  icon="pi pi-arrow-right" 
+                  iconPos="right"
+                  (onClick)="step5Component.onSubmit()"
+                />
+              </div>
+            }
           </div>
         </ng-template>
       </p-step-panel>
@@ -161,23 +180,26 @@
               #step6Component
               [currentStep]="currentStep()"
               [agreementId]="agreementId()"
+              [isViewMode]="isViewMode()"
               (stepData)="onStep6Data($event)"
             ></app-step6>
             
-            <div class="flex pt-4 justify-between gap-2">
-              <p-button 
-                [label]="'wizard.back' | translate" 
-                severity="secondary" 
-                icon="pi pi-arrow-left"
-                (onClick)="goToStep(5)"
-              />
-              <p-button 
-                [label]="'wizard.next' | translate" 
-                icon="pi pi-arrow-right" 
-                iconPos="right"
-                (onClick)="step6Component.onSubmit()"
-              />
-            </div>
+            @if (!isViewMode()) {
+              <div class="flex pt-4 justify-between gap-2">
+                <p-button 
+                  [label]="'wizard.back' | translate" 
+                  severity="secondary" 
+                  icon="pi pi-arrow-left"
+                  (onClick)="goToStep(5)"
+                />
+                <p-button 
+                  [label]="'wizard.next' | translate" 
+                  icon="pi pi-arrow-right" 
+                  iconPos="right"
+                  (onClick)="step6Component.onSubmit()"
+                />
+              </div>
+            }
           </div>
         </ng-template>
       </p-step-panel>
@@ -190,23 +212,26 @@
               #step7Component
               [currentStep]="currentStep()"
               [agreementId]="agreementId()"
+              [isViewMode]="isViewMode()"
               (stepData)="onStep7Data($event)"
             ></app-step7>
             
-            <div class="flex pt-4 justify-between gap-2">
-              <p-button 
-                [label]="'wizard.back' | translate" 
-                severity="secondary" 
-                icon="pi pi-arrow-left"
-                (onClick)="goToStep(6)"
-              />
-              <p-button 
-                [label]="'wizard.submit' | translate" 
-                icon="pi pi-check" 
-                iconPos="right"
-                (onClick)="step7Component.validateStep()"
-              />
-            </div>
+            @if (!isViewMode()) {
+              <div class="flex pt-4 justify-between gap-2">
+                <p-button 
+                  [label]="'wizard.back' | translate" 
+                  severity="secondary" 
+                  icon="pi pi-arrow-left"
+                  (onClick)="goToStep(6)"
+                />
+                <p-button 
+                  [label]="'wizard.submit' | translate" 
+                  icon="pi pi-check" 
+                  iconPos="right"
+                  (onClick)="step7Component.validateStep()"
+                />
+              </div>
+            }
           </div>
         </ng-template>
       </p-step-panel>
