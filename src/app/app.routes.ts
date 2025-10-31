@@ -5,7 +5,7 @@ export const routes: Routes = [
   // Root redirect
   {
     path: '',
-    redirectTo: '/dashboard',
+    redirectTo: '/agreement-wizard',
     pathMatch: 'full'
   },
 
@@ -35,11 +35,6 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     loadComponent: () => import('./layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
     children: [
-      {
-        path: 'dashboard',
-        loadComponent: () => import('./features/dashboard/dashboard.component')
-          .then(m => m.DashboardComponent)
-      },
       {
         path: 'analytics',
         loadComponent: () => import('./features/analytics/analytics.component')
