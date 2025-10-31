@@ -80,78 +80,98 @@ export class AgreementWizardComponent implements OnInit {
   ];
 
   ngOnInit(): void {
-    // Get the agreement ID from route params if in edit/view mode
+    // Subscribe to both params and queryParams
     this.route.params.subscribe(params => {
       const id = params['id'];
       if (id) {
         const parsedId = parseInt(id, 10);
         if (!isNaN(parsedId)) {
           this.agreementId.set(parsedId);
-          console.log('Edit/View mode - Agreement ID:', parsedId);
         }
       } else {
         // Create mode
         this.agreementId.set(0);
+      }
+    });
+
+    // Get the step from query parameters
+    this.route.queryParams.subscribe(queryParams => {
+      const step = queryParams['step'];
+      if (step) {
+        const parsedStep = parseInt(step, 10);
+        if (!isNaN(parsedStep) && parsedStep >= 1 && parsedStep <= 7) {
+          this.currentStep.set(parsedStep);
+        } else {
+          // Invalid step, default to step 1
+          this.currentStep.set(1);
+          this.updateUrlStep(1);
+        }
+      } else {
+        // No step in URL, default to step 1
         this.currentStep.set(1);
-        console.log('Create mode - Agreement ID: 0');
+        this.updateUrlStep(1);
       }
     });
   }
 
   onStep1Data(data: any) {
     this.step1Data.set(data);
-    console.log('Step 1 data received:', data);
     // Move to next step after successful submission
     this.goToStep(2);
   }
 
   onAgreementIdUpdate(newAgreementId: number) {
     this.agreementId.set(newAgreementId);
-    console.log('Agreement ID updated to:', newAgreementId);
   }
 
   onStep2Data(data: any) {
     this.step2Data.set(data);
-    console.log('Step 2 data received:', data);
     // Move to next step after successful submission
     this.goToStep(3);
   }
 
   onStep3Data(data: any) {
     this.step3Data.set(data);
-    console.log('Step 3 data received:', data);
     // Move to next step after successful submission
     this.goToStep(4);
   }
 
   onStep4Data(data: any) {
     this.step4Data.set(data);
-    console.log('Step 4 data received:', data);
     // Move to next step after successful submission
     this.goToStep(5);
   }
 
   onStep5Data(data: any) {
     this.step5Data.set(data);
-    console.log('Step 5 data received:', data);
     // Move to next step after successful submission
     this.goToStep(6);
   }
 
   onStep6Data(data: any) {
     this.step6Data.set(data);
-    console.log('Step 6 data received:', data);
     // Move to next step after successful submission
     this.goToStep(7);
   }
 
   onStep7Data(data: any) {
     this.step7Data.set(data);
-    console.log('Step 7 data received:', data);
   }
 
   goToStep(step: number) {
     this.currentStep.set(step);
+    this.updateUrlStep(step);
+  }
+
+  private updateUrlStep(step: number): void {
+    // Update the URL with the current step without triggering a full navigation
+    const currentUrl = this.router.url.split('?')[0];
+    this.router.navigate([], {
+      relativeTo: this.route,
+      queryParams: { step },
+      queryParamsHandling: 'merge',
+      replaceUrl: true
+    });
   }
 
   submitWizard() {
@@ -164,8 +184,6 @@ export class AgreementWizardComponent implements OnInit {
       step6: this.step6Data(),
       step7: this.step7Data()
     };
-
-    console.log('Complete wizard data:', completeData);
     
     // Navigate to success page
     this.router.navigate(['/agreement-wizard/success']);

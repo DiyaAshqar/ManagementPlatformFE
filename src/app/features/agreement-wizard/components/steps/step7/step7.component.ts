@@ -222,8 +222,7 @@ export class Step7Component implements OnInit, OnDestroy {
               life: 3000
             });
           },
-          error: (error) => {
-            console.error('Error downloading attachment:', error);
+          error: () => {
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
@@ -278,22 +277,6 @@ export class Step7Component implements OnInit, OnDestroy {
       fullAgreementDto.agreementId = this.agreementId();
       fullAgreementDto.seventhStepDto = stepDataValue;
 
-      // Log the payload for debugging
-      console.log('Step 7 Payload:', JSON.stringify({
-        step: fullAgreementDto.step,
-        agreementId: fullAgreementDto.agreementId,
-        seventhStepDto: {
-          agreementId: stepDataValue.agreementId,
-          attachmentDto: stepDataValue.attachmentDto?.map(att => ({
-            id: att.id,
-            fileName: att.fileName,
-            filePath: att.filePath,
-            base64Data: att.base64Data?.substring(0, 50) + '...', // Truncate for readability
-            contentType: att.contentType
-          }))
-        }
-      }, null, 2));
-
       // Call the API
       this.agreementClient
         .createAgreement(fullAgreementDto)
@@ -324,8 +307,7 @@ export class Step7Component implements OnInit, OnDestroy {
               });
             }
           },
-          error: (error) => {
-            console.error('Error submitting step 7:', error);
+          error: () => {
             this.messageService.add({
               severity: 'error',
               summary: 'Error',
@@ -335,7 +317,6 @@ export class Step7Component implements OnInit, OnDestroy {
           }
         });
     } catch (error) {
-      console.error('Error processing attachments:', error);
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
@@ -385,8 +366,7 @@ export class Step7Component implements OnInit, OnDestroy {
             }
           }
         },
-        error: (error) => {
-          console.error('Error loading attachments:', error);
+        error: () => {
           this.messageService.add({
             severity: 'error',
             summary: 'Error',
@@ -431,8 +411,7 @@ export class Step7Component implements OnInit, OnDestroy {
               });
             }
           },
-          error: (error) => {
-            console.error('Error deleting attachment:', error);
+          error: () => {
             this.messageService.add({
               severity: 'error',
               summary: 'Error',

@@ -95,9 +95,9 @@ export class Step1Component implements OnInit, OnDestroy {
       clientDto: this.fb.group({
         id: [0],
         contactPerson: ['', [Validators.required, Validators.maxLength(100)]],
-        contactPersonNumber: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
+        contactPersonNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]],
         representerName: ['', [Validators.required, Validators.maxLength(100)]],
-        representerNameNumber: ['', [Validators.required, Validators.pattern(/^\d+$/)]]
+        representerNameNumber: ['', [Validators.required, Validators.pattern(/^\d{10}$/)]]
       }),
       landInformationDto: this.fb.group({
         id: [0],
@@ -206,8 +206,6 @@ export class Step1Component implements OnInit, OnDestroy {
         }
       });
     }
-    
-    console.log('Loaded step 1 data:', data);
   }
 
   onSubmit(): void {
@@ -397,7 +395,13 @@ export class Step1Component implements OnInit, OnDestroy {
     const field = this.step1Form.get(fieldName);
     if (field?.errors) {
       if (field.errors['required']) return 'This field is required';
-      if (field.errors['pattern']) return 'Invalid format';
+      if (field.errors['pattern']) {
+        // Check if it's a phone number field
+        if (fieldName.includes('contactPersonNumber') || fieldName.includes('representerNameNumber')) {
+          return 'Must be exactly 10 digits';
+        }
+        return 'Invalid format';
+      }
       if (field.errors['min']) return 'Value must be greater than 0';
       if (field.errors['maxLength']) return 'Value is too long';
     }

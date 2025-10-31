@@ -155,7 +155,6 @@ export class Step4Component implements OnInit, OnDestroy {
       // Map the existing DTO objects directly since they already have the correct structure
       this.mainContracts.set([...data.mainContractDto]);
     }
-    console.log('Loaded step 4 data:', data);
   }
 
   onSubmit(): void {

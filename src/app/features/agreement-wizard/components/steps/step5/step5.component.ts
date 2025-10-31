@@ -122,7 +122,6 @@ export class Step5Component implements OnInit, OnDestroy {
       // Map the existing DTO objects directly since they already have the correct structure
       this.supplierServices.set([...data.supplierServiceDto]);
     }
-    console.log('Loaded supplier services:', this.supplierServices());
   }
 
   onSubmit(): void {

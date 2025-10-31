@@ -137,7 +137,6 @@ export class Step3Component implements OnInit, OnDestroy {
       // Map the existing DTO objects directly since they already have the correct structure
       this.projectAreaUnits.set([...data.projectAreaUnitDto]);
     }
-    console.log('Loaded step 3 data:', data);
   }
 
   onSubmit(): void {

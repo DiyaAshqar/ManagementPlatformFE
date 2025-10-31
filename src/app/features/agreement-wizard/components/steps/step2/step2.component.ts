@@ -162,9 +162,6 @@ export class Step2Component implements OnInit, OnDestroy {
         }
       });
     }
-    
-    console.log('Loaded step 2 data:', data);
-    console.log('Stored IDs - Payment:', this.agreementPaymentId, 'Monthly:', this.monthlyPaymentId);
   }
 
   get selectedServicesArray(): FormArray {
@@ -265,8 +262,6 @@ export class Step2Component implements OnInit, OnDestroy {
     fullAgreementDto.step = 2;
     fullAgreementDto.agreementId = this.agreementId() || 0;
     fullAgreementDto.secondStepDto = secondStepDto;
-
-    console.log('Submitting FullAgreementDto:', JSON.stringify(fullAgreementDto, null, 2));
 
     return fullAgreementDto;
   }

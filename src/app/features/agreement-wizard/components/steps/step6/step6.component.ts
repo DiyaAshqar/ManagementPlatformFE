@@ -126,7 +126,6 @@ export class Step6Component implements OnInit, OnDestroy {
       // Map the existing DTO objects directly since they already have the correct structure
       this.quantityBills.set([...data.quantityBillDto]);
     }
-    console.log('Loaded quantity bills:', this.quantityBills());
   }
 
   onSubmit(): void {
@@ -229,13 +228,9 @@ export class Step6Component implements OnInit, OnDestroy {
       entries[editIndex] = entryData;
       this.quantityBills.set(entries);
       this.editingIndex.set(null);
-      
-      console.log('Quantity bill updated successfully');
     } else {
       // Add new entry
       this.quantityBills.set([...this.quantityBills(), entryData]);
-      
-      console.log('Quantity bill added successfully');
     }
 
     this.clearForm();
@@ -290,11 +285,9 @@ export class Step6Component implements OnInit, OnDestroy {
     if (entry.id && entry.id > 0) {
       // Soft delete: mark as deleted
       entries[actualIndex].isDeleted = true;
-      console.log('Quantity bill marked for deletion');
     } else {
       // Hard delete: remove from array (not yet in DB)
       entries.splice(actualIndex, 1);
-      console.log('Quantity bill deleted successfully');
     }
 
     this.quantityBills.set(entries);
