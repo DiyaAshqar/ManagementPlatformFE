@@ -14,16 +14,11 @@
             <div formGroupName="projectAreaUnitDto">
                 <div class="grid">
                     <!-- Annex field -->
-                    <div class="col-12 md:col-4 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-3">
                         <div class="field">
                             <p-floatlabel variant="in">
-                                <p-select 
-                                    inputId="annexId" 
-                                    formControlName="annexId"
-                                    [options]="annexes()" 
-                                    optionLabel="name" 
-                                    optionValue="id"
-                                  
+                                <p-select inputId="annexId" formControlName="annexId" [options]="annexes()"
+                                    optionLabel="name" optionValue="id"
                                     [class]="isFieldInvalid('annexId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
                                 </p-select>
                                 <label for="annexId">{{ 'wizard.step3.annexName' | translate }}*</label>
@@ -35,16 +30,11 @@
                     </div>
 
                     <!-- Amount field -->
-                    <div class="col-12 md:col-4 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-3">
                         <div class="field">
                             <p-floatlabel variant="in">
-                                <p-inputNumber 
-                                    inputId="amount" 
-                                    formControlName="amount" 
-                                    [min]="0"
-                                    [showButtons]="true"
-                                    [ngClass]="{'ng-invalid': isFieldInvalid('amount')}"
-                                    inputStyleClass="w-full">
+                                <p-inputNumber inputId="amount" formControlName="amount" [min]="0" [showButtons]="true"
+                                    [ngClass]="{'ng-invalid': isFieldInvalid('amount')}" inputStyleClass="w-full">
                                 </p-inputNumber>
                                 <label for="amount">{{ 'wizard.step3.quantity' | translate }}*</label>
                             </p-floatlabel>
@@ -55,16 +45,11 @@
                     </div>
 
                     <!-- Unit field -->
-                    <div class="col-12 md:col-4 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-3">
                         <div class="field">
                             <p-floatlabel variant="in">
-                                <p-select 
-                                    inputId="unitId" 
-                                    formControlName="unitId"
-                                    [options]="units()" 
-                                    optionLabel="name" 
-                                    optionValue="id"
-                                 
+                                <p-select inputId="unitId" formControlName="unitId" [options]="units()"
+                                    optionLabel="name" optionValue="id"
                                     [class]="isFieldInvalid('unitId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
                                 </p-select>
                                 <label for="unitId">{{ 'wizard.step3.unit' | translate }}*</label>
@@ -74,28 +59,23 @@
                             }
                         </div>
                     </div>
+                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                        <!-- Action buttons -->
+                        <div class="flex gap-2 justify-end mt-2">
+                            <button type="button" class="p-button p-button-secondary" (click)="clearForm()" pButton
+                                [label]="'wizard.step3.cancel' | translate">
+                                <i class="pi pi-times mr-2"></i>
+                            </button>
+                            <button type="button" class="p-button p-button-success" (click)="addEntry()" pButton
+                                [disabled]="step3Form.get('projectAreaUnitDto')?.invalid"
+                                [label]="editingIndex() !== null ? ('wizard.step3.update' | translate) : ('wizard.step3.add' | translate)">
+                                <i class="pi pi-check mr-2"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
-                <!-- Action buttons -->
-                <div class="flex gap-2 justify-end mt-2">
-                    <button 
-                        type="button"
-                        class="p-button p-button-secondary"
-                        (click)="clearForm()"
-                        pButton
-                        [label]="'wizard.step3.cancel' | translate">
-                        <i class="pi pi-times mr-2"></i>
-                    </button>
-                    <button 
-                        type="button"
-                        class="p-button p-button-success"
-                        (click)="addEntry()"
-                        pButton
-                        [disabled]="step3Form.get('projectAreaUnitDto')?.invalid"
-                        [label]="editingIndex() !== null ? ('wizard.step3.update' | translate) : ('wizard.step3.add' | translate)">
-                        <i class="pi pi-check mr-2"></i>
-                    </button>
-                </div>
+
             </div>
         </div>
         }
@@ -108,16 +88,11 @@
                 </div>
 
                 <!-- PrimeNG Table -->
-                <p-table 
-                    [value]="getActiveEntries()" 
-                    [paginator]="true" 
-                    [rows]="5" 
-                    [showCurrentPageReport]="true"
+                <p-table [value]="getActiveEntries()" [paginator]="true" [rows]="5" [showCurrentPageReport]="true"
                     currentPageReportTemplate="{{ 'wizard.step3.showingEntries' | translate }}"
-                    [rowsPerPageOptions]="[5, 10, 25, 50]"
-                    [tableStyle]="{ 'min-width': '50rem' }"
+                    [rowsPerPageOptions]="[5, 10, 25, 50]" [tableStyle]="{ 'min-width': '50rem' }"
                     styleClass="p-datatable-striped">
-                    
+
                     <ng-template pTemplate="header">
                         <tr>
                             <th>{{ 'wizard.step3.annexName' | translate }}</th>
@@ -128,7 +103,7 @@
                             }
                         </tr>
                     </ng-template>
-                    
+
                     <ng-template pTemplate="body" let-entry let-rowIndex="rowIndex">
                         <tr>
                             <td>{{ getAnnexName(entry.annexId) }}</td>
@@ -136,27 +111,19 @@
                             <td>{{ getUnitName(entry.unitId) }}</td>
                             @if (!isViewMode()) {
                             <td class="text-center">
-                                <button 
-                                    type="button"
-                                    class="p-button-rounded p-button-text p-button-warning mr-2"
-                                    (click)="editEntry(rowIndex)"
-                                    pButton
-                                    icon="pi pi-pencil"
+                                <button type="button" class="p-button-rounded p-button-text p-button-warning mr-2"
+                                    (click)="editEntry(rowIndex)" pButton icon="pi pi-pencil"
                                     [pTooltip]="'wizard.step3.edit' | translate">
                                 </button>
-                                <button 
-                                    type="button"
-                                    class="p-button-rounded p-button-text p-button-danger"
-                                    (click)="deleteEntry(rowIndex)"
-                                    pButton
-                                    icon="pi pi-trash"
+                                <button type="button" class="p-button-rounded p-button-text p-button-danger"
+                                    (click)="deleteEntry(rowIndex)" pButton icon="pi pi-trash"
                                     [pTooltip]="'wizard.step3.delete' | translate">
                                 </button>
                             </td>
                             }
                         </tr>
                     </ng-template>
-                    
+
                     <ng-template pTemplate="emptymessage">
                         <tr>
                             <td colspan="4" class="text-center p-6">

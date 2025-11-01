@@ -279,12 +279,6 @@ export class Step4Component implements OnInit, OnDestroy {
               // Add new contract
               this.mainContracts.set([...this.mainContracts(), contractData]);
               
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: 'Contract added successfully',
-                life: 3000
-              });
             }
 
             this.clearForm();
@@ -434,7 +428,7 @@ export class Step4Component implements OnInit, OnDestroy {
     const field = this.mainContractForm.get(fieldName);
     if (field?.errors) {
       if (field.errors['required']) return 'This field is required';
-      if (field.errors['min']) return 'Value must be greater than 0';
+      return 'Should select at least one';
     }
 
     if (this.mainContractForm.errors?.['dateRange'] &&
@@ -491,20 +485,7 @@ export class Step4Component implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           if (response.succeeded && response.data !== undefined && response.data !== null) {
-            this.messageService.add({
-              severity: 'success',
-              summary: 'Success',
-              detail: 'Contractor duties saved successfully',
-              life: 3000
-            });
-          } else {
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: response.message || 'Failed to save contractor duties',
-              life: 5000
-            });
-          }
+          } 
           this.isLoading.set(false);
         },
         error: (error) => {

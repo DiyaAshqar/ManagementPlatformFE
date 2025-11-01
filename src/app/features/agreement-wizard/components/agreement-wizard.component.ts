@@ -94,13 +94,13 @@ export class AgreementWizardComponent implements OnInit {
           this.isViewMode.set(urlPath.includes('/view/'));
         }
       } else {
-        // Create mode
+        // Create mode - check query params for agreementId
         this.agreementId.set(0);
         this.isViewMode.set(false);
       }
     });
 
-    // Get the step from query parameters
+    // Get the step and agreementId from query parameters
     this.route.queryParams.subscribe(queryParams => {
       const step = queryParams['step'];
       if (step) {
@@ -117,6 +117,15 @@ export class AgreementWizardComponent implements OnInit {
         this.currentStep.set(1);
         this.updateUrlStep(1);
       }
+      
+      // Check for agreementId in query params (for create mode)
+      const agreementId = queryParams['agreementId'];
+      if (agreementId && this.agreementId() === 0) {
+        const parsedId = parseInt(agreementId, 10);
+        if (!isNaN(parsedId)) {
+          this.agreementId.set(parsedId);
+        }
+      }
     });
   }
 
@@ -128,6 +137,18 @@ export class AgreementWizardComponent implements OnInit {
 
   onAgreementIdUpdate(newAgreementId: number) {
     this.agreementId.set(newAgreementId);
+    
+    // If we just created a new agreement (were in create mode), add agreementId to query params
+    const currentUrl = this.router.url.split('?')[0];
+    if (currentUrl.includes('/create') && newAgreementId > 0) {
+      // Add agreementId to query parameters
+      this.router.navigate([], {
+        relativeTo: this.route,
+        queryParams: { agreementId: newAgreementId },
+        queryParamsHandling: 'merge',
+        replaceUrl: true
+      });
+    }
   }
 
   onStep2Data(data: any) {

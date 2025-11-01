@@ -47,7 +47,7 @@ export class SidebarComponent implements OnInit {
       title: 'Overview',
       items: [
         { label: 'Agreement Wizard', icon: 'pi pi-briefcase', route: '/agreement-wizard' },
-        { label: 'Theme Showcase', icon: 'pi pi-palette', route: '/theme-showcase' },
+        // { label: 'Theme Showcase', icon: 'pi pi-palette', route: '/theme-showcase' },
       ]
     },
     {

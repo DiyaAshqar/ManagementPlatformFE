@@ -238,12 +238,15 @@ export class Step1Component implements OnInit, OnDestroy {
       .subscribe({
         next: (response) => {
           if (response.succeeded && response.data !== undefined && response.data !== null) {
-            // Update the agreementId with the response
+            // First, update the agreementId in parent component
             this.agreementIdUpdate.emit(response.data);
             
-            // Emit the form data for parent component
-            const formValue = this.convertDatesToStrings(this.step1Form.value);
-            this.stepData.emit(formValue);
+            // Small delay to ensure URL is updated before emitting stepData and navigating
+            setTimeout(() => {
+              // Emit the form data for parent component (this will trigger navigation)
+              const formValue = this.convertDatesToStrings(this.step1Form.value);
+              this.stepData.emit(formValue);
+            }, 100);
             
             this.isLoading.set(false);
           } else {
