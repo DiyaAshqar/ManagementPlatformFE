@@ -28,7 +28,7 @@
                 </div>
 
                 <!-- Contractor -->
-                <div class="col-12 md:col-6 lg:col-3 mb-3">
+                <div class="col-12 md:col-6 lg:col-2 mb-3">
                     <div class="field">
                         <p-floatlabel variant="in">
                             <p-select inputId="constructorId" formControlName="constructorId"
@@ -43,7 +43,7 @@
                 </div>
 
                 <!-- Total Amount -->
-                <div class="col-12 md:col-6 lg:col-3 mb-3">
+                <div class="col-12 md:col-6 lg:col-1 mb-3">
                     <div class="field">
                         <p-floatlabel variant="in">
                             <p-inputNumber inputId="total" formControlName="total" [min]="0.01" [showButtons]="false"
@@ -59,7 +59,7 @@
                 </div>
 
                 <!-- Start Date -->
-                <div class="col-12 md:col-6 lg:col-3 mb-3">
+                <div class="col-12 md:col-6 lg:col-2 mb-3">
                     <div class="field">
                         <p-floatlabel variant="in">
                             <p-datepicker inputId="startDate" formControlName="startDate" [showIcon]="true"
@@ -76,7 +76,7 @@
                 </div>
 
                 <!-- End Date -->
-                <div class="col-12 md:col-6 lg:col-3 mb-3">
+                <div class="col-12 md:col-6 lg:col-2 mb-3">
                     <div class="field">
                         <p-floatlabel variant="in">
                             <p-datepicker inputId="endDate" formControlName="endDate" [showIcon]="true"
@@ -92,7 +92,7 @@
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="col-12 md:col-6 lg:col-3 mb-3 flex justify-end gap-2">
+                <div class="col-12 md:col-6 lg:col-2 mb-3 flex justify-end gap-2">
                     <p-button [label]="'common.cancel' | translate" severity="secondary" icon="pi pi-times"
                         (onClick)="clearForm()"></p-button>
                     <p-button [label]="editingIndex() !== null ? ('common.edit' | translate) : ('common.add' | translate)"
