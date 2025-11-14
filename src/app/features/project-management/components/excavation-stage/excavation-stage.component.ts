@@ -7,7 +7,7 @@ import { TagModule } from 'primeng/tag';
 import { TableModule } from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
 
 interface SubRecord {
@@ -46,7 +46,7 @@ interface ExcavationRecord {
     TableModule,
     DialogModule,
     InputTextModule,
-    DropdownModule,
+    SelectModule,
     TooltipModule
   ],
   templateUrl: './excavation-stage.component.html',

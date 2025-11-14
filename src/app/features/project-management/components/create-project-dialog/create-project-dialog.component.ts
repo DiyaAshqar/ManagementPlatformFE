@@ -7,10 +7,10 @@ import { TranslateModule } from '@ngx-translate/core';
 import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputTextarea } from 'primeng/inputtextarea';
+import { TextareaModule } from 'primeng/textarea';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { FloatLabelModule } from 'primeng/floatlabel';
 
 import { ProjectService } from '../../services/project.service';
@@ -27,10 +27,10 @@ import { MessageService } from 'primeng/api';
     DialogModule,
     ButtonModule,
     InputTextModule,
-    InputTextarea,
+    TextareaModule,
     InputNumberModule,
     DatePickerModule,
-    DropdownModule,
+    SelectModule,
     FloatLabelModule
   ],
   templateUrl: './create-project-dialog.component.html',

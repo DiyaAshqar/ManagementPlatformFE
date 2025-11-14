@@ -439,7 +439,7 @@
     <div class="grid">
       <div class="col-12 md:col-6">
         <label for="sub-status" class="block text-sm font-medium mb-2">Status</label>
-        <p-dropdown 
+        <p-select 
           id="sub-status"
           [(ngModel)]="newSubRecord.status"
           [options]="statusOptions"
@@ -447,7 +447,7 @@
           optionValue="value"
           placeholder="Select status"
           styleClass="w-full">
-        </p-dropdown>
+        </p-select>
       </div>
       <div class="col-12 md:col-6">
         <label for="sub-type" class="block text-sm font-medium mb-2">Type</label>

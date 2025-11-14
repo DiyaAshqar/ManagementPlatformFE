@@ -500,7 +500,7 @@
     <div class="field">
       <label for="milestone-description">Description</label>
       <textarea 
-        pInputTextarea 
+        pTextarea 
         id="milestone-description" 
         [(ngModel)]="newMilestone.description" 
         rows="3"
@@ -512,12 +512,12 @@
       <div class="col-6">
         <div class="field">
           <label for="milestone-target-date">Target Date</label>
-          <p-calendar 
+          <p-datepicker 
             [(ngModel)]="newMilestone.targetDate" 
             dateFormat="yy-mm-dd"
-            [showIcon]="true"
+            iconDisplay="input"
             inputId="milestone-target-date"
-            class="w-full"></p-calendar>
+            class="w-full"></p-datepicker>
         </div>
       </div>
       <div class="col-6">
@@ -536,7 +536,7 @@
     <div class="field">
       <label for="milestone-notes">Notes</label>
       <textarea 
-        pInputTextarea 
+        pTextarea 
         id="milestone-notes" 
         [(ngModel)]="newMilestone.notes" 
         rows="2"
@@ -620,23 +620,23 @@
       <div class="col-6">
         <div class="field">
           <label for="contractor-start-date">Start Date</label>
-          <p-calendar 
+          <p-datepicker 
             [(ngModel)]="newContractor.startDate" 
             dateFormat="yy-mm-dd"
-            [showIcon]="true"
+            iconDisplay="input"
             inputId="contractor-start-date"
-            class="w-full"></p-calendar>
+            class="w-full"></p-datepicker>
         </div>
       </div>
       <div class="col-6">
         <div class="field">
           <label for="contractor-end-date">End Date</label>
-          <p-calendar 
+          <p-datepicker 
             [(ngModel)]="newContractor.endDate" 
             dateFormat="yy-mm-dd"
-            [showIcon]="true"
+            iconDisplay="input"
             inputId="contractor-end-date"
-            class="w-full"></p-calendar>
+            class="w-full"></p-datepicker>
         </div>
       </div>
     </div>
@@ -775,7 +775,7 @@
     <div class="field">
       <label for="po-description">Description</label>
       <textarea 
-        pInputTextarea 
+        pTextarea 
         id="po-description" 
         [(ngModel)]="newPurchaseOrder.description" 
         rows="2"
@@ -797,23 +797,23 @@
       <div class="col-6">
         <div class="field">
           <label for="po-order-date">Order Date</label>
-          <p-calendar 
+          <p-datepicker 
             [(ngModel)]="newPurchaseOrder.orderDate" 
             dateFormat="yy-mm-dd"
-            [showIcon]="true"
+            iconDisplay="input"
             inputId="po-order-date"
-            class="w-full"></p-calendar>
+            class="w-full"></p-datepicker>
         </div>
       </div>
       <div class="col-6">
         <div class="field">
           <label for="po-delivery-date">Delivery Date</label>
-          <p-calendar 
+          <p-datepicker 
             [(ngModel)]="newPurchaseOrder.deliveryDate" 
             dateFormat="yy-mm-dd"
-            [showIcon]="true"
+            iconDisplay="input"
             inputId="po-delivery-date"
-            class="w-full"></p-calendar>
+            class="w-full"></p-datepicker>
         </div>
       </div>
     </div>
@@ -844,12 +844,12 @@
       <div class="col-6">
         <div class="field">
           <label for="survey-visit-date">Visit Date</label>
-          <p-calendar 
+          <p-datepicker 
             [(ngModel)]="newSurveyingVisit.visitDate" 
             dateFormat="yy-mm-dd"
-            [showIcon]="true"
+            iconDisplay="input"
             inputId="survey-visit-date"
-            class="w-full"></p-calendar>
+            class="w-full"></p-datepicker>
         </div>
       </div>
       <div class="col-6">
@@ -878,7 +878,7 @@
     <div class="field">
       <label for="survey-findings">Findings</label>
       <textarea 
-        pInputTextarea 
+        pTextarea 
         id="survey-findings" 
         [(ngModel)]="newSurveyingVisit.findings" 
         rows="3"
@@ -936,7 +936,7 @@
     <div class="field">
       <label for="vo-description">Description</label>
       <textarea 
-        pInputTextarea 
+        pTextarea 
         id="vo-description" 
         [(ngModel)]="newVoucherOrder.description" 
         rows="2"
@@ -948,12 +948,12 @@
       <div class="col-6">
         <div class="field">
           <label for="vo-request-date">Request Date</label>
-          <p-calendar 
+          <p-datepicker 
             [(ngModel)]="newVoucherOrder.requestDate" 
             dateFormat="yy-mm-dd"
-            [showIcon]="true"
+            iconDisplay="input"
             inputId="vo-request-date"
-            class="w-full"></p-calendar>
+            class="w-full"></p-datepicker>
         </div>
       </div>
       <div class="col-6">

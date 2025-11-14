@@ -7,13 +7,13 @@ import { TranslateModule } from '@ngx-translate/core';
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { TabViewModule } from 'primeng/tabview';
+import { TabsModule } from 'primeng/tabs';
 import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TooltipModule } from 'primeng/tooltip';
 import { SkeletonModule } from 'primeng/skeleton';
 import { DialogModule } from 'primeng/dialog';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 
 import { ProjectService } from '../../services/project.service';
 import { Project, ProjectStatus, Stage, Task, TaskStatus } from '../../models';
@@ -37,13 +37,13 @@ interface ReportType {
     TranslateModule,
     ButtonModule,
     CardModule,
-    TabViewModule,
+    TabsModule,
     TagModule,
     ProgressBarModule,
     TooltipModule,
     SkeletonModule,
     DialogModule,
-    DropdownModule,
+    SelectModule,
     PreparingStageComponent,
     ExcavationStageComponent,
     MilestoneStageComponent,
@@ -56,7 +56,7 @@ interface ReportType {
 export class ProjectDetailComponent implements OnInit {
   project = signal<Project | null>(null);
   isLoading = signal<boolean>(true);
-  activeTabIndex = 0;
+  activeTabIndex = "0";
   showPrintDialog = false;
   selectedReportType = 'full';
   

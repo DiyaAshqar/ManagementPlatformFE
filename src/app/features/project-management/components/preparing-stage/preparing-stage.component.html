@@ -130,7 +130,7 @@
   <div class="space-y-4">
     <div>
       <label for="category" class="block text-sm font-medium mb-2 text-color">Category</label>
-      <p-dropdown 
+      <p-select 
         [(ngModel)]="selectedCategory"
         [options]="categoryOptions"
         optionLabel="label"
@@ -138,7 +138,7 @@
         placeholder="Select category"
         styleClass="w-full"
         inputId="category">
-      </p-dropdown>
+      </p-select>
     </div>
     
     <div>
@@ -175,7 +175,7 @@
     
     <div>
       <label for="priority" class="block text-sm font-medium mb-2 text-color">Priority</label>
-      <p-dropdown 
+      <p-select 
         [(ngModel)]="newTask.priority"
         [options]="priorityOptions"
         optionLabel="label"
@@ -183,7 +183,7 @@
         placeholder="Select priority"
         styleClass="w-full"
         inputId="priority">
-      </p-dropdown>
+      </p-select>
     </div>
   </div>
   

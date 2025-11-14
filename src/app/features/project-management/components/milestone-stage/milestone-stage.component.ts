@@ -8,12 +8,12 @@ import { TagModule } from 'primeng/tag';
 import { AccordionModule } from 'primeng/accordion';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { InputTextarea } from 'primeng/inputtextarea';
-import { CalendarModule } from 'primeng/calendar';
+import { TextareaModule } from 'primeng/textarea';
+import { DatePickerModule } from 'primeng/datepicker';
 import { TableModule } from 'primeng/table';
 import { TabViewModule } from 'primeng/tabview';
 import { CheckboxModule } from 'primeng/checkbox';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { InputNumberModule } from 'primeng/inputnumber';
 
 interface Contractor {
@@ -115,12 +115,12 @@ interface Milestone {
     AccordionModule,
     DialogModule,
     InputTextModule,
-    InputTextarea,
-    CalendarModule,
+    TextareaModule,
+    DatePickerModule,
     TableModule,
     TabViewModule,
     CheckboxModule,
-    DropdownModule,
+    SelectModule,
     InputNumberModule
   ],
   templateUrl: './milestone-stage.component.html',

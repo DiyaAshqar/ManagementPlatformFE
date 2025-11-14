@@ -33,7 +33,7 @@
         <div class="field">
           <p-floatlabel variant="in">
             <textarea 
-              pInputTextarea 
+              pTextarea 
               id="description"
               formControlName="description"
               rows="3"
@@ -148,7 +148,7 @@
       <div class="col-12 md:col-6">
         <div class="field">
           <p-floatlabel variant="in">
-            <p-dropdown 
+            <p-select 
               inputId="priority"
               formControlName="priority"
               [options]="priorityOptions"
@@ -156,7 +156,7 @@
               optionValue="value"
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('priority')">
-            </p-dropdown>
+            </p-select>
             <label for="priority">{{ 'projects.form.priority' | translate }} *</label>
           </p-floatlabel>
           @if (isFieldInvalid('priority')) {

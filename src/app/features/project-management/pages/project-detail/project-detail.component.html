@@ -116,73 +116,68 @@
 
       <!-- Main Content Tabs -->
       <p-card>
-        <p-tabView [(activeIndex)]="activeTabIndex" styleClass="tabview-custom">
-          <!-- Overview Tab -->
-          <p-tabPanel>
-            <ng-template pTemplate="header">
+        <p-tabs [(value)]="activeTabIndex" styleClass="tabview-custom">
+          <p-tablist>
+            <p-tab value="0">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-chart-bar"></i>
                 <span>Overview</span>
               </div>
-            </ng-template>
-            
-            <div class="py-4">
-              <app-stage-kanban [projectId]="project()!.id"></app-stage-kanban>
-            </div>
-          </p-tabPanel>
-
-          <!-- Preparing Stage Tab -->
-          <p-tabPanel>
-            <ng-template pTemplate="header">
+            </p-tab>
+            <p-tab value="1">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-wrench"></i>
                 <span>Preparing</span>
               </div>
-            </ng-template>
-            <div class="py-4">
-              <app-preparing-stage [projectId]="project()!.id"></app-preparing-stage>
-            </div>
-          </p-tabPanel>
-
-          <!-- Excavation Stage Tab -->
-          <p-tabPanel>
-            <ng-template pTemplate="header">
+            </p-tab>
+            <p-tab value="2">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-shield"></i>
                 <span>Excavation</span>
               </div>
-            </ng-template>
-            <div class="py-4">
-              <app-excavation-stage [projectId]="project()!.id"></app-excavation-stage>
-            </div>
-          </p-tabPanel>
-
-          <!-- Milestones Tab -->
-          <p-tabPanel>
-            <ng-template pTemplate="header">
+            </p-tab>
+            <p-tab value="3">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-flag"></i>
                 <span>Milestones</span>
               </div>
-            </ng-template>
-            <div class="py-4">
-              <app-milestone-stage [projectId]="project()!.id"></app-milestone-stage>
-            </div>
-          </p-tabPanel>
-
-          <!-- Documents Tab -->
-          <p-tabPanel>
-            <ng-template pTemplate="header">
+            </p-tab>
+            <p-tab value="4">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-file"></i>
                 <span>Documents</span>
               </div>
-            </ng-template>
-            <div class="py-4">
-              <app-documents-stage [projectId]="project()!.id"></app-documents-stage>
-            </div>
-          </p-tabPanel>
-        </p-tabView>
+            </p-tab>
+          </p-tablist>
+          
+          <p-tabpanels>
+            <p-tabpanel value="0">
+              <div class="py-4">
+                <app-stage-kanban [projectId]="project()!.id"></app-stage-kanban>
+              </div>
+            </p-tabpanel>
+            <p-tabpanel value="1">
+              <div class="py-4">
+                <app-preparing-stage [projectId]="project()!.id"></app-preparing-stage>
+              </div>
+            </p-tabpanel>
+            <p-tabpanel value="2">
+              <div class="py-4">
+                <app-excavation-stage [projectId]="project()!.id"></app-excavation-stage>
+              </div>
+            </p-tabpanel>
+            <p-tabpanel value="3">
+              <div class="py-4">
+                <app-milestone-stage [projectId]="project()!.id"></app-milestone-stage>
+              </div>
+            </p-tabpanel>
+            <p-tabpanel value="4">
+              <div class="py-4">
+                <app-documents-stage [projectId]="project()!.id"></app-documents-stage>
+              </div>
+            </p-tabpanel>
+          </p-tabpanels>
+        </p-tabs>
       </p-card>
     </div>
   }
@@ -200,14 +195,14 @@
   
   <div class="mb-4">
     <label class="block text-sm font-medium mb-2 text-color">Report Type</label>
-    <p-dropdown 
+    <p-select 
       [(ngModel)]="selectedReportType"
       [options]="reportTypes"
       optionLabel="label"
       optionValue="value"
       placeholder="Select report type"
       styleClass="w-full">
-    </p-dropdown>
+    </p-select>
   </div>
   
   <ng-template pTemplate="footer">

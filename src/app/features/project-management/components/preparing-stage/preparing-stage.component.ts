@@ -8,7 +8,7 @@ import { TagModule } from 'primeng/tag';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { DropdownModule } from 'primeng/dropdown';
+import { SelectModule } from 'primeng/select';
 import { BadgeModule } from 'primeng/badge';
 import { TooltipModule } from 'primeng/tooltip';
 
@@ -40,7 +40,7 @@ interface TaskCategory {
     CheckboxModule,
     DialogModule,
     InputTextModule,
-    DropdownModule,
+    SelectModule,
     BadgeModule,
     TooltipModule
   ],
