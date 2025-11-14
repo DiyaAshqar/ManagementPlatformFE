@@ -1,0 +1,501 @@
+<div class="space-y-6">
+  <!-- Header Stats -->
+  <div class="grid">
+    <div class="col-12 md:col-3">
+      <p-card styleClass="h-full">
+        <div class="flex flex-column align-items-center">
+          <div class="text-500 text-sm mb-2">Total Records</div>
+          <div class="text-3xl font-bold text-color">{{ records().length }}</div>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-12 md:col-3">
+      <p-card styleClass="h-full">
+        <div class="flex flex-column align-items-center">
+          <div class="text-500 text-sm mb-2">Completed</div>
+          <div class="text-3xl font-bold text-primary">{{ completedCount }}</div>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-12 md:col-3">
+      <p-card styleClass="h-full">
+        <div class="flex flex-column align-items-center">
+          <div class="text-500 text-sm mb-2">In Progress</div>
+          <div class="text-3xl font-bold text-blue-500">{{ inProgressCount }}</div>
+        </div>
+      </p-card>
+    </div>
+    <div class="col-12 md:col-3">
+      <p-card styleClass="h-full">
+        <div class="flex flex-column align-items-center">
+          <div class="text-500 text-sm mb-2">Total Volume</div>
+          <div class="text-3xl font-bold text-color">{{ totalVolume.toFixed(0) }} m³</div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Excavation Table -->
+  <p-card>
+    <ng-template pTemplate="header">
+      <div class="flex align-items-center justify-content-between px-3 pt-3 pb-2">
+        <div>
+          <h3 class="text-xl font-semibold m-0 text-color">Excavation Records</h3>
+          <p class="text-sm text-500 mt-1 mb-0">Track excavation activities and measurements</p>
+        </div>
+        <p-button 
+          label="Add Record"
+          icon="pi pi-plus"
+          (onClick)="openAddDialog()">
+        </p-button>
+      </div>
+    </ng-template>
+
+    <div class="border-round border-1 surface-border overflow-hidden">
+      <p-table [value]="records()" styleClass="p-datatable-sm">
+        <ng-template pTemplate="header">
+          <tr>
+            <th style="width: 3rem"></th>
+            <th>Date</th>
+            <th>Location</th>
+            <th>Depth</th>
+            <th>Volume</th>
+            <th>Soil Type</th>
+            <th>Equipment</th>
+            <th>Operator</th>
+            <th>Status</th>
+            <th style="width: 8rem" class="text-right">Actions</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-record let-expanded="expanded">
+          <tr [class.border-bottom-none]="isExpanded(record.id)">
+            <td>
+              <p-button 
+                [icon]="isExpanded(record.id) ? 'pi pi-chevron-down' : 'pi pi-chevron-right'"
+                [text]="true"
+                [rounded]="true"
+                size="small"
+                (onClick)="toggleExpanded(record.id)">
+              </p-button>
+            </td>
+            <td>
+              @if (editingId() === record.id) {
+                <input 
+                  type="date" 
+                  pInputText 
+                  [(ngModel)]="editingRecord.date"
+                  class="p-inputtext-sm w-full">
+              } @else {
+                {{ formatDate(record.date) }}
+              }
+            </td>
+            <td>
+              @if (editingId() === record.id) {
+                <input 
+                  type="text" 
+                  pInputText 
+                  [(ngModel)]="editingRecord.location"
+                  class="p-inputtext-sm w-full">
+              } @else {
+                {{ record.location }}
+              }
+            </td>
+            <td>
+              @if (editingId() === record.id) {
+                <input 
+                  type="text" 
+                  pInputText 
+                  [(ngModel)]="editingRecord.depth"
+                  class="p-inputtext-sm w-full">
+              } @else {
+                {{ record.depth }}
+              }
+            </td>
+            <td>
+              @if (editingId() === record.id) {
+                <input 
+                  type="text" 
+                  pInputText 
+                  [(ngModel)]="editingRecord.volume"
+                  class="p-inputtext-sm w-full">
+              } @else {
+                {{ record.volume }}
+              }
+            </td>
+            <td>
+              @if (editingId() === record.id) {
+                <input 
+                  type="text" 
+                  pInputText 
+                  [(ngModel)]="editingRecord.soilType"
+                  class="p-inputtext-sm w-full">
+              } @else {
+                {{ record.soilType }}
+              }
+            </td>
+            <td>
+              @if (editingId() === record.id) {
+                <input 
+                  type="text" 
+                  pInputText 
+                  [(ngModel)]="editingRecord.equipment"
+                  class="p-inputtext-sm w-full">
+              } @else {
+                {{ record.equipment }}
+              }
+            </td>
+            <td>
+              @if (editingId() === record.id) {
+                <input 
+                  type="text" 
+                  pInputText 
+                  [(ngModel)]="editingRecord.operator"
+                  class="p-inputtext-sm w-full">
+              } @else {
+                {{ record.operator }}
+              }
+            </td>
+            <td>
+              <p-tag 
+                [value]="getStatusLabel(record.status)"
+                [severity]="getStatusSeverity(record.status)">
+              </p-tag>
+            </td>
+            <td class="text-right">
+              <div class="flex align-items-center justify-content-end gap-1">
+                @if (editingId() === record.id) {
+                  <p-button 
+                    icon="pi pi-check"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    severity="success"
+                    (onClick)="saveEdit()"
+                    pTooltip="Save"
+                    tooltipPosition="top">
+                  </p-button>
+                  <p-button 
+                    icon="pi pi-times"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    severity="secondary"
+                    (onClick)="cancelEdit()"
+                    pTooltip="Cancel"
+                    tooltipPosition="top">
+                  </p-button>
+                } @else {
+                  <p-button 
+                    icon="pi pi-pencil"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    (onClick)="startEdit(record)"
+                    pTooltip="Edit"
+                    tooltipPosition="top">
+                  </p-button>
+                  <p-button 
+                    icon="pi pi-trash"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    severity="danger"
+                    (onClick)="deleteRecord(record.id)"
+                    pTooltip="Delete"
+                    tooltipPosition="top">
+                  </p-button>
+                }
+              </div>
+            </td>
+          </tr>
+          
+          <!-- Expanded Sub-Records Row -->
+          @if (isExpanded(record.id)) {
+            <tr class="sub-records-row">
+              <td colspan="10" class="p-0">
+                <div class="sub-records-container p-4 pl-6 surface-50">
+                  <div class="flex align-items-center justify-content-between mb-3">
+                    <h4 class="text-base font-semibold m-0">Sub-Records</h4>
+                    <p-button 
+                      label="Add Sub-Record"
+                      icon="pi pi-plus"
+                      size="small"
+                      [outlined]="true"
+                      (onClick)="openAddSubRecord(record.id)">
+                    </p-button>
+                  </div>
+                  
+                  @if (record.subRecords && record.subRecords.length > 0) {
+                    <div class="border-round border-1 surface-border surface-card overflow-hidden">
+                      <p-table [value]="record.subRecords" styleClass="p-datatable-sm">
+                        <ng-template pTemplate="header">
+                          <tr>
+                            <th>Title</th>
+                            <th>Start Date</th>
+                            <th>End Date</th>
+                            <th>Status</th>
+                            <th>Type</th>
+                            <th>Cost</th>
+                            <th>Quantity</th>
+                            <th style="width: 5rem" class="text-right">Actions</th>
+                          </tr>
+                        </ng-template>
+                        <ng-template pTemplate="body" let-subRecord>
+                          <tr>
+                            <td class="font-semibold">{{ subRecord.title }}</td>
+                            <td>{{ formatDate(subRecord.startDate) }}</td>
+                            <td>{{ formatDate(subRecord.endDate) }}</td>
+                            <td>
+                              <p-tag 
+                                [value]="getStatusLabel(subRecord.status)"
+                                [severity]="getStatusSeverity(subRecord.status)">
+                              </p-tag>
+                            </td>
+                            <td>{{ subRecord.type }}</td>
+                            <td>{{ subRecord.cost }}</td>
+                            <td>{{ subRecord.quantity }}</td>
+                            <td class="text-right">
+                              <p-button 
+                                icon="pi pi-trash"
+                                [text]="true"
+                                [rounded]="true"
+                                size="small"
+                                severity="danger"
+                                (onClick)="deleteSubRecord(record.id, subRecord.id)"
+                                pTooltip="Delete"
+                                tooltipPosition="top">
+                              </p-button>
+                            </td>
+                          </tr>
+                        </ng-template>
+                      </p-table>
+                    </div>
+                  } @else {
+                    <div class="border-round border-1 border-dashed surface-border surface-card p-6 text-center">
+                      <p class="text-sm text-500 m-0">
+                        No sub-records yet. Click "Add Sub-Record" to create one.
+                      </p>
+                    </div>
+                  }
+                </div>
+              </td>
+            </tr>
+          }
+        </ng-template>
+      </p-table>
+    </div>
+  </p-card>
+</div>
+
+<!-- Add Record Dialog -->
+<p-dialog 
+  [(visible)]="showAddDialog"
+  [modal]="true"
+  [style]="{ width: '50rem' }"
+  header="Add Excavation Record"
+  [draggable]="false"
+  [resizable]="false">
+  <p class="text-color-secondary mb-3">Enter details for a new excavation activity</p>
+  
+  <div class="flex flex-column gap-3">
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <label for="date" class="block text-sm font-medium mb-2">Date</label>
+        <input 
+          id="date"
+          type="date" 
+          pInputText 
+          [(ngModel)]="newRecord.date"
+          class="w-full">
+      </div>
+      <div class="col-12 md:col-6">
+        <label for="location" class="block text-sm font-medium mb-2">Location</label>
+        <input 
+          id="location"
+          type="text" 
+          pInputText 
+          [(ngModel)]="newRecord.location"
+          placeholder="Grid A1-A5"
+          class="w-full">
+      </div>
+    </div>
+    
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <label for="depth" class="block text-sm font-medium mb-2">Depth</label>
+        <input 
+          id="depth"
+          type="text" 
+          pInputText 
+          [(ngModel)]="newRecord.depth"
+          placeholder="3.5m"
+          class="w-full">
+      </div>
+      <div class="col-12 md:col-6">
+        <label for="volume" class="block text-sm font-medium mb-2">Volume</label>
+        <input 
+          id="volume"
+          type="text" 
+          pInputText 
+          [(ngModel)]="newRecord.volume"
+          placeholder="450 m³"
+          class="w-full">
+      </div>
+    </div>
+    
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <label for="soilType" class="block text-sm font-medium mb-2">Soil Type</label>
+        <input 
+          id="soilType"
+          type="text" 
+          pInputText 
+          [(ngModel)]="newRecord.soilType"
+          placeholder="Clay"
+          class="w-full">
+      </div>
+      <div class="col-12 md:col-6">
+        <label for="equipment" class="block text-sm font-medium mb-2">Equipment</label>
+        <input 
+          id="equipment"
+          type="text" 
+          pInputText 
+          [(ngModel)]="newRecord.equipment"
+          placeholder="Excavator CAT 320"
+          class="w-full">
+      </div>
+    </div>
+    
+    <div>
+      <label for="operator" class="block text-sm font-medium mb-2">Operator</label>
+      <input 
+        id="operator"
+        type="text" 
+        pInputText 
+        [(ngModel)]="newRecord.operator"
+        placeholder="Mike Johnson"
+        class="w-full">
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <p-button 
+        label="Cancel"
+        [outlined]="true"
+        (onClick)="showAddDialog.set(false)">
+      </p-button>
+      <p-button 
+        label="Add Record"
+        (onClick)="addRecord()">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- Add Sub-Record Dialog -->
+<p-dialog 
+  [(visible)]="showAddSubRecordDialog"
+  [modal]="true"
+  [style]="{ width: '50rem' }"
+  header="Add Sub-Record"
+  [draggable]="false"
+  [resizable]="false">
+  <p class="text-color-secondary mb-3">Enter details for a new sub-record</p>
+  
+  <div class="flex flex-column gap-3">
+    <div>
+      <label for="sub-title" class="block text-sm font-medium mb-2">Title</label>
+      <input 
+        id="sub-title"
+        type="text" 
+        pInputText 
+        [(ngModel)]="newSubRecord.title"
+        placeholder="e.g., Topsoil Removal"
+        class="w-full">
+    </div>
+    
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <label for="sub-start-date" class="block text-sm font-medium mb-2">Start Date</label>
+        <input 
+          id="sub-start-date"
+          type="date" 
+          pInputText 
+          [(ngModel)]="newSubRecord.startDate"
+          class="w-full">
+      </div>
+      <div class="col-12 md:col-6">
+        <label for="sub-end-date" class="block text-sm font-medium mb-2">End Date</label>
+        <input 
+          id="sub-end-date"
+          type="date" 
+          pInputText 
+          [(ngModel)]="newSubRecord.endDate"
+          class="w-full">
+      </div>
+    </div>
+    
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <label for="sub-status" class="block text-sm font-medium mb-2">Status</label>
+        <p-dropdown 
+          id="sub-status"
+          [(ngModel)]="newSubRecord.status"
+          [options]="statusOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select status"
+          styleClass="w-full">
+        </p-dropdown>
+      </div>
+      <div class="col-12 md:col-6">
+        <label for="sub-type" class="block text-sm font-medium mb-2">Type</label>
+        <input 
+          id="sub-type"
+          type="text" 
+          pInputText 
+          [(ngModel)]="newSubRecord.type"
+          placeholder="e.g., Excavation, Preparation"
+          class="w-full">
+      </div>
+    </div>
+    
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <label for="sub-cost" class="block text-sm font-medium mb-2">Cost</label>
+        <input 
+          id="sub-cost"
+          type="text" 
+          pInputText 
+          [(ngModel)]="newSubRecord.cost"
+          placeholder="$1,200"
+          class="w-full">
+      </div>
+      <div class="col-12 md:col-6">
+        <label for="sub-quantity" class="block text-sm font-medium mb-2">Quantity</label>
+        <input 
+          id="sub-quantity"
+          type="text" 
+          pInputText 
+          [(ngModel)]="newSubRecord.quantity"
+          placeholder="150 m³"
+          class="w-full">
+      </div>
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <p-button 
+        label="Cancel"
+        [outlined]="true"
+        (onClick)="showAddSubRecordDialog.set(false)">
+      </p-button>
+      <p-button 
+        label="Add Sub-Record"
+        (onClick)="addSubRecord()">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>

@@ -74,6 +74,21 @@ export const routes: Routes = [
               .then(m => m.AgreementWizardComponent)
           }
         ]
+      },
+      {
+        path: 'projects',
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/project-management/pages/project-list/project-list.component')
+              .then(m => m.ProjectListComponent)
+          },
+          {
+            path: ':id',
+            loadComponent: () => import('./features/project-management/pages/project-detail/project-detail.component')
+              .then(m => m.ProjectDetailComponent)
+          }
+        ]
       }
     ]
   },

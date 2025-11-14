@@ -28,7 +28,9 @@
     "loading": "Loading...",
     "success": "Success",
     "error": "Error",
-    "warning": "Warning"
+    "warning": "Warning",
+    "view": "View",
+    "clearFilters": "Clear Filters"
   },
   "agreements": {
     "title": "Agreements",
@@ -49,6 +51,79 @@
       "view": "View Agreement",
       "edit": "Edit Agreement",
       "delete": "Delete Agreement"
+    }
+  },
+  "projects": {
+    "title": "Project Management",
+    "subtitle": "Manage all construction projects and track progress",
+    "createNew": "Create New Project",
+    "noProjects": "No projects found",
+    "searchPlaceholder": "Search projects...",
+    "pagination": "Showing {first} to {last} of {totalRecords} projects",
+    "stats": {
+      "total": "Total Projects",
+      "active": "Active Projects",
+      "completed": "Completed Projects",
+      "budget": "Total Budget"
+    },
+    "filters": {
+      "status": "Status",
+      "priority": "Priority",
+      "selectStatus": "Select Status",
+      "selectPriority": "Select Priority"
+    },
+    "columns": {
+      "name": "Project Name",
+      "client": "Client",
+      "status": "Status",
+      "priority": "Priority",
+      "progress": "Progress",
+      "budget": "Budget",
+      "endDate": "End Date"
+    },
+    "status": {
+      "planning": "Planning",
+      "in_progress": "In Progress",
+      "on_hold": "On Hold",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "form": {
+      "name": "Project Name",
+      "description": "Description",
+      "clientName": "Client Name",
+      "projectManager": "Project Manager",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "budget": "Budget",
+      "priority": "Priority"
+    },
+    "stages": {
+      "title": "Stages",
+      "preparing": "Preparing",
+      "excavation": "Excavation",
+      "foundation": "Foundation",
+      "structure": "Structure",
+      "finishing": "Finishing",
+      "milestone": "Milestone",
+      "completed": "Completed"
+    },
+    "tasks": {
+      "title": "Tasks",
+      "addNew": "Add Task",
+      "status": {
+        "todo": "To Do",
+        "in_progress": "In Progress",
+        "review": "Review",
+        "blocked": "Blocked",
+        "completed": "Completed"
+      }
     }
   },
   "validation": {

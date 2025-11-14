@@ -1,0 +1,47 @@
+::ng-deep {
+  .p-dialog {
+    .p-dialog-header {
+      background: var(--surface-0);
+      border-bottom: 1px solid var(--surface-border);
+      padding: 1.5rem;
+    }
+
+    .p-dialog-content {
+      padding: 1.5rem;
+    }
+
+    .p-dialog-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--surface-border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+    }
+  }
+
+  .field {
+    margin-bottom: 1.5rem;
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: var(--text-color);
+    }
+
+    .p-error {
+      display: block;
+      margin-top: 0.25rem;
+      color: var(--red-500);
+      font-size: 0.875rem;
+    }
+  }
+
+  .p-floatlabel {
+    display: block;
+    
+    input, textarea, .p-dropdown, .p-calendar, .p-inputnumber {
+      width: 100%;
+    }
+  }
+}

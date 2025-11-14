@@ -1,0 +1,217 @@
+<div class="project-list-container p-4">
+  <!-- Header -->
+  <div class="flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="text-3xl font-bold m-0">{{ 'projects.title' | translate }}</h1>
+      <p class="text-color-secondary mt-2">{{ 'projects.subtitle' | translate }}</p>
+    </div>
+    <p-button 
+      [label]="'projects.createNew' | translate"
+      icon="pi pi-plus"
+      (onClick)="openCreateDialog()"
+      severity="primary"
+      [raised]="true">
+    </p-button>
+  </div>
+
+  <!-- Statistics Cards -->
+  <div class="grid mb-4">
+    <div class="col-12 md:col-6 lg:col-3">
+      <div class="stat-card">
+        <div class="stat-content">
+          <div class="stat-label">{{ 'projects.stats.total' | translate }}</div>
+          <div class="stat-value">{{ stats().totalProjects }}</div>
+        </div>
+        <div class="stat-icon stat-icon-grid">
+          <i class="pi pi-th-large"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-12 md:col-6 lg:col-3">
+      <div class="stat-card">
+        <div class="stat-content">
+          <div class="stat-label">{{ 'projects.stats.active' | translate }}</div>
+          <div class="stat-value">{{ stats().activeProjects }}</div>
+        </div>
+        <div class="stat-icon stat-icon-trending">
+          <i class="pi pi-arrow-up-right"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-12 md:col-6 lg:col-3">
+      <div class="stat-card">
+        <div class="stat-content">
+          <div class="stat-label">{{ 'projects.stats.completed' | translate }}</div>
+          <div class="stat-value">{{ stats().completedProjects }}</div>
+        </div>
+        <div class="stat-icon stat-icon-archive">
+          <i class="pi pi-check-circle"></i>
+        </div>
+      </div>
+    </div>
+    
+    <div class="col-12 md:col-6 lg:col-3">
+      <div class="stat-card">
+        <div class="stat-content">
+          <div class="stat-label">Upcoming</div>
+          <div class="stat-value">{{ stats().onHoldProjects }}</div>
+        </div>
+        <div class="stat-icon stat-icon-users">
+          <i class="pi pi-users"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filter Tabs -->
+  <div class="flex flex-column md:flex-row justify-content-between align-items-start md:align-items-center gap-3 mb-4">
+    <div class="search-box flex-1">
+      <p-iconfield iconPosition="left" class="w-full">
+        <p-inputicon styleClass="pi pi-search"></p-inputicon>
+        <input 
+          type="text" 
+          pInputText 
+          [(ngModel)]="searchText"
+          (ngModelChange)="onSearchChange()"
+          [placeholder]="'projects.searchPlaceholder' | translate"
+          class="w-full" />
+      </p-iconfield>
+    </div>
+    
+    <div class="flex gap-2 align-items-center">
+      <p-button 
+        label="All"
+        [text]="selectedStatuses().length === 0"
+        [raised]="selectedStatuses().length === 0"
+        severity="contrast"
+        (onClick)="clearFilters()"
+        styleClass="filter-tab">
+      </p-button>
+      <p-button 
+        label="Active"
+        [text]="!isStatusSelected('in_progress')"
+        [raised]="isStatusSelected('in_progress')"
+        severity="contrast"
+        (onClick)="filterByStatus('in_progress')"
+        styleClass="filter-tab">
+      </p-button>
+      <p-button 
+        label="Completed"
+        [text]="!isStatusSelected('completed')"
+        [raised]="isStatusSelected('completed')"
+        severity="contrast"
+        (onClick)="filterByStatus('completed')"
+        styleClass="filter-tab">
+      </p-button>
+      <p-button 
+        label="Upcoming"
+        [text]="!isStatusSelected('planning')"
+        [raised]="isStatusSelected('planning')"
+        severity="contrast"
+        (onClick)="filterByStatus('planning')"
+        styleClass="filter-tab">
+      </p-button>
+      
+      <p-button 
+        icon="pi pi-th-large"
+        [text]="true"
+        severity="secondary"
+        styleClass="view-toggle">
+      </p-button>
+      <p-button 
+        icon="pi pi-list"
+        [text]="true"
+        severity="secondary"
+        styleClass="view-toggle">
+      </p-button>
+    </div>
+  </div>
+
+  <!-- Projects Grid -->
+  @if (isLoading()) {
+    <div class="grid">
+      @for (i of [1,2,3]; track i) {
+        <div class="col-12 md:col-6 lg:col-4">
+          <p-skeleton height="250px" borderRadius="12px"></p-skeleton>
+        </div>
+      }
+    </div>
+  } @else {
+    <div class="grid">
+      @for (project of filteredProjects(); track project.id) {
+        <div class="col-12 md:col-6 lg:col-4">
+          <div class="project-card" (click)="viewProject(project)">
+            <div class="project-card-header">
+              <h3 class="project-title">{{ project.name }}</h3>
+              <p-tag 
+                [value]="'projects.status.' + project.status | translate"
+                [severity]="getStatusSeverity(project.status)"
+                styleClass="project-status-tag">
+              </p-tag>
+            </div>
+            
+            <div class="project-client">
+              <i class="pi pi-building"></i>
+              <span>{{ project.clientName }}</span>
+            </div>
+
+            <div class="project-progress-section">
+              <div class="progress-header">
+                <span class="progress-label">Overall Progress</span>
+                <span class="progress-value">{{ project.progress }}%</span>
+              </div>
+              <p-progressbar 
+                [value]="project.progress"
+                [showValue]="false"
+                styleClass="project-progress-bar">
+              </p-progressbar>
+            </div>
+
+            <div class="project-stages">
+              @for (stage of getTopStages(project); track stage.id) {
+                <div class="stage-item">
+                  <span class="stage-name">{{ stage.name }}</span>
+                  <span class="stage-progress">{{ stage.progress }}%</span>
+                </div>
+              }
+            </div>
+
+            <div class="project-footer">
+              <div class="project-date">
+                <i class="pi pi-calendar"></i>
+                <span>{{ formatDate(project.endDate) }}</span>
+              </div>
+              <div class="project-budget">
+                {{ formatCurrency(project.budget) }}
+              </div>
+            </div>
+          </div>
+        </div>
+      } @empty {
+        <div class="col-12">
+          <div class="empty-state">
+            <i class="pi pi-inbox"></i>
+            <h3>{{ 'projects.noProjects' | translate }}</h3>
+            <p>Create your first project to get started</p>
+            <p-button 
+              [label]="'projects.createNew' | translate"
+              icon="pi pi-plus"
+              (onClick)="openCreateDialog()">
+            </p-button>
+          </div>
+        </div>
+      }
+    </div>
+  }
+</div>
+
+<!-- Create Project Dialog -->
+@if (showCreateDialog()) {
+  <app-create-project-dialog
+    [visible]="showCreateDialog()"
+    (visibleChange)="closeCreateDialog()"
+    (projectCreated)="onProjectCreated($event)">
+  </app-create-project-dialog>
+}

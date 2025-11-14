@@ -28,7 +28,9 @@
     "loading": "جاري التحميل...",
     "success": "نجح",
     "error": "خطأ",
-    "warning": "تحذير"
+    "warning": "تحذير",
+    "view": "عرض",
+    "clearFilters": "مسح الفلاتر"
   },
   "agreements": {
     "title": "الاتفاقيات",
@@ -49,6 +51,79 @@
       "view": "عرض الاتفاقية",
       "edit": "تعديل الاتفاقية",
       "delete": "حذف الاتفاقية"
+    }
+  },
+  "projects": {
+    "title": "إدارة المشاريع",
+    "subtitle": "إدارة جميع مشاريع البناء وتتبع التقدم",
+    "createNew": "إنشاء مشروع جديد",
+    "noProjects": "لم يتم العثور على مشاريع",
+    "searchPlaceholder": "البحث في المشاريع...",
+    "pagination": "عرض {first} إلى {last} من {totalRecords} مشروع",
+    "stats": {
+      "total": "إجمالي المشاريع",
+      "active": "المشاريع النشطة",
+      "completed": "المشاريع المكتملة",
+      "budget": "الميزانية الإجمالية"
+    },
+    "filters": {
+      "status": "الحالة",
+      "priority": "الأولوية",
+      "selectStatus": "اختر الحالة",
+      "selectPriority": "اختر الأولوية"
+    },
+    "columns": {
+      "name": "اسم المشروع",
+      "client": "العميل",
+      "status": "الحالة",
+      "priority": "الأولوية",
+      "progress": "التقدم",
+      "budget": "الميزانية",
+      "endDate": "تاريخ الانتهاء"
+    },
+    "status": {
+      "planning": "التخطيط",
+      "in_progress": "قيد التنفيذ",
+      "on_hold": "معلق",
+      "completed": "مكتمل",
+      "cancelled": "ملغي"
+    },
+    "priority": {
+      "low": "منخفض",
+      "medium": "متوسط",
+      "high": "عالي",
+      "urgent": "عاجل"
+    },
+    "form": {
+      "name": "اسم المشروع",
+      "description": "الوصف",
+      "clientName": "اسم العميل",
+      "projectManager": "مدير المشروع",
+      "startDate": "تاريخ البداية",
+      "endDate": "تاريخ الانتهاء",
+      "budget": "الميزانية",
+      "priority": "الأولوية"
+    },
+    "stages": {
+      "title": "المراحل",
+      "preparing": "التحضير",
+      "excavation": "الحفر",
+      "foundation": "الأساسات",
+      "structure": "الهيكل",
+      "finishing": "التشطيب",
+      "milestone": "المعلم",
+      "completed": "مكتمل"
+    },
+    "tasks": {
+      "title": "المهام",
+      "addNew": "إضافة مهمة",
+      "status": {
+        "todo": "للقيام به",
+        "in_progress": "قيد التنفيذ",
+        "review": "مراجعة",
+        "blocked": "محظور",
+        "completed": "مكتمل"
+      }
     }
   },
   "validation": {

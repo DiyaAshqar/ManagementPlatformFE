@@ -1,0 +1,201 @@
+<div class="preparing-stage">
+  <!-- Header Card -->
+  <p-card styleClass="mb-4">
+    <ng-template pTemplate="header">
+      <div class="px-3 pt-3 pb-0">
+        <div class="flex align-items-center justify-content-between">
+          <div>
+            <h3 class="text-xl font-semibold m-0 text-color">Preparing Stage</h3>
+            <p class="text-sm text-500 mt-1 mb-0">Manage pre-construction tasks and activities</p>
+          </div>
+          <p-button 
+            label="Add Task"
+            icon="pi pi-plus"
+            (onClick)="openAddTaskDialog()">
+          </p-button>
+        </div>
+      </div>
+    </ng-template>
+    
+    <div class="space-y-2">
+      <div class="flex align-items-center justify-content-between text-sm">
+        <span class="text-500">Overall Progress</span>
+        <span class="font-semibold text-color">
+          {{ completedTasks }}/{{ totalTasks }} tasks completed ({{ overallProgress }}%)
+        </span>
+      </div>
+      <p-progressBar 
+        [value]="overallProgress"
+        [showValue]="false"
+        [style]="{ height: '0.5rem' }">
+      </p-progressBar>
+    </div>
+  </p-card>
+
+  <!-- Task Categories -->
+  <div class="space-y-4">
+    @for (category of categories; track category.id) {
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="px-3 pt-3 pb-0">
+            <div class="flex align-items-center justify-content-between">
+              <div class="flex align-items-center gap-3">
+                <h4 class="text-lg font-semibold m-0 text-color">{{ category.name }}</h4>
+                <p-badge 
+                  [value]="calculateProgress(category.tasks) + '%'"
+                  severity="secondary">
+                </p-badge>
+              </div>
+              <div class="flex align-items-center gap-2">
+                <span class="text-sm font-medium text-color">
+                  {{ getCompletedTasksCount(category.tasks) }}/{{ category.tasks.length }}
+                </span>
+                <p-progressBar 
+                  [value]="calculateProgress(category.tasks)"
+                  [showValue]="false"
+                  [style]="{ height: '0.5rem', width: '6rem' }">
+                </p-progressBar>
+              </div>
+            </div>
+          </div>
+        </ng-template>
+        
+        <div class="space-y-2">
+          @for (task of category.tasks; track task.id) {
+            <div class="task-item flex align-items-center gap-3 p-3 border-round border-1 surface-border hover:surface-hover transition-colors">
+              <p-checkbox 
+                [binary]="true"
+                [(ngModel)]="task.completed"
+                (onChange)="toggleTask(category.id, task.id)"
+                [inputId]="task.id">
+              </p-checkbox>
+              
+              <div class="flex-1">
+                <label 
+                  [for]="task.id"
+                  class="cursor-pointer font-normal mb-1"
+                  [class.completed-task]="task.completed">
+                  {{ task.title }}
+                </label>
+                <div class="flex align-items-center gap-3 text-xs text-500 mt-1">
+                  @if (task.assignee) {
+                    <span class="flex align-items-center gap-1">
+                      <i class="pi pi-user"></i>
+                      {{ task.assignee }}
+                    </span>
+                  }
+                  @if (task.dueDate) {
+                    <span class="flex align-items-center gap-1">
+                      <i class="pi pi-calendar"></i>
+                      {{ formatDate(task.dueDate) }}
+                    </span>
+                  }
+                </div>
+              </div>
+              
+              <p-tag 
+                [value]="task.priority"
+                [severity]="getPrioritySeverity(task.priority)"
+                styleClass="text-xs">
+              </p-tag>
+              
+              <p-button 
+                icon="pi pi-trash"
+                [text]="true"
+                [rounded]="true"
+                severity="danger"
+                size="small"
+                (onClick)="deleteTask(category.id, task.id)"
+                pTooltip="Delete task"
+                tooltipPosition="left">
+              </p-button>
+            </div>
+          }
+        </div>
+      </p-card>
+    }
+  </div>
+</div>
+
+<!-- Add Task Dialog -->
+<p-dialog 
+  [(visible)]="showAddTaskDialog"
+  [modal]="true"
+  [style]="{ width: '40rem' }"
+  header="Add New Task"
+  [draggable]="false"
+  [resizable]="false">
+  <p class="text-500 mb-4">Create a new task in the preparing stage</p>
+  
+  <div class="space-y-4">
+    <div>
+      <label for="category" class="block text-sm font-medium mb-2 text-color">Category</label>
+      <p-dropdown 
+        [(ngModel)]="selectedCategory"
+        [options]="categoryOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select category"
+        styleClass="w-full"
+        inputId="category">
+      </p-dropdown>
+    </div>
+    
+    <div>
+      <label for="title" class="block text-sm font-medium mb-2 text-color">Task Title</label>
+      <input 
+        pInputText 
+        id="title"
+        [(ngModel)]="newTask.title"
+        placeholder="Enter task title"
+        class="w-full" />
+    </div>
+    
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <label for="assignee" class="block text-sm font-medium mb-2 text-color">Assignee</label>
+        <input 
+          pInputText 
+          id="assignee"
+          [(ngModel)]="newTask.assignee"
+          placeholder="Assign to"
+          class="w-full" />
+      </div>
+      
+      <div class="col-12 md:col-6">
+        <label for="dueDate" class="block text-sm font-medium mb-2 text-color">Due Date</label>
+        <input 
+          pInputText 
+          type="date"
+          id="dueDate"
+          [(ngModel)]="newTask.dueDate"
+          class="w-full" />
+      </div>
+    </div>
+    
+    <div>
+      <label for="priority" class="block text-sm font-medium mb-2 text-color">Priority</label>
+      <p-dropdown 
+        [(ngModel)]="newTask.priority"
+        [options]="priorityOptions"
+        optionLabel="label"
+        optionValue="value"
+        placeholder="Select priority"
+        styleClass="w-full"
+        inputId="priority">
+      </p-dropdown>
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <p-button 
+      label="Cancel"
+      [outlined]="true"
+      (onClick)="showAddTaskDialog = false; resetNewTask()">
+    </p-button>
+    <p-button 
+      label="Add Task"
+      (onClick)="addTask()">
+    </p-button>
+  </ng-template>
+</p-dialog>
