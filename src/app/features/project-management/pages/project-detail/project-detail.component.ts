@@ -11,10 +11,8 @@ import { TabViewModule } from 'primeng/tabview';
 import { TagModule } from 'primeng/tag';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { TooltipModule } from 'primeng/tooltip';
-import { DataViewModule } from 'primeng/dataview';
 import { SkeletonModule } from 'primeng/skeleton';
 import { DialogModule } from 'primeng/dialog';
-import { FileUploadModule } from 'primeng/fileupload';
 import { DropdownModule } from 'primeng/dropdown';
 
 import { ProjectService } from '../../services/project.service';
@@ -23,6 +21,7 @@ import { PreparingStageComponent } from '../../components/preparing-stage/prepar
 import { ExcavationStageComponent } from '../../components/excavation-stage/excavation-stage.component';
 import { MilestoneStageComponent } from '../../components/milestone-stage/milestone-stage.component';
 import { StageKanbanComponent } from '../../components/stage-kanban/stage-kanban.component';
+import { DocumentsStageComponent } from '../../components/documents-stage/documents-stage.component';
 
 interface ReportType {
   label: string;
@@ -42,15 +41,14 @@ interface ReportType {
     TagModule,
     ProgressBarModule,
     TooltipModule,
-    DataViewModule,
     SkeletonModule,
     DialogModule,
-    FileUploadModule,
     DropdownModule,
     PreparingStageComponent,
     ExcavationStageComponent,
     MilestoneStageComponent,
-    StageKanbanComponent
+    StageKanbanComponent,
+    DocumentsStageComponent
   ],
   templateUrl: './project-detail.component.html',
   styleUrls: ['./project-detail.component.scss']
@@ -59,7 +57,6 @@ export class ProjectDetailComponent implements OnInit {
   project = signal<Project | null>(null);
   isLoading = signal<boolean>(true);
   activeTabIndex = 0;
-  showUploadDialog = false;
   showPrintDialog = false;
   selectedReportType = 'full';
   
@@ -105,22 +102,8 @@ export class ProjectDetailComponent implements OnInit {
     this.router.navigate(['/projects']);
   }
 
-  openUploadDialog(): void {
-    this.showUploadDialog = true;
-  }
-
   openPrintDialog(): void {
     this.showPrintDialog = true;
-  }
-
-  uploadFiles(): void {
-    // Implement file upload logic
-    console.log('Uploading files...');
-    this.showUploadDialog = false;
-  }
-
-  onUploadComplete(event: any): void {
-    console.log('Upload complete:', event);
   }
 
   printReport(): void {
@@ -214,15 +197,6 @@ export class ProjectDetailComponent implements OnInit {
       month: 'short',
       day: 'numeric'
     });
-  }
-
-  getInitials(name: string): string {
-    return name
-      .split(' ')
-      .map(word => word.charAt(0))
-      .join('')
-      .toUpperCase()
-      .slice(0, 2);
   }
 
   getTasksByStage(stage: Stage): Task[] {

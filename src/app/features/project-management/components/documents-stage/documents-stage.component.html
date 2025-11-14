@@ -1,0 +1,119 @@
+<div class="documents-stage">
+  <div class="flex justify-content-between align-items-center mb-4">
+    <div>
+      <h3 class="text-xl font-semibold m-0 text-color">Project Documents</h3>
+      <p class="text-sm text-500 mt-1 mb-0">All files and documents related to this project</p>
+    </div>
+    <p-button 
+      label="Upload Files"
+      icon="pi pi-upload"
+      (onClick)="openUploadDialog()">
+    </p-button>
+  </div>
+  
+  @if (isLoading()) {
+    <!-- Loading State -->
+    <div class="grid">
+      @for (item of [1,2,3]; track item) {
+        <div class="col-12 md:col-6 lg:col-4">
+          <p-card styleClass="h-full">
+            <p-skeleton width="100%" height="4rem"></p-skeleton>
+          </p-card>
+        </div>
+      }
+    </div>
+  } @else if (documents() && documents().length > 0) {
+    <!-- Documents Grid -->
+    <p-dataView [value]="documents()" layout="grid">
+      <ng-template let-document pTemplate="gridItem">
+        <div class="col-12 md:col-6 lg:col-4">
+          <p-card styleClass="h-full">
+            <div class="flex align-items-start gap-3">
+              <div class="flex align-items-center justify-content-center border-circle bg-primary-100" 
+                   style="width: 3rem; height: 3rem;">
+                <i class="pi pi-file text-primary text-xl"></i>
+              </div>
+              <div class="flex-1">
+                <h4 class="font-semibold text-sm m-0 mb-1 text-color">{{ document.name }}</h4>
+                <p class="text-xs text-500 m-0 mb-2">{{ document.type }} • {{ document.size }}</p>
+                <div class="flex align-items-center gap-2">
+                  <p-button 
+                    icon="pi pi-eye"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    (onClick)="viewDocument(document)"
+                    pTooltip="View"
+                    tooltipPosition="bottom">
+                  </p-button>
+                  <p-button 
+                    icon="pi pi-download"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    (onClick)="downloadDocument(document)"
+                    pTooltip="Download"
+                    tooltipPosition="bottom">
+                  </p-button>
+                  <p-button 
+                    icon="pi pi-trash"
+                    [text]="true"
+                    [rounded]="true"
+                    size="small"
+                    severity="danger"
+                    (onClick)="deleteDocument(document)"
+                    pTooltip="Delete"
+                    tooltipPosition="bottom">
+                  </p-button>
+                </div>
+              </div>
+            </div>
+          </p-card>
+        </div>
+      </ng-template>
+    </p-dataView>
+  } @else {
+    <!-- Empty State -->
+    <div class="text-center py-6">
+      <i class="pi pi-inbox text-6xl text-300 mb-3"></i>
+      <p class="text-color-secondary mb-4">No documents uploaded yet</p>
+      <p-button 
+        label="Upload First Document"
+        icon="pi pi-upload"
+        (onClick)="openUploadDialog()">
+      </p-button>
+    </div>
+  }
+</div>
+
+<!-- Upload Dialog -->
+<p-dialog 
+  [(visible)]="showUploadDialog"
+  [modal]="true"
+  [style]="{ width: '50rem' }"
+  header="Upload Files"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="closeUploadDialog()">
+  <p class="text-color-secondary mb-3">Upload documents, images, and files for this project</p>
+  <p-fileUpload 
+    name="files[]"
+    [multiple]="true"
+    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx"
+    [maxFileSize]="52428800"
+    (onUpload)="onUploadComplete($event)"
+    [auto]="false"
+    chooseLabel="Choose Files">
+  </p-fileUpload>
+  <ng-template pTemplate="footer">
+    <p-button 
+      label="Cancel"
+      [outlined]="true"
+      (onClick)="closeUploadDialog()">
+    </p-button>
+    <p-button 
+      label="Upload"
+      (onClick)="uploadFiles()">
+    </p-button>
+  </ng-template>
+</p-dialog>

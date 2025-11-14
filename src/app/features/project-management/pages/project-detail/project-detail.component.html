@@ -27,13 +27,6 @@
           </div>
           <div class="flex align-items-center gap-2">
             <p-button 
-              icon="pi pi-upload"
-              label="Upload Files"
-              [outlined]="true"
-              (onClick)="openUploadDialog()"
-              severity="secondary">
-            </p-button>
-            <p-button 
               icon="pi pi-print"
               label="Print Report"
               [outlined]="true"
@@ -100,21 +93,6 @@
               <div class="flex-1">
                 <div class="text-500 text-sm mb-1">Start Date</div>
                 <div class="text-xl font-semibold text-color">{{ formatDate(project()!.startDate) }}</div>
-              </div>
-            </div>
-          </p-card>
-        </div>
-        
-        <div class="col-12 md:col-6 lg:col-3">
-          <p-card styleClass="h-full">
-            <div class="flex align-items-center gap-3">
-              <div class="flex align-items-center justify-content-center border-circle bg-purple-100" 
-                   style="width: 3rem; height: 3rem;">
-                <i class="pi pi-users text-purple-600 text-xl"></i>
-              </div>
-              <div class="flex-1">
-                <div class="text-500 text-sm mb-1">Team Members</div>
-                <div class="text-2xl font-bold text-color">{{ project()!.team.length }}</div>
               </div>
             </div>
           </p-card>
@@ -201,107 +179,7 @@
               </div>
             </ng-template>
             <div class="py-4">
-              <div class="flex justify-content-between align-items-center mb-4">
-                <div>
-                  <h3 class="text-xl font-semibold m-0 text-color">Project Documents</h3>
-                  <p class="text-sm text-500 mt-1 mb-0">All files and documents related to this project</p>
-                </div>
-                <p-button 
-                  label="Upload Files"
-                  icon="pi pi-upload"
-                  (onClick)="openUploadDialog()">
-                </p-button>
-              </div>
-              
-              @if (project()!.documents && project()!.documents.length > 0) {
-                <p-dataView [value]="project()!.documents" layout="grid">
-                  <ng-template let-document pTemplate="gridItem">
-                    <div class="col-12 md:col-6 lg:col-4">
-                      <p-card styleClass="h-full">
-                        <div class="flex align-items-start gap-3">
-                          <div class="flex align-items-center justify-content-center border-circle bg-primary-100" 
-                               style="width: 3rem; height: 3rem;">
-                            <i class="pi pi-file text-primary text-xl"></i>
-                          </div>
-                          <div class="flex-1">
-                            <h4 class="font-semibold text-sm m-0 mb-1 text-color">{{ document.name }}</h4>
-                            <p class="text-xs text-500 m-0 mb-2">{{ document.type }} • {{ document.size }}</p>
-                            <div class="flex align-items-center gap-2">
-                              <p-button 
-                                icon="pi pi-eye"
-                                [text]="true"
-                                [rounded]="true"
-                                size="small"
-                                pTooltip="View"
-                                tooltipPosition="bottom">
-                              </p-button>
-                              <p-button 
-                                icon="pi pi-download"
-                                [text]="true"
-                                [rounded]="true"
-                                size="small"
-                                pTooltip="Download"
-                                tooltipPosition="bottom">
-                              </p-button>
-                            </div>
-                          </div>
-                        </div>
-                      </p-card>
-                    </div>
-                  </ng-template>
-                </p-dataView>
-              } @else {
-                <div class="text-center py-6">
-                  <i class="pi pi-inbox text-6xl text-300 mb-3"></i>
-                  <p class="text-color-secondary mb-4">No documents uploaded yet</p>
-                  <p-button 
-                    label="Upload First Document"
-                    icon="pi pi-upload"
-                    (onClick)="openUploadDialog()">
-                  </p-button>
-                </div>
-              }
-            </div>
-          </p-tabPanel>
-
-          <!-- Team Tab -->
-          <p-tabPanel>
-            <ng-template pTemplate="header">
-              <div class="flex align-items-center gap-2">
-                <i class="pi pi-users"></i>
-                <span>Team</span>
-              </div>
-            </ng-template>
-            <div class="py-4">
-              <div class="flex justify-content-between align-items-center mb-4">
-                <div>
-                  <h3 class="text-xl font-semibold m-0 text-color">Team Members</h3>
-                  <p class="text-sm text-500 mt-1 mb-0">{{ project()!.team.length }} members working on this project</p>
-                </div>
-              </div>
-              
-              <div class="grid">
-                @for (member of project()!.team; track member.id) {
-                  <div class="col-12 md:col-6 lg:col-4">
-                    <p-card styleClass="h-full">
-                      <div class="flex align-items-center gap-3">
-                        <div class="flex align-items-center justify-content-center border-circle bg-primary text-white font-bold" 
-                             style="width: 3.5rem; height: 3.5rem; font-size: 1.25rem;">
-                          {{ getInitials(member.name) }}
-                        </div>
-                        <div class="flex-1">
-                          <h4 class="font-bold text-base m-0 mb-1 text-color">{{ member.name }}</h4>
-                          <p class="text-sm text-600 m-0 mb-1">{{ member.role }}</p>
-                          <div class="flex align-items-center gap-1 text-500">
-                            <i class="pi pi-envelope text-xs"></i>
-                            <span class="text-xs">{{ member.email }}</span>
-                          </div>
-                        </div>
-                      </div>
-                    </p-card>
-                  </div>
-                }
-              </div>
+              <app-documents-stage [projectId]="project()!.id"></app-documents-stage>
             </div>
           </p-tabPanel>
         </p-tabView>
@@ -309,37 +187,6 @@
     </div>
   }
 </div>
-
-<!-- Upload Dialog -->
-<p-dialog 
-  [(visible)]="showUploadDialog"
-  [modal]="true"
-  [style]="{ width: '50rem' }"
-  header="Upload Files"
-  [draggable]="false"
-  [resizable]="false">
-  <p class="text-color-secondary mb-3">Upload documents, images, and files for this project</p>
-  <p-fileUpload 
-    name="files[]"
-    [multiple]="true"
-    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx"
-    [maxFileSize]="52428800"
-    (onUpload)="onUploadComplete($event)"
-    [auto]="false"
-    chooseLabel="Choose Files">
-  </p-fileUpload>
-  <ng-template pTemplate="footer">
-    <p-button 
-      label="Cancel"
-      [outlined]="true"
-      (onClick)="showUploadDialog = false">
-    </p-button>
-    <p-button 
-      label="Upload"
-      (onClick)="uploadFiles()">
-    </p-button>
-  </ng-template>
-</p-dialog>
 
 <!-- Print Dialog -->
 <p-dialog 
