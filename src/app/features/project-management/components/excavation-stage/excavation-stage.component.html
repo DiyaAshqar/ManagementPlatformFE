@@ -56,13 +56,19 @@
         <ng-template pTemplate="header">
           <tr>
             <th style="width: 3rem"></th>
-            <th>Date</th>
+            <th>Title</th>
+            <th>Type</th>
+            <th>Assign To</th>
+            <th>Start Date</th>
+            <th>End Date</th>
+            <th>Priority</th>
+            <th>Task Points</th>
             <th>Location</th>
             <th>Depth</th>
             <th>Volume</th>
             <th>Soil Type</th>
             <th>Equipment</th>
-            <th>Operator</th>
+            <th>Description</th>
             <th>Status</th>
             <th style="width: 8rem" class="text-right">Actions</th>
           </tr>
@@ -78,15 +84,76 @@
                 (onClick)="toggleExpanded(record.id)">
               </p-button>
             </td>
+            <td class="font-semibold">
+              @if (editingId() === record.id) {
+                <input 
+                  type="text" 
+                  pInputText 
+                  [(ngModel)]="editingRecord.title"
+                  class="p-inputtext-sm w-full">
+              } @else {
+                {{ record.title }}
+              }
+            </td>
+            <td>
+              @if (editingId() === record.id) {
+                <input 
+                  type="text" 
+                  pInputText 
+                  [(ngModel)]="editingRecord.type"
+                  class="p-inputtext-sm w-full">
+              } @else {
+                {{ record.type }}
+              }
+            </td>
+            <td>
+              @if (editingId() === record.id) {
+                <input 
+                  type="text" 
+                  pInputText 
+                  [(ngModel)]="editingRecord.assignTo"
+                  class="p-inputtext-sm w-full">
+              } @else {
+                {{ record.assignTo }}
+              }
+            </td>
             <td>
               @if (editingId() === record.id) {
                 <input 
                   type="date" 
                   pInputText 
-                  [(ngModel)]="editingRecord.date"
+                  [(ngModel)]="editingRecord.startDate"
                   class="p-inputtext-sm w-full">
               } @else {
-                {{ formatDate(record.date) }}
+                {{ formatDate(record.startDate) }}
+              }
+            </td>
+            <td>
+              @if (editingId() === record.id) {
+                <input 
+                  type="date" 
+                  pInputText 
+                  [(ngModel)]="editingRecord.endDate"
+                  class="p-inputtext-sm w-full">
+              } @else {
+                {{ formatDate(record.endDate) }}
+              }
+            </td>
+            <td>
+              <p-tag 
+                [value]="getPriorityLabel(record.priority)"
+                [severity]="getPrioritySeverity(record.priority)">
+              </p-tag>
+            </td>
+            <td>
+              @if (editingId() === record.id) {
+                <input 
+                  type="text" 
+                  pInputText 
+                  [(ngModel)]="editingRecord.taskPoints"
+                  class="p-inputtext-sm w-full">
+              } @else {
+                {{ record.taskPoints }}
               }
             </td>
             <td>
@@ -144,15 +211,15 @@
                 {{ record.equipment }}
               }
             </td>
-            <td>
+            <td class="max-w-xs">
               @if (editingId() === record.id) {
                 <input 
                   type="text" 
                   pInputText 
-                  [(ngModel)]="editingRecord.operator"
+                  [(ngModel)]="editingRecord.description"
                   class="p-inputtext-sm w-full">
               } @else {
-                {{ record.operator }}
+                <span class="line-clamp-2">{{ record.description }}</span>
               }
             </td>
             <td>
@@ -212,7 +279,7 @@
           <!-- Expanded Sub-Records Row -->
           @if (isExpanded(record.id)) {
             <tr class="sub-records-row">
-              <td colspan="10" class="p-0">
+              <td colspan="16" class="p-0">
                 <div class="sub-records-container p-4 pl-6 surface-50">
                   <div class="flex align-items-center justify-content-between mb-3">
                     <h4 class="text-base font-semibold m-0">Sub-Records</h4>
@@ -291,23 +358,95 @@
 <p-dialog 
   [(visible)]="showAddDialog"
   [modal]="true"
-  [style]="{ width: '50rem' }"
+  [style]="{ width: '50rem', maxHeight: '90vh' }"
   header="Add Excavation Record"
   [draggable]="false"
-  [resizable]="false">
+  [resizable]="false"
+  styleClass="overflow-y-auto">
   <p class="text-color-secondary mb-3">Enter details for a new excavation activity</p>
   
   <div class="flex flex-column gap-3">
+    <div>
+      <label for="title" class="block text-sm font-medium mb-2">Title</label>
+      <input 
+        id="title"
+        type="text" 
+        pInputText 
+        [(ngModel)]="newRecord.title"
+        placeholder="Foundation Excavation - Phase 1"
+        class="w-full">
+    </div>
+    
     <div class="grid">
       <div class="col-12 md:col-6">
-        <label for="date" class="block text-sm font-medium mb-2">Date</label>
+        <label for="type" class="block text-sm font-medium mb-2">Type</label>
         <input 
-          id="date"
-          type="date" 
+          id="type"
+          type="text" 
           pInputText 
-          [(ngModel)]="newRecord.date"
+          [(ngModel)]="newRecord.type"
+          placeholder="Foundation, Basement, Utility"
           class="w-full">
       </div>
+      <div class="col-12 md:col-6">
+        <label for="assignTo" class="block text-sm font-medium mb-2">Assign To</label>
+        <input 
+          id="assignTo"
+          type="text" 
+          pInputText 
+          [(ngModel)]="newRecord.assignTo"
+          placeholder="Mike Johnson"
+          class="w-full">
+      </div>
+    </div>
+    
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <label for="startDate" class="block text-sm font-medium mb-2">Start Date</label>
+        <input 
+          id="startDate"
+          type="date" 
+          pInputText 
+          [(ngModel)]="newRecord.startDate"
+          class="w-full">
+      </div>
+      <div class="col-12 md:col-6">
+        <label for="endDate" class="block text-sm font-medium mb-2">End Date</label>
+        <input 
+          id="endDate"
+          type="date" 
+          pInputText 
+          [(ngModel)]="newRecord.endDate"
+          class="w-full">
+      </div>
+    </div>
+    
+    <div class="grid">
+      <div class="col-12 md:col-6">
+        <label for="priority" class="block text-sm font-medium mb-2">Priority</label>
+        <p-select 
+          id="priority"
+          [(ngModel)]="newRecord.priority"
+          [options]="priorityOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select priority"
+          styleClass="w-full">
+        </p-select>
+      </div>
+      <div class="col-12 md:col-6">
+        <label for="taskPoints" class="block text-sm font-medium mb-2">Task Points</label>
+        <input 
+          id="taskPoints"
+          type="text" 
+          pInputText 
+          [(ngModel)]="newRecord.taskPoints"
+          placeholder="8"
+          class="w-full">
+      </div>
+    </div>
+    
+    <div class="grid">
       <div class="col-12 md:col-6">
         <label for="location" class="block text-sm font-medium mb-2">Location</label>
         <input 
@@ -318,9 +457,6 @@
           placeholder="Grid A1-A5"
           class="w-full">
       </div>
-    </div>
-    
-    <div class="grid">
       <div class="col-12 md:col-6">
         <label for="depth" class="block text-sm font-medium mb-2">Depth</label>
         <input 
@@ -331,6 +467,9 @@
           placeholder="3.5m"
           class="w-full">
       </div>
+    </div>
+    
+    <div class="grid">
       <div class="col-12 md:col-6">
         <label for="volume" class="block text-sm font-medium mb-2">Volume</label>
         <input 
@@ -341,9 +480,6 @@
           placeholder="450 m³"
           class="w-full">
       </div>
-    </div>
-    
-    <div class="grid">
       <div class="col-12 md:col-6">
         <label for="soilType" class="block text-sm font-medium mb-2">Soil Type</label>
         <input 
@@ -354,27 +490,29 @@
           placeholder="Clay"
           class="w-full">
       </div>
-      <div class="col-12 md:col-6">
-        <label for="equipment" class="block text-sm font-medium mb-2">Equipment</label>
-        <input 
-          id="equipment"
-          type="text" 
-          pInputText 
-          [(ngModel)]="newRecord.equipment"
-          placeholder="Excavator CAT 320"
-          class="w-full">
-      </div>
     </div>
     
     <div>
-      <label for="operator" class="block text-sm font-medium mb-2">Operator</label>
+      <label for="equipment" class="block text-sm font-medium mb-2">Equipment</label>
       <input 
-        id="operator"
+        id="equipment"
         type="text" 
         pInputText 
-        [(ngModel)]="newRecord.operator"
-        placeholder="Mike Johnson"
+        [(ngModel)]="newRecord.equipment"
+        placeholder="Excavator CAT 320"
         class="w-full">
+    </div>
+    
+    <div>
+      <label for="description" class="block text-sm font-medium mb-2">Description</label>
+      <textarea 
+        id="description"
+        pTextarea
+        [(ngModel)]="newRecord.description"
+        placeholder="Describe the excavation task..."
+        [rows]="3"
+        class="w-full">
+      </textarea>
     </div>
   </div>
   

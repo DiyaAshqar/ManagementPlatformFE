@@ -9,6 +9,7 @@ import { DialogModule } from 'primeng/dialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TooltipModule } from 'primeng/tooltip';
+import { TextareaModule } from 'primeng/textarea';
 
 interface SubRecord {
   id: string;
@@ -23,13 +24,19 @@ interface SubRecord {
 
 interface ExcavationRecord {
   id: string;
-  date: string;
+  title: string;
+  type: string;
+  assignTo: string;
+  startDate: string;
+  endDate: string;
+  priority: 'high' | 'medium' | 'low';
+  taskPoints: string;
   location: string;
   depth: string;
   volume: string;
   soilType: string;
   equipment: string;
-  operator: string;
+  description: string;
   status: 'completed' | 'in-progress' | 'pending';
   subRecords?: SubRecord[];
 }
@@ -47,7 +54,8 @@ interface ExcavationRecord {
     DialogModule,
     InputTextModule,
     SelectModule,
-    TooltipModule
+    TooltipModule,
+    TextareaModule
   ],
   templateUrl: './excavation-stage.component.html',
   styleUrls: ['./excavation-stage.component.scss']
@@ -58,13 +66,19 @@ export class ExcavationStageComponent {
   records = signal<ExcavationRecord[]>([
     {
       id: 'exc-1',
-      date: '2024-02-05',
+      title: 'Foundation Excavation - Phase 1',
+      type: 'Foundation',
+      assignTo: 'Mike Johnson',
+      startDate: '2024-02-05',
+      endDate: '2024-02-05',
+      priority: 'high',
+      taskPoints: '8',
       location: 'Grid A1-A5',
       depth: '3.5m',
       volume: '450 m³',
       soilType: 'Clay',
       equipment: 'Excavator CAT 320',
-      operator: 'Mike Johnson',
+      description: 'Initial foundation excavation for the main building structure',
       status: 'completed',
       subRecords: [
         {
@@ -91,13 +105,19 @@ export class ExcavationStageComponent {
     },
     {
       id: 'exc-2',
-      date: '2024-02-06',
+      title: 'Basement Excavation',
+      type: 'Basement',
+      assignTo: 'Mike Johnson',
+      startDate: '2024-02-06',
+      endDate: '2024-02-06',
+      priority: 'high',
+      taskPoints: '10',
       location: 'Grid B1-B5',
       depth: '4.2m',
       volume: '520 m³',
       soilType: 'Sandy Clay',
       equipment: 'Excavator CAT 320',
-      operator: 'Mike Johnson',
+      description: 'Deep excavation for basement level',
       status: 'completed',
       subRecords: [
         {
@@ -114,25 +134,37 @@ export class ExcavationStageComponent {
     },
     {
       id: 'exc-3',
-      date: '2024-02-07',
+      title: 'Utility Trench Excavation',
+      type: 'Utility',
+      assignTo: 'David Smith',
+      startDate: '2024-02-07',
+      endDate: '2024-02-09',
+      priority: 'medium',
+      taskPoints: '5',
       location: 'Grid C1-C5',
       depth: '3.8m',
       volume: '480 m³',
       soilType: 'Clay',
       equipment: 'Excavator Volvo EC380',
-      operator: 'David Smith',
+      description: 'Excavation for utility lines and drainage systems',
       status: 'in-progress',
       subRecords: []
     },
     {
       id: 'exc-4',
-      date: '2024-02-08',
+      title: 'Rock Removal',
+      type: 'Site Preparation',
+      assignTo: 'David Smith',
+      startDate: '2024-02-08',
+      endDate: '2024-02-10',
+      priority: 'low',
+      taskPoints: '6',
       location: 'Grid D1-D5',
       depth: '4.0m',
       volume: '500 m³',
       soilType: 'Rock',
       equipment: 'Excavator Volvo EC380',
-      operator: 'David Smith',
+      description: 'Remove rock formations to prepare site',
       status: 'pending',
       subRecords: []
     }
@@ -145,13 +177,19 @@ export class ExcavationStageComponent {
   selectedRecordId = signal<string | null>(null);
 
   newRecord: Omit<ExcavationRecord, 'id'> = {
-    date: '',
+    title: '',
+    type: '',
+    assignTo: '',
+    startDate: '',
+    endDate: '',
+    priority: 'medium',
+    taskPoints: '',
     location: '',
     depth: '',
     volume: '',
     soilType: '',
     equipment: '',
-    operator: '',
+    description: '',
     status: 'pending'
   };
 
@@ -171,6 +209,12 @@ export class ExcavationStageComponent {
     { label: 'Pending', value: 'pending' },
     { label: 'In Progress', value: 'in-progress' },
     { label: 'Completed', value: 'completed' }
+  ];
+
+  priorityOptions = [
+    { label: 'Low', value: 'low' },
+    { label: 'Medium', value: 'medium' },
+    { label: 'High', value: 'high' }
   ];
 
   get completedCount(): number {
@@ -205,6 +249,24 @@ export class ExcavationStageComponent {
     return labelMap[status] || status;
   }
 
+  getPrioritySeverity(priority: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' {
+    const severityMap: Record<string, 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast'> = {
+      'high': 'danger',
+      'medium': 'info',
+      'low': 'secondary'
+    };
+    return severityMap[priority] || 'secondary';
+  }
+
+  getPriorityLabel(priority: string): string {
+    const labelMap: Record<string, string> = {
+      'high': 'High',
+      'medium': 'Medium',
+      'low': 'Low'
+    };
+    return labelMap[priority] || priority;
+  }
+
   toggleExpanded(recordId: string): void {
     const expanded = new Set(this.expandedRecords());
     if (expanded.has(recordId)) {
@@ -221,20 +283,26 @@ export class ExcavationStageComponent {
 
   openAddDialog(): void {
     this.newRecord = {
-      date: '',
+      title: '',
+      type: '',
+      assignTo: '',
+      startDate: '',
+      endDate: '',
+      priority: 'medium',
+      taskPoints: '',
       location: '',
       depth: '',
       volume: '',
       soilType: '',
       equipment: '',
-      operator: '',
+      description: '',
       status: 'pending'
     };
     this.showAddDialog.set(true);
   }
 
   addRecord(): void {
-    if (!this.newRecord.date || !this.newRecord.location) return;
+    if (!this.newRecord.title || !this.newRecord.location) return;
 
     const record: ExcavationRecord = {
       id: `exc-${Date.now()}`,
