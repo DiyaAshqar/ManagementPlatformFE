@@ -138,11 +138,17 @@
             </p-tab>
             <p-tab value="3">
               <div class="flex align-items-center gap-2">
+                <i class="pi pi-sitemap"></i>
+                <span>Staging</span>
+              </div>
+            </p-tab>
+            <p-tab value="4">
+              <div class="flex align-items-center gap-2">
                 <i class="pi pi-flag"></i>
                 <span>Milestones</span>
               </div>
             </p-tab>
-            <p-tab value="4">
+            <p-tab value="5">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-file"></i>
                 <span>Documents</span>
@@ -168,10 +174,15 @@
             </p-tabpanel>
             <p-tabpanel value="3">
               <div class="py-4">
-                <app-milestone-stage [projectId]="project()!.id"></app-milestone-stage>
+                <app-staging-board [projectId]="project()!.id"></app-staging-board>
               </div>
             </p-tabpanel>
             <p-tabpanel value="4">
+              <div class="py-4">
+                <app-milestone-stage [projectId]="project()!.id"></app-milestone-stage>
+              </div>
+            </p-tabpanel>
+            <p-tabpanel value="5">
               <div class="py-4">
                 <app-documents-stage [projectId]="project()!.id"></app-documents-stage>
               </div>

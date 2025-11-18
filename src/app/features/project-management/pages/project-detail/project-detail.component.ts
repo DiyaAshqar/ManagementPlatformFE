@@ -22,6 +22,7 @@ import { ExcavationStageComponent } from '../../components/excavation-stage/exca
 import { MilestoneStageComponent } from '../../components/milestone-stage/milestone-stage.component';
 import { StageKanbanComponent } from '../../components/stage-kanban/stage-kanban.component';
 import { DocumentsStageComponent } from '../../components/documents-stage/documents-stage.component';
+import { StagingBoardComponent } from '../../components/staging-board/staging-board.component';
 
 interface ReportType {
   label: string;
@@ -48,7 +49,8 @@ interface ReportType {
     ExcavationStageComponent,
     MilestoneStageComponent,
     StageKanbanComponent,
-    DocumentsStageComponent
+    DocumentsStageComponent,
+    StagingBoardComponent
   ],
   templateUrl: './project-detail.component.html',
   styleUrls: ['./project-detail.component.scss']

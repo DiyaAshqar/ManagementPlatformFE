@@ -1,0 +1,471 @@
+<div class="staging-board">
+  <!-- Header Stats -->
+  <div class="grid mb-4">
+    <div class="col-12 md:col-3">
+      <p-card styleClass="h-full">
+        <div class="flex align-items-center gap-3">
+          <div class="flex align-items-center justify-content-center border-circle bg-blue-100" 
+               style="width: 3rem; height: 3rem;">
+            <i class="pi pi-list text-blue-600 text-xl"></i>
+          </div>
+          <div>
+            <div class="text-500 text-sm mb-1">Total Items</div>
+            <div class="text-2xl font-bold text-color">{{ totalItems }}</div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+    
+    <div class="col-12 md:col-3">
+      <p-card styleClass="h-full">
+        <div class="flex align-items-center gap-3">
+          <div class="flex align-items-center justify-content-center border-circle bg-orange-100" 
+               style="width: 3rem; height: 3rem;">
+            <i class="pi pi-spin pi-spinner text-orange-600 text-xl"></i>
+          </div>
+          <div>
+            <div class="text-500 text-sm mb-1">In Progress</div>
+            <div class="text-2xl font-bold text-color">{{ inProgressCount }}</div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+    
+    <div class="col-12 md:col-3">
+      <p-card styleClass="h-full">
+        <div class="flex align-items-center gap-3">
+          <div class="flex align-items-center justify-content-center border-circle bg-green-100" 
+               style="width: 3rem; height: 3rem;">
+            <i class="pi pi-check-circle text-green-600 text-xl"></i>
+          </div>
+          <div>
+            <div class="text-500 text-sm mb-1">Completed</div>
+            <div class="text-2xl font-bold text-color">{{ completedCount }}</div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+    
+    <div class="col-12 md:col-3">
+      <p-card styleClass="h-full">
+        <div class="flex align-items-center gap-3">
+          <div class="flex align-items-center justify-content-center border-circle bg-primary-100" 
+               style="width: 3rem; height: 3rem;">
+            <i class="pi pi-percentage text-primary text-xl"></i>
+          </div>
+          <div class="flex-1">
+            <div class="text-500 text-sm mb-1">Completion</div>
+            <div class="text-2xl font-bold text-primary">{{ completionRate }}%</div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Kanban Board -->
+  <div class="kanban-container">
+    <div class="kanban-columns">
+      @for (column of columns(); track column.id) {
+        <div class="kanban-column">
+          <!-- Column Header -->
+          <div class="column-header">
+            <div class="flex align-items-center justify-content-between mb-2">
+              <div class="flex align-items-center gap-2">
+                <h3 class="text-base font-semibold m-0 text-color">{{ column.title }}</h3>
+                <p-tag 
+                  [value]="column.items.length.toString()"
+                  [rounded]="true"
+                  severity="secondary">
+                </p-tag>
+                @if (column.wipLimit) {
+                  <span class="text-xs text-500">/ {{ column.wipLimit }}</span>
+                }
+              </div>
+              <p-button 
+                icon="pi pi-plus"
+                [text]="true"
+                [rounded]="true"
+                (onClick)="openAddDialog(column.id)"
+                pTooltip="Add item"
+                tooltipPosition="top">
+              </p-button>
+            </div>
+            @if (column.wipLimit && column.items.length >= column.wipLimit) {
+              <div class="bg-orange-100 border-round p-2 mb-2">
+                <span class="text-xs text-orange-900">
+                  <i class="pi pi-exclamation-triangle"></i> WIP limit reached
+                </span>
+              </div>
+            }
+          </div>
+
+          <!-- Column Items -->
+          <div 
+            class="column-items"
+            cdkDropList
+            [cdkDropListData]="column.items"
+            [id]="column.id"
+            [cdkDropListConnectedTo]="connectedDropLists"
+            (cdkDropListDropped)="onDrop($event, column)">
+            
+            @for (item of column.items; track item.id) {
+              <div 
+                class="work-item-card"
+                cdkDrag
+                (click)="openItemDialog(item)">
+                
+                <!-- Drag Placeholder -->
+                <div class="work-item-placeholder" *cdkDragPlaceholder></div>
+
+                <!-- Work Item Header -->
+                <div class="flex align-items-start justify-content-between mb-2">
+                  <div class="flex align-items-center gap-2">
+                    <div 
+                      [class]="'work-item-icon ' + getWorkItemColor(item.type)"
+                      [pTooltip]="item.type"
+                      tooltipPosition="top">
+                      <i [class]="'pi ' + getWorkItemIcon(item.type) + ' text-white'"></i>
+                    </div>
+                    <span class="text-xs text-500 font-mono">{{ item.id }}</span>
+                  </div>
+                  @if (item.priority === 'critical' || item.priority === 'high') {
+                    <p-tag 
+                      [value]="item.priority"
+                      [severity]="getPrioritySeverity(item.priority)"
+                      styleClass="text-xs">
+                    </p-tag>
+                  }
+                </div>
+
+                <!-- Work Item Title -->
+                <h4 class="work-item-title">{{ item.title }}</h4>
+
+                <!-- Tags -->
+                @if (item.tags.length > 0) {
+                  <div class="flex flex-wrap gap-1 mb-2">
+                    @for (tag of item.tags; track tag) {
+                      <p-chip 
+                        [label]="tag"
+                        styleClass="text-xs py-0 px-2"
+                        [style]="{ fontSize: '0.75rem', height: '1.25rem' }">
+                      </p-chip>
+                    }
+                  </div>
+                }
+
+                <!-- Subtasks Progress -->
+                @if (item.subtasks.length > 0) {
+                  <div class="mb-2">
+                    <div class="flex align-items-center gap-2 mb-1">
+                      <i class="pi pi-list text-xs text-500"></i>
+                      <span class="text-xs text-500">
+                        {{ getCompletedSubtasks(item) }}/{{ item.subtasks.length }} subtasks
+                      </span>
+                    </div>
+                    <p-progressbar 
+                      [value]="getSubtaskProgress(item)"
+                      [showValue]="false"
+                      [style]="{ height: '4px' }">
+                    </p-progressbar>
+                  </div>
+                }
+
+                <!-- Work Item Footer -->
+                <div class="flex align-items-center justify-content-between mt-2">
+                  <div class="flex align-items-center gap-2">
+                    @if (item.storyPoints) {
+                      <div class="story-points" pTooltip="Story Points" tooltipPosition="top">
+                        {{ item.storyPoints }}
+                      </div>
+                    }
+                    @if (item.dueDate) {
+                      <span class="text-xs text-500">
+                        <i class="pi pi-calendar"></i> {{ item.dueDate }}
+                      </span>
+                    }
+                  </div>
+                  <p-avatar 
+                    [label]="item.assigneeAvatar"
+                    [style]="{ fontSize: '0.75rem', width: '2rem', height: '2rem' }"
+                    [pTooltip]="item.assignee"
+                    tooltipPosition="top">
+                  </p-avatar>
+                </div>
+              </div>
+            }
+
+            @if (column.items.length === 0) {
+              <div class="empty-column">
+                <i class="pi pi-inbox text-4xl text-400 mb-2"></i>
+                <p class="text-sm text-500 m-0">No items</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Work Item Details Dialog -->
+<p-dialog 
+  [(visible)]="showItemDialog"
+  [modal]="true"
+  [style]="{ width: '50rem', maxHeight: '90vh' }"
+  [header]="selectedItem()?.title || 'Work Item Details'"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="overflow-y-auto">
+  
+  @if (selectedItem()) {
+    <div class="flex flex-column gap-3">
+      <!-- Header Info -->
+      <div class="flex align-items-center gap-3 pb-3 border-bottom-1 surface-border">
+        <div 
+          [class]="'work-item-icon-lg ' + getWorkItemColor(selectedItem()!.type)">
+          <i [class]="'pi ' + getWorkItemIcon(selectedItem()!.type) + ' text-white text-xl'"></i>
+        </div>
+        <div class="flex-1">
+          <div class="flex align-items-center gap-2 mb-1">
+            <span class="text-sm font-mono text-500">{{ selectedItem()!.id }}</span>
+            <p-tag 
+              [value]="selectedItem()!.type"
+              severity="info"
+              styleClass="text-xs">
+            </p-tag>
+            <p-tag 
+              [value]="selectedItem()!.priority"
+              [severity]="getPrioritySeverity(selectedItem()!.priority)"
+              styleClass="text-xs">
+            </p-tag>
+          </div>
+          <div class="flex align-items-center gap-2 text-sm text-500">
+            <i class="pi pi-user"></i>
+            <span>{{ selectedItem()!.assignee }}</span>
+            @if (selectedItem()!.storyPoints) {
+              <span class="ml-2">
+                <i class="pi pi-chart-bar"></i> {{ selectedItem()!.storyPoints }} points
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-semibold mb-2 text-color">Description</label>
+        <p class="text-color-secondary line-height-3 m-0">
+          {{ selectedItem()!.description || 'No description provided' }}
+        </p>
+      </div>
+
+      <!-- Tags -->
+      @if (selectedItem()!.tags.length > 0) {
+        <div>
+          <label class="block text-sm font-semibold mb-2 text-color">Tags</label>
+          <div class="flex flex-wrap gap-2">
+            @for (tag of selectedItem()!.tags; track tag) {
+              <p-chip [label]="tag"></p-chip>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Dates -->
+      <div class="grid">
+        <div class="col-6">
+          <label class="block text-sm font-semibold mb-1 text-color">Created Date</label>
+          <p class="text-color-secondary m-0">{{ selectedItem()!.createdDate }}</p>
+        </div>
+        @if (selectedItem()!.dueDate) {
+          <div class="col-6">
+            <label class="block text-sm font-semibold mb-1 text-color">Due Date</label>
+            <p class="text-color-secondary m-0">{{ selectedItem()!.dueDate }}</p>
+          </div>
+        }
+      </div>
+
+      <!-- Subtasks -->
+      <div>
+        <div class="flex align-items-center justify-content-between mb-3">
+          <label class="text-sm font-semibold m-0 text-color">
+            Subtasks ({{ getCompletedSubtasks(selectedItem()!) }}/{{ selectedItem()!.subtasks.length }})
+          </label>
+          @if (selectedItem()!.subtasks.length > 0) {
+            <span class="text-xs text-500">
+              {{ getSubtaskProgress(selectedItem()!) }}% complete
+            </span>
+          }
+        </div>
+
+        <!-- Subtask List -->
+        <div class="flex flex-column gap-2 mb-3">
+          @for (subtask of selectedItem()!.subtasks; track subtask.id) {
+            <div class="flex align-items-center gap-2 p-2 border-round surface-50">
+              <p-button
+                [icon]="subtask.completed ? 'pi pi-check-square' : 'pi pi-square'"
+                [text]="true"
+                [severity]="subtask.completed ? 'success' : 'secondary'"
+                (onClick)="toggleSubtask(selectedItem()!, subtask)">
+              </p-button>
+              <span 
+                [class.line-through]="subtask.completed"
+                [class.text-500]="subtask.completed"
+                class="flex-1">
+                {{ subtask.title }}
+              </span>
+              @if (subtask.assignee) {
+                <span class="text-xs text-500">
+                  <i class="pi pi-user"></i> {{ subtask.assignee }}
+                </span>
+              }
+              <p-button
+                icon="pi pi-trash"
+                [text]="true"
+                severity="danger"
+                (onClick)="deleteSubtask(selectedItem()!, subtask.id)">
+              </p-button>
+            </div>
+          }
+        </div>
+
+        <!-- Add New Subtask -->
+        <div class="flex gap-2">
+          <input 
+            type="text" 
+            pInputText 
+            [(ngModel)]="newSubtask.title"
+            placeholder="Add a subtask..."
+            class="flex-1"
+            (keyup.enter)="addSubtask(selectedItem()!)">
+          <input 
+            type="text" 
+            pInputText 
+            [(ngModel)]="newSubtask.assignee"
+            placeholder="Assignee"
+            style="width: 150px">
+          <p-button 
+            icon="pi pi-plus"
+            label="Add"
+            (onClick)="addSubtask(selectedItem()!)">
+          </p-button>
+        </div>
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="flex justify-content-between w-full">
+        <p-button 
+          label="Delete Item"
+          icon="pi pi-trash"
+          severity="danger"
+          [outlined]="true"
+          (onClick)="deleteWorkItem(selectedItem()!)">
+        </p-button>
+        <p-button 
+          label="Close"
+          (onClick)="showItemDialog.set(false)">
+        </p-button>
+      </div>
+    </ng-template>
+  }
+</p-dialog>
+
+<!-- Add Work Item Dialog -->
+<p-dialog 
+  [(visible)]="showAddDialog"
+  [modal]="true"
+  [style]="{ width: '40rem' }"
+  header="Add Work Item"
+  [draggable]="false"
+  [resizable]="false">
+  
+  <div class="flex flex-column gap-3">
+    <div>
+      <label for="item-title" class="block text-sm font-medium mb-2">Title *</label>
+      <input 
+        id="item-title"
+        type="text" 
+        pInputText 
+        [(ngModel)]="newItem.title"
+        placeholder="Enter work item title"
+        class="w-full">
+    </div>
+    
+    <div class="grid">
+      <div class="col-6">
+        <label for="item-type" class="block text-sm font-medium mb-2">Type</label>
+        <p-select 
+          id="item-type"
+          [(ngModel)]="newItem.type"
+          [options]="workItemTypes"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select type"
+          styleClass="w-full">
+        </p-select>
+      </div>
+      <div class="col-6">
+        <label for="item-priority" class="block text-sm font-medium mb-2">Priority</label>
+        <p-select 
+          id="item-priority"
+          [(ngModel)]="newItem.priority"
+          [options]="priorityOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select priority"
+          styleClass="w-full">
+        </p-select>
+      </div>
+    </div>
+    
+    <div class="grid">
+      <div class="col-6">
+        <label for="item-assignee" class="block text-sm font-medium mb-2">Assignee</label>
+        <input 
+          id="item-assignee"
+          type="text" 
+          pInputText 
+          [(ngModel)]="newItem.assignee"
+          placeholder="John Smith"
+          class="w-full">
+      </div>
+      <div class="col-6">
+        <label for="item-points" class="block text-sm font-medium mb-2">Story Points</label>
+        <input 
+          id="item-points"
+          type="number" 
+          pInputText 
+          [(ngModel)]="newItem.storyPoints"
+          placeholder="0"
+          class="w-full">
+      </div>
+    </div>
+    
+    <div>
+      <label for="item-description" class="block text-sm font-medium mb-2">Description</label>
+      <textarea 
+        id="item-description"
+        pTextarea
+        [(ngModel)]="newItem.description"
+        placeholder="Describe the work item..."
+        [rows]="3"
+        class="w-full">
+      </textarea>
+    </div>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <p-button 
+        label="Cancel"
+        [outlined]="true"
+        (onClick)="showAddDialog.set(false)">
+      </p-button>
+      <p-button 
+        label="Add Item"
+        (onClick)="addWorkItem()">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
