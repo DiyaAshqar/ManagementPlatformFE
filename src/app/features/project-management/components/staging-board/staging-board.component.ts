@@ -1,7 +1,10 @@
-import { Component, Input, signal } from '@angular/core';
+import { Component, Input, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
+import { WorkItemDialogComponent, WorkItemFormData } from './work-item-dialog/work-item-dialog.component';
+import { SubtaskDialogComponent, SubTaskFormData } from './subtask-dialog/subtask-dialog.component';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
@@ -20,9 +23,12 @@ import { ProgressBarModule } from 'primeng/progressbar';
 interface SubTask {
   id: string;
   title: string;
-  status: TaskStatus;
-  assignee?: string;
-  completed: boolean;
+  startDate: string;
+  endDate: string;
+  status: 'completed' | 'in-progress' | 'pending';
+  type: string;
+  cost: string;
+  quantity: string;
 }
 
 interface WorkItem {
@@ -30,14 +36,20 @@ interface WorkItem {
   title: string;
   type: WorkItemType;
   priority: 'low' | 'medium' | 'high' | 'critical';
-  assignee: string;
+  assignTo: string;
   assigneeAvatar?: string;
-  storyPoints?: number;
+  taskPoints: string;
   tags: string[];
   description: string;
   status: TaskStatus;
   subtasks: SubTask[];
-  dueDate?: string;
+  startDate: string;
+  endDate: string;
+  location: string;
+  depth: string;
+  volume: string;
+  soilType: string;
+  equipment: string;
   createdDate: string;
 }
 
@@ -89,46 +101,11 @@ interface Column {
 })
 export class StagingBoardComponent {
   @Input() projectId!: string;
+  
+  private dialogService = inject(DialogService);
+  private dialogRef: DynamicDialogRef | undefined;
 
   columns = signal<Column[]>([
-    {
-      id: TaskStatus.BACKLOG,
-      title: 'Backlog',
-      items: [
-        {
-          id: 'item-1',
-          title: 'Implement User Authentication',
-          type: WorkItemType.USER_STORY,
-          priority: 'high',
-          assignee: 'John Smith',
-          assigneeAvatar: 'JS',
-          storyPoints: 8,
-          tags: ['authentication', 'security'],
-          description: 'Implement secure user authentication with JWT tokens',
-          status: TaskStatus.BACKLOG,
-          subtasks: [
-            { id: 'sub-1-1', title: 'Setup JWT middleware', status: TaskStatus.BACKLOG, completed: false },
-            { id: 'sub-1-2', title: 'Create login endpoint', status: TaskStatus.BACKLOG, completed: false },
-            { id: 'sub-1-3', title: 'Add password encryption', status: TaskStatus.BACKLOG, completed: false }
-          ],
-          dueDate: '2024-03-15',
-          createdDate: '2024-02-01'
-        },
-        {
-          id: 'item-2',
-          title: 'Fix Navigation Menu Bug',
-          type: WorkItemType.BUG,
-          priority: 'medium',
-          assignee: 'Sarah Johnson',
-          assigneeAvatar: 'SJ',
-          tags: ['bug', 'ui'],
-          description: 'Navigation menu not closing on mobile devices',
-          status: TaskStatus.BACKLOG,
-          subtasks: [],
-          createdDate: '2024-02-05'
-        }
-      ]
-    },
     {
       id: TaskStatus.TODO,
       title: 'To Do',
@@ -138,18 +115,24 @@ export class StagingBoardComponent {
           title: 'Design Dashboard Layout',
           type: WorkItemType.TASK,
           priority: 'high',
-          assignee: 'Mike Wilson',
+          assignTo: 'Mike Wilson',
           assigneeAvatar: 'MW',
-          storyPoints: 5,
+          taskPoints: '5',
           tags: ['design', 'dashboard'],
           description: 'Create wireframes and mockups for dashboard',
           status: TaskStatus.TODO,
           subtasks: [
-            { id: 'sub-3-1', title: 'Create wireframes', status: TaskStatus.TODO, assignee: 'Mike Wilson', completed: false },
-            { id: 'sub-3-2', title: 'Design mockups', status: TaskStatus.TODO, completed: false },
-            { id: 'sub-3-3', title: 'Get stakeholder approval', status: TaskStatus.TODO, completed: false }
+            { id: 'sub-3-1', title: 'Create wireframes', startDate: '2024-02-03', endDate: '2024-02-05', status: 'in-progress', type: 'Design', cost: '$500', quantity: '1' },
+            { id: 'sub-3-2', title: 'Design mockups', startDate: '2024-02-06', endDate: '2024-02-08', status: 'pending', type: 'Design', cost: '$800', quantity: '1' },
+            { id: 'sub-3-3', title: 'Get stakeholder approval', startDate: '2024-02-09', endDate: '2024-02-10', status: 'pending', type: 'Review', cost: '$0', quantity: '1' }
           ],
-          dueDate: '2024-03-10',
+          startDate: '2024-02-03',
+          endDate: '2024-03-10',
+          location: 'Dashboard Module',
+          depth: '',
+          volume: '',
+          soilType: '',
+          equipment: '',
           createdDate: '2024-02-03'
         }
       ],
@@ -164,19 +147,25 @@ export class StagingBoardComponent {
           title: 'API Integration for Reports',
           type: WorkItemType.FEATURE,
           priority: 'critical',
-          assignee: 'David Chen',
+          assignTo: 'David Chen',
           assigneeAvatar: 'DC',
-          storyPoints: 13,
+          taskPoints: '13',
           tags: ['api', 'backend', 'reports'],
           description: 'Integrate reporting API endpoints with frontend',
           status: TaskStatus.IN_PROGRESS,
           subtasks: [
-            { id: 'sub-4-1', title: 'Setup API client', status: TaskStatus.IN_PROGRESS, assignee: 'David Chen', completed: true },
-            { id: 'sub-4-2', title: 'Implement data fetching', status: TaskStatus.IN_PROGRESS, assignee: 'David Chen', completed: true },
-            { id: 'sub-4-3', title: 'Add error handling', status: TaskStatus.IN_PROGRESS, completed: false },
-            { id: 'sub-4-4', title: 'Write unit tests', status: TaskStatus.IN_PROGRESS, completed: false }
+            { id: 'sub-4-1', title: 'Setup API client', startDate: '2024-02-02', endDate: '2024-02-03', status: 'completed', type: 'Development', cost: '$1,200', quantity: '1' },
+            { id: 'sub-4-2', title: 'Implement data fetching', startDate: '2024-02-04', endDate: '2024-02-05', status: 'completed', type: 'Development', cost: '$1,500', quantity: '1' },
+            { id: 'sub-4-3', title: 'Add error handling', startDate: '2024-02-06', endDate: '2024-02-07', status: 'in-progress', type: 'Development', cost: '$800', quantity: '1' },
+            { id: 'sub-4-4', title: 'Write unit tests', startDate: '2024-02-07', endDate: '2024-02-08', status: 'pending', type: 'Testing', cost: '$600', quantity: '1' }
           ],
-          dueDate: '2024-03-08',
+          startDate: '2024-02-02',
+          endDate: '2024-03-08',
+          location: 'API Module',
+          depth: '',
+          volume: '',
+          soilType: '',
+          equipment: '',
           createdDate: '2024-02-02'
         },
         {
@@ -184,17 +173,23 @@ export class StagingBoardComponent {
           title: 'Database Schema Migration',
           type: WorkItemType.TASK,
           priority: 'high',
-          assignee: 'Emily Brown',
+          assignTo: 'Emily Brown',
           assigneeAvatar: 'EB',
-          storyPoints: 8,
+          taskPoints: '8',
           tags: ['database', 'backend'],
           description: 'Migrate database schema to new version',
           status: TaskStatus.IN_PROGRESS,
           subtasks: [
-            { id: 'sub-5-1', title: 'Create migration scripts', status: TaskStatus.IN_PROGRESS, completed: true },
-            { id: 'sub-5-2', title: 'Test on staging', status: TaskStatus.IN_PROGRESS, completed: false }
+            { id: 'sub-5-1', title: 'Create migration scripts', startDate: '2024-02-04', endDate: '2024-02-06', status: 'completed', type: 'Development', cost: '$1,000', quantity: '1' },
+            { id: 'sub-5-2', title: 'Test on staging', startDate: '2024-02-07', endDate: '2024-02-09', status: 'in-progress', type: 'Testing', cost: '$500', quantity: '1' }
           ],
-          dueDate: '2024-03-12',
+          startDate: '2024-02-04',
+          endDate: '2024-03-12',
+          location: 'Database',
+          depth: '',
+          volume: '',
+          soilType: '',
+          equipment: '',
           createdDate: '2024-02-04'
         }
       ],
@@ -209,17 +204,24 @@ export class StagingBoardComponent {
           title: 'Implement Search Functionality',
           type: WorkItemType.FEATURE,
           priority: 'medium',
-          assignee: 'Alex Turner',
+          assignTo: 'Alex Turner',
           assigneeAvatar: 'AT',
-          storyPoints: 5,
+          taskPoints: '5',
           tags: ['search', 'frontend'],
           description: 'Add search functionality to the application',
           status: TaskStatus.REVIEW,
           subtasks: [
-            { id: 'sub-6-1', title: 'Build search component', status: TaskStatus.REVIEW, completed: true },
-            { id: 'sub-6-2', title: 'Add search filters', status: TaskStatus.REVIEW, completed: true },
-            { id: 'sub-6-3', title: 'Optimize search performance', status: TaskStatus.REVIEW, completed: true }
+            { id: 'sub-6-1', title: 'Build search component', startDate: '2024-02-01', endDate: '2024-02-05', status: 'completed', type: 'Development', cost: '$1,200', quantity: '1' },
+            { id: 'sub-6-2', title: 'Add search filters', startDate: '2024-02-06', endDate: '2024-02-10', status: 'completed', type: 'Development', cost: '$800', quantity: '1' },
+            { id: 'sub-6-3', title: 'Optimize search performance', startDate: '2024-02-11', endDate: '2024-02-15', status: 'completed', type: 'Optimization', cost: '$600', quantity: '1' }
           ],
+          startDate: '2024-02-01',
+          endDate: '2024-02-15',
+          location: 'Search Module',
+          depth: '',
+          volume: '',
+          soilType: '',
+          equipment: '',
           createdDate: '2024-02-01'
         }
       ],
@@ -234,17 +236,24 @@ export class StagingBoardComponent {
           title: 'Setup CI/CD Pipeline',
           type: WorkItemType.TASK,
           priority: 'high',
-          assignee: 'Chris Lee',
+          assignTo: 'Chris Lee',
           assigneeAvatar: 'CL',
-          storyPoints: 8,
+          taskPoints: '8',
           tags: ['devops', 'ci-cd'],
           description: 'Configure automated deployment pipeline',
           status: TaskStatus.DONE,
           subtasks: [
-            { id: 'sub-7-1', title: 'Configure GitHub Actions', status: TaskStatus.DONE, completed: true },
-            { id: 'sub-7-2', title: 'Setup staging environment', status: TaskStatus.DONE, completed: true },
-            { id: 'sub-7-3', title: 'Add automated tests', status: TaskStatus.DONE, completed: true }
+            { id: 'sub-7-1', title: 'Configure GitHub Actions', startDate: '2024-01-28', endDate: '2024-01-30', status: 'completed', type: 'DevOps', cost: '$500', quantity: '1' },
+            { id: 'sub-7-2', title: 'Setup staging environment', startDate: '2024-01-31', endDate: '2024-02-02', status: 'completed', type: 'DevOps', cost: '$800', quantity: '1' },
+            { id: 'sub-7-3', title: 'Add automated tests', startDate: '2024-02-03', endDate: '2024-02-05', status: 'completed', type: 'Testing', cost: '$700', quantity: '1' }
           ],
+          startDate: '2024-01-28',
+          endDate: '2024-02-05',
+          location: 'DevOps',
+          depth: '',
+          volume: '',
+          soilType: '',
+          equipment: '',
           createdDate: '2024-01-28'
         }
       ]
@@ -253,25 +262,14 @@ export class StagingBoardComponent {
 
   selectedItem = signal<WorkItem | null>(null);
   showItemDialog = signal(false);
-  showAddDialog = signal(false);
   expandedItems = signal<Set<string>>(new Set());
   selectedColumn = signal<TaskStatus | null>(null);
 
-  newItem: Partial<WorkItem> = {
-    title: '',
-    type: WorkItemType.TASK,
-    priority: 'medium',
-    assignee: '',
-    storyPoints: 0,
-    tags: [],
-    description: '',
-    subtasks: []
-  };
-
-  newSubtask = {
-    title: '',
-    assignee: ''
-  };
+  statusOptions = [
+    { label: 'Pending', value: 'pending' },
+    { label: 'In Progress', value: 'in-progress' },
+    { label: 'Completed', value: 'completed' }
+  ];
 
   workItemTypes = [
     { label: 'User Story', value: WorkItemType.USER_STORY },
@@ -337,80 +335,259 @@ export class StagingBoardComponent {
 
   openItemDialog(item: WorkItem): void {
     this.selectedItem.set(item);
-    this.showItemDialog.set(true);
+    
+    this.dialogRef = this.dialogService.open(WorkItemDialogComponent, {
+      header: 'Edit Work Item',
+      width: '900px',
+      height: '900px',
+      modal: true,
+      maximizable: true,
+      data: {
+        mode: 'edit',
+        workItem: {
+          id: item.id,
+          title: item.title,
+          type: item.type,
+          priority: item.priority,
+          assignTo: item.assignTo,
+          taskPoints: item.taskPoints,
+          tags: item.tags,
+          description: item.description,
+          startDate: item.startDate,
+          endDate: item.endDate,
+          location: item.location,
+          depth: item.depth,
+          volume: item.volume,
+          soilType: item.soilType,
+          equipment: item.equipment,
+          status: item.status,
+          subtasks: item.subtasks
+        }
+      }
+    });
+    
+    this.dialogRef.onClose.subscribe((formData: WorkItemFormData) => {
+      if (formData) {
+        this.saveWorkItem(formData);
+      }
+    });
   }
 
   openAddDialog(columnId: TaskStatus): void {
     this.selectedColumn.set(columnId);
-    this.newItem = {
-      title: '',
-      type: WorkItemType.TASK,
-      priority: 'medium',
-      assignee: '',
-      storyPoints: 0,
-      tags: [],
-      description: '',
-      subtasks: []
-    };
-    this.showAddDialog.set(true);
+    
+    this.dialogRef = this.dialogService.open(WorkItemDialogComponent, {
+      header: 'Add Work Item',
+      width: '900px',
+      height: '900px',
+      modal: true,
+      maximizable: true,
+      data: {
+        mode: 'add',
+        workItem: {
+          title: '',
+          type: WorkItemType.TASK,
+          priority: 'medium',
+          assignTo: '',
+          taskPoints: '',
+          tags: [],
+          description: '',
+          startDate: '',
+          endDate: '',
+          location: '',
+          depth: '',
+          volume: '',
+          soilType: '',
+          equipment: ''
+        }
+      }
+    });
+    
+    this.dialogRef.onClose.subscribe((formData: WorkItemFormData) => {
+      if (formData) {
+        this.saveWorkItem(formData);
+      }
+    });
   }
 
-  addWorkItem(): void {
-    if (!this.newItem.title || !this.selectedColumn()) return;
+  saveWorkItem(formData: WorkItemFormData): void {
+    if (!formData.title) return;
 
-    const item: WorkItem = {
-      id: `item-${Date.now()}`,
-      title: this.newItem.title!,
-      type: this.newItem.type || WorkItemType.TASK,
-      priority: this.newItem.priority || 'medium',
-      assignee: this.newItem.assignee || 'Unassigned',
-      assigneeAvatar: this.newItem.assignee ? this.newItem.assignee.split(' ').map(n => n[0]).join('') : '?',
-      storyPoints: this.newItem.storyPoints || 0,
-      tags: this.newItem.tags || [],
-      description: this.newItem.description || '',
-      status: this.selectedColumn()!,
-      subtasks: [],
-      createdDate: new Date().toISOString().split('T')[0]
-    };
+    if (formData.id) {
+      // Edit existing item
+      this.columns.update(cols =>
+        cols.map(col => ({
+          ...col,
+          items: col.items.map(item =>
+            item.id === formData.id
+              ? {
+                  ...item,
+                  title: formData.title,
+                  type: formData.type as WorkItemType,
+                  priority: formData.priority as any,
+                  assignTo: formData.assignTo || 'Unassigned',
+                  assigneeAvatar: formData.assignTo ? formData.assignTo.split(' ').map(n => n[0]).join('') : '?',
+                  taskPoints: formData.taskPoints,
+                  tags: formData.tags,
+                  description: formData.description,
+                  startDate: formData.startDate,
+                  endDate: formData.endDate,
+                  location: formData.location,
+                  depth: formData.depth,
+                  volume: formData.volume,
+                  soilType: formData.soilType,
+                  equipment: formData.equipment,
+                  subtasks: formData.subtasks || item.subtasks
+                }
+              : item
+          )
+        }))
+      );
+    } else {
+      // Add new item
+      if (!this.selectedColumn()) return;
 
-    this.columns.update(cols => 
-      cols.map(col => 
-        col.id === this.selectedColumn()
-          ? { ...col, items: [...col.items, item] }
-          : col
-      )
-    );
+      const item: WorkItem = {
+        id: `item-${Date.now()}`,
+        title: formData.title,
+        type: formData.type as WorkItemType,
+        priority: formData.priority as any,
+        assignTo: formData.assignTo || 'Unassigned',
+        assigneeAvatar: formData.assignTo ? formData.assignTo.split(' ').map(n => n[0]).join('') : '?',
+        taskPoints: formData.taskPoints,
+        tags: formData.tags,
+        description: formData.description,
+        status: this.selectedColumn()!,
+        subtasks: formData.subtasks || [],
+        startDate: formData.startDate,
+        endDate: formData.endDate,
+        location: formData.location,
+        depth: formData.depth,
+        volume: formData.volume,
+        soilType: formData.soilType,
+        equipment: formData.equipment,
+        createdDate: new Date().toISOString().split('T')[0]
+      };
 
-    this.showAddDialog.set(false);
+      this.columns.update(cols =>
+        cols.map(col =>
+          col.id === this.selectedColumn()
+            ? { ...col, items: [...col.items, item] }
+            : col
+        )
+      );
+    }
+
     this.selectedColumn.set(null);
   }
 
-  addSubtask(item: WorkItem): void {
-    if (!this.newSubtask.title) return;
+  openAddSubtaskDialog(item: WorkItem): void {
+    const dialogRef = this.dialogService.open(SubtaskDialogComponent, {
+      header: `Add Subtask to "${item.title}"`,
+      width: '500px',
+      modal: true,
+      maximizable: true,
+      data: {
+        mode: 'add',
+        subtask: {
+          title: '',
+          startDate: '',
+          endDate: '',
+          status: 'pending',
+          type: '',
+          cost: '',
+          quantity: ''
+        },
+        parentTaskTitle: item.title
+      }
+    });
 
-    const subtask: SubTask = {
-      id: `sub-${Date.now()}`,
-      title: this.newSubtask.title,
-      status: item.status,
-      assignee: this.newSubtask.assignee || undefined,
-      completed: false
-    };
+    dialogRef.onClose.subscribe((formData: SubTaskFormData) => {
+      if (formData && formData.title) {
+        const subtask: SubTask = {
+          id: `sub-${Date.now()}`,
+          ...formData
+        };
 
-    item.subtasks.push(subtask);
-    this.newSubtask = { title: '', assignee: '' };
-
-    // Force update
-    this.columns.update(cols => [...cols]);
+        this.columns.update(cols =>
+          cols.map(col => ({
+            ...col,
+            items: col.items.map(i =>
+              i.id === item.id
+                ? { ...i, subtasks: [...i.subtasks, subtask] }
+                : i
+            )
+          }))
+        );
+      }
+    });
   }
 
-  toggleSubtask(item: WorkItem, subtask: SubTask): void {
-    subtask.completed = !subtask.completed;
-    this.columns.update(cols => [...cols]);
+  openEditSubtaskDialog(item: WorkItem, subtask: SubTask): void {
+    const dialogRef = this.dialogService.open(SubtaskDialogComponent, {
+      header: 'Edit Subtask',
+      width: '500px',
+      modal: true,
+      maximizable: true,
+      data: {
+        mode: 'edit',
+        subtask: subtask,
+        parentTaskTitle: item.title
+      }
+    });
+
+    dialogRef.onClose.subscribe((formData: SubTaskFormData) => {
+      if (formData) {
+        this.columns.update(cols =>
+          cols.map(col => ({
+            ...col,
+            items: col.items.map(i =>
+              i.id === item.id
+                ? {
+                    ...i,
+                    subtasks: i.subtasks.map(st =>
+                      st.id === subtask.id
+                        ? { ...st, ...formData }
+                        : st
+                    )
+                  }
+                : i
+            )
+          }))
+        );
+      }
+    });
   }
 
   deleteSubtask(item: WorkItem, subtaskId: string): void {
-    item.subtasks = item.subtasks.filter(st => st.id !== subtaskId);
-    this.columns.update(cols => [...cols]);
+    this.columns.update(cols =>
+      cols.map(col => ({
+        ...col,
+        items: col.items.map(i =>
+          i.id === item.id
+            ? { ...i, subtasks: i.subtasks.filter(st => st.id !== subtaskId) }
+            : i
+        )
+      }))
+    );
+  }
+
+  getStatusSeverity(status: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' {
+    const severityMap: Record<string, 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast'> = {
+      'completed': 'success',
+      'in-progress': 'info',
+      'pending': 'warning'
+    };
+    return severityMap[status] || 'secondary';
+  }
+
+  getStatusLabel(status: string): string {
+    const labelMap: Record<string, string> = {
+      'completed': 'Completed',
+      'in-progress': 'In Progress',
+      'pending': 'Pending'
+    };
+    return labelMap[status] || status;
   }
 
   deleteWorkItem(item: WorkItem): void {
@@ -470,7 +647,7 @@ export class StagingBoardComponent {
   }
 
   getCompletedSubtasks(item: WorkItem): number {
-    return item.subtasks.filter(st => st.completed).length;
+    return item.subtasks.filter(st => st.status === 'completed').length;
   }
 
   getSubtaskProgress(item: WorkItem): number {

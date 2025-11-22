@@ -173,21 +173,21 @@
                 <!-- Work Item Footer -->
                 <div class="flex align-items-center justify-content-between mt-2">
                   <div class="flex align-items-center gap-2">
-                    @if (item.storyPoints) {
-                      <div class="story-points" pTooltip="Story Points" tooltipPosition="top">
-                        {{ item.storyPoints }}
+                    @if (item.taskPoints) {
+                      <div class="story-points" pTooltip="Task Points" tooltipPosition="top">
+                        {{ item.taskPoints }}
                       </div>
                     }
-                    @if (item.dueDate) {
+                    @if (item.endDate) {
                       <span class="text-xs text-500">
-                        <i class="pi pi-calendar"></i> {{ item.dueDate }}
+                        <i class="pi pi-calendar"></i> {{ item.endDate }}
                       </span>
                     }
                   </div>
                   <p-avatar 
                     [label]="item.assigneeAvatar"
                     [style]="{ fontSize: '0.75rem', width: '2rem', height: '2rem' }"
-                    [pTooltip]="item.assignee"
+                    [pTooltip]="item.assignTo"
                     tooltipPosition="top">
                   </p-avatar>
                 </div>
@@ -211,7 +211,7 @@
 <p-dialog 
   [(visible)]="showItemDialog"
   [modal]="true"
-  [style]="{ width: '50rem', maxHeight: '90vh' }"
+  [style]="{ width: '60rem', maxHeight: '90vh' }"
   [header]="selectedItem()?.title || 'Work Item Details'"
   [draggable]="false"
   [resizable]="false"
@@ -241,10 +241,10 @@
           </div>
           <div class="flex align-items-center gap-2 text-sm text-500">
             <i class="pi pi-user"></i>
-            <span>{{ selectedItem()!.assignee }}</span>
-            @if (selectedItem()!.storyPoints) {
+            <span>{{ selectedItem()!.assignTo }}</span>
+            @if (selectedItem()!.taskPoints) {
               <span class="ml-2">
-                <i class="pi pi-chart-bar"></i> {{ selectedItem()!.storyPoints }} points
+                <i class="pi pi-chart-bar"></i> {{ selectedItem()!.taskPoints }} points
               </span>
             }
           </div>
@@ -274,16 +274,50 @@
       <!-- Dates -->
       <div class="grid">
         <div class="col-6">
-          <label class="block text-sm font-semibold mb-1 text-color">Created Date</label>
-          <p class="text-color-secondary m-0">{{ selectedItem()!.createdDate }}</p>
+          <label class="block text-sm font-semibold mb-1 text-color">Start Date</label>
+          <p class="text-color-secondary m-0">{{ selectedItem()!.startDate }}</p>
         </div>
-        @if (selectedItem()!.dueDate) {
-          <div class="col-6">
-            <label class="block text-sm font-semibold mb-1 text-color">Due Date</label>
-            <p class="text-color-secondary m-0">{{ selectedItem()!.dueDate }}</p>
-          </div>
-        }
+        <div class="col-6">
+          <label class="block text-sm font-semibold mb-1 text-color">End Date</label>
+          <p class="text-color-secondary m-0">{{ selectedItem()!.endDate }}</p>
+        </div>
       </div>
+
+      <!-- Additional Details -->
+      @if (selectedItem()!.location || selectedItem()!.depth || selectedItem()!.volume || selectedItem()!.soilType || selectedItem()!.equipment) {
+        <div class="grid">
+          @if (selectedItem()!.location) {
+            <div class="col-6">
+              <label class="block text-sm font-semibold mb-1 text-color">Location</label>
+              <p class="text-color-secondary m-0">{{ selectedItem()!.location }}</p>
+            </div>
+          }
+          @if (selectedItem()!.depth) {
+            <div class="col-6">
+              <label class="block text-sm font-semibold mb-1 text-color">Depth</label>
+              <p class="text-color-secondary m-0">{{ selectedItem()!.depth }}</p>
+            </div>
+          }
+          @if (selectedItem()!.volume) {
+            <div class="col-6">
+              <label class="block text-sm font-semibold mb-1 text-color">Volume</label>
+              <p class="text-color-secondary m-0">{{ selectedItem()!.volume }}</p>
+            </div>
+          }
+          @if (selectedItem()!.soilType) {
+            <div class="col-6">
+              <label class="block text-sm font-semibold mb-1 text-color">Soil Type</label>
+              <p class="text-color-secondary m-0">{{ selectedItem()!.soilType }}</p>
+            </div>
+          }
+          @if (selectedItem()!.equipment) {
+            <div class="col-12">
+              <label class="block text-sm font-semibold mb-1 text-color">Equipment</label>
+              <p class="text-color-secondary m-0">{{ selectedItem()!.equipment }}</p>
+            </div>
+          }
+        </div>
+      }
 
       <!-- Subtasks -->
       <div>
@@ -291,65 +325,81 @@
           <label class="text-sm font-semibold m-0 text-color">
             Subtasks ({{ getCompletedSubtasks(selectedItem()!) }}/{{ selectedItem()!.subtasks.length }})
           </label>
-          @if (selectedItem()!.subtasks.length > 0) {
-            <span class="text-xs text-500">
-              {{ getSubtaskProgress(selectedItem()!) }}% complete
-            </span>
-          }
+          <p-button 
+            label="Add Subtask"
+            icon="pi pi-plus"
+            size="small"
+            (onClick)="openAddSubtaskDialog(selectedItem()!)">
+          </p-button>
         </div>
 
         <!-- Subtask List -->
-        <div class="flex flex-column gap-2 mb-3">
-          @for (subtask of selectedItem()!.subtasks; track subtask.id) {
-            <div class="flex align-items-center gap-2 p-2 border-round surface-50">
-              <p-button
-                [icon]="subtask.completed ? 'pi pi-check-square' : 'pi pi-square'"
-                [text]="true"
-                [severity]="subtask.completed ? 'success' : 'secondary'"
-                (onClick)="toggleSubtask(selectedItem()!, subtask)">
-              </p-button>
-              <span 
-                [class.line-through]="subtask.completed"
-                [class.text-500]="subtask.completed"
-                class="flex-1">
-                {{ subtask.title }}
-              </span>
-              @if (subtask.assignee) {
-                <span class="text-xs text-500">
-                  <i class="pi pi-user"></i> {{ subtask.assignee }}
-                </span>
-              }
-              <p-button
-                icon="pi pi-trash"
-                [text]="true"
-                severity="danger"
-                (onClick)="deleteSubtask(selectedItem()!, subtask.id)">
-              </p-button>
-            </div>
-          }
-        </div>
-
-        <!-- Add New Subtask -->
-        <div class="flex gap-2">
-          <input 
-            type="text" 
-            pInputText 
-            [(ngModel)]="newSubtask.title"
-            placeholder="Add a subtask..."
-            class="flex-1"
-            (keyup.enter)="addSubtask(selectedItem()!)">
-          <input 
-            type="text" 
-            pInputText 
-            [(ngModel)]="newSubtask.assignee"
-            placeholder="Assignee"
-            style="width: 150px">
-          <p-button 
-            icon="pi pi-plus"
-            label="Add"
-            (onClick)="addSubtask(selectedItem()!)">
-          </p-button>
-        </div>
+        @if (selectedItem()!.subtasks.length > 0) {
+          <div class="border-round border-1 surface-border overflow-hidden mb-2">
+            <table class="w-full text-sm">
+              <thead class="surface-50">
+                <tr>
+                  <th class="text-left p-2 font-semibold">Title</th>
+                  <th class="text-left p-2 font-semibold">Dates</th>
+                  <th class="text-left p-2 font-semibold">Type</th>
+                  <th class="text-left p-2 font-semibold">Status</th>
+                  <th class="text-left p-2 font-semibold">Cost</th>
+                  <th class="text-left p-2 font-semibold">Quantity</th>
+                  <th class="text-right p-2 font-semibold" style="width: 100px">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (subtask of selectedItem()!.subtasks; track subtask.id) {
+                  <tr class="border-top-1 surface-border">
+                    <td class="p-2">{{ subtask.title }}</td>
+                    <td class="p-2 text-xs text-500">
+                      {{ subtask.startDate }} - {{ subtask.endDate }}
+                    </td>
+                    <td class="p-2">{{ subtask.type }}</td>
+                    <td class="p-2">
+                      <p-tag 
+                        [value]="getStatusLabel(subtask.status)"
+                        [severity]="getStatusSeverity(subtask.status)"
+                        styleClass="text-xs">
+                      </p-tag>
+                    </td>
+                    <td class="p-2">{{ subtask.cost }}</td>
+                    <td class="p-2">{{ subtask.quantity }}</td>
+                    <td class="p-2 text-right">
+                      <div class="flex align-items-center justify-content-end gap-1">
+                        <p-button
+                          icon="pi pi-pencil"
+                          [text]="true"
+                          [rounded]="true"
+                          size="small"
+                          severity="secondary"
+                          (onClick)="openEditSubtaskDialog(selectedItem()!, subtask)"
+                          pTooltip="Edit"
+                          tooltipPosition="top">
+                        </p-button>
+                        <p-button
+                          icon="pi pi-trash"
+                          [text]="true"
+                          [rounded]="true"
+                          size="small"
+                          severity="danger"
+                          (onClick)="deleteSubtask(selectedItem()!, subtask.id)"
+                          pTooltip="Delete"
+                          tooltipPosition="top">
+                        </p-button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="text-center p-4 surface-50 border-round">
+            <i class="pi pi-list text-3xl text-400 mb-2"></i>
+            <p class="text-sm text-500 m-0">No subtasks yet</p>
+          </div>
+        }
       </div>
     </div>
 
@@ -369,103 +419,4 @@
       </div>
     </ng-template>
   }
-</p-dialog>
-
-<!-- Add Work Item Dialog -->
-<p-dialog 
-  [(visible)]="showAddDialog"
-  [modal]="true"
-  [style]="{ width: '40rem' }"
-  header="Add Work Item"
-  [draggable]="false"
-  [resizable]="false">
-  
-  <div class="flex flex-column gap-3">
-    <div>
-      <label for="item-title" class="block text-sm font-medium mb-2">Title *</label>
-      <input 
-        id="item-title"
-        type="text" 
-        pInputText 
-        [(ngModel)]="newItem.title"
-        placeholder="Enter work item title"
-        class="w-full">
-    </div>
-    
-    <div class="grid">
-      <div class="col-6">
-        <label for="item-type" class="block text-sm font-medium mb-2">Type</label>
-        <p-select 
-          id="item-type"
-          [(ngModel)]="newItem.type"
-          [options]="workItemTypes"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Select type"
-          styleClass="w-full">
-        </p-select>
-      </div>
-      <div class="col-6">
-        <label for="item-priority" class="block text-sm font-medium mb-2">Priority</label>
-        <p-select 
-          id="item-priority"
-          [(ngModel)]="newItem.priority"
-          [options]="priorityOptions"
-          optionLabel="label"
-          optionValue="value"
-          placeholder="Select priority"
-          styleClass="w-full">
-        </p-select>
-      </div>
-    </div>
-    
-    <div class="grid">
-      <div class="col-6">
-        <label for="item-assignee" class="block text-sm font-medium mb-2">Assignee</label>
-        <input 
-          id="item-assignee"
-          type="text" 
-          pInputText 
-          [(ngModel)]="newItem.assignee"
-          placeholder="John Smith"
-          class="w-full">
-      </div>
-      <div class="col-6">
-        <label for="item-points" class="block text-sm font-medium mb-2">Story Points</label>
-        <input 
-          id="item-points"
-          type="number" 
-          pInputText 
-          [(ngModel)]="newItem.storyPoints"
-          placeholder="0"
-          class="w-full">
-      </div>
-    </div>
-    
-    <div>
-      <label for="item-description" class="block text-sm font-medium mb-2">Description</label>
-      <textarea 
-        id="item-description"
-        pTextarea
-        [(ngModel)]="newItem.description"
-        placeholder="Describe the work item..."
-        [rows]="3"
-        class="w-full">
-      </textarea>
-    </div>
-  </div>
-  
-  <ng-template pTemplate="footer">
-    <div class="flex justify-content-end gap-2">
-      <p-button 
-        label="Cancel"
-        [outlined]="true"
-        (onClick)="showAddDialog.set(false)">
-      </p-button>
-      <p-button 
-        label="Add Item"
-        (onClick)="addWorkItem()">
-      </p-button>
-    </div>
-  </ng-template>
 </p-dialog>
