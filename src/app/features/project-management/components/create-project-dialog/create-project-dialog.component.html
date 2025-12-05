@@ -1,30 +1,18 @@
-<p-dialog
-  [(visible)]="visible"
-  (onHide)="onHide()"
-  [header]="'projects.createNew' | translate"
-  [modal]="true"
-  [closable]="true"
-  [dismissableMask]="true"
-  [style]="{ width: '50vw' }"
+<p-dialog [(visible)]="visible" (onHide)="onHide()" [header]="'projects.createNew' | translate" [modal]="true"
+  [closable]="true" [dismissableMask]="true" [style]="{ width: '50vw' }"
   [breakpoints]="{ '960px': '75vw', '640px': '95vw' }">
-  
+
   <form [formGroup]="projectForm" (ngSubmit)="onSubmit()">
     <div class="grid">
-      <!-- Project Name -->
+      <!-- Project Title -->
       <div class="col-12">
         <div class="field">
           <p-floatlabel variant="in">
-            <input 
-              pInputText 
-              id="name"
-              formControlName="name"
-              class="w-full"
-              [class.ng-invalid]="isFieldInvalid('name')" />
-            <label for="name">{{ 'projects.form.name' | translate }} *</label>
+            <input pInputText id="title" formControlName="title" class="w-full"
+              [class.ng-invalid]="isFieldInvalid('title')" />
+            <label for="title">{{ 'projects.form.name' | translate }} *</label>
           </p-floatlabel>
-          @if (isFieldInvalid('name')) {
-            <small class="p-error">{{ getErrorMessage('name') }}</small>
-          }
+          <small *ngIf="isFieldInvalid('title')" class="p-error">{{ getErrorMessage('title') }}</small>
         </div>
       </div>
 
@@ -32,54 +20,25 @@
       <div class="col-12">
         <div class="field">
           <p-floatlabel variant="in">
-            <textarea 
-              pTextarea 
-              id="description"
-              formControlName="description"
-              rows="3"
-              class="w-full"
+            <textarea pTextarea id="description" formControlName="description" rows="3" class="w-full"
               [class.ng-invalid]="isFieldInvalid('description')"></textarea>
             <label for="description">{{ 'projects.form.description' | translate }} *</label>
           </p-floatlabel>
-          @if (isFieldInvalid('description')) {
-            <small class="p-error">{{ getErrorMessage('description') }}</small>
-          }
+          <small *ngIf="isFieldInvalid('description')" class="p-error">{{ getErrorMessage('description') }}</small>
         </div>
       </div>
 
-      <!-- Client Name -->
-      <div class="col-12 md:col-6">
+      <!-- Agreement -->
+      <div class="col-12">
         <div class="field">
           <p-floatlabel variant="in">
-            <input 
-              pInputText 
-              id="clientName"
-              formControlName="clientName"
-              class="w-full"
-              [class.ng-invalid]="isFieldInvalid('clientName')" />
-            <label for="clientName">{{ 'projects.form.clientName' | translate }} *</label>
+            <p-select inputId="agreementId" formControlName="agreementId" [options]="agreementOptions()"
+              optionLabel="label" optionValue="value" [filter]="true" [filterPlaceholder]="'projects.form.searchAgreements' | translate"
+              [showClear]="true" [placeholder]="'projects.form.selectAgreement' | translate" class="w-full" [loading]="isLoadingAgreements()"
+              appendTo="body" [class.ng-invalid]="isFieldInvalid('agreementId')">
+            </p-select>
           </p-floatlabel>
-          @if (isFieldInvalid('clientName')) {
-            <small class="p-error">{{ getErrorMessage('clientName') }}</small>
-          }
-        </div>
-      </div>
-
-      <!-- Project Manager -->
-      <div class="col-12 md:col-6">
-        <div class="field">
-          <p-floatlabel variant="in">
-            <input 
-              pInputText 
-              id="projectManager"
-              formControlName="projectManager"
-              class="w-full"
-              [class.ng-invalid]="isFieldInvalid('projectManager')" />
-            <label for="projectManager">{{ 'projects.form.projectManager' | translate }} *</label>
-          </p-floatlabel>
-          @if (isFieldInvalid('projectManager')) {
-            <small class="p-error">{{ getErrorMessage('projectManager') }}</small>
-          }
+          <small *ngIf="isFieldInvalid('agreementId')" class="p-error">{{ getErrorMessage('agreementId') }}</small>
         </div>
       </div>
 
@@ -87,19 +46,12 @@
       <div class="col-12 md:col-6">
         <div class="field">
           <p-floatlabel variant="in">
-            <p-datepicker 
-              inputId="startDate"
-              formControlName="startDate"
-              [showIcon]="true"
-              dateFormat="yy-mm-dd"
-              class="w-full"
-              [class.ng-invalid]="isFieldInvalid('startDate')">
+            <p-datepicker inputId="startDate" formControlName="startDate" [showIcon]="true" dateFormat="yy-mm-dd"
+              class="w-full" [class.ng-invalid]="isFieldInvalid('startDate')">
             </p-datepicker>
             <label for="startDate">{{ 'projects.form.startDate' | translate }} *</label>
           </p-floatlabel>
-          @if (isFieldInvalid('startDate')) {
-            <small class="p-error">{{ getErrorMessage('startDate') }}</small>
-          }
+          <small *ngIf="isFieldInvalid('startDate')" class="p-error">{{ getErrorMessage('startDate') }}</small>
         </div>
       </div>
 
@@ -107,79 +59,36 @@
       <div class="col-12 md:col-6">
         <div class="field">
           <p-floatlabel variant="in">
-            <p-datepicker 
-              inputId="endDate"
-              formControlName="endDate"
-              [showIcon]="true"
-              dateFormat="yy-mm-dd"
-              class="w-full"
-              [class.ng-invalid]="isFieldInvalid('endDate')">
+            <p-datepicker inputId="endDate" formControlName="endDate" [showIcon]="true" dateFormat="yy-mm-dd"
+              class="w-full" [class.ng-invalid]="isFieldInvalid('endDate')">
             </p-datepicker>
             <label for="endDate">{{ 'projects.form.endDate' | translate }} *</label>
           </p-floatlabel>
-          @if (isFieldInvalid('endDate')) {
-            <small class="p-error">{{ getErrorMessage('endDate') }}</small>
-          }
+          <small *ngIf="isFieldInvalid('endDate')" class="p-error">{{ getErrorMessage('endDate') }}</small>
         </div>
       </div>
 
-      <!-- Budget -->
-      <div class="col-12 md:col-6">
+      <!-- Status -->
+      <div class="col-12">
         <div class="field">
           <p-floatlabel variant="in">
-            <p-inputnumber 
-              inputId="budget"
-              formControlName="budget"
-              mode="currency"
-              currency="USD"
-              locale="en-US"
-              class="w-full"
-              [class.ng-invalid]="isFieldInvalid('budget')">
-            </p-inputnumber>
-            <label for="budget">{{ 'projects.form.budget' | translate }} *</label>
-          </p-floatlabel>
-          @if (isFieldInvalid('budget')) {
-            <small class="p-error">{{ getErrorMessage('budget') }}</small>
-          }
-        </div>
-      </div>
-
-      <!-- Priority -->
-      <div class="col-12 md:col-6">
-        <div class="field">
-          <p-floatlabel variant="in">
-            <p-select 
-              inputId="priority"
-              formControlName="priority"
-              [options]="priorityOptions"
-              optionLabel="label"
-              optionValue="value"
-              class="w-full"
-              [class.ng-invalid]="isFieldInvalid('priority')">
+            <p-select inputId="status" formControlName="status" [options]="statusOptions" optionLabel="label"
+              optionValue="value" class="w-full" appendTo="body" [panelStyle]="{ maxHeight: '200px' }"
+              [class.ng-invalid]="isFieldInvalid('status')">
             </p-select>
-            <label for="priority">{{ 'projects.form.priority' | translate }} *</label>
+            <label for="status">{{ 'projects.filters.status' | translate }} *</label>
           </p-floatlabel>
-          @if (isFieldInvalid('priority')) {
-            <small class="p-error">{{ getErrorMessage('priority') }}</small>
-          }
+          <small *ngIf="isFieldInvalid('status')" class="p-error">{{ getErrorMessage('status') }}</small>
         </div>
       </div>
     </div>
   </form>
 
   <ng-template pTemplate="footer">
-    <p-button 
-      [label]="'common.cancel' | translate"
-      icon="pi pi-times"
-      (onClick)="onHide()"
-      severity="secondary"
+    <p-button [label]="'common.cancel' | translate" icon="pi pi-times" (onClick)="onHide()" severity="secondary"
       [outlined]="true">
     </p-button>
-    <p-button 
-      [label]="'common.save' | translate"
-      icon="pi pi-check"
-      (onClick)="onSubmit()"
-      [loading]="isSubmitting()"
+    <p-button [label]="'common.save' | translate" icon="pi pi-check" (onClick)="onSubmit()" [loading]="isSubmitting()"
       [disabled]="projectForm.invalid">
     </p-button>
   </ng-template>

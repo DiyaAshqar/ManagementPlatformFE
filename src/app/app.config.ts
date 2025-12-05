@@ -12,7 +12,7 @@ import { providePrimeNG } from 'primeng/config';
 import { DialogService } from 'primeng/dynamicdialog';
 
 import { environment } from '../environments/environment';
-import { AgreementClient, AttachmentClient, LookupClient, API_BASE_URL } from '../nswag/api-client';
+import { AgreementClient, AttachmentClient, LookupClient, ProjectClient, API_BASE_URL } from '../nswag/api-client';
 import { routes } from './app.routes';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { ErrorInterceptor } from './core/interceptors/error.interceptor';
@@ -72,6 +72,7 @@ export const appConfig: ApplicationConfig = {
     AgreementClient,
     AttachmentClient,
     LookupClient,
+    ProjectClient,
     {
       provide: API_BASE_URL, useValue: environment.nSwagUrl
     },

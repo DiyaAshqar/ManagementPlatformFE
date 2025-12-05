@@ -1,21 +1,24 @@
-import { Component, EventEmitter, Input, Output, signal, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 
 // PrimeNG Imports
-import { DialogModule } from 'primeng/dialog';
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { TextareaModule } from 'primeng/textarea';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { DatePickerModule } from 'primeng/datepicker';
-import { SelectModule } from 'primeng/select';
+import { DialogModule } from 'primeng/dialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextModule } from 'primeng/inputtext';
+import { SelectModule } from 'primeng/select';
+import { TextareaModule } from 'primeng/textarea';
 
-import { ProjectService } from '../../services/project.service';
-import { CreateProjectDto, Project, ProjectPriority } from '../../models';
 import { MessageService } from 'primeng/api';
+import { CreateProjectCommand, GetAllAgreementDto, ProjectStatus } from '../../../../../nswag/api-client';
+import { AgreementWizardService } from '../../../agreement-wizard/services/agreement-wizard.service';
+import { Project } from '../../models';
+import { ProjectApiService } from '../../services/project-api.service';
 
 @Component({
   selector: 'app-create-project-dialog',
@@ -43,34 +46,59 @@ export class CreateProjectDialogComponent implements OnInit {
 
   projectForm!: FormGroup;
   isSubmitting = signal<boolean>(false);
+  isLoadingAgreements = signal<boolean>(false);
+  agreements = signal<GetAllAgreementDto[]>([]);
 
-  priorityOptions = [
-    { label: 'Low', value: ProjectPriority.LOW },
-    { label: 'Medium', value: ProjectPriority.MEDIUM },
-    { label: 'High', value: ProjectPriority.HIGH },
-    { label: 'Urgent', value: ProjectPriority.URGENT }
+  statusOptions = [
+    { label: 'To Do', value: ProjectStatus._0 },
+    { label: 'In Progress', value: ProjectStatus._1 },
+    { label: 'Review', value: ProjectStatus._2 },
+    { label: 'Completed', value: ProjectStatus._3 }
   ];
+
+  agreementOptions = signal<{ label: string, value: number }[]>([]);
 
   constructor(
     private fb: FormBuilder,
-    private projectService: ProjectService,
-    private messageService: MessageService
+    private projectApiService: ProjectApiService,
+    private agreementWizardService: AgreementWizardService,
+    private messageService: MessageService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
+    this.loadAgreements();
   }
 
   initializeForm(): void {
     this.projectForm = this.fb.group({
-      name: ['', [Validators.required, Validators.minLength(3)]],
+      title: ['', [Validators.required, Validators.minLength(3)]],
       description: ['', [Validators.required, Validators.minLength(10)]],
-      clientName: ['', Validators.required],
-      projectManager: ['', Validators.required],
+      agreementId: [null, [Validators.required]],
       startDate: [new Date(), Validators.required],
       endDate: [null, Validators.required],
-      budget: [0, [Validators.required, Validators.min(1000)]],
-      priority: [ProjectPriority.MEDIUM, Validators.required]
+      status: [ProjectStatus._0]
+    });
+  }
+
+  loadAgreements(): void {
+    this.isLoadingAgreements.set(true);
+    this.agreementWizardService.getAllAgreements(1, 100).subscribe({
+      next: (response) => {
+        if (response.succeeded && response.data?.data) {
+          this.agreements.set(response.data.data);
+          const options = response.data.data.map(agreement => ({
+            label: `${agreement.projectNumber || agreement.id} - ${agreement.projectName}`,
+            value: agreement.id!
+          }));
+          this.agreementOptions.set(options);
+        }
+        this.isLoadingAgreements.set(false);
+      },
+      error: (error) => {
+        this.isLoadingAgreements.set(false);
+      }
     });
   }
 
@@ -86,28 +114,30 @@ export class CreateProjectDialogComponent implements OnInit {
     }
 
     this.isSubmitting.set(true);
-    const dto: CreateProjectDto = this.projectForm.value;
+    
+    // Map form data to CreateProjectCommand
+    const command = new CreateProjectCommand({
+      title: this.projectForm.get('title')?.value,
+      description: this.projectForm.get('description')?.value,
+      agreementId: this.projectForm.get('agreementId')?.value || undefined,
+      startDate: this.projectForm.get('startDate')?.value,
+      endDate: this.projectForm.get('endDate')?.value,
+      status: this.projectForm.get('status')?.value
+    });
 
-    this.projectService.createProject(dto).subscribe({
-      next: (project) => {
-        this.messageService.add({
-          severity: 'success',
-          summary: 'Success',
-          detail: 'Project created successfully',
-          life: 3000
-        });
-        this.projectCreated.emit(project);
-        this.isSubmitting.set(false);
-        this.projectForm.reset();
+    this.projectApiService.createProject(command).subscribe({
+      next: (response) => {
+        if (response.succeeded) {
+          // Optionally emit the created project ID or refresh the list
+          this.visibleChange.emit(false);
+          this.isSubmitting.set(false);
+          this.projectForm.reset();
+        } else {
+          this.isSubmitting.set(false);
+        }
       },
       error: (error) => {
         console.error('Error creating project:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to create project',
-          life: 5000
-        });
         this.isSubmitting.set(false);
       }
     });
@@ -132,11 +162,10 @@ export class CreateProjectDialogComponent implements OnInit {
   getErrorMessage(fieldName: string): string {
     const field = this.projectForm.get(fieldName);
     if (!field || !field.errors) return '';
+    if (field.errors['required']) return this.translate.instant('validation.required') || 'This field is required';
+    if (field.errors['minlength']) return this.translate.instant('validation.minlength', { requiredLength: field.errors['minlength'].requiredLength }) || `Minimum length is ${field.errors['minlength'].requiredLength}`;
+    if (field.errors['min']) return this.translate.instant('validation.min', { min: field.errors['min'].min }) || `Minimum value is ${field.errors['min'].min}`;
 
-    if (field.errors['required']) return 'This field is required';
-    if (field.errors['minlength']) return `Minimum length is ${field.errors['minlength'].requiredLength}`;
-    if (field.errors['min']) return `Minimum value is ${field.errors['min'].min}`;
-
-    return 'Invalid field';
+    return this.translate.instant('validation.invalid') || 'Invalid field';
   }
 }

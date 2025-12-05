@@ -682,6 +682,738 @@ export class ProjectClient {
     }
 }
 
+@Injectable()
+export class SubTaskClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createSubTask(body: CreateSubTaskCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/SubTask";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateSubTask(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateSubTask(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateSubTask(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    deleteSubTask(body: DeleteSubTaskCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/SubTask";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteSubTask(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteSubTask(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDeleteSubTask(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getAllSubTask(requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<ProjectSubTaskDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/SubTask?";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllSubTask(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllSubTask(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProjectSubTaskDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProjectSubTaskDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetAllSubTask(response: HttpResponseBase): Observable<ProjectSubTaskDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProjectSubTaskDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getSubTask(id: number): Observable<ProjectSubTaskDtoResponse> {
+        let url_ = this.baseUrl + "/api/SubTask/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSubTask(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSubTask(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ProjectSubTaskDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ProjectSubTaskDtoResponse>;
+        }));
+    }
+
+    protected processGetSubTask(response: HttpResponseBase): Observable<ProjectSubTaskDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ProjectSubTaskDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class SupplierClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createSupplier(body: CreateSupplierCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/Supplier";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateSupplier(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateSupplier(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateSupplier(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    deleteSupplier(body: DeleteSupplierCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/Supplier";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteSupplier(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteSupplier(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDeleteSupplier(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getAllSuppliers(requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<SupplierListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/Supplier?";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllSuppliers(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllSuppliers(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SupplierListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SupplierListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetAllSuppliers(response: HttpResponseBase): Observable<SupplierListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SupplierListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getSupplierById(id: number): Observable<SupplierResponse> {
+        let url_ = this.baseUrl + "/api/Supplier/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetSupplierById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetSupplierById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<SupplierResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<SupplierResponse>;
+        }));
+    }
+
+    protected processGetSupplierById(response: HttpResponseBase): Observable<SupplierResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = SupplierResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class TaskClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createSupplier(body: CreateTaskCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/Task";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateSupplier(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateSupplier(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateSupplier(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    deleteSupplier(body: DeleteTaskCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/Task";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteSupplier(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteSupplier(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDeleteSupplier(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getAllTasks(requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetProjectTaskDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/Task?";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllTasks(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllTasks(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectTaskDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectTaskDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetAllTasks(response: HttpResponseBase): Observable<GetProjectTaskDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectTaskDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getTaskById(id: number): Observable<GetProjectTaskDtoResponse> {
+        let url_ = this.baseUrl + "/api/Task/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTaskById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTaskById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectTaskDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectTaskDtoResponse>;
+        }));
+    }
+
+    protected processGetTaskById(response: HttpResponseBase): Observable<GetProjectTaskDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectTaskDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
 export class AgreementDto implements IAgreementDto {
     id?: number | undefined;
     projectNumber?: string | undefined;
@@ -1164,6 +1896,326 @@ export interface ICreateProjectCommand {
     endDate?: Date;
     status?: ProjectStatus;
     description?: string | undefined;
+}
+
+export class CreateSubTaskCommand implements ICreateSubTaskCommand {
+    id?: number | undefined;
+    title?: string | undefined;
+    startDate?: Date;
+    endDate?: Date | undefined;
+    status?: ProjectStatusSubTask;
+    type?: SubTaskType;
+    cost?: number | undefined;
+    qty?: number | undefined;
+    projectStageTaskId?: number;
+
+    constructor(data?: ICreateSubTaskCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.title = _data["title"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.status = _data["status"];
+            this.type = _data["type"];
+            this.cost = _data["cost"];
+            this.qty = _data["qty"];
+            this.projectStageTaskId = _data["projectStageTaskId"];
+        }
+    }
+
+    static fromJS(data: any): CreateSubTaskCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateSubTaskCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["title"] = this.title;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        data["status"] = this.status;
+        data["type"] = this.type;
+        data["cost"] = this.cost;
+        data["qty"] = this.qty;
+        data["projectStageTaskId"] = this.projectStageTaskId;
+        return data;
+    }
+}
+
+export interface ICreateSubTaskCommand {
+    id?: number | undefined;
+    title?: string | undefined;
+    startDate?: Date;
+    endDate?: Date | undefined;
+    status?: ProjectStatusSubTask;
+    type?: SubTaskType;
+    cost?: number | undefined;
+    qty?: number | undefined;
+    projectStageTaskId?: number;
+}
+
+export class CreateSupplierCommand implements ICreateSupplierCommand {
+    id?: number | undefined;
+    name?: string | undefined;
+    phoneNumber?: string | undefined;
+    email?: string | undefined;
+
+    constructor(data?: ICreateSupplierCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.email = _data["email"];
+        }
+    }
+
+    static fromJS(data: any): CreateSupplierCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateSupplierCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["phoneNumber"] = this.phoneNumber;
+        data["email"] = this.email;
+        return data;
+    }
+}
+
+export interface ICreateSupplierCommand {
+    id?: number | undefined;
+    name?: string | undefined;
+    phoneNumber?: string | undefined;
+    email?: string | undefined;
+}
+
+export class CreateTaskCommand implements ICreateTaskCommand {
+    id?: number | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    assignTo?: number | undefined;
+    startDate?: Date;
+    endDate?: Date;
+    priority?: number | undefined;
+    taskPoint?: number | undefined;
+    excavationLocation?: string | undefined;
+    excavationDepth?: number | undefined;
+    excavationVolume?: number | undefined;
+    excavationSoilType?: string | undefined;
+    excavationEquipment?: string | undefined;
+    status?: StatusTask;
+    projectStageId?: number;
+    taskTypeId?: number;
+
+    constructor(data?: ICreateTaskCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.title = _data["title"];
+            this.description = _data["description"];
+            this.assignTo = _data["assignTo"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.priority = _data["priority"];
+            this.taskPoint = _data["taskPoint"];
+            this.excavationLocation = _data["excavationLocation"];
+            this.excavationDepth = _data["excavationDepth"];
+            this.excavationVolume = _data["excavationVolume"];
+            this.excavationSoilType = _data["excavationSoilType"];
+            this.excavationEquipment = _data["excavationEquipment"];
+            this.status = _data["status"];
+            this.projectStageId = _data["projectStageId"];
+            this.taskTypeId = _data["taskTypeId"];
+        }
+    }
+
+    static fromJS(data: any): CreateTaskCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateTaskCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        data["assignTo"] = this.assignTo;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        data["priority"] = this.priority;
+        data["taskPoint"] = this.taskPoint;
+        data["excavationLocation"] = this.excavationLocation;
+        data["excavationDepth"] = this.excavationDepth;
+        data["excavationVolume"] = this.excavationVolume;
+        data["excavationSoilType"] = this.excavationSoilType;
+        data["excavationEquipment"] = this.excavationEquipment;
+        data["status"] = this.status;
+        data["projectStageId"] = this.projectStageId;
+        data["taskTypeId"] = this.taskTypeId;
+        return data;
+    }
+}
+
+export interface ICreateTaskCommand {
+    id?: number | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    assignTo?: number | undefined;
+    startDate?: Date;
+    endDate?: Date;
+    priority?: number | undefined;
+    taskPoint?: number | undefined;
+    excavationLocation?: string | undefined;
+    excavationDepth?: number | undefined;
+    excavationVolume?: number | undefined;
+    excavationSoilType?: string | undefined;
+    excavationEquipment?: string | undefined;
+    status?: StatusTask;
+    projectStageId?: number;
+    taskTypeId?: number;
+}
+
+export class DeleteSubTaskCommand implements IDeleteSubTaskCommand {
+    id?: number;
+
+    constructor(data?: IDeleteSubTaskCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): DeleteSubTaskCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new DeleteSubTaskCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IDeleteSubTaskCommand {
+    id?: number;
+}
+
+export class DeleteSupplierCommand implements IDeleteSupplierCommand {
+    id?: number;
+
+    constructor(data?: IDeleteSupplierCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): DeleteSupplierCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new DeleteSupplierCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IDeleteSupplierCommand {
+    id?: number;
+}
+
+export class DeleteTaskCommand implements IDeleteTaskCommand {
+    id?: number;
+
+    constructor(data?: IDeleteTaskCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): DeleteTaskCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new DeleteTaskCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IDeleteTaskCommand {
+    id?: number;
 }
 
 export class FifthStepDto implements IFifthStepDto {
@@ -1790,6 +2842,14 @@ export class GetProjectDto implements IGetProjectDto {
     startDate?: Date;
     endDate?: Date;
     clinet?: string | undefined;
+    budget?: number;
+    countTodo?: number;
+    countInProgress?: number;
+    countCompleted?: number;
+    countReview?: number;
+    countPreparing?: number | undefined;
+    countExcavation?: number | undefined;
+    projectStages?: ProjectStageDto[] | undefined;
 
     constructor(data?: IGetProjectDto) {
         if (data) {
@@ -1809,6 +2869,18 @@ export class GetProjectDto implements IGetProjectDto {
             this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
             this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
             this.clinet = _data["clinet"];
+            this.budget = _data["budget"];
+            this.countTodo = _data["countTodo"];
+            this.countInProgress = _data["countInProgress"];
+            this.countCompleted = _data["countCompleted"];
+            this.countReview = _data["countReview"];
+            this.countPreparing = _data["countPreparing"];
+            this.countExcavation = _data["countExcavation"];
+            if (Array.isArray(_data["projectStages"])) {
+                this.projectStages = [] as any;
+                for (let item of _data["projectStages"])
+                    this.projectStages!.push(ProjectStageDto.fromJS(item));
+            }
         }
     }
 
@@ -1828,6 +2900,18 @@ export class GetProjectDto implements IGetProjectDto {
         data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
         data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
         data["clinet"] = this.clinet;
+        data["budget"] = this.budget;
+        data["countTodo"] = this.countTodo;
+        data["countInProgress"] = this.countInProgress;
+        data["countCompleted"] = this.countCompleted;
+        data["countReview"] = this.countReview;
+        data["countPreparing"] = this.countPreparing;
+        data["countExcavation"] = this.countExcavation;
+        if (Array.isArray(this.projectStages)) {
+            data["projectStages"] = [];
+            for (let item of this.projectStages)
+                data["projectStages"].push(item ? item.toJSON() : undefined as any);
+        }
         return data;
     }
 }
@@ -1840,6 +2924,14 @@ export interface IGetProjectDto {
     startDate?: Date;
     endDate?: Date;
     clinet?: string | undefined;
+    budget?: number;
+    countTodo?: number;
+    countInProgress?: number;
+    countCompleted?: number;
+    countReview?: number;
+    countPreparing?: number | undefined;
+    countExcavation?: number | undefined;
+    projectStages?: ProjectStageDto[] | undefined;
 }
 
 export class GetProjectDtoListPagedResponse implements IGetProjectDtoListPagedResponse {
@@ -2040,6 +3132,302 @@ export interface IGetProjectDtoResponse {
     message?: string | undefined;
     errors?: string[] | undefined;
     data?: GetProjectDto;
+}
+
+export class GetProjectTaskDto implements IGetProjectTaskDto {
+    id?: number | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    assignTo?: number | undefined;
+    startDate?: Date;
+    endDate?: Date;
+    priority?: number | undefined;
+    taskPoint?: number | undefined;
+    excavationLocation?: string | undefined;
+    excavationDepth?: number | undefined;
+    excavationVolume?: number | undefined;
+    excavationSoilType?: string | undefined;
+    excavationEquipment?: string | undefined;
+    status?: StatusTask;
+    projectStageId?: number;
+    taskTypeId?: number;
+
+    constructor(data?: IGetProjectTaskDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.title = _data["title"];
+            this.description = _data["description"];
+            this.assignTo = _data["assignTo"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.priority = _data["priority"];
+            this.taskPoint = _data["taskPoint"];
+            this.excavationLocation = _data["excavationLocation"];
+            this.excavationDepth = _data["excavationDepth"];
+            this.excavationVolume = _data["excavationVolume"];
+            this.excavationSoilType = _data["excavationSoilType"];
+            this.excavationEquipment = _data["excavationEquipment"];
+            this.status = _data["status"];
+            this.projectStageId = _data["projectStageId"];
+            this.taskTypeId = _data["taskTypeId"];
+        }
+    }
+
+    static fromJS(data: any): GetProjectTaskDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectTaskDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        data["assignTo"] = this.assignTo;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        data["priority"] = this.priority;
+        data["taskPoint"] = this.taskPoint;
+        data["excavationLocation"] = this.excavationLocation;
+        data["excavationDepth"] = this.excavationDepth;
+        data["excavationVolume"] = this.excavationVolume;
+        data["excavationSoilType"] = this.excavationSoilType;
+        data["excavationEquipment"] = this.excavationEquipment;
+        data["status"] = this.status;
+        data["projectStageId"] = this.projectStageId;
+        data["taskTypeId"] = this.taskTypeId;
+        return data;
+    }
+}
+
+export interface IGetProjectTaskDto {
+    id?: number | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    assignTo?: number | undefined;
+    startDate?: Date;
+    endDate?: Date;
+    priority?: number | undefined;
+    taskPoint?: number | undefined;
+    excavationLocation?: string | undefined;
+    excavationDepth?: number | undefined;
+    excavationVolume?: number | undefined;
+    excavationSoilType?: string | undefined;
+    excavationEquipment?: string | undefined;
+    status?: StatusTask;
+    projectStageId?: number;
+    taskTypeId?: number;
+}
+
+export class GetProjectTaskDtoListPagedResponse implements IGetProjectTaskDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectTaskDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IGetProjectTaskDtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetProjectTaskDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): GetProjectTaskDtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectTaskDtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IGetProjectTaskDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectTaskDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class GetProjectTaskDtoListPagedResponseResponse implements IGetProjectTaskDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectTaskDtoListPagedResponse;
+
+    constructor(data?: IGetProjectTaskDtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectTaskDtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectTaskDtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectTaskDtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectTaskDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectTaskDtoListPagedResponse;
+}
+
+export class GetProjectTaskDtoResponse implements IGetProjectTaskDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectTaskDto;
+
+    constructor(data?: IGetProjectTaskDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectTaskDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectTaskDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectTaskDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectTaskDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectTaskDto;
 }
 
 export class Int32Response implements IInt32Response {
@@ -2370,10 +3758,334 @@ export interface IProjectAreaUnitDto {
     isDeleted?: boolean;
 }
 
+export class ProjectStageDto implements IProjectStageDto {
+    projectId?: number;
+    status?: number | undefined;
+    stageType?: ProjectStageType;
+
+    constructor(data?: IProjectStageDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.projectId = _data["projectId"];
+            this.status = _data["status"];
+            this.stageType = _data["stageType"];
+        }
+    }
+
+    static fromJS(data: any): ProjectStageDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectStageDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["projectId"] = this.projectId;
+        data["status"] = this.status;
+        data["stageType"] = this.stageType;
+        return data;
+    }
+}
+
+export interface IProjectStageDto {
+    projectId?: number;
+    status?: number | undefined;
+    stageType?: ProjectStageType;
+}
+
+export enum ProjectStageType {
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+}
+
 export enum ProjectStatus {
     _0 = 0,
     _1 = 1,
     _2 = 2,
+    _3 = 3,
+}
+
+export enum ProjectStatusSubTask {
+    _0 = 0,
+    _1 = 1,
+}
+
+export class ProjectSubTaskDto implements IProjectSubTaskDto {
+    id?: number;
+    title?: string | undefined;
+    startDate?: Date;
+    endDate?: Date | undefined;
+    status?: ProjectStatusSubTask;
+    type?: SubTaskType;
+    cost?: number | undefined;
+    qty?: number | undefined;
+    projectStageTaskId?: number;
+
+    constructor(data?: IProjectSubTaskDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.title = _data["title"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.status = _data["status"];
+            this.type = _data["type"];
+            this.cost = _data["cost"];
+            this.qty = _data["qty"];
+            this.projectStageTaskId = _data["projectStageTaskId"];
+        }
+    }
+
+    static fromJS(data: any): ProjectSubTaskDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectSubTaskDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["title"] = this.title;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        data["status"] = this.status;
+        data["type"] = this.type;
+        data["cost"] = this.cost;
+        data["qty"] = this.qty;
+        data["projectStageTaskId"] = this.projectStageTaskId;
+        return data;
+    }
+}
+
+export interface IProjectSubTaskDto {
+    id?: number;
+    title?: string | undefined;
+    startDate?: Date;
+    endDate?: Date | undefined;
+    status?: ProjectStatusSubTask;
+    type?: SubTaskType;
+    cost?: number | undefined;
+    qty?: number | undefined;
+    projectStageTaskId?: number;
+}
+
+export class ProjectSubTaskDtoListPagedResponse implements IProjectSubTaskDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: ProjectSubTaskDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IProjectSubTaskDtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(ProjectSubTaskDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): ProjectSubTaskDtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectSubTaskDtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IProjectSubTaskDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: ProjectSubTaskDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class ProjectSubTaskDtoListPagedResponseResponse implements IProjectSubTaskDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: ProjectSubTaskDtoListPagedResponse;
+
+    constructor(data?: IProjectSubTaskDtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? ProjectSubTaskDtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ProjectSubTaskDtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectSubTaskDtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IProjectSubTaskDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: ProjectSubTaskDtoListPagedResponse;
+}
+
+export class ProjectSubTaskDtoResponse implements IProjectSubTaskDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: ProjectSubTaskDto;
+
+    constructor(data?: IProjectSubTaskDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? ProjectSubTaskDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ProjectSubTaskDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectSubTaskDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IProjectSubTaskDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: ProjectSubTaskDto;
 }
 
 export class QuantityBillDto implements IQuantityBillDto {
@@ -2580,6 +4292,13 @@ export interface ISixthStepDto {
     quantityBillDto?: QuantityBillDto[] | undefined;
 }
 
+export enum StatusTask {
+    _0 = 0,
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+}
+
 export class StringLookupDtoListDictionaryResponse implements IStringLookupDtoListDictionaryResponse {
     succeeded?: boolean;
     message?: string | undefined;
@@ -2646,6 +4365,262 @@ export interface IStringLookupDtoListDictionaryResponse {
     message?: string | undefined;
     errors?: string[] | undefined;
     data?: { [key: string]: LookupDto[]; } | undefined;
+}
+
+export enum SubTaskType {
+    _0 = 0,
+}
+
+export class Supplier implements ISupplier {
+    id?: number;
+    isDeleted?: boolean;
+    name?: string | undefined;
+    phoneNumber?: string | undefined;
+    email?: string | undefined;
+
+    constructor(data?: ISupplier) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.name = _data["name"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.email = _data["email"];
+        }
+    }
+
+    static fromJS(data: any): Supplier {
+        data = typeof data === 'object' ? data : {};
+        let result = new Supplier();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["name"] = this.name;
+        data["phoneNumber"] = this.phoneNumber;
+        data["email"] = this.email;
+        return data;
+    }
+}
+
+export interface ISupplier {
+    id?: number;
+    isDeleted?: boolean;
+    name?: string | undefined;
+    phoneNumber?: string | undefined;
+    email?: string | undefined;
+}
+
+export class SupplierListPagedResponse implements ISupplierListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: Supplier[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: ISupplierListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(Supplier.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): SupplierListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SupplierListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface ISupplierListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: Supplier[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class SupplierListPagedResponseResponse implements ISupplierListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: SupplierListPagedResponse;
+
+    constructor(data?: ISupplierListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? SupplierListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): SupplierListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SupplierListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface ISupplierListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: SupplierListPagedResponse;
+}
+
+export class SupplierResponse implements ISupplierResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: Supplier;
+
+    constructor(data?: ISupplierResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? Supplier.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): SupplierResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new SupplierResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface ISupplierResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: Supplier;
 }
 
 export class SupplierServiceDto implements ISupplierServiceDto {

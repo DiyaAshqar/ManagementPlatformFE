@@ -1,22 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { 
-  AgreementClient, 
-  AttachmentClient, 
-  LookupClient,
+import {
+  AgreementClient,
+  AttachmentClient,
+  BooleanResponse,
+  FourthStepDto,
   FullAgreementDto,
   FullAgreementDtoResponse,
-  Int32Response,
   GetAllAgreementDtoListPagedResponseResponse,
-  GetAttachmentMetaDataResponse,
   GetAttachmentMetaDataListResponse,
-  BooleanResponse,
-  StringLookupDtoListDictionaryResponse,
+  GetAttachmentMetaDataResponse,
+  Int32Response,
+  LookupClient,
   LookupDto,
-  FourthStepDto,
-  FifthStepDto,
-  SixthStepDto
+  StringLookupDtoListDictionaryResponse
 } from '../../../../nswag/api-client';
 
 @Injectable({
