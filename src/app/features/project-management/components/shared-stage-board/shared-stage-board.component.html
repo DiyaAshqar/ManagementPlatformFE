@@ -1,0 +1,428 @@
+<div class="staging-board">
+  <!-- Header Stats -->
+  <div class="grid mb-4">
+    <div class="col-12 md:col-3">
+      <p-card styleClass="h-full">
+        <div class="flex align-items-center gap-3">
+          <div class="flex align-items-center justify-content-center border-circle bg-blue-100" 
+               style="width: 3rem; height: 3rem;">
+            <i class="pi pi-list text-blue-600 text-xl"></i>
+          </div>
+          <div>
+            <div class="text-500 text-sm mb-1">Total Items</div>
+            <div class="text-2xl font-bold text-color">{{ totalItems }}</div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+    
+    <div class="col-12 md:col-3">
+      <p-card styleClass="h-full">
+        <div class="flex align-items-center gap-3">
+          <div class="flex align-items-center justify-content-center border-circle bg-orange-100" 
+               style="width: 3rem; height: 3rem;">
+            <i class="pi pi-spin pi-spinner text-orange-600 text-xl"></i>
+          </div>
+          <div>
+            <div class="text-500 text-sm mb-1">In Progress</div>
+            <div class="text-2xl font-bold text-color">{{ inProgressCount }}</div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+    
+    <div class="col-12 md:col-3">
+      <p-card styleClass="h-full">
+        <div class="flex align-items-center gap-3">
+          <div class="flex align-items-center justify-content-center border-circle bg-green-100" 
+               style="width: 3rem; height: 3rem;">
+            <i class="pi pi-check-circle text-green-600 text-xl"></i>
+          </div>
+          <div>
+            <div class="text-500 text-sm mb-1">Completed</div>
+            <div class="text-2xl font-bold text-color">{{ completedCount }}</div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+    
+    <div class="col-12 md:col-3">
+      <p-card styleClass="h-full">
+        <div class="flex align-items-center gap-3">
+          <div class="flex align-items-center justify-content-center border-circle bg-primary-100" 
+               style="width: 3rem; height: 3rem;">
+            <i class="pi pi-percentage text-primary text-xl"></i>
+          </div>
+          <div class="flex-1">
+            <div class="text-500 text-sm mb-1">Completion</div>
+            <div class="text-2xl font-bold text-primary">{{ completionRate }}%</div>
+          </div>
+        </div>
+      </p-card>
+    </div>
+  </div>
+
+  <!-- Kanban Board -->
+  <div class="kanban-container">
+    <div class="kanban-columns">
+      @for (column of columns(); track column.id) {
+        <div class="kanban-column">
+          <!-- Column Header -->
+          <div class="column-header">
+            <div class="flex align-items-center justify-content-between mb-2">
+              <div class="flex align-items-center gap-2">
+                <h3 class="text-base font-semibold m-0 text-color">{{ column.title }}</h3>
+                <p-tag 
+                  [value]="column.items.length.toString()"
+                  [rounded]="true"
+                  severity="secondary">
+                </p-tag>
+                @if (column.wipLimit) {
+                  <span class="text-xs text-500">/ {{ column.wipLimit }}</span>
+                }
+              </div>
+              <p-button 
+                icon="pi pi-plus"
+                [text]="true"
+                [rounded]="true"
+                (onClick)="openAddDialog(column.id)"
+                pTooltip="Add item"
+                tooltipPosition="top">
+              </p-button>
+            </div>
+            @if (column.wipLimit && column.items.length >= column.wipLimit) {
+              <div class="bg-orange-100 border-round p-2 mb-2">
+                <span class="text-xs text-orange-900">
+                  <i class="pi pi-exclamation-triangle"></i> WIP limit reached
+                </span>
+              </div>
+            }
+          </div>
+
+          <!-- Column Items -->
+          <div 
+            class="column-items"
+            cdkDropList
+            [cdkDropListData]="column.items"
+            [id]="column.id"
+            [cdkDropListConnectedTo]="connectedDropLists"
+            (cdkDropListDropped)="onDrop($event, column)">
+            
+            @for (item of column.items; track item.id) {
+              <div 
+                class="work-item-card"
+                cdkDrag
+                (click)="openItemDialog(item)">
+                
+                <!-- Drag Placeholder -->
+                <div class="work-item-placeholder" *cdkDragPlaceholder></div>
+
+                <!-- Work Item Header -->
+                <div class="flex align-items-start justify-content-between mb-2">
+                  <div class="flex align-items-center gap-2">
+                    <div 
+                      [class]="'work-item-icon ' + getWorkItemColor(item.type)">
+                      <i [class]="'pi ' + getWorkItemIcon(item.type) + ' text-white text-xs'"></i>
+                    </div>
+                    <span class="text-xs font-mono text-500">{{ item.id }}</span>
+                  </div>
+                  @if (item.priority === 'critical' || item.priority === 'high') {
+                    <p-tag 
+                      [value]="item.priority"
+                      [severity]="getPrioritySeverity(item.priority)"
+                      styleClass="text-xs">
+                    </p-tag>
+                  }
+                </div>
+
+                <!-- Work Item Title -->
+                <h4 class="work-item-title">{{ item.title }}</h4>
+
+                <!-- Tags -->
+                @if (item.tags.length > 0) {
+                  <div class="flex flex-wrap gap-1 mb-2">
+                    @for (tag of item.tags.slice(0, 2); track tag) {
+                      <p-chip 
+                        [label]="tag"
+                        styleClass="text-xs py-0 px-2"
+                        [style]="{ height: '1.25rem', fontSize: '0.7rem' }">
+                      </p-chip>
+                    }
+                    @if (item.tags.length > 2) {
+                      <p-chip 
+                        [label]="'+' + (item.tags.length - 2)"
+                        styleClass="text-xs py-0 px-2"
+                        [style]="{ height: '1.25rem', fontSize: '0.7rem' }">
+                      </p-chip>
+                    }
+                  </div>
+                }
+
+                <!-- Subtasks Progress -->
+                @if (item.subtasks.length > 0) {
+                  <div class="mb-2">
+                    <div class="flex align-items-center justify-content-between text-xs mb-1">
+                      <span class="text-500">
+                        <i class="pi pi-list"></i> {{ getCompletedSubtasks(item) }}/{{ item.subtasks.length }}
+                      </span>
+                      <span class="font-medium text-color">{{ getSubtaskProgress(item) }}%</span>
+                    </div>
+                    <p-progressBar 
+                      [value]="getSubtaskProgress(item)"
+                      [showValue]="false"
+                      [style]="{ height: '0.25rem' }">
+                    </p-progressBar>
+                  </div>
+                }
+
+                <!-- Work Item Footer -->
+                <div class="flex align-items-center justify-content-between mt-2">
+                  <div class="flex align-items-center gap-2">
+                    @if (item.taskPoints) {
+                      <span class="text-xs text-500">
+                        <i class="pi pi-chart-bar"></i> {{ item.taskPoints }}
+                      </span>
+                    }
+                    @if (item.subtasks.length > 0) {
+                      <span class="text-xs text-500">
+                        <i class="pi pi-paperclip"></i> {{ item.subtasks.length }}
+                      </span>
+                    }
+                  </div>
+                  <p-avatar 
+                    [label]="item.assigneeAvatar"
+                    size="normal"
+                    shape="circle"
+                    [style]="{ 'background-color': '#2196F3', color: '#ffffff', 'font-size': '0.7rem' }">
+                  </p-avatar>
+                </div>
+              </div>
+            }
+
+            @if (column.items.length === 0) {
+              <div class="empty-column">
+                <i class="pi pi-inbox text-4xl text-400 mb-2"></i>
+                <p class="text-sm text-500 m-0">No items</p>
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>
+
+<!-- Work Item Details Dialog -->
+<p-dialog 
+  [(visible)]="showItemDialog"
+  [modal]="true"
+  [style]="{ width: '60rem', maxHeight: '90vh' }"
+  [header]="selectedItem()?.title || 'Work Item Details'"
+  [draggable]="false"
+  [resizable]="false"
+  styleClass="overflow-y-auto">
+  
+  @if (selectedItem()) {
+    <div class="flex flex-column gap-3">
+      <!-- Header Info -->
+      <div class="flex align-items-center gap-3 pb-3 border-bottom-1 surface-border">
+        <div 
+          [class]="'work-item-icon-lg ' + getWorkItemColor(selectedItem()!.type)">
+          <i [class]="'pi ' + getWorkItemIcon(selectedItem()!.type) + ' text-white text-xl'"></i>
+        </div>
+        <div class="flex-1">
+          <div class="flex align-items-center gap-2 mb-1">
+            <span class="text-sm font-mono text-500">{{ selectedItem()!.id }}</span>
+            <p-tag 
+              [value]="selectedItem()!.type"
+              severity="info"
+              styleClass="text-xs">
+            </p-tag>
+            <p-tag 
+              [value]="selectedItem()!.priority"
+              [severity]="getPrioritySeverity(selectedItem()!.priority)"
+              styleClass="text-xs">
+            </p-tag>
+          </div>
+          <div class="flex align-items-center gap-2 text-sm text-500">
+            <i class="pi pi-user"></i>
+            <span>{{ selectedItem()!.assignTo }}</span>
+            @if (selectedItem()!.taskPoints) {
+              <span class="ml-2">
+                <i class="pi pi-chart-bar"></i> {{ selectedItem()!.taskPoints }} points
+              </span>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div>
+        <label class="block text-sm font-semibold mb-2 text-color">Description</label>
+        <p class="text-color-secondary line-height-3 m-0">
+          {{ selectedItem()!.description || 'No description provided' }}
+        </p>
+      </div>
+
+      <!-- Tags -->
+      @if (selectedItem()!.tags.length > 0) {
+        <div>
+          <label class="block text-sm font-semibold mb-2 text-color">Tags</label>
+          <div class="flex flex-wrap gap-2">
+            @for (tag of selectedItem()!.tags; track tag) {
+              <p-chip [label]="tag"></p-chip>
+            }
+          </div>
+        </div>
+      }
+
+      <!-- Dates -->
+      <div class="grid">
+        <div class="col-6">
+          <label class="block text-sm font-semibold mb-1 text-color">Start Date</label>
+          <p class="text-color-secondary m-0">{{ selectedItem()!.startDate }}</p>
+        </div>
+        <div class="col-6">
+          <label class="block text-sm font-semibold mb-1 text-color">End Date</label>
+          <p class="text-color-secondary m-0">{{ selectedItem()!.endDate }}</p>
+        </div>
+      </div>
+
+      <!-- Additional Details -->
+      @if (selectedItem()!.location || selectedItem()!.depth || selectedItem()!.volume || selectedItem()!.soilType || selectedItem()!.equipment) {
+        <div class="grid">
+          @if (selectedItem()!.location) {
+            <div class="col-6">
+              <label class="block text-sm font-semibold mb-1 text-color">Location</label>
+              <p class="text-color-secondary m-0">{{ selectedItem()!.location }}</p>
+            </div>
+          }
+          @if (selectedItem()!.depth) {
+            <div class="col-6">
+              <label class="block text-sm font-semibold mb-1 text-color">Depth</label>
+              <p class="text-color-secondary m-0">{{ selectedItem()!.depth }}</p>
+            </div>
+          }
+          @if (selectedItem()!.volume) {
+            <div class="col-6">
+              <label class="block text-sm font-semibold mb-1 text-color">Volume</label>
+              <p class="text-color-secondary m-0">{{ selectedItem()!.volume }}</p>
+            </div>
+          }
+          @if (selectedItem()!.soilType) {
+            <div class="col-6">
+              <label class="block text-sm font-semibold mb-1 text-color">Soil Type</label>
+              <p class="text-color-secondary m-0">{{ selectedItem()!.soilType }}</p>
+            </div>
+          }
+          @if (selectedItem()!.equipment) {
+            <div class="col-12">
+              <label class="block text-sm font-semibold mb-1 text-color">Equipment</label>
+              <p class="text-color-secondary m-0">{{ selectedItem()!.equipment }}</p>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Subtasks -->
+      <div>
+        <div class="flex align-items-center justify-content-between mb-3">
+          <label class="text-sm font-semibold m-0 text-color">
+            Subtasks ({{ getCompletedSubtasks(selectedItem()!) }}/{{ selectedItem()!.subtasks.length }})
+          </label>
+          <p-button 
+            label="Add Subtask"
+            icon="pi pi-plus"
+            size="small"
+            (onClick)="openAddSubtaskDialog(selectedItem()!)">
+          </p-button>
+        </div>
+
+        <!-- Subtask List -->
+        @if (selectedItem()!.subtasks.length > 0) {
+          <div class="border-round border-1 surface-border overflow-hidden mb-2">
+            <table class="w-full text-sm">
+              <thead class="surface-50">
+                <tr>
+                  <th class="text-left p-2 font-semibold">Title</th>
+                  <th class="text-left p-2 font-semibold">Dates</th>
+                  <th class="text-left p-2 font-semibold">Type</th>
+                  <th class="text-left p-2 font-semibold">Status</th>
+                  <th class="text-left p-2 font-semibold">Cost</th>
+                  <th class="text-left p-2 font-semibold">Quantity</th>
+                  <th class="text-right p-2 font-semibold" style="width: 100px">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                @for (subtask of selectedItem()!.subtasks; track subtask.id) {
+                  <tr class="border-top-1 surface-border">
+                    <td class="p-2">{{ subtask.title }}</td>
+                    <td class="p-2 text-500 text-xs">
+                      {{ subtask.startDate }} - {{ subtask.endDate }}
+                    </td>
+                    <td class="p-2">
+                      <p-tag [value]="subtask.type" severity="secondary" styleClass="text-xs"></p-tag>
+                    </td>
+                    <td class="p-2">
+                      <p-tag 
+                        [value]="getStatusLabel(subtask.status)"
+                        [severity]="getStatusSeverity(subtask.status)"
+                        styleClass="text-xs">
+                      </p-tag>
+                    </td>
+                    <td class="p-2 font-mono text-sm">{{ subtask.cost }}</td>
+                    <td class="p-2 text-500">{{ subtask.quantity }}</td>
+                    <td class="p-2 text-right">
+                      <div class="flex align-items-center justify-content-end gap-1">
+                        <p-button 
+                          icon="pi pi-pencil"
+                          [text]="true"
+                          [rounded]="true"
+                          size="small"
+                          (onClick)="openEditSubtaskDialog(selectedItem()!, subtask)"
+                          pTooltip="Edit"
+                          tooltipPosition="top">
+                        </p-button>
+                        <p-button 
+                          icon="pi pi-trash"
+                          [text]="true"
+                          [rounded]="true"
+                          severity="danger"
+                          size="small"
+                          (onClick)="deleteSubtask(selectedItem()!, subtask.id)"
+                          pTooltip="Delete"
+                          tooltipPosition="top">
+                        </p-button>
+                      </div>
+                    </td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        } @else {
+          <div class="text-center p-4 surface-50 border-round">
+            <i class="pi pi-list text-3xl text-400 mb-2"></i>
+            <p class="text-sm text-500 m-0">No subtasks yet</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <ng-template pTemplate="footer">
+      <div class="flex justify-content-between w-full">
+        <p-button 
+          label="Delete Item"
+          icon="pi pi-trash"
+          severity="danger"
+          [outlined]="true"
+          (onClick)="deleteWorkItem(selectedItem()!)">
+        </p-button>
+        <p-button 
+          label="Close"
+          (onClick)="showItemDialog.set(false)">
+        </p-button>
+      </div>
+    </ng-template>
+  }
+</p-dialog>

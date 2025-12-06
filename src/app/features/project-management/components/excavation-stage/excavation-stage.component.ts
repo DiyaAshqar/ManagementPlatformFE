@@ -1,396 +1,169 @@
 import { Component, Input, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { TableModule } from 'primeng/table';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TooltipModule } from 'primeng/tooltip';
-import { TextareaModule } from 'primeng/textarea';
-
-interface SubRecord {
-  id: string;
-  title: string;
-  startDate: string;
-  endDate: string;
-  status: 'completed' | 'in-progress' | 'pending';
-  type: string;
-  cost: string;
-  quantity: string;
-}
-
-interface ExcavationRecord {
-  id: string;
-  title: string;
-  type: string;
-  assignTo: string;
-  startDate: string;
-  endDate: string;
-  priority: 'high' | 'medium' | 'low';
-  taskPoints: string;
-  location: string;
-  depth: string;
-  volume: string;
-  soilType: string;
-  equipment: string;
-  description: string;
-  status: 'completed' | 'in-progress' | 'pending';
-  subRecords?: SubRecord[];
-}
+import { SharedStageBoardComponent, Column, TaskStatus, WorkItemType } from '../shared-stage-board/shared-stage-board.component';
+import { DialogService } from 'primeng/dynamicdialog';
 
 @Component({
   selector: 'app-excavation-stage',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
-    CardModule,
-    ButtonModule,
-    TagModule,
-    TableModule,
-    DialogModule,
-    InputTextModule,
-    SelectModule,
-    TooltipModule,
-    TextareaModule
+    SharedStageBoardComponent
   ],
+  providers: [DialogService],
   templateUrl: './excavation-stage.component.html',
   styleUrls: ['./excavation-stage.component.scss']
 })
 export class ExcavationStageComponent {
   @Input() projectId!: string;
 
-  records = signal<ExcavationRecord[]>([
+  columns = signal<Column[]>([
     {
-      id: 'exc-1',
-      title: 'Foundation Excavation - Phase 1',
-      type: 'Foundation',
-      assignTo: 'Mike Johnson',
-      startDate: '2024-02-05',
-      endDate: '2024-02-05',
-      priority: 'high',
-      taskPoints: '8',
-      location: 'Grid A1-A5',
-      depth: '3.5m',
-      volume: '450 m³',
-      soilType: 'Clay',
-      equipment: 'Excavator CAT 320',
-      description: 'Initial foundation excavation for the main building structure',
-      status: 'completed',
-      subRecords: [
+      id: TaskStatus.TODO,
+      title: 'To Do',
+      items: [
         {
-          id: 'sub-1-1',
-          title: 'Topsoil Removal',
+          id: 'exc-1',
+          title: 'Foundation Excavation - Phase 1',
+          type: WorkItemType.TASK,
+          priority: 'high',
+          assignTo: 'Mike Johnson',
+          assigneeAvatar: 'MJ',
+          taskPoints: '8',
+          tags: ['foundation', 'excavation'],
+          description: 'Initial foundation excavation for the main building structure',
+          status: TaskStatus.TODO,
+          subtasks: [
+            { id: 'sub-1-1', title: 'Topsoil Removal', startDate: '2024-02-05', endDate: '2024-02-05', status: 'pending', type: 'Excavation', cost: '$1,200', quantity: '150 m³' },
+            { id: 'sub-1-2', title: 'Clay Extraction', startDate: '2024-02-05', endDate: '2024-02-05', status: 'pending', type: 'Excavation', cost: '$2,500', quantity: '300 m³' }
+          ],
           startDate: '2024-02-05',
           endDate: '2024-02-05',
-          status: 'completed',
-          type: 'Excavation',
-          cost: '$1,200',
-          quantity: '150 m³'
+          location: 'Grid A1-A5',
+          depth: '3.5m',
+          volume: '450 m³',
+          soilType: 'Clay',
+          equipment: 'Excavator CAT 320',
+          createdDate: '2024-02-05'
         },
         {
-          id: 'sub-1-2',
-          title: 'Clay Extraction',
-          startDate: '2024-02-05',
-          endDate: '2024-02-05',
-          status: 'completed',
-          type: 'Excavation',
-          cost: '$2,400',
-          quantity: '300 m³'
-        }
-      ]
-    },
-    {
-      id: 'exc-2',
-      title: 'Basement Excavation',
-      type: 'Basement',
-      assignTo: 'Mike Johnson',
-      startDate: '2024-02-06',
-      endDate: '2024-02-06',
-      priority: 'high',
-      taskPoints: '10',
-      location: 'Grid B1-B5',
-      depth: '4.2m',
-      volume: '520 m³',
-      soilType: 'Sandy Clay',
-      equipment: 'Excavator CAT 320',
-      description: 'Deep excavation for basement level',
-      status: 'completed',
-      subRecords: [
-        {
-          id: 'sub-2-1',
-          title: 'Site Clearing',
+          id: 'exc-2',
+          title: 'Utility Trench - North Section',
+          type: WorkItemType.TASK,
+          priority: 'medium',
+          assignTo: 'Sarah Williams',
+          assigneeAvatar: 'SW',
+          taskPoints: '5',
+          tags: ['utilities', 'trench'],
+          description: 'Excavate trench for utility lines in the north section',
+          status: TaskStatus.TODO,
+          subtasks: [],
           startDate: '2024-02-06',
-          endDate: '2024-02-06',
-          status: 'completed',
-          type: 'Preparation',
-          cost: '$800',
-          quantity: '520 m³'
+          endDate: '2024-02-07',
+          location: 'North Section',
+          depth: '2m',
+          volume: '120 m³',
+          soilType: 'Sandy Clay',
+          equipment: 'Mini Excavator',
+          createdDate: '2024-02-06'
         }
-      ]
+      ],
+      wipLimit: 5
     },
     {
-      id: 'exc-3',
-      title: 'Utility Trench Excavation',
-      type: 'Utility',
-      assignTo: 'David Smith',
-      startDate: '2024-02-07',
-      endDate: '2024-02-09',
-      priority: 'medium',
-      taskPoints: '5',
-      location: 'Grid C1-C5',
-      depth: '3.8m',
-      volume: '480 m³',
-      soilType: 'Clay',
-      equipment: 'Excavator Volvo EC380',
-      description: 'Excavation for utility lines and drainage systems',
-      status: 'in-progress',
-      subRecords: []
+      id: TaskStatus.IN_PROGRESS,
+      title: 'In Progress',
+      items: [
+        {
+          id: 'exc-3',
+          title: 'Basement Excavation - Level 1',
+          type: WorkItemType.TASK,
+          priority: 'critical',
+          assignTo: 'David Chen',
+          assigneeAvatar: 'DC',
+          taskPoints: '13',
+          tags: ['basement', 'excavation'],
+          description: 'First level basement excavation with shoring installation',
+          status: TaskStatus.IN_PROGRESS,
+          subtasks: [
+            { id: 'sub-3-1', title: 'Shoring Installation', startDate: '2024-02-07', endDate: '2024-02-08', status: 'completed', type: 'Safety', cost: '$5,000', quantity: '1' },
+            { id: 'sub-3-2', title: 'Soil Excavation', startDate: '2024-02-08', endDate: '2024-02-09', status: 'in-progress', type: 'Excavation', cost: '$3,500', quantity: '600 m³' },
+            { id: 'sub-3-3', title: 'Soil Testing', startDate: '2024-02-09', endDate: '2024-02-09', status: 'pending', type: 'Testing', cost: '$800', quantity: '1' }
+          ],
+          startDate: '2024-02-07',
+          endDate: '2024-02-09',
+          location: 'Building Core',
+          depth: '5m',
+          volume: '600 m³',
+          soilType: 'Mixed Clay/Rock',
+          equipment: 'Excavator CAT 336',
+          createdDate: '2024-02-07'
+        }
+      ],
+      wipLimit: 3
     },
     {
-      id: 'exc-4',
-      title: 'Rock Removal',
-      type: 'Site Preparation',
-      assignTo: 'David Smith',
-      startDate: '2024-02-08',
-      endDate: '2024-02-10',
-      priority: 'low',
-      taskPoints: '6',
-      location: 'Grid D1-D5',
-      depth: '4.0m',
-      volume: '500 m³',
-      soilType: 'Rock',
-      equipment: 'Excavator Volvo EC380',
-      description: 'Remove rock formations to prepare site',
-      status: 'pending',
-      subRecords: []
+      id: TaskStatus.REVIEW,
+      title: 'Review',
+      items: [
+        {
+          id: 'exc-4',
+          title: 'Site Leveling - East Wing',
+          type: WorkItemType.TASK,
+          priority: 'medium',
+          assignTo: 'Robert Taylor',
+          assigneeAvatar: 'RT',
+          taskPoints: '5',
+          tags: ['leveling', 'grading'],
+          description: 'Level and grade the east wing area for construction',
+          status: TaskStatus.REVIEW,
+          subtasks: [
+            { id: 'sub-4-1', title: 'Initial Grading', startDate: '2024-02-04', endDate: '2024-02-05', status: 'completed', type: 'Grading', cost: '$2,000', quantity: '200 m³' },
+            { id: 'sub-4-2', title: 'Final Leveling', startDate: '2024-02-05', endDate: '2024-02-06', status: 'completed', type: 'Leveling', cost: '$1,500', quantity: '200 m³' }
+          ],
+          startDate: '2024-02-04',
+          endDate: '2024-02-06',
+          location: 'East Wing',
+          depth: '0.5m',
+          volume: '200 m³',
+          soilType: 'Topsoil',
+          equipment: 'Bulldozer',
+          createdDate: '2024-02-04'
+        }
+      ],
+      wipLimit: 3
+    },
+    {
+      id: TaskStatus.DONE,
+      title: 'Done',
+      items: [
+        {
+          id: 'exc-5',
+          title: 'Access Road Excavation',
+          type: WorkItemType.TASK,
+          priority: 'high',
+          assignTo: 'Emily Brown',
+          assigneeAvatar: 'EB',
+          taskPoints: '8',
+          tags: ['road', 'access'],
+          description: 'Excavate and prepare access road to construction site',
+          status: TaskStatus.DONE,
+          subtasks: [
+            { id: 'sub-5-1', title: 'Clear Vegetation', startDate: '2024-02-01', endDate: '2024-02-02', status: 'completed', type: 'Clearing', cost: '$1,000', quantity: '1' },
+            { id: 'sub-5-2', title: 'Excavate Road Base', startDate: '2024-02-02', endDate: '2024-02-03', status: 'completed', type: 'Excavation', cost: '$2,500', quantity: '300 m³' },
+            { id: 'sub-5-3', title: 'Compact Base', startDate: '2024-02-03', endDate: '2024-02-04', status: 'completed', type: 'Compaction', cost: '$800', quantity: '1' }
+          ],
+          startDate: '2024-02-01',
+          endDate: '2024-02-04',
+          location: 'Site Access',
+          depth: '1m',
+          volume: '300 m³',
+          soilType: 'Mixed',
+          equipment: 'Excavator + Compactor',
+          createdDate: '2024-02-01'
+        }
+      ],
+      wipLimit: undefined
     }
   ]);
-
-  expandedRecords = signal<Set<string>>(new Set());
-  editingId = signal<string | null>(null);
-  showAddDialog = signal(false);
-  showAddSubRecordDialog = signal(false);
-  selectedRecordId = signal<string | null>(null);
-
-  newRecord: Omit<ExcavationRecord, 'id'> = {
-    title: '',
-    type: '',
-    assignTo: '',
-    startDate: '',
-    endDate: '',
-    priority: 'medium',
-    taskPoints: '',
-    location: '',
-    depth: '',
-    volume: '',
-    soilType: '',
-    equipment: '',
-    description: '',
-    status: 'pending'
-  };
-
-  newSubRecord: Omit<SubRecord, 'id'> = {
-    title: '',
-    startDate: '',
-    endDate: '',
-    status: 'pending',
-    type: '',
-    cost: '',
-    quantity: ''
-  };
-
-  editingRecord: Partial<ExcavationRecord> = {};
-
-  statusOptions = [
-    { label: 'Pending', value: 'pending' },
-    { label: 'In Progress', value: 'in-progress' },
-    { label: 'Completed', value: 'completed' }
-  ];
-
-  priorityOptions = [
-    { label: 'Low', value: 'low' },
-    { label: 'Medium', value: 'medium' },
-    { label: 'High', value: 'high' }
-  ];
-
-  get completedCount(): number {
-    return this.records().filter(r => r.status === 'completed').length;
-  }
-
-  get inProgressCount(): number {
-    return this.records().filter(r => r.status === 'in-progress').length;
-  }
-
-  get totalVolume(): number {
-    return this.records()
-      .filter(r => r.status === 'completed')
-      .reduce((sum, r) => sum + parseFloat(r.volume.replace(/[^\d.]/g, '') || '0'), 0);
-  }
-
-  getStatusSeverity(status: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' {
-    const severityMap: Record<string, 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast'> = {
-      'completed': 'success',
-      'in-progress': 'info',
-      'pending': 'warning'
-    };
-    return severityMap[status] || 'secondary';
-  }
-
-  getStatusLabel(status: string): string {
-    const labelMap: Record<string, string> = {
-      'completed': 'Completed',
-      'in-progress': 'In Progress',
-      'pending': 'Pending'
-    };
-    return labelMap[status] || status;
-  }
-
-  getPrioritySeverity(priority: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' {
-    const severityMap: Record<string, 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast'> = {
-      'high': 'danger',
-      'medium': 'info',
-      'low': 'secondary'
-    };
-    return severityMap[priority] || 'secondary';
-  }
-
-  getPriorityLabel(priority: string): string {
-    const labelMap: Record<string, string> = {
-      'high': 'High',
-      'medium': 'Medium',
-      'low': 'Low'
-    };
-    return labelMap[priority] || priority;
-  }
-
-  toggleExpanded(recordId: string): void {
-    const expanded = new Set(this.expandedRecords());
-    if (expanded.has(recordId)) {
-      expanded.delete(recordId);
-    } else {
-      expanded.add(recordId);
-    }
-    this.expandedRecords.set(expanded);
-  }
-
-  isExpanded(recordId: string): boolean {
-    return this.expandedRecords().has(recordId);
-  }
-
-  openAddDialog(): void {
-    this.newRecord = {
-      title: '',
-      type: '',
-      assignTo: '',
-      startDate: '',
-      endDate: '',
-      priority: 'medium',
-      taskPoints: '',
-      location: '',
-      depth: '',
-      volume: '',
-      soilType: '',
-      equipment: '',
-      description: '',
-      status: 'pending'
-    };
-    this.showAddDialog.set(true);
-  }
-
-  addRecord(): void {
-    if (!this.newRecord.title || !this.newRecord.location) return;
-
-    const record: ExcavationRecord = {
-      id: `exc-${Date.now()}`,
-      ...this.newRecord,
-      subRecords: []
-    };
-
-    this.records.update(records => [...records, record]);
-    this.showAddDialog.set(false);
-  }
-
-  startEdit(record: ExcavationRecord): void {
-    this.editingId.set(record.id);
-    this.editingRecord = { ...record };
-  }
-
-  cancelEdit(): void {
-    this.editingId.set(null);
-    this.editingRecord = {};
-  }
-
-  saveEdit(): void {
-    const id = this.editingId();
-    if (!id) return;
-
-    this.records.update(records => 
-      records.map(r => r.id === id ? { ...r, ...this.editingRecord } : r)
-    );
-    this.editingId.set(null);
-    this.editingRecord = {};
-  }
-
-  deleteRecord(id: string): void {
-    this.records.update(records => records.filter(r => r.id !== id));
-  }
-
-  openAddSubRecord(recordId: string): void {
-    this.selectedRecordId.set(recordId);
-    this.newSubRecord = {
-      title: '',
-      startDate: '',
-      endDate: '',
-      status: 'pending',
-      type: '',
-      cost: '',
-      quantity: ''
-    };
-    this.showAddSubRecordDialog.set(true);
-  }
-
-  addSubRecord(): void {
-    const recordId = this.selectedRecordId();
-    if (!recordId || !this.newSubRecord.title) return;
-
-    const subRecord: SubRecord = {
-      id: `sub-${Date.now()}`,
-      ...this.newSubRecord
-    };
-
-    this.records.update(records =>
-      records.map(r =>
-        r.id === recordId
-          ? { ...r, subRecords: [...(r.subRecords || []), subRecord] }
-          : r
-      )
-    );
-
-    // Expand the record to show the new sub-record
-    const expanded = new Set(this.expandedRecords());
-    expanded.add(recordId);
-    this.expandedRecords.set(expanded);
-
-    this.showAddSubRecordDialog.set(false);
-    this.selectedRecordId.set(null);
-  }
-
-  deleteSubRecord(recordId: string, subRecordId: string): void {
-    this.records.update(records =>
-      records.map(r =>
-        r.id === recordId
-          ? { ...r, subRecords: r.subRecords?.filter(sr => sr.id !== subRecordId) }
-          : r
-      )
-    );
-  }
-
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-  }
 }

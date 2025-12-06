@@ -50,7 +50,7 @@ interface ReportType {
     MilestoneStageComponent,
     StageKanbanComponent,
     DocumentsStageComponent,
-    StagingBoardComponent
+    // StagingBoardComponent
   ],
   templateUrl: './project-detail.component.html',
   styleUrls: ['./project-detail.component.scss']
