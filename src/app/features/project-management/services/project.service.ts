@@ -1,5 +1,14 @@
 import { Injectable, signal } from '@angular/core';
 import { Observable, of, delay, map } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environment';
+import {
+  GetProjectDto,
+  GetProjectDtoListPagedResponseResponse,
+  ProjectStatus as ApiProjectStatus,
+  ProjectStageDto,
+  ProjectStageType
+} from '../../../../nswag/api-client';
 import {
   Project,
   ProjectStatus,
@@ -33,50 +42,176 @@ export class ProjectService {
     averageProgress: 0
   });
 
-  constructor() {
-    this.loadMockProjects();
+  private apiUrl = environment.apiUrl;
+
+  constructor(private http: HttpClient) {
+    // Note: loadMockProjects() removed - using API data instead
   }
 
-  // Get all projects with optional filters
+  // Mapper: Convert API DTO to Project model
+  private mapApiProjectToProject(apiProject: GetProjectDto, index: number): Project {
+    return {
+      id: apiProject.projectNumber || '',
+      name: apiProject.title || '',
+      description: apiProject.description || '',
+      status: this.mapApiStatusToProjectStatus(apiProject.status),
+      priority: ProjectPriority.MEDIUM, // Default, as API doesn't provide priority
+      startDate: apiProject.startDate ? new Date(apiProject.startDate) : new Date(),
+      endDate: apiProject.endDate ? new Date(apiProject.endDate) : new Date(),
+      progress: this.calculateProgress(apiProject),
+      budget: apiProject.budget || 0,
+      spent: 0, // API doesn't provide spent amount
+      clientName: apiProject.clinet || '',
+      projectManager: 'N/A', // API doesn't provide project manager
+      team: [],
+      stages: this.mapApiStagesToStages(apiProject.projectStages, apiProject.projectNumber || ''),
+      documents: [],
+      createdAt: apiProject.startDate ? new Date(apiProject.startDate) : new Date(),
+      updatedAt: new Date()
+    };
+  }
+
+  // Map backend status enum to frontend status
+  private mapApiStatusToProjectStatus(status: ApiProjectStatus | undefined): ProjectStatus {
+    switch (status) {
+      case ApiProjectStatus._0:
+        return ProjectStatus.PLANNING;
+      case ApiProjectStatus._1:
+        return ProjectStatus.IN_PROGRESS;
+      case ApiProjectStatus._2:
+        return ProjectStatus.COMPLETED;
+      default:
+        return ProjectStatus.PLANNING;
+    }
+  }
+
+  // Calculate overall progress from task counts
+  private calculateProgress(apiProject: GetProjectDto): number {
+    const total = (apiProject.countTodo || 0) + (apiProject.countInProgress || 0) + (apiProject.countCompleted || 0) + (apiProject.countReview || 0);
+    if (total === 0) return 0;
+    return Math.round(((apiProject.countCompleted || 0) / total) * 100);
+  }
+
+  // Map API stages to frontend stages
+  private mapApiStagesToStages(apiStages: ProjectStageDto[] | undefined, projectId: string): Stage[] {
+    if (!apiStages || apiStages.length === 0) {
+      return this.generateInitialStages();
+    }
+
+    return apiStages.map((apiStage, index) => ({
+      id: `stage-${apiStage.projectId || index}`,
+      name: this.getStageNameByType(apiStage.stageType),
+      projectId: projectId,
+      order: index + 1,
+      status: this.mapStageTypeToStageStatus(apiStage.stageType),
+      tasks: [],
+      progress: 0
+    }));
+  }
+
+  // Get stage name from stage type
+  private getStageNameByType(stageType: ProjectStageType | undefined): string {
+    switch (stageType) {
+      case ProjectStageType._1:
+        return 'Preparing';
+      case ProjectStageType._2:
+        return 'Excavation';
+      case ProjectStageType._3:
+        return 'Foundation';
+      default:
+        return 'Unknown Stage';
+    }
+  }
+
+  // Map stage type to stage status
+  private mapStageTypeToStageStatus(stageType: ProjectStageType | undefined): StageStatus {
+    switch (stageType) {
+      case ProjectStageType._1:
+        return StageStatus.PREPARING;
+      case ProjectStageType._2:
+        return StageStatus.EXCAVATION;
+      case ProjectStageType._3:
+        return StageStatus.FOUNDATION;
+      default:
+        return StageStatus.PREPARING;
+    }
+  }
+
+  // Get all projects from API with optional filters
   getProjects(filters?: ProjectFilters): Observable<Project[]> {
-    return of(this.projects()).pipe(
-      delay(500),
-      map(projects => {
-        if (!filters) return projects;
+    const pageNumber = 1;
+    const pageSize = 100; // Get all projects
+    const searchParam = filters?.search || '';
 
-        return projects.filter(project => {
-          // Search filter
-          if (filters.search) {
-            const search = filters.search.toLowerCase();
-            const matchesSearch = 
-              project.name.toLowerCase().includes(search) ||
-              project.description.toLowerCase().includes(search) ||
-              project.clientName.toLowerCase().includes(search);
-            if (!matchesSearch) return false;
-          }
+    return this.http.get<GetProjectDtoListPagedResponseResponse>(`${this.apiUrl}/Project`, {
+      params: {
+        pageNumber: pageNumber.toString(),
+        pageSize: pageSize.toString(),
+        ...(searchParam && { filterByTitle: searchParam })
+      }
+    }).pipe(
+      map(response => {
+        if (!response.succeeded || !response.data || !response.data.data) {
+          return [];
+        }
 
-          // Status filter
-          if (filters.status && filters.status.length > 0) {
-            if (!filters.status.includes(project.status)) return false;
-          }
+        const projects = response.data.data.map((apiProject, index) => 
+          this.mapApiProjectToProject(apiProject, index)
+        );
 
-          // Priority filter
-          if (filters.priority && filters.priority.length > 0) {
-            if (!filters.priority.includes(project.priority)) return false;
-          }
+        // Apply client-side filters
+        let filteredProjects = projects;
 
-          // Date range filter
-          if (filters.startDate && project.startDate < filters.startDate) {
-            return false;
-          }
-          if (filters.endDate && project.endDate > filters.endDate) {
-            return false;
-          }
+        if (filters) {
+          filteredProjects = projects.filter(project => {
+            // Status filter
+            if (filters.status && filters.status.length > 0) {
+              if (!filters.status.includes(project.status)) return false;
+            }
 
-          return true;
-        });
+            // Priority filter
+            if (filters.priority && filters.priority.length > 0) {
+              if (!filters.priority.includes(project.priority)) return false;
+            }
+
+            // Date range filter
+            if (filters.startDate && project.startDate < filters.startDate) {
+              return false;
+            }
+            if (filters.endDate && project.endDate > filters.endDate) {
+              return false;
+            }
+
+            return true;
+          });
+        }
+
+        // Update stats
+        this.updateStats(projects);
+        
+        // Update signals
+        this.projects.set(projects);
+
+        return filteredProjects;
       })
     );
+  }
+
+  // Update statistics based on projects
+  private updateStats(projects: Project[]): void {
+    const stats: ProjectStats = {
+      totalProjects: projects.length,
+      activeProjects: projects.filter(p => p.status === ProjectStatus.IN_PROGRESS).length,
+      completedProjects: projects.filter(p => p.status === ProjectStatus.COMPLETED).length,
+      onHoldProjects: projects.filter(p => p.status === ProjectStatus.PLANNING).length,
+      totalBudget: projects.reduce((sum, p) => sum + p.budget, 0),
+      totalSpent: projects.reduce((sum, p) => sum + p.spent, 0),
+      averageProgress: projects.length > 0 
+        ? Math.round(projects.reduce((sum, p) => sum + p.progress, 0) / projects.length)
+        : 0
+    };
+    
+    this.stats.set(stats);
   }
 
   // Get project by ID
@@ -100,7 +235,7 @@ export class ProjectService {
     };
 
     this.projects.update(projects => [...projects, newProject]);
-    this.updateStats();
+    this.updateStats(this.projects());
     return of(newProject).pipe(delay(500));
   }
 
@@ -115,20 +250,20 @@ export class ProjectService {
     );
     
     const updated = this.projects().find(p => p.id === id)!;
-    this.updateStats();
+    this.updateStats(this.projects());
     return of(updated).pipe(delay(500));
   }
 
   // Delete project
   deleteProject(id: string): Observable<void> {
     this.projects.update(projects => projects.filter(p => p.id !== id));
-    this.updateStats();
+    this.updateStats(this.projects());
     return of(void 0).pipe(delay(300));
   }
 
   // Get project statistics
   getProjectStats(): Observable<ProjectStats> {
-    this.updateStats();
+    this.updateStats(this.projects());
     return of(this.stats()).pipe(delay(200));
   }
 
@@ -256,156 +391,5 @@ export class ProjectService {
     if (stages.length === 0) return 0;
     const totalProgress = stages.reduce((sum, stage) => sum + stage.progress, 0);
     return Math.round(totalProgress / stages.length);
-  }
-
-  private updateStats(): void {
-    const projects = this.projects();
-    const stats: ProjectStats = {
-      totalProjects: projects.length,
-      activeProjects: projects.filter(p => p.status === ProjectStatus.IN_PROGRESS).length,
-      completedProjects: projects.filter(p => p.status === ProjectStatus.COMPLETED).length,
-      onHoldProjects: projects.filter(p => p.status === ProjectStatus.ON_HOLD).length,
-      totalBudget: projects.reduce((sum, p) => sum + p.budget, 0),
-      totalSpent: projects.reduce((sum, p) => sum + p.spent, 0),
-      averageProgress: projects.length > 0 
-        ? Math.round(projects.reduce((sum, p) => sum + p.progress, 0) / projects.length)
-        : 0
-    };
-    this.stats.set(stats);
-  }
-
-  // Load mock data for demonstration
-  private loadMockProjects(): void {
-    const mockProjects: Project[] = [
-      {
-        id: '1',
-        name: 'Downtown Commercial Complex',
-        description: 'Multi-story commercial building with retail and office spaces',
-        status: ProjectStatus.IN_PROGRESS,
-        priority: ProjectPriority.HIGH,
-        startDate: new Date('2024-01-15'),
-        endDate: new Date('2025-12-31'),
-        progress: 45,
-        budget: 5000000,
-        spent: 2250000,
-        clientName: 'ABC Corporation',
-        projectManager: 'John Smith',
-        team: [
-          { id: '1', name: 'John Smith', role: 'Project Manager', email: 'john@example.com' },
-          { id: '2', name: 'Sarah Johnson', role: 'Site Engineer', email: 'sarah@example.com' },
-          { id: '3', name: 'Mike Davis', role: 'Safety Officer', email: 'mike@example.com' }
-        ],
-        stages: this.generateMockStages('1'),
-        documents: [],
-        createdAt: new Date('2024-01-01'),
-        updatedAt: new Date()
-      },
-      {
-        id: '2',
-        name: 'Residential Tower Project',
-        description: '30-floor residential tower with amenities',
-        status: ProjectStatus.IN_PROGRESS,
-        priority: ProjectPriority.MEDIUM,
-        startDate: new Date('2024-03-01'),
-        endDate: new Date('2026-06-30'),
-        progress: 25,
-        budget: 8000000,
-        spent: 2000000,
-        clientName: 'Real Estate Developers Ltd',
-        projectManager: 'Emily Brown',
-        team: [
-          { id: '4', name: 'Emily Brown', role: 'Project Manager', email: 'emily@example.com' },
-          { id: '5', name: 'David Wilson', role: 'Structural Engineer', email: 'david@example.com' }
-        ],
-        stages: this.generateMockStages('2'),
-        documents: [],
-        createdAt: new Date('2024-02-15'),
-        updatedAt: new Date()
-      },
-      {
-        id: '3',
-        name: 'Industrial Warehouse Expansion',
-        description: 'Large-scale warehouse facility expansion',
-        status: ProjectStatus.PLANNING,
-        priority: ProjectPriority.MEDIUM,
-        startDate: new Date('2024-03-01'),
-        endDate: new Date('2025-08-31'),
-        progress: 15,
-        budget: 1200000,
-        spent: 180000,
-        clientName: 'LogiTech Industries',
-        projectManager: 'Michael Chen',
-        team: [
-          { id: '7', name: 'Michael Chen', role: 'Project Manager', email: 'michael@example.com' }
-        ],
-        stages: this.generateMockStages('3'),
-        documents: [],
-        createdAt: new Date('2024-02-01'),
-        updatedAt: new Date()
-      },
-      {
-        id: '4',
-        name: 'Shopping Mall Renovation',
-        description: 'Complete interior renovation of shopping complex',
-        status: ProjectStatus.COMPLETED,
-        priority: ProjectPriority.LOW,
-        startDate: new Date('2023-06-01'),
-        endDate: new Date('2024-10-31'),
-        progress: 100,
-        budget: 3500000,
-        spent: 3400000,
-        clientName: 'Retail Spaces Inc',
-        projectManager: 'Jennifer White',
-        team: [
-          { id: '8', name: 'Jennifer White', role: 'Project Manager', email: 'jennifer@example.com' },
-          { id: '9', name: 'Tom Anderson', role: 'Interior Designer', email: 'tom@example.com' }
-        ],
-        stages: this.generateMockStages('4'),
-        documents: [],
-        createdAt: new Date('2023-05-01'),
-        updatedAt: new Date()
-      }
-    ];
-
-    this.projects.set(mockProjects);
-    this.updateStats();
-  }
-
-  private generateMockStages(projectId: string): Stage[] {
-    const stages = this.generateInitialStages();
-    stages.forEach(stage => {
-      stage.projectId = projectId;
-      // Add some mock tasks
-      if (stage.order <= 2) {
-        stage.tasks = [
-          {
-            id: this.generateId(),
-            title: `${stage.name} Task 1`,
-            description: `Complete ${stage.name} phase`,
-            stageId: stage.id,
-            assignedTo: 'Team Member',
-            status: TaskStatus.COMPLETED,
-            priority: TaskPriority.HIGH,
-            progress: 100,
-            dependencies: [],
-            attachments: []
-          },
-          {
-            id: this.generateId(),
-            title: `${stage.name} Task 2`,
-            description: `Quality check for ${stage.name}`,
-            stageId: stage.id,
-            assignedTo: 'Team Member',
-            status: TaskStatus.IN_PROGRESS,
-            priority: TaskPriority.MEDIUM,
-            progress: 60,
-            dependencies: [],
-            attachments: []
-          }
-        ];
-        stage.progress = this.calculateStageProgress(stage.tasks);
-      }
-    });
-    return stages;
   }
 }

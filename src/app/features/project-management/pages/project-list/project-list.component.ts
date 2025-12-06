@@ -53,7 +53,7 @@ export class ProjectListComponent implements OnInit {
   showCreateDialog = signal<boolean>(false);
 
   // Filters
-  searchText = signal<string>('');
+  searchText: string = '';
   selectedStatuses = signal<ProjectStatus[]>([]);
   selectedPriorities = signal<ProjectPriority[]>([]);
 
@@ -90,7 +90,7 @@ export class ProjectListComponent implements OnInit {
   loadProjects(): void {
     this.isLoading.set(true);
     const filters: ProjectFilters = {
-      search: this.searchText() || undefined,
+      search: this.searchText || undefined,
       status: this.selectedStatuses().length > 0 ? this.selectedStatuses() : undefined,
       priority: this.selectedPriorities().length > 0 ? this.selectedPriorities() : undefined
     };
@@ -117,7 +117,7 @@ export class ProjectListComponent implements OnInit {
   }
 
   clearFilters(): void {
-    this.searchText.set('');
+    this.searchText = '';
     this.selectedStatuses.set([]);
     this.selectedPriorities.set([]);
     this.loadProjects();
