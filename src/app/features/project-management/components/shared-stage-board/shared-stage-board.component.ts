@@ -18,9 +18,9 @@ import { AvatarGroupModule } from 'primeng/avatargroup';
 import { ChipModule } from 'primeng/chip';
 import { ProgressBarModule } from 'primeng/progressbar';
 
-import { WorkItemDialogComponent } from '../staging-board/work-item-dialog/work-item-dialog.component';
-import { SubtaskDialogComponent } from '../staging-board/subtask-dialog/subtask-dialog.component';
 import { WorkItemFormData } from '../staging-board/work-item-dialog/work-item-dialog.component';
+import { WorkItemDialogComponent } from './dialog/work-item-dialog/work-item-dialog.component';
+import { SubtaskDialogComponent } from './dialog/subtask-dialog/subtask-dialog.component';
 
 export interface SubTask {
   id: string;

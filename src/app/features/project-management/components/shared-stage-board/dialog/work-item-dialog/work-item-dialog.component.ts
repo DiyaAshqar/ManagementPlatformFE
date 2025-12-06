@@ -1,16 +1,15 @@
+import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ButtonModule } from 'primeng/button';
-import { DialogService, DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { DynamicDialogRef, DynamicDialogConfig, DialogService } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
+import { TextareaModule } from 'primeng/textarea';
+import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
-import { SubtaskDialogComponent } from '../../shared-stage-board/dialog/subtask-dialog/subtask-dialog.component';
-import { SubTaskFormData } from '../subtask-dialog/subtask-dialog.component';
+import { SubtaskDialogComponent, SubTaskFormData } from '../subtask-dialog/subtask-dialog.component';
 
 export interface SubTask {
   id: string;
@@ -111,12 +110,12 @@ export class WorkItemDialogComponent implements OnInit {
   onSave(): void {
     const data = this.formData();
     if (!data.title) return;
-
+    
     const dataWithSubtasks = {
       ...data,
       subtasks: this.subtasks()
     };
-
+    
     this.dialogRef.close(dataWithSubtasks);
   }
 

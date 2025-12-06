@@ -1,0 +1,101 @@
+<div class="flex flex-column gap-3 p-3">
+    <div>
+      <label for="subtask-title" class="block text-sm font-medium mb-2">Title *</label>
+      <input 
+        id="subtask-title"
+        type="text" 
+        pInputText 
+        [ngModel]="currentFormData.title"
+        (ngModelChange)="updateFormField('title', $event)"
+        placeholder="e.g., Topsoil Removal"
+        class="w-full">
+    </div>
+    
+    <div class="grid">
+      <div class="col-6">
+        <label for="subtask-start-date" class="block text-sm font-medium mb-2">Start Date</label>
+        <input 
+          id="subtask-start-date"
+          type="date" 
+          pInputText 
+          [ngModel]="currentFormData.startDate"
+          (ngModelChange)="updateFormField('startDate', $event)"
+          class="w-full">
+      </div>
+      <div class="col-6">
+        <label for="subtask-end-date" class="block text-sm font-medium mb-2">End Date</label>
+        <input 
+          id="subtask-end-date"
+          type="date" 
+          pInputText 
+          [ngModel]="currentFormData.endDate"
+          (ngModelChange)="updateFormField('endDate', $event)"
+          class="w-full">
+      </div>
+    </div>
+    
+    <div class="grid">
+      <div class="col-6">
+        <label for="subtask-status" class="block text-sm font-medium mb-2">Status</label>
+        <p-select 
+          id="subtask-status"
+          [ngModel]="currentFormData.status"
+          (ngModelChange)="updateFormField('status', $event)"
+          [options]="statusOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select status"
+          styleClass="w-full">
+        </p-select>
+      </div>
+      <div class="col-6">
+        <label for="subtask-type" class="block text-sm font-medium mb-2">Type</label>
+        <input 
+          id="subtask-type"
+          type="text" 
+          pInputText 
+          [ngModel]="currentFormData.type"
+          (ngModelChange)="updateFormField('type', $event)"
+          placeholder="e.g., Excavation, Preparation"
+          class="w-full">
+      </div>
+    </div>
+    
+    <div class="grid">
+      <div class="col-6">
+        <label for="subtask-cost" class="block text-sm font-medium mb-2">Cost</label>
+        <input 
+          id="subtask-cost"
+          type="text" 
+          pInputText 
+          [ngModel]="currentFormData.cost"
+          (ngModelChange)="updateFormField('cost', $event)"
+          placeholder="$1,200"
+          class="w-full">
+      </div>
+      <div class="col-6">
+        <label for="subtask-quantity" class="block text-sm font-medium mb-2">Quantity</label>
+        <input 
+          id="subtask-quantity"
+          type="text" 
+          pInputText 
+          [ngModel]="currentFormData.quantity"
+          (ngModelChange)="updateFormField('quantity', $event)"
+          placeholder="150 m³"
+          class="w-full">
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex justify-content-end gap-2 border-top-1 surface-border pt-3">
+      <p-button 
+        label="Cancel"
+        [outlined]="true"
+        (onClick)="onCancel()">
+      </p-button>
+      <p-button 
+        label="Save"
+        (onClick)="onSave()">
+      </p-button>
+    </div>
+  </div>

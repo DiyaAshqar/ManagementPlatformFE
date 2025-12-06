@@ -2,8 +2,8 @@ import { Component, Input, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { WorkItemDialogComponent, WorkItemFormData } from './work-item-dialog/work-item-dialog.component';
-import { SubtaskDialogComponent, SubTaskFormData } from './subtask-dialog/subtask-dialog.component';
+import { WorkItemFormData } from './work-item-dialog/work-item-dialog.component';
+import {  SubTaskFormData } from './subtask-dialog/subtask-dialog.component';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 // PrimeNG Imports
@@ -19,6 +19,8 @@ import { AvatarModule } from 'primeng/avatar';
 import { AvatarGroupModule } from 'primeng/avatargroup';
 import { ChipModule } from 'primeng/chip';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { WorkItemDialogComponent } from '../shared-stage-board/dialog/work-item-dialog/work-item-dialog.component';
+import { SubtaskDialogComponent } from '../shared-stage-board/dialog/subtask-dialog/subtask-dialog.component';
 
 interface SubTask {
   id: string;
