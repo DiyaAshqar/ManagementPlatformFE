@@ -2835,6 +2835,7 @@ export interface IGetAttachmentMetaDataResponse {
 }
 
 export class GetProjectDto implements IGetProjectDto {
+    id?: number | undefined;
     title?: string | undefined;
     status?: ProjectStatus;
     description?: string | undefined;
@@ -2862,6 +2863,7 @@ export class GetProjectDto implements IGetProjectDto {
 
     init(_data?: any) {
         if (_data) {
+            this.id = _data["id"];
             this.title = _data["title"];
             this.status = _data["status"];
             this.description = _data["description"];
@@ -2893,6 +2895,7 @@ export class GetProjectDto implements IGetProjectDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         data["title"] = this.title;
         data["status"] = this.status;
         data["description"] = this.description;
@@ -2917,6 +2920,7 @@ export class GetProjectDto implements IGetProjectDto {
 }
 
 export interface IGetProjectDto {
+    id?: number | undefined;
     title?: string | undefined;
     status?: ProjectStatus;
     description?: string | undefined;
@@ -3759,6 +3763,7 @@ export interface IProjectAreaUnitDto {
 }
 
 export class ProjectStageDto implements IProjectStageDto {
+    id?: number;
     projectId?: number;
     status?: number | undefined;
     stageType?: ProjectStageType;
@@ -3774,6 +3779,7 @@ export class ProjectStageDto implements IProjectStageDto {
 
     init(_data?: any) {
         if (_data) {
+            this.id = _data["id"];
             this.projectId = _data["projectId"];
             this.status = _data["status"];
             this.stageType = _data["stageType"];
@@ -3789,6 +3795,7 @@ export class ProjectStageDto implements IProjectStageDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         data["projectId"] = this.projectId;
         data["status"] = this.status;
         data["stageType"] = this.stageType;
@@ -3797,6 +3804,7 @@ export class ProjectStageDto implements IProjectStageDto {
 }
 
 export interface IProjectStageDto {
+    id?: number;
     projectId?: number;
     status?: number | undefined;
     stageType?: ProjectStageType;
