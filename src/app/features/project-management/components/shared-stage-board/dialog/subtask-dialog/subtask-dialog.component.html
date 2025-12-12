@@ -91,10 +91,13 @@
       <p-button 
         label="Cancel"
         [outlined]="true"
+        [disabled]="isLoading()"
         (onClick)="onCancel()">
       </p-button>
       <p-button 
         label="Save"
+        [loading]="isLoading()"
+        [disabled]="isLoading()"
         (onClick)="onSave()">
       </p-button>
     </div>

@@ -25,7 +25,7 @@ import { TaskService } from '../../services/task.service';
 import { StatusTask } from '../../../../../nswag/api-client';
 
 export interface SubTask {
-  id: string;
+  id: string | number;
   title: string;
   startDate: string;
   endDate: string;
@@ -37,6 +37,8 @@ export interface SubTask {
 
 export interface WorkItem {
   id: string;
+  taskId?: number; // Backend task ID for API operations
+  projectStageId?: number; // Stage ID that this task belongs to (needed for subtask creation)
   title: string;
   type: WorkItemType;
   priority: 'low' | 'medium' | 'high' | 'critical';
@@ -228,6 +230,8 @@ export class SharedStageBoardComponent implements OnInit {
 
   openItemDialog(item: WorkItem): void {
     this.selectedItem.set(item);
+    console.log('🔍 Opening Work Item Dialog - item.taskId:', item.taskId);
+    console.log('🔍 Opening Work Item Dialog - item.projectStageId:', item.projectStageId);
     
     this.dialogRef = this.dialogService.open(WorkItemDialogComponent, {
       header: 'Edit Work Item',
@@ -239,6 +243,8 @@ export class SharedStageBoardComponent implements OnInit {
         mode: 'edit',
         workItem: {
           id: item.id,
+          taskTypeId: item.taskId, // Pass the backend task ID
+          projectStageId: item.projectStageId, // Pass the stage ID
           title: item.title,
           type: item.type,
           priority: item.priority,
@@ -387,6 +393,7 @@ export class SharedStageBoardComponent implements OnInit {
       modal: true,
       data: {
         mode: 'add',
+        projectStageTaskId: item.taskId, // Pass the backend task ID
         subtask: {
           title: '',
           startDate: '',
@@ -400,31 +407,9 @@ export class SharedStageBoardComponent implements OnInit {
     });
 
     this.dialogRef.onClose.subscribe((result: any) => {
-      if (result) {
-        this.columns.update(cols => {
-          return cols.map(col => ({
-            ...col,
-            items: col.items.map(workItem => {
-              if (workItem.id === item.id) {
-                const newSubtask: SubTask = {
-                  id: `sub-${Date.now()}`,
-                  title: result.title,
-                  startDate: result.startDate,
-                  endDate: result.endDate,
-                  status: result.status,
-                  type: result.type,
-                  cost: result.cost,
-                  quantity: result.quantity
-                };
-                return {
-                  ...workItem,
-                  subtasks: [...workItem.subtasks, newSubtask]
-                };
-              }
-              return workItem;
-            })
-          }));
-        });
+      if (result && result.success) {
+        // Subtask created successfully via API
+        // Parent component should refresh the data
       }
     });
   }
@@ -436,33 +421,20 @@ export class SharedStageBoardComponent implements OnInit {
       modal: true,
       data: {
         mode: 'edit',
+        projectStageTaskId: item.taskId, // Pass the backend task ID
         subtask: { ...subtask }
       }
     });
 
     this.dialogRef.onClose.subscribe((result: any) => {
-      if (result) {
-        this.columns.update(cols => {
-          return cols.map(col => ({
-            ...col,
-            items: col.items.map(workItem => {
-              if (workItem.id === item.id) {
-                return {
-                  ...workItem,
-                  subtasks: workItem.subtasks.map(st =>
-                    st.id === subtask.id ? { ...st, ...result } : st
-                  )
-                };
-              }
-              return workItem;
-            })
-          }));
-        });
+      if (result && result.success) {
+        // Subtask updated successfully via API
+        // Parent component should refresh the data
       }
     });
   }
 
-  deleteSubtask(item: WorkItem, subtaskId: string): void {
+  deleteSubtask(item: WorkItem, subtaskId: string | number): void {
     this.columns.update(cols => {
       return cols.map(col => ({
         ...col,

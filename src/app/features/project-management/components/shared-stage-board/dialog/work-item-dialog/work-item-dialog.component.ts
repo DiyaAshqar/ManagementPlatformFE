@@ -14,7 +14,7 @@ import { SubtaskDialogComponent, SubTaskFormData } from '../subtask-dialog/subta
 import { TaskService } from '../../../../services/task.service';
 
 export interface SubTask {
-  id: string;
+  id: string | number;
   title: string;
   startDate: string;
   endDate: string;
@@ -29,6 +29,7 @@ export interface WorkItemFormData {
   title: string;
   type: string;
   taskTypeId?: number;
+  projectStageId?: number; // Stage ID for subtask creation
   priority: string;
   assignTo: string;
   taskPoints: string;
@@ -200,6 +201,17 @@ export class WorkItemDialogComponent implements OnInit {
   }
 
   openAddSubtaskDialog(): void {
+    const currentFormData = this.formData();
+    console.log('🔍 Work Item Dialog - openAddSubtaskDialog - Full form data:', currentFormData);
+    console.log('🔍 Work Item Dialog - openAddSubtaskDialog - projectStageId:', currentFormData.projectStageId);
+    console.log('🔍 Work Item Dialog - openAddSubtaskDialog - taskTypeId:', currentFormData.taskTypeId);
+    console.log('🔍 Work Item Dialog - openAddSubtaskDialog - id:', currentFormData.id);
+    
+    // Use projectStageId (the correct field for subtask creation)
+    // Fallback to taskTypeId, then to parsed task ID if needed
+    const stageTaskId = currentFormData.projectStageId || currentFormData.taskTypeId || (currentFormData.id ? parseInt(currentFormData.id) : undefined);
+    console.log('✅ Work Item Dialog - Resolved projectStageTaskId (Stage ID):', stageTaskId);
+    
     const dialogRef = this.dialogService.open(SubtaskDialogComponent, {
       header: 'Add Subtask',
       width: '500px',
@@ -207,6 +219,7 @@ export class WorkItemDialogComponent implements OnInit {
       maximizable: true,
       data: {
         mode: 'add',
+        projectStageTaskId: stageTaskId,
         subtask: {
           title: '',
           startDate: '',
@@ -220,18 +233,19 @@ export class WorkItemDialogComponent implements OnInit {
       }
     });
 
-    dialogRef.onClose.subscribe((formData: SubTaskFormData) => {
-      if (formData) {
-        const subtask: SubTask = {
-          id: `sub-${Date.now()}`,
-          ...formData
-        };
-        this.subtasks.update(subtasks => [...subtasks, subtask]);
+    dialogRef.onClose.subscribe((result: any) => {
+      if (result && result.success) {
+        // Subtask created successfully via API
+        // Parent component will handle refresh
       }
     });
   }
 
   openEditSubtaskDialog(subtask: SubTask): void {
+    const currentFormData = this.formData();
+    const stageTaskId = currentFormData.projectStageId || currentFormData.taskTypeId || (currentFormData.id ? parseInt(currentFormData.id) : undefined);
+    console.log('✅ Work Item Dialog - openEditSubtaskDialog - Resolved projectStageTaskId (Stage ID):', stageTaskId);
+    
     const dialogRef = this.dialogService.open(SubtaskDialogComponent, {
       header: 'Edit Subtask',
       width: '500px',
@@ -239,18 +253,16 @@ export class WorkItemDialogComponent implements OnInit {
       maximizable: true,
       data: {
         mode: 'edit',
+        projectStageTaskId: stageTaskId,
         subtask: subtask,
-        parentTaskTitle: this.formData().title
+        parentTaskTitle: currentFormData.title
       }
     });
 
-    dialogRef.onClose.subscribe((formData: SubTaskFormData) => {
-      if (formData) {
-        this.subtasks.update(subtasks =>
-          subtasks.map(st =>
-            st.id === subtask.id ? { ...st, ...formData } : st
-          )
-        );
+    dialogRef.onClose.subscribe((result: any) => {
+      if (result && result.success) {
+        // Subtask updated successfully via API
+        // Parent component will handle refresh
       }
     });
   }

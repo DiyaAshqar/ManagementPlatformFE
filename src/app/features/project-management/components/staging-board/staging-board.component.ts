@@ -25,7 +25,7 @@ import { TaskService } from '../../services/task.service';
 import { StatusTask } from '../../../../../nswag/api-client';
 
 interface SubTask {
-  id: string;
+  id: string | number;
   title: string;
   startDate: string;
   endDate: string;
@@ -507,6 +507,7 @@ export class StagingBoardComponent {
   }
 
   openAddSubtaskDialog(item: WorkItem): void {
+    alert('openAddSubtaskDialog');
     const dialogRef = this.dialogService.open(SubtaskDialogComponent, {
       header: `Add Subtask to "${item.title}"`,
       width: '500px',

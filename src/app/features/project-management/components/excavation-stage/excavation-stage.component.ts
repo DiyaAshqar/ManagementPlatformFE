@@ -92,6 +92,8 @@ export class ExcavationStageComponent implements OnInit {
   private mapTasksToWorkItems(tasks: GetProjectTaskDto[]): WorkItem[] {
     return tasks.map(task => ({
       id: task.id?.toString() || '',
+      taskId: task.id, // Backend task ID
+      projectStageId: task.projectStageId, // Stage ID for subtask creation
       title: task.title || 'Untitled Task',
       type: WorkItemType.TASK,
       priority: this.mapPriority(task.priority),

@@ -13,7 +13,7 @@ import { SubtaskDialogComponent } from '../../shared-stage-board/dialog/subtask-
 import { SubTaskFormData } from '../subtask-dialog/subtask-dialog.component';
 
 export interface SubTask {
-  id: string;
+  id: string | number;
   title: string;
   startDate: string;
   endDate: string;
@@ -133,6 +133,7 @@ export class WorkItemDialogComponent implements OnInit {
   }
 
   openAddSubtaskDialog(): void {
+    alert('openAddSubtaskDialog');
     const dialogRef = this.dialogService.open(SubtaskDialogComponent, {
       header: 'Add Subtask',
       width: '500px',
@@ -165,6 +166,7 @@ export class WorkItemDialogComponent implements OnInit {
   }
 
   openEditSubtaskDialog(subtask: SubTask): void {
+    alert('openEditSubtaskDialog');
     const dialogRef = this.dialogService.open(SubtaskDialogComponent, {
       header: 'Edit Subtask',
       width: '500px',

@@ -77,7 +77,7 @@ interface VoucherOrder {
 }
 
 interface SubTask {
-  id: string;
+  id: string | number;
   title: string;
   completed: boolean;
   assignee: string;
@@ -287,7 +287,7 @@ export class MilestoneStageComponent implements OnInit {
     return this.expandedMilestones.has(id);
   }
 
-  toggleSubTask(milestoneId: string, subTaskId: string) {
+  toggleSubTask(milestoneId: string | number, subTaskId: string | number) {
     const milestone = this.milestones.find(m => m.id === milestoneId);
     if (milestone) {
       const task = milestone.subTasks.find(t => t.id === subTaskId);
