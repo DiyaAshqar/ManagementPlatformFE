@@ -17,11 +17,12 @@
         <p-select 
           id="item-type"
           [ngModel]="currentFormData.type"
-          (ngModelChange)="updateFormField('type', $event)"
+          (ngModelChange)="onTaskTypeChange($event)"
           [options]="workItemTypes"
           optionLabel="label"
           optionValue="value"
           placeholder="Select type"
+          [loading]="isLoadingTaskTypes()"
           styleClass="w-full">
         </p-select>
       </div>
@@ -41,23 +42,29 @@
     <div class="grid">
       <div class="col-6">
         <label for="item-start-date" class="block text-sm font-medium mb-2">Start Date</label>
-        <input 
+        <p-datepicker 
           id="item-start-date"
-          type="date" 
-          pInputText 
           [ngModel]="currentFormData.startDate"
           (ngModelChange)="updateFormField('startDate', $event)"
-          class="w-full">
+          dateFormat="mm/dd/yy"
+          [showIcon]="true"
+          [showButtonBar]="true"
+          placeholder="mm/dd/yyyy"
+          styleClass="w-full">
+        </p-datepicker>
       </div>
       <div class="col-6">
         <label for="item-end-date" class="block text-sm font-medium mb-2">End Date</label>
-        <input 
+        <p-datepicker 
           id="item-end-date"
-          type="date" 
-          pInputText 
           [ngModel]="currentFormData.endDate"
           (ngModelChange)="updateFormField('endDate', $event)"
-          class="w-full">
+          dateFormat="mm/dd/yy"
+          [showIcon]="true"
+          [showButtonBar]="true"
+          placeholder="mm/dd/yyyy"
+          styleClass="w-full">
+        </p-datepicker>
       </div>
     </div>
     

@@ -1,21 +1,21 @@
 import { Injectable, signal } from '@angular/core';
-import { Observable, of, delay, map } from 'rxjs';
+import { Observable, of, map, switchMap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
 import {
   GetProjectDto,
   GetProjectDtoListPagedResponseResponse,
-  GetProjectDtoResponse,
   ProjectStatus as ApiProjectStatus,
   ProjectStageDto,
-  ProjectStageType
+  ProjectStageType,
+  CreateTaskCommand,
+  StatusTask
 } from '../../../../nswag/api-client';
+import { TaskService } from './task.service';
 import {
   Project,
   ProjectStatus,
   ProjectPriority,
-  CreateProjectDto,
-  UpdateProjectDto,
   ProjectFilters,
   ProjectStats,
   Stage,
@@ -31,7 +31,6 @@ import {
 export class ProjectService {
   // Signals for reactive state
   projects = signal<Project[]>([]);
-  selectedProject = signal<Project | null>(null);
   isLoading = signal<boolean>(false);
   stats = signal<ProjectStats>({
     totalProjects: 0,
@@ -45,9 +44,7 @@ export class ProjectService {
 
   private apiUrl = environment.apiUrl;
 
-  constructor(private http: HttpClient) {
-    // Note: loadMockProjects() removed - using API data instead
-  }
+  constructor(private http: HttpClient, private taskService: TaskService) {}
 
   // Mapper: Convert API DTO to Project model
   private mapApiProjectToProject(apiProject: GetProjectDto, index: number): Project {
@@ -96,7 +93,7 @@ export class ProjectService {
   // Map API stages to frontend stages
   private mapApiStagesToStages(apiStages: ProjectStageDto[] | undefined, projectId: string): Stage[] {
     if (!apiStages || apiStages.length === 0) {
-      return this.generateInitialStages();
+      return [];
     }
 
     return apiStages.map((apiStage, index) => ({
@@ -215,194 +212,69 @@ export class ProjectService {
     this.stats.set(stats);
   }
 
-  // Get project by ID from API
-  getProjectById(id: string): Observable<Project | undefined> {
-    const numericId = parseInt(id, 10);
-    if (isNaN(numericId)) {
-      return of(undefined);
-    }
-
-    return this.http.get<GetProjectDtoResponse>(`${this.apiUrl}/Project/${numericId}`).pipe(
-      map(response => {
-        if (!response.succeeded || !response.data) {
-          return undefined;
-        }
-        return this.mapApiProjectToProject(response.data, 0);
-      })
-    );
-  }
-
-  // Create new project
-  createProject(dto: CreateProjectDto): Observable<Project> {
-    const newProject: Project = {
-      id: this.generateId(),
-      ...dto,
-      status: ProjectStatus.PLANNING,
-      progress: 0,
-      spent: 0,
-      team: [],
-      stages: this.generateInitialStages(),
-      documents: [],
-      createdAt: new Date(),
-      updatedAt: new Date()
-    };
-
-    this.projects.update(projects => [...projects, newProject]);
-    this.updateStats(this.projects());
-    return of(newProject).pipe(delay(500));
-  }
-
-  // Update existing project
-  updateProject(id: string, dto: UpdateProjectDto): Observable<Project> {
-    this.projects.update(projects => 
-      projects.map(p => 
-        p.id === id 
-          ? { ...p, ...dto, updatedAt: new Date() }
-          : p
-      )
-    );
-    
-    const updated = this.projects().find(p => p.id === id)!;
-    this.updateStats(this.projects());
-    return of(updated).pipe(delay(500));
-  }
-
-  // Delete project
+  // Delete project (only removes from local state - no API call)
   deleteProject(id: string): Observable<void> {
     this.projects.update(projects => projects.filter(p => p.id !== id));
     this.updateStats(this.projects());
-    return of(void 0).pipe(delay(300));
+    return of(void 0);
   }
 
-  // Get project statistics
-  getProjectStats(): Observable<ProjectStats> {
-    this.updateStats(this.projects());
-    return of(this.stats()).pipe(delay(200));
-  }
+  // Add task to stage via API
+  addTask(projectId: string, stageId: string, task: Omit<Task, 'id'>, projectStageId: number, taskTypeId: number = 1): Observable<Task> {
+    // Convert frontend task model to backend CreateTaskCommand
+    const createTaskCommand = new CreateTaskCommand({
+      title: task.name,
+      description: task.description || '',
+      assignTo: task.assignedTo ? parseInt(task.assignedTo) : undefined,
+      startDate: task.startDate ? new Date(task.startDate) : undefined,
+      endDate: task.dueDate ? new Date(task.dueDate) : undefined,
+      priority: task.priority ? this.mapTaskPriorityToNumber(task.priority) : 1,
+      taskPoint: task.estimatedHours || 0,
+      excavationLocation: task.location || '',
+      excavationDepth: task.depth || undefined,
+      excavationVolume: task.volume || undefined,
+      excavationSoilType: task.soilType || '',
+      excavationEquipment: task.equipment || '',
+      status: task.status ? this.mapTaskStatusToStatusTask(task.status) : 0,
+      projectStageId: projectStageId,
+      taskTypeId: taskTypeId
+    });
 
-  // Update task status in a stage
-  updateTaskStatus(projectId: string, stageId: string, taskId: string, status: TaskStatus): Observable<void> {
-    this.projects.update(projects => 
-      projects.map(project => {
-        if (project.id === projectId) {
-          const stages = project.stages.map(stage => {
-            if (stage.id === stageId) {
-              const tasks = stage.tasks.map(task => 
-                task.id === taskId ? { ...task, status } : task
-              );
-              const progress = this.calculateStageProgress(tasks);
-              return { ...stage, tasks, progress };
-            }
-            return stage;
-          });
-          const projectProgress = this.calculateProjectProgress(stages);
-          return { ...project, stages, progress: projectProgress };
+    // Call API to create task (don't update local state)
+    return this.taskService.createTask(createTaskCommand).pipe(
+      map((response) => {
+        if (response.succeeded) {
+          const newTask: Task = {
+            ...task,
+            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
+          };
+          return newTask;
+        } else {
+          throw new Error('Failed to create task');
         }
-        return project;
       })
     );
-    return of(void 0).pipe(delay(200));
   }
 
-  // Add task to stage
-  addTask(projectId: string, stageId: string, task: Omit<Task, 'id'>): Observable<Task> {
-    const newTask: Task = {
-      ...task,
-      id: this.generateId()
-    };
-
-    this.projects.update(projects => 
-      projects.map(project => {
-        if (project.id === projectId) {
-          const stages = project.stages.map(stage => 
-            stage.id === stageId 
-              ? { ...stage, tasks: [...stage.tasks, newTask] }
-              : stage
-          );
-          return { ...project, stages };
-        }
-        return project;
-      })
-    );
-
-    return of(newTask).pipe(delay(300));
+  // Helper method to map frontend task priority to backend number
+  private mapTaskPriorityToNumber(priority: TaskPriority): number {
+    switch (priority) {
+      case TaskPriority.LOW: return 0;
+      case TaskPriority.MEDIUM: return 1;
+      case TaskPriority.HIGH: return 2;
+      default: return 1;
+    }
   }
 
-  // Private helper methods
-  private generateId(): string {
-    return `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-  }
-
-  private generateInitialStages(): Stage[] {
-    const stages: Stage[] = [
-      {
-        id: this.generateId(),
-        name: 'Preparing',
-        projectId: '',
-        order: 1,
-        status: StageStatus.PREPARING,
-        tasks: [],
-        progress: 0
-      },
-      {
-        id: this.generateId(),
-        name: 'Excavation',
-        projectId: '',
-        order: 2,
-        status: StageStatus.EXCAVATION,
-        tasks: [],
-        progress: 0
-      },
-      {
-        id: this.generateId(),
-        name: 'Foundation',
-        projectId: '',
-        order: 3,
-        status: StageStatus.FOUNDATION,
-        tasks: [],
-        progress: 0
-      },
-      {
-        id: this.generateId(),
-        name: 'Structure',
-        projectId: '',
-        order: 4,
-        status: StageStatus.STRUCTURE,
-        tasks: [],
-        progress: 0
-      },
-      {
-        id: this.generateId(),
-        name: 'Finishing',
-        projectId: '',
-        order: 5,
-        status: StageStatus.FINISHING,
-        tasks: [],
-        progress: 0
-      },
-      {
-        id: this.generateId(),
-        name: 'Milestone',
-        projectId: '',
-        order: 6,
-        status: StageStatus.MILESTONE,
-        tasks: [],
-        progress: 0
-      }
-    ];
-
-    return stages;
-  }
-
-  private calculateStageProgress(tasks: Task[]): number {
-    if (tasks.length === 0) return 0;
-    const totalProgress = tasks.reduce((sum, task) => sum + task.progress, 0);
-    return Math.round(totalProgress / tasks.length);
-  }
-
-  private calculateProjectProgress(stages: Stage[]): number {
-    if (stages.length === 0) return 0;
-    const totalProgress = stages.reduce((sum, stage) => sum + stage.progress, 0);
-    return Math.round(totalProgress / stages.length);
+  // Helper method to map frontend task status to backend StatusTask enum
+  // API status: 0 = To Do, 1 = In Progress, 2 = Review, 3 = Done/Completed
+  private mapTaskStatusToStatusTask(status: TaskStatus): StatusTask {
+    switch (status) {
+      case TaskStatus.TODO: return StatusTask._0;
+      case TaskStatus.IN_PROGRESS: return StatusTask._1;
+      case TaskStatus.REVIEW: return StatusTask._2;
+      case TaskStatus.COMPLETED: return StatusTask._3;
+      default: return StatusTask._0;
+    }
   }
 }

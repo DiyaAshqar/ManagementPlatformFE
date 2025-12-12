@@ -2,5 +2,6 @@
   [projectId]="projectId"
   [stageTitle]="'Preparing Stage'"
   [stageDescription]="'Manage pre-construction tasks and activities'"
-  [columnsInput]="columns">
+  [columnsInput]="columns"
+  (workItemAdded)="onWorkItemAdded($event)">
 </app-shared-stage-board>

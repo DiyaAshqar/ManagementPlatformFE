@@ -1,4 +1,4 @@
-import { Component, Input, inject, signal, Signal, OnInit, effect } from '@angular/core';
+import { Component, Input, Output, EventEmitter, inject, signal, Signal, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -106,6 +106,9 @@ export class SharedStageBoardComponent implements OnInit {
   @Input() stageTitle: string = 'Stage Board';
   @Input() stageDescription: string = 'Manage tasks and activities';
   @Input({ required: true }) columnsInput!: Signal<Column[]>;
+  
+  @Output() workItemAdded = new EventEmitter<{formData: WorkItemFormData, columnId: TaskStatus}>();
+  @Output() workItemUpdated = new EventEmitter<WorkItemFormData>();
   
   // Internal writable signal for columns (so we can mutate them for drag-drop)
   columns = signal<Column[]>([]);
@@ -280,6 +283,8 @@ export class SharedStageBoardComponent implements OnInit {
   saveWorkItem(formData: WorkItemFormData): void {
     if (!formData.title) return;
 
+    const selectedColumnId = this.selectedColumn();
+
     this.columns.update(cols => {
       return cols.map(col => {
         if (formData.id) {
@@ -308,9 +313,10 @@ export class SharedStageBoardComponent implements OnInit {
 
             const newItems = [...col.items];
             newItems[itemIndex] = updatedItem;
+            
             return { ...col, items: newItems };
           }
-        } else if (col.id === this.selectedColumn()) {
+        } else if (col.id === selectedColumnId) {
           // Adding new item
           const newItem: WorkItem = {
             id: `item-${Date.now()}`,
@@ -339,6 +345,13 @@ export class SharedStageBoardComponent implements OnInit {
         return col;
       });
     });
+
+    // Emit events AFTER the signal update completes
+    if (formData.id) {
+      this.workItemUpdated.emit(formData);
+    } else if (selectedColumnId) {
+      this.workItemAdded.emit({ formData, columnId: selectedColumnId });
+    }
 
     this.showItemDialog.set(false);
     this.selectedItem.set(null);

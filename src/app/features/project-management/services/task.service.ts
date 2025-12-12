@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { TaskClient, GetProjectTaskDtoListPagedResponseResponse } from '../../../../nswag/api-client';
+import { TaskClient, GetProjectTaskDtoListPagedResponseResponse, CreateTaskCommand, BooleanResponse, ResultListPagedResponseResponse } from '../../../../nswag/api-client';
 
 @Injectable({
   providedIn: 'root'
@@ -37,5 +37,29 @@ export class TaskService {
     pageSize: number = 100
   ): Observable<GetProjectTaskDtoListPagedResponseResponse> {
     return this.taskClient.getAllTasksByStageId(stageId, pageNumber, pageSize, undefined);
+  }
+
+  /**
+   * Create a new task via API
+   * @param taskCommand The task command with all required fields
+   * @returns Observable of boolean response indicating success
+   */
+  createTask(taskCommand: CreateTaskCommand): Observable<BooleanResponse> {
+    return this.taskClient.createTask(taskCommand);
+  }
+
+  /**
+   * Get all task types from API
+   * @param pageNumber Page number (default: 1)
+   * @param pageSize Page size (default: 100)
+   * @param filter Optional filter string
+   * @returns Observable of paginated task types response
+   */
+  getTaskTypes(
+    pageNumber: number = 1,
+    pageSize: number = 100,
+    filter?: string
+  ): Observable<ResultListPagedResponseResponse> {
+    return this.taskClient.getTaskTypes(pageNumber, pageSize, filter);
   }
 }

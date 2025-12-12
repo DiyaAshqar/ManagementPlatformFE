@@ -1,0 +1,216 @@
+<div class="add-task-dialog">
+  <form class="task-form">
+    <!-- Title -->
+     TEMP DISABLED
+    <div class="form-group">
+      <label for="title">Title *</label>
+      <input
+        id="title"
+        pInputText
+        [(ngModel)]="formData.title"
+        name="title"
+        placeholder="Enter task title"
+        class="form-control"
+      />
+    </div>
+
+    <!-- Description -->
+    <div class="form-group">
+      <label for="description">Description</label>
+      <textarea
+        id="description"
+        pTextarea
+        [(ngModel)]="formData.description"
+        name="description"
+        placeholder="Enter task description"
+        rows="3"
+        class="form-control"
+      ></textarea>
+    </div>
+
+    <!-- Row: Priority, Task Points, Assign To -->
+    <div class="form-row">
+      <div class="form-group col-6">
+        <label for="priority">Priority</label>
+        <p-select
+          id="priority"
+          [(ngModel)]="formData.priority"
+          name="priority"
+          [options]="priorityOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select priority"
+          class="form-control"
+        ></p-select>
+      </div>
+
+      <div class="form-group col-6">
+        <label for="taskPoints">Estimated Hours</label>
+        <p-inputNumber
+          id="taskPoints"
+          [(ngModel)]="formData.taskPoints"
+          name="taskPoints"
+          placeholder="0"
+          class="form-control"
+        ></p-inputNumber>
+      </div>
+    </div>
+
+    <!-- Row: Start Date, End Date -->
+    <div class="form-row">
+      <div class="form-group col-6">
+        <label for="startDate">Start Date</label>
+        <p-calendar
+          id="startDate"
+          [(ngModel)]="formData.startDate"
+          name="startDate"
+          dateFormat="mm/dd/yy"
+          placeholder="Select start date"
+          class="form-control"
+        ></p-calendar>
+      </div>
+
+      <div class="form-group col-6">
+        <label for="endDate">Due Date</label>
+        <p-calendar
+          id="endDate"
+          [(ngModel)]="formData.endDate"
+          name="endDate"
+          dateFormat="mm/dd/yy"
+          placeholder="Select due date"
+          class="form-control"
+        ></p-calendar>
+      </div>
+    </div>
+
+    <!-- Row: Assign To, Task Type -->
+    <div class="form-row">
+      <div class="form-group col-6">
+        <label for="assignTo">Assign To</label>
+        <input
+          id="assignTo"
+          pInputText
+          [(ngModel)]="formData.assignTo"
+          name="assignTo"
+          placeholder="User ID or name"
+          class="form-control"
+        />
+      </div>
+
+      <div class="form-group col-6">
+        <label for="taskType">Task Type</label>
+        <p-select
+          id="taskType"
+          [(ngModel)]="formData.taskTypeId"
+          name="taskType"
+          [options]="taskTypeOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select task type"
+          [loading]="isLoadingTaskTypes()"
+          class="form-control"
+        ></p-select>
+      </div>
+    </div>
+
+    <!-- Excavation Details Section -->
+    <div class="excavation-section">
+      <h4>Excavation Details (Optional)</h4>
+
+      <!-- Row: Location, Depth -->
+      <div class="form-row">
+        <div class="form-group col-6">
+          <label for="location">Location</label>
+          <input
+            id="location"
+            pInputText
+            [(ngModel)]="formData.location"
+            name="location"
+            placeholder="e.g., Grid A1-A5"
+            class="form-control"
+          />
+        </div>
+
+        <div class="form-group col-6">
+          <label for="depth">Depth (m)</label>
+          <p-inputNumber
+            id="depth"
+            [(ngModel)]="formData.depth"
+            name="depth"
+            placeholder="0"
+            [minFractionDigits]="1"
+            [maxFractionDigits]="2"
+            class="form-control"
+          ></p-inputNumber>
+        </div>
+      </div>
+
+      <!-- Row: Volume, Soil Type -->
+      <div class="form-row">
+        <div class="form-group col-6">
+          <label for="volume">Volume (m³)</label>
+          <p-inputNumber
+            id="volume"
+            [(ngModel)]="formData.volume"
+            name="volume"
+            placeholder="0"
+            [minFractionDigits]="1"
+            [maxFractionDigits]="2"
+            class="form-control"
+          ></p-inputNumber>
+        </div>
+
+        <div class="form-group col-6">
+          <label for="soilType">Soil Type</label>
+          <p-select
+            id="soilType"
+            [(ngModel)]="formData.soilType"
+            name="soilType"
+            [options]="soilTypeOptions"
+            optionLabel="label"
+            optionValue="value"
+            placeholder="Select soil type"
+            class="form-control"
+          ></p-select>
+        </div>
+      </div>
+
+      <!-- Equipment -->
+      <div class="form-group">
+        <label for="equipment">Equipment</label>
+        <input
+          id="equipment"
+          pInputText
+          [(ngModel)]="formData.equipment"
+          name="equipment"
+          placeholder="e.g., Excavator CAT 320"
+          class="form-control"
+        />
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-actions">
+      <button
+        pButton
+        type="button"
+        label="Cancel"
+        icon="pi pi-times"
+        (click)="cancel()"
+        class="p-button-secondary"
+      ></button>
+      <button
+        pButton
+        type="button"
+        label="Create Task"
+        icon="pi pi-check"
+        (click)="save()"
+        [disabled]="isLoading()"
+        [loading]="isLoading()"
+        class="p-button-primary"
+      ></button>
+    </div>
+  </form>
+
+  <p-toast></p-toast>
+</div>

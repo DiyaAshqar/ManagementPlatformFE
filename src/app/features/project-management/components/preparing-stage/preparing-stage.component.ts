@@ -1,8 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, computed, signal } from '@angular/core';
+import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { DialogService } from 'primeng/dynamicdialog';
 import { GetProjectTaskDto } from '../../../../../nswag/api-client';
 import { TaskService } from '../../services/task.service';
+import { ProjectService } from '../../services/project.service';
+import { Task, TaskPriority, TaskStatus as ModelTaskStatus } from '../../models/project.model';
 import { Column, SharedStageBoardComponent, TaskStatus, WorkItem, WorkItemType } from '../shared-stage-board/shared-stage-board.component';
 
 @Component({
@@ -53,6 +55,8 @@ export class PreparingStageComponent implements OnInit {
     ];
   });
 
+  private projectService = inject(ProjectService);
+
   constructor(private taskService: TaskService) {}
 
   ngOnInit(): void {
@@ -60,23 +64,105 @@ export class PreparingStageComponent implements OnInit {
   }
 
   /**
+   * Handle when a work item is added through the shared stage board
+   */
+  onWorkItemAdded(event: {formData: any, columnId: any}): void {
+    const { formData, columnId } = event;
+
+    // Map the columnId to the task status based on where it's being added
+    const taskStatus = this.mapColumnIdToTaskStatus(columnId);
+
+    // Create the task object from form data
+    const newTask: Omit<Task, 'id'> = {
+      title: formData.title,
+      name: formData.title,
+      description: formData.description || '',
+      stageId: `stage-${this.projectStageId}`,
+      assignedTo: formData.assignTo || '',
+      status: taskStatus,
+      priority: this.mapFormPriorityToTaskPriority(formData.priority),
+      dueDate: formData.endDate ? new Date(formData.endDate) : undefined,
+      completedDate: undefined,
+      progress: 0,
+      estimatedHours: parseInt(formData.taskPoints, 10) || 0,
+      startDate: formData.startDate ? new Date(formData.startDate) : undefined,
+      location: formData.location,
+      depth: parseFloat(formData.depth) || 0,
+      volume: parseFloat(formData.volume) || 0,
+      soilType: formData.soilType,
+      equipment: formData.equipment,
+      dependencies: [],
+      attachments: []
+    };
+
+    // Get taskTypeId from formData, default to 1 if not provided
+    const taskTypeId = formData.taskTypeId || 1;
+
+    // Call the API to create the task
+    this.projectService.addTask(
+      this.projectId,
+      `stage-${this.projectStageId}`,
+      newTask,
+      this.projectStageId,
+      taskTypeId
+    ).subscribe({
+      next: () => {
+        // Reload tasks to reflect the new one from API
+        this.loadTasks();
+      },
+      error: (error) => {
+        console.error('Error creating task:', error);
+      }
+    });
+  }
+
+  /**
+   * Map form priority to TaskPriority enum
+   */
+  private mapFormPriorityToTaskPriority(priority: string): TaskPriority {
+    switch (priority?.toLowerCase()) {
+      case 'low': return TaskPriority.LOW;
+      case 'medium': return TaskPriority.MEDIUM;
+      case 'high': return TaskPriority.HIGH;
+      case 'critical': return TaskPriority.HIGH;
+      default: return TaskPriority.MEDIUM;
+    }
+  }
+
+  /**
+   * Map columnId (TaskStatus string) to ModelTaskStatus enum
+   * API expects: 0 = To Do, 1 = In Progress, 2 = Review, 3 = Done
+   */
+  private mapColumnIdToTaskStatus(columnId: TaskStatus): ModelTaskStatus {
+    switch (columnId) {
+      case TaskStatus.TODO:
+        return ModelTaskStatus.TODO;
+      case TaskStatus.IN_PROGRESS:
+        return ModelTaskStatus.IN_PROGRESS;
+      case TaskStatus.REVIEW:
+        return ModelTaskStatus.REVIEW;
+      case TaskStatus.DONE:
+        return ModelTaskStatus.COMPLETED;
+      default:
+        return ModelTaskStatus.TODO;
+    }
+  }
+
+  /**
    * Load tasks from API by projectStageId
    */
   private loadTasks(): void {
-    console.log('[PreparingStage] Loading tasks for projectStageId:', this.projectStageId);
     this.isLoading.set(true);
     
     this.taskService.getTasksByStageId(this.projectStageId, 1, 100).subscribe({
       next: (response) => {
-        console.log('[PreparingStage] API Response:', response);
         if (response.succeeded && response.data?.data) {
-          console.log('[PreparingStage] Tasks loaded:', response.data.data.length, response.data.data);
           this.tasks.set(response.data.data);
         }
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('[PreparingStage] Error loading tasks:', error);
+        console.error('Error loading tasks:', error);
         this.tasks.set([]);
         this.isLoading.set(false);
       }
