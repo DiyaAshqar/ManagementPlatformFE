@@ -66,6 +66,14 @@ export class ExcavationStageComponent implements OnInit {
   }
 
   /**
+   * Handle task created event from shared stage board
+   */
+  onTaskCreated(): void {
+    console.log('✅ Task created, reloading tasks...');
+    this.loadTasks();
+  }
+
+  /**
    * Load tasks from API by projectStageId
    */
   private loadTasks(): void {

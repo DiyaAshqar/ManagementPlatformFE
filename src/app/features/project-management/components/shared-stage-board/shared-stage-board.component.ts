@@ -18,11 +18,10 @@ import { AvatarGroupModule } from 'primeng/avatargroup';
 import { ChipModule } from 'primeng/chip';
 import { ProgressBarModule } from 'primeng/progressbar';
 
-import { WorkItemFormData } from '../staging-board/work-item-dialog/work-item-dialog.component';
 import { WorkItemDialogComponent } from './dialog/work-item-dialog/work-item-dialog.component';
 import { SubtaskDialogComponent } from './dialog/subtask-dialog/subtask-dialog.component';
 import { TaskService } from '../../services/task.service';
-import { StatusTask } from '../../../../../nswag/api-client';
+import { StatusTask, CreateTaskCommand } from '../../../../../nswag/api-client';
 
 export interface SubTask {
   id: string | number;
@@ -107,12 +106,12 @@ export interface Column {
 })
 export class SharedStageBoardComponent implements OnInit {
   @Input() projectId!: string;
+  @Input() projectStageId!: number;
   @Input() stageTitle: string = 'Stage Board';
   @Input() stageDescription: string = 'Manage tasks and activities';
   @Input({ required: true }) columnsInput!: Signal<Column[]>;
+  @Output() taskCreated = new EventEmitter<void>();
   
-  @Output() workItemAdded = new EventEmitter<{formData: WorkItemFormData, columnId: TaskStatus}>();
-  @Output() workItemUpdated = new EventEmitter<WorkItemFormData>();
   
   // Internal writable signal for columns (so we can mutate them for drag-drop)
   columns = signal<Column[]>([]);
@@ -265,9 +264,29 @@ export class SharedStageBoardComponent implements OnInit {
       }
     });
     
-    this.dialogRef.onClose.subscribe((formData: WorkItemFormData) => {
-      if (formData) {
-        this.saveWorkItem(formData);
+    this.dialogRef.onClose.subscribe((result: any) => {
+      if (result) {
+        console.log('💾 Edit dialog closed with data:', result);
+        // Update the work item in the UI
+        // Note: For edit mode, we typically would call an update API
+        // For now, just update the local state
+        this.columns.update(cols => {
+          return cols.map(col => ({
+            ...col,
+            items: col.items.map(workItem => {
+              if (workItem.id === item.id) {
+                return {
+                  ...workItem,
+                  ...result,
+                  id: item.id,
+                  taskId: item.taskId,
+                  projectStageId: item.projectStageId
+                };
+              }
+              return workItem;
+            })
+          }));
+        });
       }
     });
   }
@@ -283,6 +302,7 @@ export class SharedStageBoardComponent implements OnInit {
       maximizable: true,
       data: {
         mode: 'add',
+        projectStageId: this.projectStageId,
         workItem: {
           title: '',
           type: WorkItemType.TASK,
@@ -297,94 +317,54 @@ export class SharedStageBoardComponent implements OnInit {
           depth: '',
           volume: '',
           soilType: '',
-          equipment: ''
+          equipment: '',
+          projectStageId: this.projectStageId
         }
       }
     });
     
-    this.dialogRef.onClose.subscribe((formData: WorkItemFormData) => {
-      if (formData) {
-        this.saveWorkItem(formData);
+    this.dialogRef.onClose.subscribe((result: any) => {
+      if (result) {
+        console.log('💾 Add dialog closed with data:', result);
+        
+        // Prepare the CreateTaskCommand for API using the proper constructor
+        const createCommand = new CreateTaskCommand({
+          title: result.title,
+          description: result.description,
+          startDate: result.startDate ? new Date(result.startDate) : undefined,
+          endDate: result.endDate ? new Date(result.endDate) : undefined,
+          excavationLocation: result.location || undefined,
+          excavationDepth: result.depth ? parseFloat(result.depth) : undefined,
+          excavationVolume: result.volume ? parseFloat(result.volume) : undefined,
+          excavationSoilType: result.soilType || undefined,
+          excavationEquipment: result.equipment || undefined,
+          taskTypeId: result.taskTypeId || 1,
+          projectStageId: this.getStageIdFromProjectId(),
+          status: this.mapTaskStatusToApiStatus(columnId)
+        });
+        
+        console.log('📤 Sending create task command:', createCommand);
+        
+        // Call the API to create the task
+        this.taskService.createTask(createCommand).subscribe({
+          next: (response) => {
+            if (response.succeeded) {
+              console.log('✅ Task created successfully');
+              // Emit event to notify parent component to reload tasks
+              this.taskCreated.emit();
+            } else {
+              console.error('❌ Failed to create task:', response.message);
+            }
+          },
+          error: (error) => {
+            console.error('❌ Error creating task:', error);
+          }
+        });
       }
     });
   }
 
-  saveWorkItem(formData: WorkItemFormData): void {
-    if (!formData.title) return;
 
-    const selectedColumnId = this.selectedColumn();
-
-    this.columns.update(cols => {
-      return cols.map(col => {
-        if (formData.id) {
-          // Editing existing item
-          const itemIndex = col.items.findIndex(item => item.id === formData.id);
-          if (itemIndex !== -1) {
-            const updatedItem: WorkItem = {
-              ...col.items[itemIndex],
-              title: formData.title,
-              type: formData.type as WorkItemType,
-              priority: formData.priority as 'low' | 'medium' | 'high' | 'critical',
-              assignTo: formData.assignTo,
-              taskPoints: formData.taskPoints,
-              tags: formData.tags,
-              description: formData.description,
-              startDate: formData.startDate,
-              endDate: formData.endDate,
-              location: formData.location,
-              depth: formData.depth,
-              volume: formData.volume,
-              soilType: formData.soilType,
-              equipment: formData.equipment,
-              status: (formData.status || col.items[itemIndex].status) as TaskStatus,
-              subtasks: formData.subtasks || []
-            };
-
-            const newItems = [...col.items];
-            newItems[itemIndex] = updatedItem;
-            
-            return { ...col, items: newItems };
-          }
-        } else if (col.id === selectedColumnId) {
-          // Adding new item
-          const newItem: WorkItem = {
-            id: `item-${Date.now()}`,
-            title: formData.title,
-            type: formData.type as WorkItemType,
-            priority: formData.priority as 'low' | 'medium' | 'high' | 'critical',
-            assignTo: formData.assignTo,
-            assigneeAvatar: formData.assignTo.split(' ').map(n => n[0]).join(''),
-            taskPoints: formData.taskPoints,
-            tags: formData.tags,
-            description: formData.description,
-            status: col.id,
-            subtasks: formData.subtasks || [],
-            startDate: formData.startDate,
-            endDate: formData.endDate,
-            location: formData.location,
-            depth: formData.depth,
-            volume: formData.volume,
-            soilType: formData.soilType,
-            equipment: formData.equipment,
-            createdDate: new Date().toISOString().split('T')[0]
-          };
-
-          return { ...col, items: [...col.items, newItem] };
-        }
-        return col;
-      });
-    });
-
-    // Emit events AFTER the signal update completes
-    if (formData.id) {
-      this.workItemUpdated.emit(formData);
-    } else if (selectedColumnId) {
-      this.workItemAdded.emit({ formData, columnId: selectedColumnId });
-    }
-
-    this.showItemDialog.set(false);
-    this.selectedItem.set(null);
-  }
 
   openAddSubtaskDialog(item: WorkItem): void {
     this.dialogRef = this.dialogService.open(SubtaskDialogComponent, {
@@ -554,5 +534,12 @@ export class SharedStageBoardComponent implements OnInit {
       default:
         return StatusTask._0; // Default to TODO
     }
+  }
+
+  /**
+   * Get the project stage ID for API calls
+   */
+  private getStageIdFromProjectId(): number {
+    return this.projectStageId;
   }
 }

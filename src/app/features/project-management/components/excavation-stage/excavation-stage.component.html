@@ -1,7 +1,9 @@
 <app-shared-stage-board
   [projectId]="projectId"
+  [projectStageId]="projectStageId"
   [stageTitle]="'Excavation Stage'"
   [stageDescription]="'Track excavation activities and measurements'"
   [columnsInput]="columns"
-  (workItemAdded)="onWorkItemAdded($event)">
+  (taskCreated)="onTaskCreated()"
+ >
 </app-shared-stage-board>
