@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { TaskClient, GetProjectTaskDtoListPagedResponseResponse, CreateTaskCommand, BooleanResponse, ResultListPagedResponseResponse } from '../../../../nswag/api-client';
+import { TaskClient, GetProjectTaskDtoListPagedResponseResponse, CreateTaskCommand, BooleanResponse, ResultListPagedResponseResponse, StatusTask } from '../../../../nswag/api-client';
 
 @Injectable({
   providedIn: 'root'
@@ -61,5 +61,15 @@ export class TaskService {
     filter?: string
   ): Observable<ResultListPagedResponseResponse> {
     return this.taskClient.getTaskTypes(pageNumber, pageSize, filter);
+  }
+
+  /**
+   * Update task status
+   * @param taskId The ID of the task to update
+   * @param status The new status for the task
+   * @returns Observable of boolean response indicating success
+   */
+  updateTaskStatus(taskId: number, status: StatusTask): Observable<BooleanResponse> {
+    return this.taskClient.updateStatus(taskId, status);
   }
 }

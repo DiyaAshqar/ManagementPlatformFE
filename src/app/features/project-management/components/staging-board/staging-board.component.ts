@@ -21,6 +21,8 @@ import { ChipModule } from 'primeng/chip';
 import { ProgressBarModule } from 'primeng/progressbar';
 import { WorkItemDialogComponent } from '../shared-stage-board/dialog/work-item-dialog/work-item-dialog.component';
 import { SubtaskDialogComponent } from '../shared-stage-board/dialog/subtask-dialog/subtask-dialog.component';
+import { TaskService } from '../../services/task.service';
+import { StatusTask } from '../../../../../nswag/api-client';
 
 interface SubTask {
   id: string;
@@ -106,6 +108,7 @@ export class StagingBoardComponent {
   
   private dialogService = inject(DialogService);
   private dialogRef: DynamicDialogRef | undefined;
+  private taskService = inject(TaskService);
 
   columns = signal<Column[]>([
     {
@@ -332,6 +335,26 @@ export class StagingBoardComponent {
 
       // Update columns signal
       this.columns.update(cols => [...cols]);
+
+      // Call API to update task status
+      const taskId = parseInt(item.id);
+      if (!isNaN(taskId)) {
+        const apiStatus = this.mapTaskStatusToApiStatus(targetColumn.id);
+        this.taskService.updateTaskStatus(taskId, apiStatus).subscribe({
+          next: (response) => {
+            if (response.succeeded) {
+              console.log('Task status updated successfully');
+            } else {
+              console.error('Failed to update task status:', response.message);
+              // Optionally revert the UI change here if API fails
+            }
+          },
+          error: (error) => {
+            console.error('Error updating task status:', error);
+            // Optionally revert the UI change here if API fails
+          }
+        });
+      }
     }
   }
 
@@ -655,5 +678,25 @@ export class StagingBoardComponent {
   getSubtaskProgress(item: WorkItem): number {
     if (item.subtasks.length === 0) return 0;
     return Math.round((this.getCompletedSubtasks(item) / item.subtasks.length) * 100);
+  }
+
+  /**
+   * Map the UI TaskStatus to the API StatusTask enum
+   * API enum values: 0 (TODO), 1 (In Progress), 2 (Review), 3 (Done)
+   */
+  private mapTaskStatusToApiStatus(status: TaskStatus): StatusTask {
+    switch (status) {
+      case TaskStatus.TODO:
+      case TaskStatus.BACKLOG:
+        return StatusTask._0; // TODO
+      case TaskStatus.IN_PROGRESS:
+        return StatusTask._1; // In Progress
+      case TaskStatus.REVIEW:
+        return StatusTask._2; // Review
+      case TaskStatus.DONE:
+        return StatusTask._3; // Done
+      default:
+        return StatusTask._0; // Default to TODO
+    }
   }
 }
