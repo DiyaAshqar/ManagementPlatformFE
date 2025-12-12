@@ -5,6 +5,7 @@ import { environment } from '../../../../environments/environment';
 import {
   GetProjectDto,
   GetProjectDtoListPagedResponseResponse,
+  GetProjectDtoResponse,
   ProjectStatus as ApiProjectStatus,
   ProjectStageDto,
   ProjectStageType
@@ -51,7 +52,7 @@ export class ProjectService {
   // Mapper: Convert API DTO to Project model
   private mapApiProjectToProject(apiProject: GetProjectDto, index: number): Project {
     return {
-      id: apiProject.projectNumber || '',
+      id: (apiProject.id || 0).toString(), // Use numeric ID from API
       name: apiProject.title || '',
       description: apiProject.description || '',
       status: this.mapApiStatusToProjectStatus(apiProject.status),
@@ -64,7 +65,7 @@ export class ProjectService {
       clientName: apiProject.clinet || '',
       projectManager: 'N/A', // API doesn't provide project manager
       team: [],
-      stages: this.mapApiStagesToStages(apiProject.projectStages, apiProject.projectNumber || ''),
+      stages: this.mapApiStagesToStages(apiProject.projectStages, (apiProject.id || 0).toString()),
       documents: [],
       createdAt: apiProject.startDate ? new Date(apiProject.startDate) : new Date(),
       updatedAt: new Date()
@@ -214,9 +215,21 @@ export class ProjectService {
     this.stats.set(stats);
   }
 
-  // Get project by ID
+  // Get project by ID from API
   getProjectById(id: string): Observable<Project | undefined> {
-    return of(this.projects().find(p => p.id === id)).pipe(delay(300));
+    const numericId = parseInt(id, 10);
+    if (isNaN(numericId)) {
+      return of(undefined);
+    }
+
+    return this.http.get<GetProjectDtoResponse>(`${this.apiUrl}/Project/${numericId}`).pipe(
+      map(response => {
+        if (!response.succeeded || !response.data) {
+          return undefined;
+        }
+        return this.mapApiProjectToProject(response.data, 0);
+      })
+    );
   }
 
   // Create new project

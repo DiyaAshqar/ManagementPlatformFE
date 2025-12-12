@@ -1,7 +1,9 @@
-import { Component, Input, signal } from '@angular/core';
+import { Component, Input, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SharedStageBoardComponent, Column, TaskStatus, WorkItemType } from '../shared-stage-board/shared-stage-board.component';
+import { SharedStageBoardComponent, Column, TaskStatus, WorkItemType, WorkItem } from '../shared-stage-board/shared-stage-board.component';
 import { DialogService } from 'primeng/dynamicdialog';
+import { TaskService } from '../../services/task.service';
+import { GetProjectTaskDto, StatusTask } from '../../../../../nswag/api-client';
 
 @Component({
   selector: 'app-preparing-stage',
@@ -14,147 +16,141 @@ import { DialogService } from 'primeng/dynamicdialog';
   templateUrl: './preparing-stage.component.html',
   styleUrls: ['./preparing-stage.component.scss']
 })
-export class PreparingStageComponent {
+export class PreparingStageComponent implements OnInit {
   @Input() projectId!: string;
+  @Input() projectStageId!: number; // The projectStageId for Preparing stage (stageType: 1)
 
-  columns = signal<Column[]>([
-    {
-      id: TaskStatus.TODO,
-      title: 'To Do',
-      items: [
-        {
-          id: 'prep-1',
-          title: 'Conduct topographical survey',
-          type: WorkItemType.TASK,
-          priority: 'high',
-          assignTo: 'John Smith',
-          assigneeAvatar: 'JS',
-          taskPoints: '8',
-          tags: ['survey', 'site-analysis'],
-          description: 'Complete detailed topographical survey of the construction site including measurements and elevations',
-          status: TaskStatus.TODO,
-          subtasks: [
-            { id: 'sub-1-1', title: 'Initial site measurement', startDate: '2024-01-15', endDate: '2024-01-16', status: 'pending', type: 'Survey', cost: '$2,500', quantity: '1' },
-            { id: 'sub-1-2', title: 'Elevation mapping', startDate: '2024-01-16', endDate: '2024-01-17', status: 'pending', type: 'Survey', cost: '$3,200', quantity: '1' }
-          ],
-          startDate: '2024-01-15',
-          endDate: '2024-01-18',
-          location: 'Construction Site',
-          depth: '',
-          volume: '',
-          soilType: '',
-          equipment: '',
-          createdDate: '2024-01-15'
-        },
-        {
-          id: 'prep-2',
-          title: 'Submit building permit application',
-          type: WorkItemType.TASK,
-          priority: 'high',
-          assignTo: 'Emily Brown',
-          assigneeAvatar: 'EB',
-          taskPoints: '8',
-          tags: ['permits', 'documentation'],
-          description: 'Prepare and submit complete building permit application with all required documentation',
-          status: TaskStatus.TODO,
-          subtasks: [],
-          startDate: '2024-01-20',
-          endDate: '2024-01-22',
-          location: 'Building Department',
-          depth: '',
-          volume: '',
-          soilType: '',
-          equipment: '',
-          createdDate: '2024-01-20'
+  private tasks = signal<GetProjectTaskDto[]>([]);
+  private isLoading = signal<boolean>(true);
+
+  columns = computed<Column[]>(() => {
+    const tasksList = this.tasks();
+    return [
+      {
+        id: TaskStatus.TODO,
+        title: 'To Do',
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 0)),
+        wipLimit: 5
+      },
+      {
+        id: TaskStatus.IN_PROGRESS,
+        title: 'In Progress',
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 1)),
+        wipLimit: 3
+      },
+      {
+        id: TaskStatus.REVIEW,
+        title: 'Review',
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 2)),
+        wipLimit: 3
+      },
+      {
+        id: TaskStatus.DONE,
+        title: 'Done',
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 3)),
+        wipLimit: undefined
+      }
+    ];
+  });
+
+  constructor(private taskService: TaskService) {}
+
+  ngOnInit(): void {
+    this.loadTasks();
+  }
+
+  /**
+   * Load tasks from API and filter by projectStageId
+   */
+  private loadTasks(): void {
+    console.log('[PreparingStage] Loading tasks for projectStageId:', this.projectStageId);
+    this.isLoading.set(true);
+    
+    this.taskService.getAllTasks(1, 100).subscribe({
+      next: (response) => {
+        console.log('[PreparingStage] API Response:', response);
+        if (response.succeeded && response.data?.data) {
+          console.log('[PreparingStage] Total tasks from API:', response.data.data.length);
+          // Filter tasks by projectStageId
+          const filteredTasks = response.data.data.filter(
+            task => task.projectStageId === this.projectStageId
+          );
+          console.log('[PreparingStage] Filtered tasks for projectStageId', this.projectStageId, ':', filteredTasks.length, filteredTasks);
+          this.tasks.set(filteredTasks);
         }
-      ],
-      wipLimit: 5
-    },
-    {
-      id: TaskStatus.IN_PROGRESS,
-      title: 'In Progress',
-      items: [
-        {
-          id: 'prep-3',
-          title: 'Soil testing and analysis',
-          type: WorkItemType.TASK,
-          priority: 'high',
-          assignTo: 'Sarah Johnson',
-          assigneeAvatar: 'SJ',
-          taskPoints: '5',
-          tags: ['testing', 'analysis'],
-          description: 'Conduct comprehensive soil testing to determine load-bearing capacity and composition',
-          status: TaskStatus.IN_PROGRESS,
-          subtasks: [
-            { id: 'sub-3-1', title: 'Collect soil samples', startDate: '2024-01-17', endDate: '2024-01-18', status: 'completed', type: 'Testing', cost: '$1,500', quantity: '5' },
-            { id: 'sub-3-2', title: 'Laboratory analysis', startDate: '2024-01-18', endDate: '2024-01-19', status: 'in-progress', type: 'Testing', cost: '$2,800', quantity: '5' }
-          ],
-          startDate: '2024-01-17',
-          endDate: '2024-01-19',
-          location: 'Testing Lab',
-          depth: '',
-          volume: '',
-          soilType: '',
-          equipment: '',
-          createdDate: '2024-01-17'
-        },
-        {
-          id: 'prep-4',
-          title: 'Utility mapping',
-          type: WorkItemType.TASK,
-          priority: 'medium',
-          assignTo: 'John Smith',
-          assigneeAvatar: 'JS',
-          taskPoints: '3',
-          tags: ['survey', 'utilities'],
-          description: 'Map existing utilities to avoid conflicts during construction',
-          status: TaskStatus.IN_PROGRESS,
-          subtasks: [],
-          startDate: '2024-01-19',
-          endDate: '2024-01-20',
-          location: 'Construction Site',
-          depth: '',
-          volume: '',
-          soilType: '',
-          equipment: '',
-          createdDate: '2024-01-19'
-        }
-      ],
-      wipLimit: 3
-    },
-    {
-      id: TaskStatus.REVIEW,
-      title: 'Review',
-      items: [
-        {
-          id: 'prep-5',
-          title: 'Environmental impact assessment',
-          type: WorkItemType.TASK,
-          priority: 'medium',
-          assignTo: 'Mike Davis',
-          assigneeAvatar: 'MD',
-          taskPoints: '5',
-          tags: ['assessment', 'compliance'],
-          description: 'Evaluate environmental impact and ensure compliance with regulations',
-          status: TaskStatus.REVIEW,
-          subtasks: [],
-          startDate: '2024-01-18',
-          endDate: '2024-01-20',
-          location: 'Site Office',
-          depth: '',
-          volume: '',
-          soilType: '',
-          equipment: '',
-          createdDate: '2024-01-18'
-        }
-      ],
-      wipLimit: 3
-    },
-    {
-      id: TaskStatus.DONE,
-      title: 'Done',
-      items: [],
-      wipLimit: undefined
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('[PreparingStage] Error loading tasks:', error);
+        this.tasks.set([]);
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  /**
+   * Map API tasks to WorkItem interface
+   */
+  private mapTasksToWorkItems(tasks: GetProjectTaskDto[]): WorkItem[] {
+    return tasks.map(task => ({
+      id: task.id?.toString() || '',
+      title: task.title || 'Untitled Task',
+      type: WorkItemType.TASK,
+      priority: this.mapPriority(task.priority),
+      assignTo: task.assignTo?.toString() || 'Unassigned',
+      assigneeAvatar: this.getInitials(task.assignTo?.toString()),
+      taskPoints: task.taskPoint?.toString() || '0',
+      tags: [],
+      description: task.description || '',
+      status: this.mapStatus(task.status),
+      subtasks: [],
+      startDate: task.startDate ? new Date(task.startDate).toISOString().split('T')[0] : '',
+      endDate: task.endDate ? new Date(task.endDate).toISOString().split('T')[0] : '',
+      location: task.excavationLocation || '',
+      depth: task.excavationDepth?.toString() || '',
+      volume: task.excavationVolume?.toString() || '',
+      soilType: task.excavationSoilType || '',
+      equipment: task.excavationEquipment || '',
+      createdDate: task.startDate ? new Date(task.startDate).toISOString().split('T')[0] : ''
+    }));
+  }
+
+  /**
+   * Map API priority to UI priority
+   */
+  private mapPriority(priority?: number): 'low' | 'medium' | 'high' | 'critical' {
+    switch (priority) {
+      case 0: return 'low';
+      case 1: return 'medium';
+      case 2: return 'high';
+      case 3: return 'critical';
+      default: return 'medium';
     }
-  ]);
+  }
+
+  /**
+   * Map API status to TaskStatus enum
+   * API status: 0=To Do, 1=In Progress, 2=Review, 3=Completed
+   */
+  private mapStatus(status?: number): TaskStatus {
+    switch (status) {
+      case 0: return TaskStatus.TODO;
+      case 1: return TaskStatus.IN_PROGRESS;
+      case 2: return TaskStatus.REVIEW;
+      case 3: return TaskStatus.DONE;
+      default: return TaskStatus.TODO;
+    }
+  }
+
+  /**
+   * Get initials from assignee name or ID
+   */
+  private getInitials(assignee?: string): string {
+    if (!assignee) return 'NA';
+    // If assignee is a number (ID), return placeholder
+    if (!isNaN(Number(assignee))) return 'U' + assignee.slice(0, 1);
+    // Extract initials from name
+    const names = assignee.split(' ');
+    return names.map(n => n.charAt(0).toUpperCase()).join('').slice(0, 2);
+  }
 }

@@ -1,4 +1,4 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -23,6 +23,9 @@ import { MilestoneStageComponent } from '../../components/milestone-stage/milest
 import { StageKanbanComponent } from '../../components/stage-kanban/stage-kanban.component';
 import { DocumentsStageComponent } from '../../components/documents-stage/documents-stage.component';
 import { StagingBoardComponent } from '../../components/staging-board/staging-board.component';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../../environments/environment';
+import { GetProjectDto, ProjectStageDto, ProjectStageType } from '../../../../../nswag/api-client';
 
 interface ReportType {
   label: string;
@@ -57,10 +60,22 @@ interface ReportType {
 })
 export class ProjectDetailComponent implements OnInit {
   project = signal<Project | null>(null);
+  projectData = signal<GetProjectDto | null>(null);
   isLoading = signal<boolean>(true);
   activeTabIndex = "0";
   showPrintDialog = false;
   selectedReportType = 'full';
+  
+  // Computed signals for stage IDs
+  preparingStageId = computed(() => {
+    const stages = this.projectData()?.projectStages;
+    return stages?.find((s: ProjectStageDto) => s.stageType === ProjectStageType._1)?.id || 0;
+  });
+
+  excavationStageId = computed(() => {
+    const stages = this.projectData()?.projectStages;
+    return stages?.find((s: ProjectStageDto) => s.stageType === ProjectStageType._2)?.id || 0;
+  });
   
   reportTypes: ReportType[] = [
     { label: 'Full Project Report', value: 'full' },
@@ -73,7 +88,8 @@ export class ProjectDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private projectService: ProjectService
+    private projectService: ProjectService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -85,17 +101,39 @@ export class ProjectDetailComponent implements OnInit {
 
   loadProject(id: string): void {
     this.isLoading.set(true);
+    
+    // Load both the mapped project and raw API data
     this.projectService.getProjectById(id).subscribe({
       next: (project) => {
         if (project) {
           this.project.set(project);
+          // Also fetch raw API data for stage IDs
+          this.loadRawProjectData(id);
+        } else {
+          this.isLoading.set(false);
+          this.router.navigate(['/projects']);
         }
-        this.isLoading.set(false);
       },
       error: (error) => {
         console.error('Error loading project:', error);
         this.isLoading.set(false);
         this.router.navigate(['/projects']);
+      }
+    });
+  }
+
+  private loadRawProjectData(id: string): void {
+    const numericId = parseInt(id, 10);
+    this.http.get<{ succeeded: boolean; data: GetProjectDto }>(`${environment.apiUrl}/Project/${numericId}`).subscribe({
+      next: (response) => {
+        if (response.succeeded && response.data) {
+          this.projectData.set(response.data);
+        }
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading raw project data:', error);
+        this.isLoading.set(false);
       }
     });
   }

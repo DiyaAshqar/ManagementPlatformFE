@@ -164,12 +164,18 @@
             </p-tabpanel>
             <p-tabpanel value="1">
               <div class="py-4">
-                <app-preparing-stage [projectId]="project()!.id"></app-preparing-stage>
+                <app-preparing-stage 
+                  [projectId]="project()!.id" 
+                  [projectStageId]="preparingStageId()">
+                </app-preparing-stage>
               </div>
             </p-tabpanel>
             <p-tabpanel value="2">
               <div class="py-4">
-                <app-excavation-stage [projectId]="project()!.id"></app-excavation-stage>
+                <app-excavation-stage 
+                  [projectId]="project()!.id"
+                  [projectStageId]="excavationStageId()">
+                </app-excavation-stage>
               </div>
             </p-tabpanel>
             <!-- <p-tabpanel value="3">

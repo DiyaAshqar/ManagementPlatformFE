@@ -1,4 +1,4 @@
-import { Component, Input, inject, signal } from '@angular/core';
+import { Component, Input, inject, signal, Signal, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
@@ -101,14 +101,25 @@ export interface Column {
   templateUrl: './shared-stage-board.component.html',
   styleUrls: ['./shared-stage-board.component.scss']
 })
-export class SharedStageBoardComponent {
+export class SharedStageBoardComponent implements OnInit {
   @Input() projectId!: string;
   @Input() stageTitle: string = 'Stage Board';
   @Input() stageDescription: string = 'Manage tasks and activities';
-  @Input({ required: true }) columns!: ReturnType<typeof signal<Column[]>>;
+  @Input({ required: true }) columnsInput!: Signal<Column[]>;
+  
+  // Internal writable signal for columns (so we can mutate them for drag-drop)
+  columns = signal<Column[]>([]);
   
   private dialogService = inject(DialogService);
   private dialogRef: DynamicDialogRef | undefined;
+
+  constructor() {
+    // Use effect to sync columnsInput to internal columns signal
+    effect(() => {
+      const inputColumns = this.columnsInput();
+      this.columns.set(inputColumns);
+    });
+  }
 
   selectedItem = signal<WorkItem | null>(null);
   showItemDialog = signal(false);
@@ -155,6 +166,11 @@ export class SharedStageBoardComponent {
 
   get connectedDropLists(): string[] {
     return this.columns().map(c => c.id);
+  }
+
+  ngOnInit(): void {
+    // Component initialization if needed
+    // The columnsInput setter will handle syncing the input signal
   }
 
   onDrop(event: CdkDragDrop<WorkItem[]>, targetColumn: Column): void {

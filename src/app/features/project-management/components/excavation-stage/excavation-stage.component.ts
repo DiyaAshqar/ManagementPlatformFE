@@ -1,7 +1,9 @@
-import { Component, Input, signal } from '@angular/core';
+import { Component, Input, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SharedStageBoardComponent, Column, TaskStatus, WorkItemType } from '../shared-stage-board/shared-stage-board.component';
+import { SharedStageBoardComponent, Column, TaskStatus, WorkItemType, WorkItem } from '../shared-stage-board/shared-stage-board.component';
 import { DialogService } from 'primeng/dynamicdialog';
+import { TaskService } from '../../services/task.service';
+import { GetProjectTaskDto, StatusTask } from '../../../../../nswag/api-client';
 
 @Component({
   selector: 'app-excavation-stage',
@@ -14,156 +16,137 @@ import { DialogService } from 'primeng/dynamicdialog';
   templateUrl: './excavation-stage.component.html',
   styleUrls: ['./excavation-stage.component.scss']
 })
-export class ExcavationStageComponent {
+export class ExcavationStageComponent implements OnInit {
   @Input() projectId!: string;
+  @Input() projectStageId!: number; // The projectStageId for Excavation stage (stageType: 2)
 
-  columns = signal<Column[]>([
-    {
-      id: TaskStatus.TODO,
-      title: 'To Do',
-      items: [
-        {
-          id: 'exc-1',
-          title: 'Foundation Excavation - Phase 1',
-          type: WorkItemType.TASK,
-          priority: 'high',
-          assignTo: 'Mike Johnson',
-          assigneeAvatar: 'MJ',
-          taskPoints: '8',
-          tags: ['foundation', 'excavation'],
-          description: 'Initial foundation excavation for the main building structure',
-          status: TaskStatus.TODO,
-          subtasks: [
-            { id: 'sub-1-1', title: 'Topsoil Removal', startDate: '2024-02-05', endDate: '2024-02-05', status: 'pending', type: 'Excavation', cost: '$1,200', quantity: '150 m³' },
-            { id: 'sub-1-2', title: 'Clay Extraction', startDate: '2024-02-05', endDate: '2024-02-05', status: 'pending', type: 'Excavation', cost: '$2,500', quantity: '300 m³' }
-          ],
-          startDate: '2024-02-05',
-          endDate: '2024-02-05',
-          location: 'Grid A1-A5',
-          depth: '3.5m',
-          volume: '450 m³',
-          soilType: 'Clay',
-          equipment: 'Excavator CAT 320',
-          createdDate: '2024-02-05'
-        },
-        {
-          id: 'exc-2',
-          title: 'Utility Trench - North Section',
-          type: WorkItemType.TASK,
-          priority: 'medium',
-          assignTo: 'Sarah Williams',
-          assigneeAvatar: 'SW',
-          taskPoints: '5',
-          tags: ['utilities', 'trench'],
-          description: 'Excavate trench for utility lines in the north section',
-          status: TaskStatus.TODO,
-          subtasks: [],
-          startDate: '2024-02-06',
-          endDate: '2024-02-07',
-          location: 'North Section',
-          depth: '2m',
-          volume: '120 m³',
-          soilType: 'Sandy Clay',
-          equipment: 'Mini Excavator',
-          createdDate: '2024-02-06'
+  private tasks = signal<GetProjectTaskDto[]>([]);
+  private isLoading = signal<boolean>(true);
+
+  columns = computed<Column[]>(() => {
+    const tasksList = this.tasks();
+    return [
+      {
+        id: TaskStatus.TODO,
+        title: 'To Do',
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 0)),
+        wipLimit: 5
+      },
+      {
+        id: TaskStatus.IN_PROGRESS,
+        title: 'In Progress',
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 1)),
+        wipLimit: 3
+      },
+      {
+        id: TaskStatus.REVIEW,
+        title: 'Review',
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 2)),
+        wipLimit: 3
+      },
+      {
+        id: TaskStatus.DONE,
+        title: 'Done',
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 3)),
+        wipLimit: undefined
+      }
+    ];
+  });
+
+  constructor(private taskService: TaskService) {}
+
+  ngOnInit(): void {
+    this.loadTasks();
+  }
+
+  /**
+   * Load tasks from API and filter by projectStageId
+   */
+  private loadTasks(): void {
+    this.isLoading.set(true);
+    
+    this.taskService.getAllTasks(1, 100).subscribe({
+      next: (response) => {
+        if (response.succeeded && response.data?.data) {
+          // Filter tasks by projectStageId
+          const filteredTasks = response.data.data.filter(
+            task => task.projectStageId === this.projectStageId
+          );
+          this.tasks.set(filteredTasks);
         }
-      ],
-      wipLimit: 5
-    },
-    {
-      id: TaskStatus.IN_PROGRESS,
-      title: 'In Progress',
-      items: [
-        {
-          id: 'exc-3',
-          title: 'Basement Excavation - Level 1',
-          type: WorkItemType.TASK,
-          priority: 'critical',
-          assignTo: 'David Chen',
-          assigneeAvatar: 'DC',
-          taskPoints: '13',
-          tags: ['basement', 'excavation'],
-          description: 'First level basement excavation with shoring installation',
-          status: TaskStatus.IN_PROGRESS,
-          subtasks: [
-            { id: 'sub-3-1', title: 'Shoring Installation', startDate: '2024-02-07', endDate: '2024-02-08', status: 'completed', type: 'Safety', cost: '$5,000', quantity: '1' },
-            { id: 'sub-3-2', title: 'Soil Excavation', startDate: '2024-02-08', endDate: '2024-02-09', status: 'in-progress', type: 'Excavation', cost: '$3,500', quantity: '600 m³' },
-            { id: 'sub-3-3', title: 'Soil Testing', startDate: '2024-02-09', endDate: '2024-02-09', status: 'pending', type: 'Testing', cost: '$800', quantity: '1' }
-          ],
-          startDate: '2024-02-07',
-          endDate: '2024-02-09',
-          location: 'Building Core',
-          depth: '5m',
-          volume: '600 m³',
-          soilType: 'Mixed Clay/Rock',
-          equipment: 'Excavator CAT 336',
-          createdDate: '2024-02-07'
-        }
-      ],
-      wipLimit: 3
-    },
-    {
-      id: TaskStatus.REVIEW,
-      title: 'Review',
-      items: [
-        {
-          id: 'exc-4',
-          title: 'Site Leveling - East Wing',
-          type: WorkItemType.TASK,
-          priority: 'medium',
-          assignTo: 'Robert Taylor',
-          assigneeAvatar: 'RT',
-          taskPoints: '5',
-          tags: ['leveling', 'grading'],
-          description: 'Level and grade the east wing area for construction',
-          status: TaskStatus.REVIEW,
-          subtasks: [
-            { id: 'sub-4-1', title: 'Initial Grading', startDate: '2024-02-04', endDate: '2024-02-05', status: 'completed', type: 'Grading', cost: '$2,000', quantity: '200 m³' },
-            { id: 'sub-4-2', title: 'Final Leveling', startDate: '2024-02-05', endDate: '2024-02-06', status: 'completed', type: 'Leveling', cost: '$1,500', quantity: '200 m³' }
-          ],
-          startDate: '2024-02-04',
-          endDate: '2024-02-06',
-          location: 'East Wing',
-          depth: '0.5m',
-          volume: '200 m³',
-          soilType: 'Topsoil',
-          equipment: 'Bulldozer',
-          createdDate: '2024-02-04'
-        }
-      ],
-      wipLimit: 3
-    },
-    {
-      id: TaskStatus.DONE,
-      title: 'Done',
-      items: [
-        {
-          id: 'exc-5',
-          title: 'Access Road Excavation',
-          type: WorkItemType.TASK,
-          priority: 'high',
-          assignTo: 'Emily Brown',
-          assigneeAvatar: 'EB',
-          taskPoints: '8',
-          tags: ['road', 'access'],
-          description: 'Excavate and prepare access road to construction site',
-          status: TaskStatus.DONE,
-          subtasks: [
-            { id: 'sub-5-1', title: 'Clear Vegetation', startDate: '2024-02-01', endDate: '2024-02-02', status: 'completed', type: 'Clearing', cost: '$1,000', quantity: '1' },
-            { id: 'sub-5-2', title: 'Excavate Road Base', startDate: '2024-02-02', endDate: '2024-02-03', status: 'completed', type: 'Excavation', cost: '$2,500', quantity: '300 m³' },
-            { id: 'sub-5-3', title: 'Compact Base', startDate: '2024-02-03', endDate: '2024-02-04', status: 'completed', type: 'Compaction', cost: '$800', quantity: '1' }
-          ],
-          startDate: '2024-02-01',
-          endDate: '2024-02-04',
-          location: 'Site Access',
-          depth: '1m',
-          volume: '300 m³',
-          soilType: 'Mixed',
-          equipment: 'Excavator + Compactor',
-          createdDate: '2024-02-01'
-        }
-      ],
-      wipLimit: undefined
+        this.isLoading.set(false);
+      },
+      error: (error) => {
+        console.error('Error loading tasks:', error);
+        this.tasks.set([]);
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  /**
+   * Map API tasks to WorkItem interface
+   */
+  private mapTasksToWorkItems(tasks: GetProjectTaskDto[]): WorkItem[] {
+    return tasks.map(task => ({
+      id: task.id?.toString() || '',
+      title: task.title || 'Untitled Task',
+      type: WorkItemType.TASK,
+      priority: this.mapPriority(task.priority),
+      assignTo: task.assignTo?.toString() || 'Unassigned',
+      assigneeAvatar: this.getInitials(task.assignTo?.toString()),
+      taskPoints: task.taskPoint?.toString() || '0',
+      tags: [],
+      description: task.description || '',
+      status: this.mapStatus(task.status),
+      subtasks: [],
+      startDate: task.startDate ? new Date(task.startDate).toISOString().split('T')[0] : '',
+      endDate: task.endDate ? new Date(task.endDate).toISOString().split('T')[0] : '',
+      location: task.excavationLocation || '',
+      depth: task.excavationDepth?.toString() || '',
+      volume: task.excavationVolume?.toString() || '',
+      soilType: task.excavationSoilType || '',
+      equipment: task.excavationEquipment || '',
+      createdDate: task.startDate ? new Date(task.startDate).toISOString().split('T')[0] : ''
+    }));
+  }
+
+  /**
+   * Map API priority to UI priority
+   */
+  private mapPriority(priority?: number): 'low' | 'medium' | 'high' | 'critical' {
+    switch (priority) {
+      case 0: return 'low';
+      case 1: return 'medium';
+      case 2: return 'high';
+      case 3: return 'critical';
+      default: return 'medium';
     }
-  ]);
+  }
+
+  /**
+   * Map API status to TaskStatus enum
+   * API status: 0=To Do, 1=In Progress, 2=Review, 3=Completed
+   */
+  private mapStatus(status?: number): TaskStatus {
+    switch (status) {
+      case 0: return TaskStatus.TODO;
+      case 1: return TaskStatus.IN_PROGRESS;
+      case 2: return TaskStatus.REVIEW;
+      case 3: return TaskStatus.DONE;
+      default: return TaskStatus.TODO;
+    }
+  }
+
+  /**
+   * Get initials from assignee name or ID
+   */
+  private getInitials(assignee?: string): string {
+    if (!assignee) return 'NA';
+    // If assignee is a number (ID), return placeholder
+    if (!isNaN(Number(assignee))) return 'U' + assignee.slice(0, 1);
+    // Extract initials from name
+    const names = assignee.split(' ');
+    return names.map(n => n.charAt(0).toUpperCase()).join('').slice(0, 2);
+  }
 }

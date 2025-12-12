@@ -1185,7 +1185,7 @@ export class TaskClient {
      * @param body (optional) 
      * @return OK
      */
-    createSupplier(body: CreateTaskCommand | undefined): Observable<BooleanResponse> {
+    createTask(body: CreateTaskCommand | undefined): Observable<BooleanResponse> {
         let url_ = this.baseUrl + "/api/Task";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1202,11 +1202,11 @@ export class TaskClient {
         };
 
         return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processCreateSupplier(response_);
+            return this.processCreateTask(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processCreateSupplier(response_ as any);
+                    return this.processCreateTask(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<BooleanResponse>;
                 }
@@ -1215,7 +1215,7 @@ export class TaskClient {
         }));
     }
 
-    protected processCreateSupplier(response: HttpResponseBase): Observable<BooleanResponse> {
+    protected processCreateTask(response: HttpResponseBase): Observable<BooleanResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1241,7 +1241,7 @@ export class TaskClient {
      * @param body (optional) 
      * @return OK
      */
-    deleteSupplier(body: DeleteTaskCommand | undefined): Observable<BooleanResponse> {
+    deleteTask(body: DeleteTaskCommand | undefined): Observable<BooleanResponse> {
         let url_ = this.baseUrl + "/api/Task";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1258,11 +1258,11 @@ export class TaskClient {
         };
 
         return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processDeleteSupplier(response_);
+            return this.processDeleteTask(response_);
         })).pipe(_observableCatch((response_: any) => {
             if (response_ instanceof HttpResponseBase) {
                 try {
-                    return this.processDeleteSupplier(response_ as any);
+                    return this.processDeleteTask(response_ as any);
                 } catch (e) {
                     return _observableThrow(e) as any as Observable<BooleanResponse>;
                 }
@@ -1271,7 +1271,7 @@ export class TaskClient {
         }));
     }
 
-    protected processDeleteSupplier(response: HttpResponseBase): Observable<BooleanResponse> {
+    protected processDeleteTask(response: HttpResponseBase): Observable<BooleanResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1403,6 +1403,204 @@ export class TaskClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = GetProjectTaskDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param stageId (optional) 
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getAllTasksByStageId(stageId: number | undefined, requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetProjectTaskDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/Task/by-stage?";
+        if (stageId === null)
+            throw new globalThis.Error("The parameter 'stageId' cannot be null.");
+        else if (stageId !== undefined)
+            url_ += "StageId=" + encodeURIComponent("" + stageId) + "&";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllTasksByStageId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllTasksByStageId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectTaskDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectTaskDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetAllTasksByStageId(response: HttpResponseBase): Observable<GetProjectTaskDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectTaskDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getTaskTypes(requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<ResultListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/Task/types?";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetTaskTypes(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetTaskTypes(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<ResultListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<ResultListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetTaskTypes(response: HttpResponseBase): Observable<ResultListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = ResultListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @param status (optional) 
+     * @return OK
+     */
+    updateStatus(id: number | undefined, status: StatusTask | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/Task/update-status?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        if (status === null)
+            throw new globalThis.Error("The parameter 'status' cannot be null.");
+        else if (status !== undefined)
+            url_ += "Status=" + encodeURIComponent("" + status) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("put", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdateStatus(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdateStatus(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processUpdateStatus(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -4158,6 +4356,190 @@ export interface IQuantityBillDto {
     agreementId?: number;
     mileStoneId?: number;
     isDeleted?: boolean;
+}
+
+export class Result implements IResult {
+    id?: number;
+    name?: string | undefined;
+
+    constructor(data?: IResult) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): Result {
+        data = typeof data === 'object' ? data : {};
+        let result = new Result();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IResult {
+    id?: number;
+    name?: string | undefined;
+}
+
+export class ResultListPagedResponse implements IResultListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: Result[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IResultListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(Result.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): ResultListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ResultListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IResultListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: Result[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class ResultListPagedResponseResponse implements IResultListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: ResultListPagedResponse;
+
+    constructor(data?: IResultListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? ResultListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ResultListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new ResultListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IResultListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: ResultListPagedResponse;
 }
 
 export class SecondStepDto implements ISecondStepDto {
