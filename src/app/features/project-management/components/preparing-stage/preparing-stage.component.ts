@@ -1,9 +1,9 @@
-import { Component, Input, signal, OnInit, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SharedStageBoardComponent, Column, TaskStatus, WorkItemType, WorkItem } from '../shared-stage-board/shared-stage-board.component';
+import { Component, Input, OnInit, computed, signal } from '@angular/core';
 import { DialogService } from 'primeng/dynamicdialog';
+import { GetProjectTaskDto } from '../../../../../nswag/api-client';
 import { TaskService } from '../../services/task.service';
-import { GetProjectTaskDto, StatusTask } from '../../../../../nswag/api-client';
+import { Column, SharedStageBoardComponent, TaskStatus, WorkItem, WorkItemType } from '../shared-stage-board/shared-stage-board.component';
 
 @Component({
   selector: 'app-preparing-stage',
@@ -60,23 +60,18 @@ export class PreparingStageComponent implements OnInit {
   }
 
   /**
-   * Load tasks from API and filter by projectStageId
+   * Load tasks from API by projectStageId
    */
   private loadTasks(): void {
     console.log('[PreparingStage] Loading tasks for projectStageId:', this.projectStageId);
     this.isLoading.set(true);
     
-    this.taskService.getAllTasks(1, 100).subscribe({
+    this.taskService.getTasksByStageId(this.projectStageId, 1, 100).subscribe({
       next: (response) => {
         console.log('[PreparingStage] API Response:', response);
         if (response.succeeded && response.data?.data) {
-          console.log('[PreparingStage] Total tasks from API:', response.data.data.length);
-          // Filter tasks by projectStageId
-          const filteredTasks = response.data.data.filter(
-            task => task.projectStageId === this.projectStageId
-          );
-          console.log('[PreparingStage] Filtered tasks for projectStageId', this.projectStageId, ':', filteredTasks.length, filteredTasks);
-          this.tasks.set(filteredTasks);
+          console.log('[PreparingStage] Tasks loaded:', response.data.data.length, response.data.data);
+          this.tasks.set(response.data.data);
         }
         this.isLoading.set(false);
       },

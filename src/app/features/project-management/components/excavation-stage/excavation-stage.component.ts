@@ -60,19 +60,15 @@ export class ExcavationStageComponent implements OnInit {
   }
 
   /**
-   * Load tasks from API and filter by projectStageId
+   * Load tasks from API by projectStageId
    */
   private loadTasks(): void {
     this.isLoading.set(true);
     
-    this.taskService.getAllTasks(1, 100).subscribe({
+    this.taskService.getTasksByStageId(this.projectStageId, 1, 100).subscribe({
       next: (response) => {
         if (response.succeeded && response.data?.data) {
-          // Filter tasks by projectStageId
-          const filteredTasks = response.data.data.filter(
-            task => task.projectStageId === this.projectStageId
-          );
-          this.tasks.set(filteredTasks);
+          this.tasks.set(response.data.data);
         }
         this.isLoading.set(false);
       },

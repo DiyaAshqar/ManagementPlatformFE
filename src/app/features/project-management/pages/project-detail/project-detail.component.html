@@ -159,23 +159,29 @@
           <p-tabpanels>
             <p-tabpanel value="0">
               <div class="py-4">
-                <app-stage-kanban [projectId]="project()!.id"></app-stage-kanban>
+                @if (activeTabIndex === '0') {
+                  <app-stage-kanban [projectId]="project()!.id"></app-stage-kanban>
+                }
               </div>
             </p-tabpanel>
             <p-tabpanel value="1">
               <div class="py-4">
-                <app-preparing-stage 
-                  [projectId]="project()!.id" 
-                  [projectStageId]="preparingStageId()">
-                </app-preparing-stage>
+                @if (activeTabIndex === '1') {
+                  <app-preparing-stage 
+                    [projectId]="project()!.id" 
+                    [projectStageId]="preparingStageId()">
+                  </app-preparing-stage>
+                }
               </div>
             </p-tabpanel>
             <p-tabpanel value="2">
               <div class="py-4">
-                <app-excavation-stage 
-                  [projectId]="project()!.id"
-                  [projectStageId]="excavationStageId()">
-                </app-excavation-stage>
+                @if (activeTabIndex === '2') {
+                  <app-excavation-stage 
+                    [projectId]="project()!.id"
+                    [projectStageId]="excavationStageId()">
+                  </app-excavation-stage>
+                }
               </div>
             </p-tabpanel>
             <!-- <p-tabpanel value="3">

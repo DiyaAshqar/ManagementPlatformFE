@@ -26,19 +26,16 @@ export class TaskService {
 
   /**
    * Get tasks filtered by project stage ID
-   * In the future, this will be replaced with a dedicated backend endpoint
-   * @param projectStageId The project stage ID to filter by
+   * @param stageId The project stage ID to filter by
    * @param pageNumber Page number (default: 1)
    * @param pageSize Page size (default: 100)
    * @returns Observable of paginated task response
    */
-  getTasksByProjectStageId(
-    projectStageId: number,
+  getTasksByStageId(
+    stageId: number,
     pageNumber: number = 1,
     pageSize: number = 100
   ): Observable<GetProjectTaskDtoListPagedResponseResponse> {
-    // TODO: Replace with dedicated backend endpoint when available
-    // For now, we fetch all tasks and filter on the frontend
-    return this.getAllTasks(pageNumber, pageSize);
+    return this.taskClient.getAllTasksByStageId(stageId, pageNumber, pageSize, undefined);
   }
 }
