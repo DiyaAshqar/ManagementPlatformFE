@@ -1,14 +1,8 @@
-import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-import { 
-  SubTaskClient, 
-  CreateSubTaskCommand, 
-  ProjectSubTaskDto,
-  ProjectSubTaskDtoResponse,
-  BooleanResponse,
-  DeleteSubTaskCommand,
+import { Injectable } from '@angular/core';
+import {
+  CreateSubTaskCommand,
   ProjectStatusSubTask,
+  ProjectSubTaskDtoResponse,
   SubTaskType
 } from '../../../../nswag/api-client';
 
@@ -16,28 +10,12 @@ import {
   providedIn: 'root'
 })
 export class SubtaskService {
-  private subTaskClient = inject(SubTaskClient);
-
-  createSubTask(command: CreateSubTaskCommand): Observable<boolean> {
-    return this.subTaskClient.createSubTask(command).pipe(
-      map((response: BooleanResponse) => response.data ?? false)
-    );
-  }
-
-  getSubTask(id: number): Observable<ProjectSubTaskDto | undefined> {
-    return this.subTaskClient.getSubTask(id).pipe(
-      map((response: ProjectSubTaskDtoResponse) => response.data)
-    );
-  }
-
-  deleteSubTask(id: number): Observable<boolean> {
-    const command = new DeleteSubTaskCommand({ id });
-    return this.subTaskClient.deleteSubTask(command).pipe(
-      map((response: BooleanResponse) => response.data ?? false)
-    );
-  }
-
-  // Helper to map form data to API command
+  /**
+   * Helper to map form data to API command
+   * @param formData The form data object
+   * @param projectStageTaskId The project stage task ID
+   * @returns CreateSubTaskCommand ready for API
+   */
   mapToCreateCommand(formData: any, projectStageTaskId: number): CreateSubTaskCommand {
     return new CreateSubTaskCommand({
       id: formData.id,
@@ -52,17 +30,24 @@ export class SubtaskService {
     });
   }
 
-  // Helper to map API DTO to form data
-  mapToFormData(dto: ProjectSubTaskDto): any {
+  /**
+   * Helper to map API DTO to form data
+   * @param dto The subtask DTO from API
+   * @returns Form data object for display
+   */
+  mapToFormData(dto: ProjectSubTaskDtoResponse): any {
+    const data = dto.data;
+    if (!data) return null;
+
     return {
-      id: dto.id,
-      title: dto.title || '',
-      startDate: dto.startDate ? this.formatDateForInput(dto.startDate) : '',
-      endDate: dto.endDate ? this.formatDateForInput(dto.endDate) : '',
-      status: this.mapEnumToStatus(dto.status),
-      type: this.mapEnumToType(dto.type),
-      cost: dto.cost ? `$${dto.cost.toLocaleString()}` : '',
-      quantity: dto.qty ? `${dto.qty}` : ''
+      id: data.id,
+      title: data.title || '',
+      startDate: data.startDate ? this.formatDateForInput(data.startDate) : '',
+      endDate: data.endDate ? this.formatDateForInput(data.endDate) : '',
+      status: this.mapEnumToStatus(data.status),
+      type: this.mapEnumToType(data.type),
+      cost: data.cost ? `$${data.cost.toLocaleString()}` : '',
+      quantity: data.qty ? `${data.qty}` : ''
     };
   }
 

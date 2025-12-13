@@ -5,8 +5,9 @@ import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
-import { SubtaskService } from '../../../../services/subtask.service';
 import { MessageService } from 'primeng/api';
+import { SubtaskApiService } from '../../../../services/subtask-api.service';
+import { SubtaskService } from '../../../../services/subtask.service';
 
 export interface SubTaskFormData {
   id?: number;
@@ -35,8 +36,9 @@ export interface SubTaskFormData {
 export class SubtaskDialogComponent implements OnInit {
   private dialogRef = inject(DynamicDialogRef);
   private config = inject(DynamicDialogConfig);
-  private subtaskService = inject(SubtaskService);
+  private subtaskApiService = inject(SubtaskApiService);
   private messageService = inject(MessageService);
+  private subtaskService = inject(SubtaskService);
 
   formData = signal<SubTaskFormData>({
     title: '',
@@ -59,20 +61,14 @@ export class SubtaskDialogComponent implements OnInit {
 
   ngOnInit(): void {
     const data = this.config.data;
-    console.log('🔍 Subtask Dialog - ngOnInit - Full config data:', data);
-    console.log('🔍 Subtask Dialog - ngOnInit - projectStageTaskId:', data?.projectStageTaskId);
     
     // Get projectStageTaskId from config
     if (data && data.projectStageTaskId) {
       this.projectStageTaskId = data.projectStageTaskId;
-      console.log('✅ Subtask Dialog - projectStageTaskId SET:', this.projectStageTaskId);
-    } else {
-      console.warn('⚠️ Subtask Dialog - projectStageTaskId is MISSING in config.data');
     }
 
     // Load existing subtask data if editing
     if (data && data.subtask) {
-      console.log('🔍 Subtask Dialog - subtask data:', data.subtask);
       if (data.subtask.id) {
         this.loadSubTask(data.subtask.id);
       } else {
@@ -83,7 +79,7 @@ export class SubtaskDialogComponent implements OnInit {
 
   loadSubTask(id: number): void {
     this.isLoading.set(true);
-    this.subtaskService.getSubTask(id).subscribe({
+    this.subtaskApiService.getSubTask(id).subscribe({
       next: (dto) => {
         if (dto) {
           const formData = this.subtaskService.mapToFormData(dto);
@@ -116,12 +112,7 @@ export class SubtaskDialogComponent implements OnInit {
       return;
     }
 
-    console.log('🔍 Subtask Dialog - onSave - projectStageTaskId:', this.projectStageTaskId);
-    console.log('🔍 Subtask Dialog - onSave - data.id:', data.id);
-    console.log('🔍 Subtask Dialog - onSave - form data:', data);
-    
     if (!this.projectStageTaskId && !data.id) {
-      console.error('❌ Subtask Dialog - Validation FAILED: projectStageTaskId is missing');
       this.messageService.add({
         severity: 'error',
         summary: 'Error',
@@ -131,17 +122,15 @@ export class SubtaskDialogComponent implements OnInit {
     }
 
     this.isLoading.set(true);
-    console.log('🚀 Subtask Dialog - Creating API command...');
 
     // Convert form data to API command
     const command = this.subtaskService.mapToCreateCommand(
       data, 
       this.projectStageTaskId!
     );
-    console.log('🔍 Subtask Dialog - API command:', command);
 
     // Call API to create/update subtask
-    this.subtaskService.createSubTask(command).subscribe({
+    this.subtaskApiService.createSubTask(command).subscribe({
       next: (success) => {
         this.isLoading.set(false);
         if (success) {

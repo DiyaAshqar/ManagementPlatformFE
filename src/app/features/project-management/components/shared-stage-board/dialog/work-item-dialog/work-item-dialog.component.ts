@@ -26,9 +26,10 @@ export interface SubTask {
 
 export interface WorkItemFormData {
   id?: string;
+  backendTaskId?: number; // Backend task ID for updates
   title: string;
   type: string;
-  taskTypeId?: number;
+  taskTypeId?: number; // Task type reference ID
   projectStageId?: number; // Stage ID for subtask creation
   priority: string;
   assignTo: string;
@@ -76,6 +77,7 @@ export class WorkItemDialogComponent implements OnInit {
   formData = signal<WorkItemFormData>({
     title: '',
     type: 'Task',
+    backendTaskId: undefined,
     taskTypeId: undefined,
     priority: 'medium',
     assignTo: '',

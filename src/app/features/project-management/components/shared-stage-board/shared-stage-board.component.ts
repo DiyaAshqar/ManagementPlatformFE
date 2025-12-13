@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { ConfirmationService } from 'primeng/api';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
@@ -17,6 +18,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { AvatarGroupModule } from 'primeng/avatargroup';
 import { ChipModule } from 'primeng/chip';
 import { ProgressBarModule } from 'primeng/progressbar';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { WorkItemDialogComponent } from './dialog/work-item-dialog/work-item-dialog.component';
 import { SubtaskDialogComponent } from './dialog/subtask-dialog/subtask-dialog.component';
@@ -99,10 +101,12 @@ export interface Column {
     AvatarModule,
     AvatarGroupModule,
     ChipModule,
-    ProgressBarModule
+    ProgressBarModule,
+    ConfirmDialogModule
   ],
   templateUrl: './shared-stage-board.component.html',
-  styleUrls: ['./shared-stage-board.component.scss']
+  styleUrls: ['./shared-stage-board.component.scss'],
+  providers: [ConfirmationService]
 })
 export class SharedStageBoardComponent implements OnInit {
   @Input() projectId!: string;
@@ -111,12 +115,15 @@ export class SharedStageBoardComponent implements OnInit {
   @Input() stageDescription: string = 'Manage tasks and activities';
   @Input({ required: true }) columnsInput!: Signal<Column[]>;
   @Output() taskCreated = new EventEmitter<void>();
+  @Output() taskUpdated = new EventEmitter<void>();
+  @Output() taskDeleted = new EventEmitter<void>();
   
   
   // Internal writable signal for columns (so we can mutate them for drag-drop)
   columns = signal<Column[]>([]);
   
   private dialogService = inject(DialogService);
+  private confirmationService = inject(ConfirmationService);
   private dialogRef: DynamicDialogRef | undefined;
   private taskService = inject(TaskService);
 
@@ -185,7 +192,6 @@ export class SharedStageBoardComponent implements OnInit {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
       const item = event.previousContainer.data[event.previousIndex];
-      const updatedItem = { ...item, status: targetColumn.id };
       
       transferArrayItem(
         event.previousContainer.data,
@@ -194,33 +200,21 @@ export class SharedStageBoardComponent implements OnInit {
         event.currentIndex
       );
       
-      event.container.data[event.currentIndex] = updatedItem;
-      
-      this.columns.update(cols => {
-        return cols.map(col => {
-          if (col.id === targetColumn.id) {
-            return { ...col, items: [...event.container.data] };
-          }
-          return col;
-        });
-      });
-
-      // Call API to update task status
-      const taskId = parseInt(item.id);
-      if (!isNaN(taskId)) {
+      // Call API to update task status only
+      if (item.taskId) {
         const apiStatus = this.mapTaskStatusToApiStatus(targetColumn.id);
-        this.taskService.updateTaskStatus(taskId, apiStatus).subscribe({
+        this.taskService.updateTaskStatus(item.taskId, apiStatus).subscribe({
           next: (response) => {
             if (response.succeeded) {
-              console.log('Task status updated successfully');
+              console.log('✅ Task status updated successfully');
+              // Emit event for parent to reload all tasks
+              this.taskUpdated.emit();
             } else {
-              console.error('Failed to update task status:', response.message);
-              // Optionally revert the UI change here if API fails
+              console.error('❌ Failed to update task status:', response.message);
             }
           },
           error: (error) => {
-            console.error('Error updating task status:', error);
-            // Optionally revert the UI change here if API fails
+            console.error('❌ Error updating task status:', error);
           }
         });
       }
@@ -242,7 +236,7 @@ export class SharedStageBoardComponent implements OnInit {
         mode: 'edit',
         workItem: {
           id: item.id,
-          taskTypeId: item.taskId, // Pass the backend task ID
+          backendTaskId: item.taskId, // Pass the backend task ID for updates
           projectStageId: item.projectStageId, // Pass the stage ID
           title: item.title,
           type: item.type,
@@ -267,25 +261,40 @@ export class SharedStageBoardComponent implements OnInit {
     this.dialogRef.onClose.subscribe((result: any) => {
       if (result) {
         console.log('💾 Edit dialog closed with data:', result);
-        // Update the work item in the UI
-        // Note: For edit mode, we typically would call an update API
-        // For now, just update the local state
-        this.columns.update(cols => {
-          return cols.map(col => ({
-            ...col,
-            items: col.items.map(workItem => {
-              if (workItem.id === item.id) {
-                return {
-                  ...workItem,
-                  ...result,
-                  id: item.id,
-                  taskId: item.taskId,
-                  projectStageId: item.projectStageId
-                };
-              }
-              return workItem;
-            })
-          }));
+        
+        // Prepare the CreateTaskCommand for API with task ID for update
+        const updateCommand = new CreateTaskCommand({
+          id: result.backendTaskId || item.taskId, // Include the backend task ID for update
+          title: result.title,
+          description: result.description,
+          startDate: result.startDate ? new Date(result.startDate) : undefined,
+          endDate: result.endDate ? new Date(result.endDate) : undefined,
+          excavationLocation: result.location || undefined,
+          excavationDepth: result.depth ? parseFloat(result.depth) : undefined,
+          excavationVolume: result.volume ? parseFloat(result.volume) : undefined,
+          excavationSoilType: result.soilType || undefined,
+          excavationEquipment: result.equipment || undefined,
+          taskTypeId: result.taskTypeId || 1,
+          projectStageId: item.projectStageId,
+          status: this.mapTaskStatusToApiStatus(result.status || item.status)
+        });
+        
+        console.log('📤 Sending update task command:', updateCommand);
+        
+        // Call the API to update the task
+        this.taskService.updateTask(updateCommand).subscribe({
+          next: (response) => {
+            if (response.succeeded) {
+              console.log('✅ Task updated successfully');
+              // Emit event to notify parent component to reload tasks
+              this.taskCreated.emit();
+            } else {
+              console.error('❌ Failed to update task:', response.message);
+            }
+          },
+          error: (error) => {
+            console.error('❌ Error updating task:', error);
+          }
         });
       }
     });
@@ -415,20 +424,9 @@ export class SharedStageBoardComponent implements OnInit {
   }
 
   deleteSubtask(item: WorkItem, subtaskId: string | number): void {
-    this.columns.update(cols => {
-      return cols.map(col => ({
-        ...col,
-        items: col.items.map(workItem => {
-          if (workItem.id === item.id) {
-            return {
-              ...workItem,
-              subtasks: workItem.subtasks.filter(st => st.id !== subtaskId)
-            };
-          }
-          return workItem;
-        })
-      }));
-    });
+    // Subtask deletion is handled via API in the subtask dialog
+    // Emit event for parent to reload all data
+    this.taskUpdated.emit();
   }
 
   getStatusSeverity(status: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' {
@@ -450,13 +448,32 @@ export class SharedStageBoardComponent implements OnInit {
   }
 
   deleteWorkItem(item: WorkItem): void {
-    this.columns.update(cols => {
-      return cols.map(col => ({
-        ...col,
-        items: col.items.filter(workItem => workItem.id !== item.id)
-      }));
+    this.confirmationService.confirm({
+      message: `Are you sure you want to delete the task "${item.title}"?`,
+      header: 'Confirm Delete',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        if (item.taskId) {
+          // Call API to delete the task
+          this.taskService.deleteTask(item.taskId).subscribe({
+            next: (response) => {
+              if (response.succeeded) {
+                console.log('✅ Task deleted successfully');
+                // Close dialog first
+                this.showItemDialog.set(false);
+                // Emit event for parent to reload all tasks
+                this.taskDeleted.emit();
+              } else {
+                console.error('❌ Failed to delete task:', response.message);
+              }
+            },
+            error: (error) => {
+              console.error('❌ Error deleting task:', error);
+            }
+          });
+        }
+      }
     });
-    this.showItemDialog.set(false);
   }
 
   toggleExpanded(itemId: string): void {

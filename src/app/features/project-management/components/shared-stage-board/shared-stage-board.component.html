@@ -1,4 +1,7 @@
 <div class="staging-board">
+  <!-- Confirmation Dialog -->
+  <p-confirmDialog></p-confirmDialog>
+  
   <!-- Header Stats -->
   <div class="grid mb-4">
     <div class="col-12 md:col-3">
@@ -126,13 +129,25 @@
                     </div>
                     <span class="text-xs font-mono text-500">{{ item.id }}</span>
                   </div>
-                  @if (item.priority === 'critical' || item.priority === 'high') {
-                    <p-tag 
-                      [value]="item.priority"
-                      [severity]="getPrioritySeverity(item.priority)"
-                      styleClass="text-xs">
-                    </p-tag>
-                  }
+                  <div class="flex align-items-center gap-1">
+                    @if (item.priority === 'critical' || item.priority === 'high') {
+                      <p-tag 
+                        [value]="item.priority"
+                        [severity]="getPrioritySeverity(item.priority)"
+                        styleClass="text-xs">
+                      </p-tag>
+                    }
+                    <p-button 
+                      icon="pi pi-trash"
+                      [text]="true"
+                      [rounded]="true"
+                      severity="danger"
+                      size="small"
+                      (onClick)="$event.stopPropagation(); deleteWorkItem(item)"
+                      pTooltip="Delete task"
+                      tooltipPosition="top">
+                    </p-button>
+                  </div>
                 </div>
 
                 <!-- Work Item Title -->

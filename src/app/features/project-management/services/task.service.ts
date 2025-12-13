@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { TaskClient, GetProjectTaskDtoListPagedResponseResponse, CreateTaskCommand, BooleanResponse, ResultListPagedResponseResponse, StatusTask } from '../../../../nswag/api-client';
+import { TaskClient, GetProjectTaskDtoListPagedResponseResponse, CreateTaskCommand, BooleanResponse, ResultListPagedResponseResponse, StatusTask, DeleteTaskCommand } from '../../../../nswag/api-client';
 
 @Injectable({
   providedIn: 'root'
@@ -71,5 +71,25 @@ export class TaskService {
    */
   updateTaskStatus(taskId: number, status: StatusTask): Observable<BooleanResponse> {
     return this.taskClient.updateStatus(taskId, status);
+  }
+
+  /**
+   * Update an existing task via API
+   * Uses the same CreateTaskCommand as create but includes the task ID
+   * @param taskCommand The task command with all required fields including ID
+   * @returns Observable of boolean response indicating success
+   */
+  updateTask(taskCommand: CreateTaskCommand): Observable<BooleanResponse> {
+    return this.taskClient.createTask(taskCommand);
+  }
+
+  /**
+   * Delete a task via API
+   * @param taskId The ID of the task to delete
+   * @returns Observable of boolean response indicating success
+   */
+  deleteTask(taskId: number): Observable<BooleanResponse> {
+    const deleteCommand = new DeleteTaskCommand({ id: taskId });
+    return this.taskClient.deleteTask(deleteCommand);
   }
 }
