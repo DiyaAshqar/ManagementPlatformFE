@@ -20,7 +20,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 
 import { ProjectService } from '../../services/project.service';
 import { Project, ProjectStatus, ProjectPriority, ProjectFilters } from '../../models';
-import { CreateProjectDialogComponent } from '../../components/create-project-dialog/create-project-dialog.component';
+import { CreateProjectDialogComponent } from '../../components/dialog/create-project-dialog/create-project-dialog.component';
 
 @Component({
   selector: 'app-project-list',

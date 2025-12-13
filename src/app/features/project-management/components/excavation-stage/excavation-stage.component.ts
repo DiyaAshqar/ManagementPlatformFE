@@ -5,8 +5,8 @@ import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { TaskService } from '../../services/task.service';
 import { ProjectService } from '../../services/project.service';
 import { GetProjectTaskDto, StatusTask } from '../../../../../nswag/api-client';
-import { AddTaskDialogComponent } from '../add-task-dialog/add-task-dialog.component';
 import { Task, TaskPriority, TaskStatus } from '../../models';
+import { AddTaskDialogComponent } from '../dialog/add-task-dialog/add-task-dialog.component';
 
 @Component({
   selector: 'app-excavation-stage',

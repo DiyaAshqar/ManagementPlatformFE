@@ -15,10 +15,10 @@ import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 
 import { MessageService } from 'primeng/api';
-import { CreateProjectCommand, GetAllAgreementDto, ProjectStatus } from '../../../../../nswag/api-client';
-import { AgreementWizardService } from '../../../agreement-wizard/services/agreement-wizard.service';
-import { Project } from '../../models';
-import { ProjectApiService } from '../../services/project-api.service';
+import { Project } from '../../../models';
+import { ProjectApiService } from '../../../services/project-api.service';
+import { AgreementWizardService } from '../../../../agreement-wizard/services/agreement-wizard.service';
+import { CreateProjectCommand, GetAllAgreementDto, ProjectStatus } from '../../../../../../nswag/api-client';
 
 @Component({
   selector: 'app-create-project-dialog',
