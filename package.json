@@ -24,6 +24,7 @@
     "@ngx-translate/core": "^17.0.0",
     "@ngx-translate/http-loader": "^8.0.0",
     "@primeng/themes": "^19.1.4",
+    "date-fns": "^4.1.0",
     "primeflex": "^4.0.0",
     "primeicons": "^7.0.0",
     "primeng": "^19.1.4",

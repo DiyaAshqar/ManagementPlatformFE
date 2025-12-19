@@ -4,6 +4,7 @@ import {
   SubTaskClient, 
   CreateSubTaskCommand, 
   ProjectSubTaskDtoResponse,
+  ProjectSubTaskDtoListResponse,
   BooleanResponse,
   DeleteSubTaskCommand
 } from '../../../../nswag/api-client';
@@ -31,6 +32,15 @@ export class SubtaskApiService {
    */
   getSubTask(id: number): Observable<ProjectSubTaskDtoResponse> {
     return this.subTaskClient.getSubTask(id);
+  }
+
+  /**
+   * Get all subtasks for a specific task
+   * @param taskId The task ID to get subtasks for
+   * @returns Observable of subtask list response
+   */
+  getSubTasksByTaskId(taskId: number): Observable<ProjectSubTaskDtoListResponse> {
+    return this.subTaskClient.getSubTaskByTaskId(taskId);
   }
 
   /**

@@ -1,12 +1,13 @@
-import { Component, Input, signal, OnInit, computed, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { SharedStageBoardComponent, Column, TaskStatus as BoardTaskStatus, WorkItemType, WorkItem } from '../shared-stage-board/shared-stage-board.component';
+import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
+import { format } from 'date-fns';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { TaskService } from '../../services/task.service';
-import { ProjectService } from '../../services/project.service';
-import { GetProjectTaskDto, StatusTask } from '../../../../../nswag/api-client';
+import { GetProjectTaskDto } from '../../../../../nswag/api-client';
 import { Task, TaskPriority, TaskStatus } from '../../models';
+import { ProjectService } from '../../services/project.service';
+import { TaskService } from '../../services/task.service';
 import { AddTaskDialogComponent } from '../dialog/add-task-dialog/add-task-dialog.component';
+import { TaskStatus as BoardTaskStatus, Column, SharedStageBoardComponent, WorkItem, WorkItemType } from '../shared-stage-board/shared-stage-board.component';
 
 @Component({
   selector: 'app-excavation-stage',
@@ -102,6 +103,7 @@ export class ExcavationStageComponent implements OnInit {
       id: task.id?.toString() || '',
       taskId: task.id, // Backend task ID
       projectStageId: task.projectStageId, // Stage ID for subtask creation
+      taskTypeId: task.taskTypeId, // Task type ID from API
       title: task.title || 'Untitled Task',
       type: WorkItemType.TASK,
       priority: this.mapPriority(task.priority),
@@ -112,14 +114,14 @@ export class ExcavationStageComponent implements OnInit {
       description: task.description || '',
       status: this.mapStatus(task.status),
       subtasks: [],
-      startDate: task.startDate ? new Date(task.startDate).toISOString().split('T')[0] : '',
-      endDate: task.endDate ? new Date(task.endDate).toISOString().split('T')[0] : '',
+      startDate: task.startDate ? this.formatDateAsLocalString(task.startDate) : '',
+      endDate: task.endDate ? this.formatDateAsLocalString(task.endDate) : '',
       location: task.excavationLocation || '',
       depth: task.excavationDepth?.toString() || '',
       volume: task.excavationVolume?.toString() || '',
       soilType: task.excavationSoilType || '',
       equipment: task.excavationEquipment || '',
-      createdDate: task.startDate ? new Date(task.startDate).toISOString().split('T')[0] : ''
+      createdDate: task.startDate ? this.formatDateAsLocalString(task.startDate) : ''
     }));
   }
 
@@ -147,6 +149,27 @@ export class ExcavationStageComponent implements OnInit {
       case 2: return BoardTaskStatus.REVIEW;
       case 3: return BoardTaskStatus.DONE;
       default: return BoardTaskStatus.TODO;
+    }
+  }
+
+  /**
+   * Format date from API as local date string YYYY-MM-DD using date-fns
+   * Treats the date string from API as local time, not UTC
+   */
+  private formatDateAsLocalString(dateString: string | Date): string {
+    if (!dateString) return '';
+    
+    try {
+      // Parse date string as local time (ignore timezone)
+      const dateStr = typeof dateString === 'string' ? dateString : dateString.toISOString();
+      // Extract just the date part without timezone conversion
+      const datePart = dateStr.split('T')[0];
+      // Parse as local date and format
+      const date = new Date(datePart + 'T00:00:00');
+      return format(date, 'yyyy-MM-dd');
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return '';
     }
   }
 

@@ -1,29 +1,30 @@
-import { Component, Input, Output, EventEmitter, inject, signal, Signal, OnInit, effect } from '@angular/core';
-import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
 import { CdkDragDrop, DragDropModule, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
-import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
+import { CommonModule } from '@angular/common';
+import { Component, effect, EventEmitter, inject, Input, OnInit, Output, signal, Signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { parseISO } from 'date-fns';
 import { ConfirmationService } from 'primeng/api';
+import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 
 // PrimeNG Imports
-import { CardModule } from 'primeng/card';
-import { ButtonModule } from 'primeng/button';
-import { TagModule } from 'primeng/tag';
-import { DialogModule } from 'primeng/dialog';
-import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
-import { TooltipModule } from 'primeng/tooltip';
-import { TextareaModule } from 'primeng/textarea';
 import { AvatarModule } from 'primeng/avatar';
 import { AvatarGroupModule } from 'primeng/avatargroup';
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
 import { ChipModule } from 'primeng/chip';
-import { ProgressBarModule } from 'primeng/progressbar';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { DialogModule } from 'primeng/dialog';
+import { InputTextModule } from 'primeng/inputtext';
+import { ProgressBarModule } from 'primeng/progressbar';
+import { SelectModule } from 'primeng/select';
+import { TagModule } from 'primeng/tag';
+import { TextareaModule } from 'primeng/textarea';
+import { TooltipModule } from 'primeng/tooltip';
 
-import { WorkItemDialogComponent } from './dialog/work-item-dialog/work-item-dialog.component';
-import { SubtaskDialogComponent } from './dialog/subtask-dialog/subtask-dialog.component';
+import { CreateTaskCommand, StatusTask } from '../../../../../nswag/api-client';
 import { TaskService } from '../../services/task.service';
-import { StatusTask, CreateTaskCommand } from '../../../../../nswag/api-client';
+import { SubtaskDialogComponent } from './dialog/subtask-dialog/subtask-dialog.component';
+import { WorkItemDialogComponent } from './dialog/work-item-dialog/work-item-dialog.component';
 
 export interface SubTask {
   id: string | number;
@@ -40,6 +41,7 @@ export interface WorkItem {
   id: string;
   taskId?: number; // Backend task ID for API operations
   projectStageId?: number; // Stage ID that this task belongs to (needed for subtask creation)
+  taskTypeId?: number; // Task type ID from API
   title: string;
   type: WorkItemType;
   priority: 'low' | 'medium' | 'high' | 'critical';
@@ -113,6 +115,7 @@ export class SharedStageBoardComponent implements OnInit {
   @Input() projectStageId!: number;
   @Input() stageTitle: string = 'Stage Board';
   @Input() stageDescription: string = 'Manage tasks and activities';
+  @Input() showExcavationFields: boolean = false; // Controls visibility of excavation-specific fields
   @Input({ required: true }) columnsInput!: Signal<Column[]>;
   @Output() taskCreated = new EventEmitter<void>();
   @Output() taskUpdated = new EventEmitter<void>();
@@ -234,10 +237,12 @@ export class SharedStageBoardComponent implements OnInit {
       maximizable: true,
       data: {
         mode: 'edit',
+        showExcavationFields: this.showExcavationFields,
         workItem: {
           id: item.id,
           backendTaskId: item.taskId, // Pass the backend task ID for updates
           projectStageId: item.projectStageId, // Pass the stage ID
+          taskTypeId: item.taskTypeId, // Pass the task type ID
           title: item.title,
           type: item.type,
           priority: item.priority,
@@ -267,8 +272,11 @@ export class SharedStageBoardComponent implements OnInit {
           id: result.backendTaskId || item.taskId, // Include the backend task ID for update
           title: result.title,
           description: result.description,
-          startDate: result.startDate ? new Date(result.startDate) : undefined,
-          endDate: result.endDate ? new Date(result.endDate) : undefined,
+          assignTo: result.assignTo ? parseInt(result.assignTo) : 0,
+          priority: this.mapPriorityToNumber(result.priority),
+          taskPoint: result.taskPoints ? parseInt(result.taskPoints) : 0,
+          startDate: result.startDate ? this.parseDateString(result.startDate) : undefined,
+          endDate: result.endDate ? this.parseDateString(result.endDate) : undefined,
           excavationLocation: result.location || undefined,
           excavationDepth: result.depth ? parseFloat(result.depth) : undefined,
           excavationVolume: result.volume ? parseFloat(result.volume) : undefined,
@@ -312,6 +320,7 @@ export class SharedStageBoardComponent implements OnInit {
       data: {
         mode: 'add',
         projectStageId: this.projectStageId,
+        showExcavationFields: this.showExcavationFields,
         workItem: {
           title: '',
           type: WorkItemType.TASK,
@@ -340,8 +349,11 @@ export class SharedStageBoardComponent implements OnInit {
         const createCommand = new CreateTaskCommand({
           title: result.title,
           description: result.description,
-          startDate: result.startDate ? new Date(result.startDate) : undefined,
-          endDate: result.endDate ? new Date(result.endDate) : undefined,
+          assignTo: result.assignTo ? parseInt(result.assignTo) : 0,
+          priority: this.mapPriorityToNumber(result.priority),
+          taskPoint: result.taskPoints ? parseInt(result.taskPoints) : 0,
+          startDate: result.startDate ? this.parseDateString(result.startDate) : undefined,
+          endDate: result.endDate ? this.parseDateString(result.endDate) : undefined,
           excavationLocation: result.location || undefined,
           excavationDepth: result.depth ? parseFloat(result.depth) : undefined,
           excavationVolume: result.volume ? parseFloat(result.volume) : undefined,
@@ -550,6 +562,46 @@ export class SharedStageBoardComponent implements OnInit {
         return StatusTask._3; // Done
       default:
         return StatusTask._0; // Default to TODO
+    }
+  }
+
+  /**
+   * Parse date string to Date object without timezone conversion
+   * Handles both ISO strings and Date objects
+   */
+  private parseDateString(dateValue: any): Date | undefined {
+    if (!dateValue) return undefined;
+    
+    try {
+      // If it's already a Date object, return it
+      if (dateValue instanceof Date) {
+        return dateValue;
+      }
+      
+      // If it's a string in format YYYY-MM-DDTHH:mm:ss (without timezone)
+      if (typeof dateValue === 'string') {
+        // Parse the date string as local time by using parseISO
+        return parseISO(dateValue);
+      }
+      
+      return undefined;
+    } catch (error) {
+      console.error('Error parsing date:', error);
+      return undefined;
+    }
+  }
+
+  /**
+   * Map priority string to number for API
+   * low = 0, medium = 1, high = 2, critical = 3
+   */
+  private mapPriorityToNumber(priority: string): number {
+    switch (priority?.toLowerCase()) {
+      case 'low': return 0;
+      case 'medium': return 1;
+      case 'high': return 2;
+      case 'critical': return 3;
+      default: return 1; // Default to medium
     }
   }
 

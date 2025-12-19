@@ -1,17 +1,20 @@
-import { Component, signal, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { DynamicDialogRef, DynamicDialogConfig, DialogService } from 'primeng/dynamicdialog';
+import { format } from 'date-fns';
+import { MessageService } from 'primeng/api';
+import { ButtonModule } from 'primeng/button';
+import { DatePickerModule } from 'primeng/datepicker';
+import { DialogService, DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
-import { TextareaModule } from 'primeng/textarea';
-import { ButtonModule } from 'primeng/button';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
+import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
-import { DatePickerModule } from 'primeng/datepicker';
-import { SubtaskDialogComponent, SubTaskFormData } from '../subtask-dialog/subtask-dialog.component';
+import { SubtaskApiService } from '../../../../services/subtask-api.service';
 import { TaskService } from '../../../../services/task.service';
+import { SubtaskDialogComponent } from '../subtask-dialog/subtask-dialog.component';
 
 export interface SubTask {
   id: string | number;
@@ -70,9 +73,18 @@ export class WorkItemDialogComponent implements OnInit {
   private config = inject(DynamicDialogConfig);
   private dialogService = inject(DialogService);
   private taskService = inject(TaskService);
+  private subtaskApiService = inject(SubtaskApiService);
+  private messageService = inject(MessageService);
 
   subtasks = signal<SubTask[]>([]);
   isLoadingTaskTypes = signal(false);
+  isLoadingSubtasks = signal(false);
+  projectStageId = signal<number | undefined>(undefined);
+  
+  // Computed signal to determine if excavation fields should be shown
+  // Excavation fields are only shown for Excavation stage (stageType 2)
+  // Hidden for Preparing stage (stageType 1) and other stages
+  shouldShowExcavationFields = signal(true);
 
   formData = signal<WorkItemFormData>({
     title: '',
@@ -106,8 +118,43 @@ export class WorkItemDialogComponent implements OnInit {
   ngOnInit(): void {
     const data = this.config.data;
     if (data && data.workItem) {
-      this.formData.set({ ...data.workItem });
-      this.subtasks.set(data.workItem.subtasks || []);
+      // Convert date strings to Date objects for p-datepicker
+      const workItemData = { ...data.workItem };
+      if (workItemData.startDate && typeof workItemData.startDate === 'string') {
+        workItemData.startDate = new Date(workItemData.startDate);
+      }
+      if (workItemData.endDate && typeof workItemData.endDate === 'string') {
+        workItemData.endDate = new Date(workItemData.endDate);
+      }
+      console.log('🔧 Dialog initialized with data:', {
+        mode: data.mode,
+        type: workItemData.type,
+        taskTypeId: workItemData.taskTypeId,
+        startDate: workItemData.startDate,
+        endDate: workItemData.endDate,
+        backendTaskId: workItemData.backendTaskId
+      });
+      this.formData.set(workItemData);
+      
+      // Load subtasks from API if in edit mode and backendTaskId is available
+      if (data.mode === 'edit' && workItemData.backendTaskId) {
+        this.loadSubtasks(workItemData.backendTaskId);
+      } else {
+        this.subtasks.set(data.workItem.subtasks || []);
+      }
+    }
+    
+    // Get projectStageId from config data
+    if (data && data.projectStageId !== undefined) {
+      this.projectStageId.set(data.projectStageId);
+    }
+    
+    // Get showExcavationFields flag from config data
+    if (data && data.showExcavationFields !== undefined) {
+      this.shouldShowExcavationFields.set(data.showExcavationFields);
+    } else {
+      // Default to false (hide excavation fields) if not specified
+      this.shouldShowExcavationFields.set(false);
     }
     
     // Load task types from API
@@ -120,6 +167,78 @@ export class WorkItemDialogComponent implements OnInit {
   private taskTypeMap = new Map<string, number>();
 
   /**
+   * Load subtasks for a specific task from API
+   */
+  private loadSubtasks(taskId: number): void {
+    console.log('🔄 Loading subtasks for task ID:', taskId);
+    this.isLoadingSubtasks.set(true);
+
+    this.subtaskApiService.getSubTasksByTaskId(taskId).subscribe({
+      next: (response) => {
+        console.log('✅ Subtasks loaded:', response);
+        if (response.succeeded && response.data) {
+          // Map API response to SubTask interface
+          const subtasks: SubTask[] = response.data.map(subtask => ({
+            id: subtask.id || 0,
+            title: subtask.title || '',
+            startDate: subtask.startDate ? new Date(subtask.startDate).toISOString().split('T')[0] : '',
+            endDate: subtask.endDate ? new Date(subtask.endDate).toISOString().split('T')[0] : '',
+            status: this.mapApiStatusToSubtaskStatus(subtask.status),
+            type: this.mapApiTypeToString(subtask.type),
+            cost: subtask.cost ? `$${subtask.cost}` : '',
+            quantity: subtask.qty ? `${subtask.qty}` : ''
+          }));
+          
+          this.subtasks.set(subtasks);
+          console.log('📋 Subtasks set:', subtasks);
+        }
+        this.isLoadingSubtasks.set(false);
+      },
+      error: (error) => {
+        console.error('❌ Failed to load subtasks:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load subtasks'
+        });
+        this.isLoadingSubtasks.set(false);
+      }
+    });
+  }
+
+  /**
+   * Map API status enum to SubTask status
+   */
+  private mapApiStatusToSubtaskStatus(status: any): 'completed' | 'in-progress' | 'pending' {
+    // Assuming: 0 = pending, 1 = in-progress, 2 = completed
+    switch (status) {
+      case 0:
+        return 'pending';
+      case 1:
+        return 'in-progress';
+      case 2:
+        return 'completed';
+      default:
+        return 'pending';
+    }
+  }
+
+  /**
+   * Map API type enum to string
+   */
+  private mapApiTypeToString(type: any): string {
+    // Assuming: 0 = Excavation, 1 = Preparation, etc.
+    switch (type) {
+      case 0:
+        return 'Excavation';
+      case 1:
+        return 'Preparation';
+      default:
+        return `Type ${type}`;
+    }
+  }
+
+  /**
    * Load task types from API
    */
   private loadTaskTypes(): void {
@@ -130,27 +249,41 @@ export class WorkItemDialogComponent implements OnInit {
         if (response.succeeded && response.data?.data) {
           // Build the task type map and options
           this.taskTypeMap.clear();
+          const taskTypeIdToName = new Map<number, string>();
+          
           this.workItemTypes = response.data.data.map(type => {
             const name = type.name || '';
             const id = type.id || 0;
             this.taskTypeMap.set(name, id);
+            taskTypeIdToName.set(id, name);
             return {
               label: name,
               value: name
             };
           });
           
+          // If in edit mode and taskTypeId is set, load the type name
+          const currentFormData = this.formData();
+          if (currentFormData.taskTypeId) {
+            const typeName = taskTypeIdToName.get(currentFormData.taskTypeId);
+            if (typeName) {
+              console.log('🔍 Setting type from taskTypeId:', currentFormData.taskTypeId, '-> ', typeName);
+              this.updateFormField('type', typeName);
+            }
+          }
           // Set default task type if available and not already set
-          if (this.workItemTypes.length > 0 && !this.formData().type) {
+          else if (this.workItemTypes.length > 0 && !currentFormData.type) {
             const defaultType = this.workItemTypes[0].value;
+            const defaultTypeId = this.taskTypeMap.get(defaultType);
+            console.log('🔍 Setting default type:', defaultType, 'ID:', defaultTypeId);
             this.updateFormField('type', defaultType);
-            this.updateFormField('taskTypeId', this.taskTypeMap.get(defaultType));
+            this.updateFormField('taskTypeId', defaultTypeId);
           }
         }
         this.isLoadingTaskTypes.set(false);
       },
       error: (error) => {
-        console.error('Error loading task types:', error);
+        console.error('❌ Failed to load task types:', error);
         // Fallback to default options
         this.workItemTypes = [
           { label: 'User Story', value: 'User Story' },
@@ -162,6 +295,16 @@ export class WorkItemDialogComponent implements OnInit {
         this.taskTypeMap.set('Task', 1);
         this.taskTypeMap.set('Bug', 2);
         this.taskTypeMap.set('Feature', 3);
+        
+        // Set default if no type is set
+        const currentFormData = this.formData();
+        if (!currentFormData.type && this.workItemTypes.length > 0) {
+          const defaultType = this.workItemTypes[2].value; // 'Task'
+          console.log('🔧 Setting fallback default type:', defaultType);
+          this.updateFormField('type', defaultType);
+          this.updateFormField('taskTypeId', this.taskTypeMap.get(defaultType));
+        }
+        
         this.isLoadingTaskTypes.set(false);
       }
     });
@@ -182,12 +325,39 @@ export class WorkItemDialogComponent implements OnInit {
       return;
     }
     
-    const dataWithSubtasks = {
+    // Convert dates to local timezone format using date-fns
+    const dataToSave = {
       ...data,
+      startDate: this.formatDateForApi(data.startDate),
+      endDate: this.formatDateForApi(data.endDate),
       subtasks: this.subtasks()
     };
     
-    this.dialogRef.close(dataWithSubtasks);
+    console.log('💾 Saving with local dates:', {
+      startDate: dataToSave.startDate,
+      endDate: dataToSave.endDate
+    });
+    
+    this.dialogRef.close(dataToSave);
+  }
+  
+  /**
+   * Format date for API using date-fns
+   * Formats date as ISO string without timezone conversion
+   */
+  private formatDateForApi(date: any): string | undefined {
+    if (!date) return undefined;
+    
+    try {
+      const d = date instanceof Date ? date : new Date(date);
+      if (isNaN(d.getTime())) return undefined;
+      
+      // Format as ISO date-time without timezone (YYYY-MM-DDTHH:mm:ss)
+      return format(d, "yyyy-MM-dd'T'HH:mm:ss");
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return undefined;
+    }
   }
 
   onCancel(): void {
@@ -204,15 +374,9 @@ export class WorkItemDialogComponent implements OnInit {
 
   openAddSubtaskDialog(): void {
     const currentFormData = this.formData();
-    console.log('🔍 Work Item Dialog - openAddSubtaskDialog - Full form data:', currentFormData);
-    console.log('🔍 Work Item Dialog - openAddSubtaskDialog - projectStageId:', currentFormData.projectStageId);
-    console.log('🔍 Work Item Dialog - openAddSubtaskDialog - taskTypeId:', currentFormData.taskTypeId);
-    console.log('🔍 Work Item Dialog - openAddSubtaskDialog - id:', currentFormData.id);
-    
-    // Use projectStageId (the correct field for subtask creation)
-    // Fallback to taskTypeId, then to parsed task ID if needed
-    const stageTaskId = currentFormData.projectStageId || currentFormData.taskTypeId || (currentFormData.id ? parseInt(currentFormData.id) : undefined);
-    console.log('✅ Work Item Dialog - Resolved projectStageTaskId (Stage ID):', stageTaskId);
+
+    // Use backendTaskId (the actual task ID from the backend) or parse the id field
+    const taskId = currentFormData.backendTaskId || (currentFormData.id ? parseInt(currentFormData.id) : undefined);
     
     const dialogRef = this.dialogService.open(SubtaskDialogComponent, {
       header: 'Add Subtask',
@@ -221,7 +385,7 @@ export class WorkItemDialogComponent implements OnInit {
       maximizable: true,
       data: {
         mode: 'add',
-        projectStageTaskId: stageTaskId,
+        projectStageTaskId: taskId,
         subtask: {
           title: '',
           startDate: '',
@@ -237,16 +401,17 @@ export class WorkItemDialogComponent implements OnInit {
 
     dialogRef.onClose.subscribe((result: any) => {
       if (result && result.success) {
-        // Subtask created successfully via API
-        // Parent component will handle refresh
+        // Subtask created successfully via API, reload subtasks
+        if (taskId) {
+          this.loadSubtasks(taskId);
+        }
       }
     });
   }
 
   openEditSubtaskDialog(subtask: SubTask): void {
     const currentFormData = this.formData();
-    const stageTaskId = currentFormData.projectStageId || currentFormData.taskTypeId || (currentFormData.id ? parseInt(currentFormData.id) : undefined);
-    console.log('✅ Work Item Dialog - openEditSubtaskDialog - Resolved projectStageTaskId (Stage ID):', stageTaskId);
+    const taskId = currentFormData.backendTaskId || (currentFormData.id ? parseInt(currentFormData.id) : undefined);
     
     const dialogRef = this.dialogService.open(SubtaskDialogComponent, {
       header: 'Edit Subtask',
@@ -255,7 +420,7 @@ export class WorkItemDialogComponent implements OnInit {
       maximizable: true,
       data: {
         mode: 'edit',
-        projectStageTaskId: stageTaskId,
+        projectStageTaskId: taskId,
         subtask: subtask,
         parentTaskTitle: currentFormData.title
       }
@@ -263,14 +428,32 @@ export class WorkItemDialogComponent implements OnInit {
 
     dialogRef.onClose.subscribe((result: any) => {
       if (result && result.success) {
-        // Subtask updated successfully via API
-        // Parent component will handle refresh
+        // Subtask updated successfully via API, reload subtasks
+        if (taskId) {
+          this.loadSubtasks(taskId);
+        }
       }
     });
   }
 
-  deleteSubtask(subtaskId: string): void {
-    this.subtasks.update(subtasks => subtasks.filter(st => st.id !== subtaskId));
+  deleteSubtask(subtaskId: string | number): void {
+    const numericId = typeof subtaskId === 'string' ? parseInt(subtaskId, 10) : subtaskId;
+    
+    if (isNaN(numericId)) {
+      return;
+    }
+
+    this.subtaskApiService.deleteSubTask(numericId).subscribe({
+      next: (response) => {
+        if (response.succeeded) {
+          this.subtasks.update(subtasks => subtasks.filter(st => st.id !== subtaskId));
+          console.log('✅ Subtask deleted:', numericId);
+        }
+      },
+      error: (error) => {
+        console.error('❌ Failed to delete subtask:', error);
+      }
+    });
   }
 
   getStatusSeverity(status: string): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' {

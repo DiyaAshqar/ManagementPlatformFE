@@ -1,10 +1,11 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
+import { format } from 'date-fns';
 import { DialogService } from 'primeng/dynamicdialog';
 import { GetProjectTaskDto } from '../../../../../nswag/api-client';
-import { TaskService } from '../../services/task.service';
+import { TaskStatus as ModelTaskStatus, Task, TaskPriority } from '../../models/project.model';
 import { ProjectService } from '../../services/project.service';
-import { Task, TaskPriority, TaskStatus as ModelTaskStatus } from '../../models/project.model';
+import { TaskService } from '../../services/task.service';
 import { Column, SharedStageBoardComponent, TaskStatus, WorkItem, WorkItemType } from '../shared-stage-board/shared-stage-board.component';
 
 @Component({
@@ -185,6 +186,7 @@ export class PreparingStageComponent implements OnInit {
       id: task.id?.toString() || '',
       taskId: task.id, // Backend task ID
       projectStageId: task.projectStageId, // Stage ID for subtask creation
+      taskTypeId: task.taskTypeId, // Task type ID from API
       title: task.title || 'Untitled Task',
       type: WorkItemType.TASK,
       priority: this.mapPriority(task.priority),
@@ -195,8 +197,8 @@ export class PreparingStageComponent implements OnInit {
       description: task.description || '',
       status: this.mapStatus(task.status),
       subtasks: [],
-      startDate: task.startDate ? new Date(task.startDate).toISOString().split('T')[0] : '',
-      endDate: task.endDate ? new Date(task.endDate).toISOString().split('T')[0] : '',
+      startDate: task.startDate ? this.formatDateAsLocalString(task.startDate) : '',
+      endDate: task.endDate ? this.formatDateAsLocalString(task.endDate) : '',
       location: task.excavationLocation || '',
       depth: task.excavationDepth?.toString() || '',
       volume: task.excavationVolume?.toString() || '',
@@ -230,6 +232,27 @@ export class PreparingStageComponent implements OnInit {
       case 2: return TaskStatus.REVIEW;
       case 3: return TaskStatus.DONE;
       default: return TaskStatus.TODO;
+    }
+  }
+
+  /**
+   * Format date from API as local date string YYYY-MM-DD using date-fns
+   * Treats the date string from API as local time, not UTC
+   */
+  private formatDateAsLocalString(dateString: string | Date): string {
+    if (!dateString) return '';
+    
+    try {
+      // Parse date string as local time (ignore timezone)
+      const dateStr = typeof dateString === 'string' ? dateString : dateString.toISOString();
+      // Extract just the date part without timezone conversion
+      const datePart = dateStr.split('T')[0];
+      // Parse as local date and format
+      const date = new Date(datePart + 'T00:00:00');
+      return format(date, 'yyyy-MM-dd');
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return '';
     }
   }
 
