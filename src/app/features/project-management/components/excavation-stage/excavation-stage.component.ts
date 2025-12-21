@@ -38,26 +38,22 @@ export class ExcavationStageComponent implements OnInit {
       {
         id: BoardTaskStatus.TODO,
         title: 'To Do',
-        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 0)),
-        wipLimit: 5
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 0))
       },
       {
         id: BoardTaskStatus.IN_PROGRESS,
         title: 'In Progress',
-        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 1)),
-        wipLimit: 3
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 1))
       },
       {
         id: BoardTaskStatus.REVIEW,
         title: 'Review',
-        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 2)),
-        wipLimit: 3
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 2))
       },
       {
         id: BoardTaskStatus.DONE,
         title: 'Done',
-        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 3)),
-        wipLimit: undefined
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 3))
       }
     ];
   });
@@ -71,6 +67,14 @@ export class ExcavationStageComponent implements OnInit {
    */
   onTaskCreated(): void {
     console.log('✅ Task created, reloading tasks...');
+    this.loadTasks();
+  }
+
+  /**
+   * Handle task deleted event from shared stage board
+   */
+  onTaskDeleted(): void {
+    console.log('🗑️ Task deleted, reloading tasks...');
     this.loadTasks();
   }
 

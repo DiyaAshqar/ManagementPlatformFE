@@ -82,7 +82,6 @@ export interface Column {
   id: TaskStatus;
   title: string;
   items: WorkItem[];
-  wipLimit?: number;
 }
 
 @Component({
