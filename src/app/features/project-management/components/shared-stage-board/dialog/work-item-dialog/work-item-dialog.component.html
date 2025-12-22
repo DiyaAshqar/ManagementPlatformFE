@@ -88,8 +88,8 @@
           id="item-task-points"
           type="text" 
           pInputText 
-          [ngModel]="currentFormData.taskPoints"
-          (ngModelChange)="updateFormField('taskPoints', $event)"
+          [ngModel]="currentFormData.taskPoint"
+          (ngModelChange)="updateFormField('taskPoint', $event)"
           placeholder="8"
           class="w-full">
       </div>
@@ -103,8 +103,8 @@
             id="item-location"
             type="text" 
             pInputText 
-            [ngModel]="currentFormData.location"
-            (ngModelChange)="updateFormField('location', $event)"
+            [ngModel]="currentFormData.excavationLocation"
+            (ngModelChange)="updateFormField('excavationLocation', $event)"
             placeholder="Grid A1-A5"
             class="w-full">
         </div>
@@ -114,8 +114,8 @@
             id="item-depth"
             type="text" 
             pInputText 
-            [ngModel]="currentFormData.depth"
-            (ngModelChange)="updateFormField('depth', $event)"
+            [ngModel]="currentFormData.excavationDepth"
+            (ngModelChange)="updateFormField('excavationDepth', $event)"
             placeholder="3.5m"
             class="w-full">
         </div>
@@ -128,8 +128,8 @@
             id="item-volume"
             type="text" 
             pInputText 
-            [ngModel]="currentFormData.volume"
-            (ngModelChange)="updateFormField('volume', $event)"
+            [ngModel]="currentFormData.excavationVolume"
+            (ngModelChange)="updateFormField('excavationVolume', $event)"
             placeholder="450 m³"
             class="w-full">
         </div>
@@ -139,8 +139,8 @@
             id="item-soil-type"
             type="text" 
             pInputText 
-            [ngModel]="currentFormData.soilType"
-            (ngModelChange)="updateFormField('soilType', $event)"
+            [ngModel]="currentFormData.excavationSoilType"
+            (ngModelChange)="updateFormField('excavationSoilType', $event)"
             placeholder="Clay"
             class="w-full">
         </div>
@@ -152,8 +152,8 @@
           id="item-equipment"
           type="text" 
           pInputText 
-          [ngModel]="currentFormData.equipment"
-          (ngModelChange)="updateFormField('equipment', $event)"
+          [ngModel]="currentFormData.excavationEquipment"
+          (ngModelChange)="updateFormField('excavationEquipment', $event)"
           placeholder="Excavator CAT 320"
           class="w-full">
       </div>
@@ -205,8 +205,8 @@
               <tr>
                 <td>{{ subtask.title }}</td>
                 <td class="text-xs">
-                  <div>{{ subtask.startDate }}</div>
-                  <div>{{ subtask.endDate }}</div>
+                  <div>{{ formatSubtaskDate(subtask.startDate) }}</div>
+                  <div>{{ formatSubtaskDate(subtask.endDate) }}</div>
                 </td>
                 <td>{{ subtask.type }}</td>
                 <td>

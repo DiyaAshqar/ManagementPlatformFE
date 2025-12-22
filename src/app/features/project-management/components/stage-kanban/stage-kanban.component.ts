@@ -159,7 +159,6 @@ export class StageKanbanComponent implements OnInit {
 
     ngOnInit(): void {
         // Load stages data based on projectId
-        console.log('Loading stages for project:', this.projectId);
     }
 
     getStatusIcon(status: string): string {

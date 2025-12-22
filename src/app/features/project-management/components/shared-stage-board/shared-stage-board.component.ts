@@ -208,15 +208,9 @@ export class SharedStageBoardComponent implements OnInit {
         this.taskService.updateTaskStatus(item.taskId, apiStatus).subscribe({
           next: (response) => {
             if (response.succeeded) {
-              console.log('✅ Task status updated successfully');
               // Emit event for parent to reload all tasks
               this.taskUpdated.emit();
-            } else {
-              console.error('❌ Failed to update task status:', response.message);
             }
-          },
-          error: (error) => {
-            console.error('❌ Error updating task status:', error);
           }
         });
       }
@@ -225,8 +219,6 @@ export class SharedStageBoardComponent implements OnInit {
 
   openItemDialog(item: WorkItem): void {
     this.selectedItem.set(item);
-    console.log('🔍 Opening Work Item Dialog - item.taskId:', item.taskId);
-    console.log('🔍 Opening Work Item Dialog - item.projectStageId:', item.projectStageId);
     
     this.dialogRef = this.dialogService.open(WorkItemDialogComponent, {
       header: 'Edit Work Item',
@@ -264,8 +256,6 @@ export class SharedStageBoardComponent implements OnInit {
     
     this.dialogRef.onClose.subscribe((result: any) => {
       if (result) {
-        console.log('💾 Edit dialog closed with data:', result);
-        
         // Prepare the CreateTaskCommand for API with task ID for update
         const updateCommand = new CreateTaskCommand({
           id: result.backendTaskId || item.taskId, // Include the backend task ID for update
@@ -273,7 +263,7 @@ export class SharedStageBoardComponent implements OnInit {
           description: result.description,
           assignTo: result.assignTo ? parseInt(result.assignTo) : 0,
           priority: this.mapPriorityToNumber(result.priority),
-          taskPoint: result.taskPoints ? parseInt(result.taskPoints) : 0,
+          taskPoint: result.taskPoint ? parseInt(result.taskPoint) : 0,
           startDate: result.startDate ? this.parseDateString(result.startDate) : undefined,
           endDate: result.endDate ? this.parseDateString(result.endDate) : undefined,
           excavationLocation: result.location || undefined,
@@ -286,21 +276,13 @@ export class SharedStageBoardComponent implements OnInit {
           status: this.mapTaskStatusToApiStatus(result.status || item.status)
         });
         
-        console.log('📤 Sending update task command:', updateCommand);
-        
         // Call the API to update the task
         this.taskService.updateTask(updateCommand).subscribe({
           next: (response) => {
             if (response.succeeded) {
-              console.log('✅ Task updated successfully');
               // Emit event to notify parent component to reload tasks
               this.taskCreated.emit();
-            } else {
-              console.error('❌ Failed to update task:', response.message);
             }
-          },
-          error: (error) => {
-            console.error('❌ Error updating task:', error);
           }
         });
       }
@@ -342,15 +324,13 @@ export class SharedStageBoardComponent implements OnInit {
     
     this.dialogRef.onClose.subscribe((result: any) => {
       if (result) {
-        console.log('💾 Add dialog closed with data:', result);
-        
         // Prepare the CreateTaskCommand for API using the proper constructor
         const createCommand = new CreateTaskCommand({
           title: result.title,
           description: result.description,
           assignTo: result.assignTo ? parseInt(result.assignTo) : 0,
           priority: this.mapPriorityToNumber(result.priority),
-          taskPoint: result.taskPoints ? parseInt(result.taskPoints) : 0,
+          taskPoint: result.taskPoint ? parseInt(result.taskPoint) : 0,
           startDate: result.startDate ? this.parseDateString(result.startDate) : undefined,
           endDate: result.endDate ? this.parseDateString(result.endDate) : undefined,
           excavationLocation: result.location || undefined,
@@ -363,21 +343,13 @@ export class SharedStageBoardComponent implements OnInit {
           status: this.mapTaskStatusToApiStatus(columnId)
         });
         
-        console.log('📤 Sending create task command:', createCommand);
-        
         // Call the API to create the task
         this.taskService.createTask(createCommand).subscribe({
           next: (response) => {
             if (response.succeeded) {
-              console.log('✅ Task created successfully');
               // Emit event to notify parent component to reload tasks
               this.taskCreated.emit();
-            } else {
-              console.error('❌ Failed to create task:', response.message);
             }
-          },
-          error: (error) => {
-            console.error('❌ Error creating task:', error);
           }
         });
       }
@@ -469,17 +441,11 @@ export class SharedStageBoardComponent implements OnInit {
           this.taskService.deleteTask(item.taskId).subscribe({
             next: (response) => {
               if (response.succeeded) {
-                console.log('✅ Task deleted successfully');
                 // Close dialog first
                 this.showItemDialog.set(false);
                 // Emit event for parent to reload all tasks
                 this.taskDeleted.emit();
-              } else {
-                console.error('❌ Failed to delete task:', response.message);
               }
-            },
-            error: (error) => {
-              console.error('❌ Error deleting task:', error);
             }
           });
         }
@@ -585,7 +551,6 @@ export class SharedStageBoardComponent implements OnInit {
       
       return undefined;
     } catch (error) {
-      console.error('Error parsing date:', error);
       return undefined;
     }
   }

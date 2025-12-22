@@ -149,7 +149,7 @@ export class PreparingStageComponent implements OnInit {
    * Handle task created event from shared stage board
    */
   onTaskCreated(): void {
-    console.log('✅ Task created, reloading tasks...');
+
     this.loadTasks();
   }
 
@@ -157,7 +157,7 @@ export class PreparingStageComponent implements OnInit {
    * Handle task deleted event from shared stage board
    */
   onTaskDeleted(): void {
-    console.log('🗑️ Task deleted, reloading tasks...');
+
     this.loadTasks();
   }
 
@@ -166,16 +166,23 @@ export class PreparingStageComponent implements OnInit {
    */
   private loadTasks(): void {
     this.isLoading.set(true);
+
     
     this.taskService.getTasksByStageId(this.projectStageId, 1, 100).subscribe({
       next: (response) => {
+        console.log('📥 Tasks API response:', response);
         if (response.succeeded && response.data?.data) {
+          console.log('✅ Setting tasks:', response.data.data.length, 'tasks');
           this.tasks.set(response.data.data);
+          console.log('📊 Current tasks signal value:', this.tasks());
+          console.log('📊 Computed columns:', this.columns());
+        } else {
+          console.warn('⚠️ No tasks data in response');
         }
         this.isLoading.set(false);
       },
       error: (error) => {
-        console.error('Error loading tasks:', error);
+        console.error('❌ Error loading tasks:', error);
         this.tasks.set([]);
         this.isLoading.set(false);
       }
@@ -186,7 +193,8 @@ export class PreparingStageComponent implements OnInit {
    * Map API tasks to WorkItem interface
    */
   private mapTasksToWorkItems(tasks: GetProjectTaskDto[]): WorkItem[] {
-    return tasks.map(task => ({
+
+    const workItems = tasks.map(task => ({
       id: task.id?.toString() || '',
       taskId: task.id, // Backend task ID
       projectStageId: task.projectStageId, // Stage ID for subtask creation
@@ -210,6 +218,7 @@ export class PreparingStageComponent implements OnInit {
       equipment: task.excavationEquipment || '',
       createdDate: task.startDate ? new Date(task.startDate).toISOString().split('T')[0] : ''
     }));
+    return workItems;
   }
 
   /**
@@ -272,3 +281,4 @@ export class PreparingStageComponent implements OnInit {
     return names.map(n => n.charAt(0).toUpperCase()).join('').slice(0, 2);
   }
 }
+
