@@ -1,29 +1,25 @@
-import { Injectable, signal } from '@angular/core';
-import { Observable, of, map, switchMap } from 'rxjs';
 import { HttpClient } from '@angular/common/http';
+import { Injectable, signal } from '@angular/core';
+import { map, Observable, of } from 'rxjs';
 import { environment } from '../../../../environments/environment';
 import {
+  ProjectStatus as ApiProjectStatus,
+  CreateTaskCommand,
   GetProjectDto,
   GetProjectDtoListPagedResponseResponse,
-  ProjectStatus as ApiProjectStatus,
   ProjectStageDto,
-  ProjectStageType,
-  CreateTaskCommand,
-  StatusTask
+  ProjectStageType
 } from '../../../../nswag/api-client';
-import { TaskService } from './task.service';
 import {
   Project,
-  ProjectStatus,
-  ProjectPriority,
   ProjectFilters,
+  ProjectPriority,
   ProjectStats,
+  ProjectStatus,
   Stage,
-  StageStatus,
-  Task,
-  TaskStatus,
-  TaskPriority
+  StageStatus
 } from '../models';
+import { TaskService } from './task.service';
 
 @Injectable({
   providedIn: 'root'
@@ -220,61 +216,23 @@ export class ProjectService {
   }
 
   // Add task to stage via API
-  addTask(projectId: string, stageId: string, task: Omit<Task, 'id'>, projectStageId: number, taskTypeId: number = 1): Observable<Task> {
-    // Convert frontend task model to backend CreateTaskCommand
+  addTask(projectId: string, stageId: string, task: Partial<CreateTaskCommand>, projectStageId: number, taskTypeId: number = 1): Observable<boolean> {
+    // Task is already in the correct format (CreateTaskCommand), just ensure required fields
     const createTaskCommand = new CreateTaskCommand({
-      title: task.name,
-      description: task.description || '',
-      assignTo: task.assignedTo ? parseInt(task.assignedTo) : undefined,
-      startDate: task.startDate ? new Date(task.startDate) : undefined,
-      endDate: task.dueDate ? new Date(task.dueDate) : undefined,
-      priority: task.priority ? this.mapTaskPriorityToNumber(task.priority) : 1,
-      taskPoint: task.estimatedHours || 0,
-      excavationLocation: task.location || '',
-      excavationDepth: task.depth || undefined,
-      excavationVolume: task.volume || undefined,
-      excavationSoilType: task.soilType || '',
-      excavationEquipment: task.equipment || '',
-      status: task.status ? this.mapTaskStatusToStatusTask(task.status) : 0,
+      ...task,
       projectStageId: projectStageId,
       taskTypeId: taskTypeId
     });
 
-    // Call API to create task (don't update local state)
+    // Call API to create task
     return this.taskService.createTask(createTaskCommand).pipe(
       map((response) => {
-        if (response.succeeded) {
-          const newTask: Task = {
-            ...task,
-            id: `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-          };
-          return newTask;
+        if (response.succeeded && response.data) {
+          return response.data;
         } else {
           throw new Error('Failed to create task');
         }
       })
     );
-  }
-
-  // Helper method to map frontend task priority to backend number
-  private mapTaskPriorityToNumber(priority: TaskPriority): number {
-    switch (priority) {
-      case TaskPriority.LOW: return 0;
-      case TaskPriority.MEDIUM: return 1;
-      case TaskPriority.HIGH: return 2;
-      default: return 1;
-    }
-  }
-
-  // Helper method to map frontend task status to backend StatusTask enum
-  // API status: 0 = To Do, 1 = In Progress, 2 = Review, 3 = Done/Completed
-  private mapTaskStatusToStatusTask(status: TaskStatus): StatusTask {
-    switch (status) {
-      case TaskStatus.TODO: return StatusTask._0;
-      case TaskStatus.IN_PROGRESS: return StatusTask._1;
-      case TaskStatus.REVIEW: return StatusTask._2;
-      case TaskStatus.COMPLETED: return StatusTask._3;
-      default: return StatusTask._0;
-    }
   }
 }

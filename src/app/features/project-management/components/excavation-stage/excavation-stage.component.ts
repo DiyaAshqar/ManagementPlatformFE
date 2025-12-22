@@ -2,8 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { format } from 'date-fns';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { GetProjectTaskDto } from '../../../../../nswag/api-client';
-import { Task, TaskPriority, TaskStatus } from '../../models';
+import { CreateTaskCommand, GetProjectTaskDto } from '../../../../../nswag/api-client';
+import { TaskStatus } from '../../models';
 import { ProjectService } from '../../services/project.service';
 import { TaskService } from '../../services/task.service';
 import { AddTaskDialogComponent } from '../dialog/add-task-dialog/add-task-dialog.component';
@@ -199,26 +199,22 @@ export class ExcavationStageComponent implements OnInit {
     const taskStatus = this.mapColumnIdToTaskStatus(columnId);
 
     // Create the task object from form data
-    const newTask: Omit<Task, 'id'> = {
+    const newTask: Partial<CreateTaskCommand> = {
       title: formData.title,
-      name: formData.title,
       description: formData.description || '',
-      stageId: `stage-${this.projectStageId}`,
-      assignedTo: formData.assignTo || '',
-      status: taskStatus,
-      priority: this.mapFormPriorityToTaskPriority(formData.priority),
-      dueDate: formData.endDate ? new Date(formData.endDate) : undefined,
-      completedDate: undefined,
-      progress: 0,
-      estimatedHours: parseInt(formData.taskPoints, 10) || 0,
+      assignTo: formData.assignTo ? parseInt(formData.assignTo, 10) : undefined,
       startDate: formData.startDate ? new Date(formData.startDate) : undefined,
-      location: formData.location,
-      depth: parseFloat(formData.depth) || 0,
-      volume: parseFloat(formData.volume) || 0,
-      soilType: formData.soilType,
-      equipment: formData.equipment,
-      dependencies: [],
-      attachments: []
+      endDate: formData.endDate ? new Date(formData.endDate) : undefined,
+      priority: this.mapFormPriorityToNumber(formData.priority),
+      taskPoint: parseInt(formData.taskPoints, 10) || 0,
+      excavationLocation: formData.location,
+      excavationDepth: parseFloat(formData.depth) || undefined,
+      excavationVolume: parseFloat(formData.volume) || undefined,
+      excavationSoilType: formData.soilType,
+      excavationEquipment: formData.equipment,
+      status: this.mapTaskStatusToStatusTask(taskStatus),
+      projectStageId: this.projectStageId,
+      taskTypeId: formData.taskTypeId || 1
     };
 
     // Get taskTypeId from formData, default to 1 if not provided
@@ -243,16 +239,29 @@ export class ExcavationStageComponent implements OnInit {
   }
 
   /**
-   * Map form priority string to TaskPriority enum
+   * Map form priority string to number for API
    */
-  private mapFormPriorityToTaskPriority(priority: string): TaskPriority {
+  private mapFormPriorityToNumber(priority: string): number {
     switch (priority?.toLowerCase()) {
-      case 'low': return TaskPriority.LOW;
-      case 'medium': return TaskPriority.MEDIUM;
-      case 'high': return TaskPriority.HIGH;
+      case 'low': return 0;
+      case 'medium': return 1;
+      case 'high': return 2;
       case 'urgent':
-      case 'critical': return TaskPriority.URGENT;
-      default: return TaskPriority.MEDIUM;
+      case 'critical': return 3;
+      default: return 1;
+    }
+  }
+
+  /**
+   * Map TaskStatus enum to StatusTask API enum
+   */
+  private mapTaskStatusToStatusTask(status: TaskStatus): number {
+    switch (status) {
+      case TaskStatus.TODO: return 0;
+      case TaskStatus.IN_PROGRESS: return 1;
+      case TaskStatus.REVIEW: return 2;
+      case TaskStatus.COMPLETED: return 3;
+      default: return 0;
     }
   }
 

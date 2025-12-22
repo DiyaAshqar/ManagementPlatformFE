@@ -183,6 +183,9 @@
           icon="pi pi-plus"
           size="small"
           [outlined]="true"
+          [disabled]="!formData().backendTaskId"
+          [pTooltip]="!formData().backendTaskId ? 'Please save the task first before adding subtasks' : ''"
+          tooltipPosition="left"
           (onClick)="openAddSubtaskDialog()">
         </p-button>
       </div>

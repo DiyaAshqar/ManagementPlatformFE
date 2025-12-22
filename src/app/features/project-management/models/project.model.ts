@@ -41,7 +41,7 @@ export interface Stage {
   projectId: string;
   order: number;
   status: StageStatus;
-  tasks: Task[];
+  tasks: any[]; // Using any[] to avoid circular dependency with GetProjectTaskDto
   startDate?: Date;
   endDate?: Date;
   progress: number;
@@ -57,28 +57,7 @@ export enum StageStatus {
   COMPLETED = 'completed'
 }
 
-export interface Task {
-  id: string;
-  title: string;
-  name?: string; // Alias for title
-  description: string;
-  stageId: string;
-  assignedTo: string;
-  status: TaskStatus;
-  priority: TaskPriority;
-  dueDate?: Date;
-  completedDate?: Date;
-  progress: number;
-  estimatedHours?: number;
-  startDate?: Date;
-  location?: string;
-  depth?: number;
-  volume?: number;
-  soilType?: string;
-  equipment?: string;
-  dependencies: string[];
-  attachments: string[];
-}
+// Task interface removed - use GetProjectTaskDto from api-client.ts instead
 
 export enum TaskStatus {
   TODO = 'todo',

@@ -5,6 +5,7 @@ import { DynamicDialogRef, DynamicDialogConfig } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
+import { CalendarModule } from 'primeng/calendar';
 import { MessageService } from 'primeng/api';
 import { SubtaskApiService } from '../../../../services/subtask-api.service';
 import { SubtaskService } from '../../../../services/subtask.service';
@@ -12,8 +13,8 @@ import { SubtaskService } from '../../../../services/subtask.service';
 export interface SubTaskFormData {
   id?: number;
   title: string;
-  startDate: string;
-  endDate: string;
+  startDate: string | Date;
+  endDate: string | Date;
   status: 'completed' | 'in-progress' | 'pending';
   type: string;
   cost: string;
@@ -28,7 +29,8 @@ export interface SubTaskFormData {
     FormsModule,
     InputTextModule,
     SelectModule,
-    ButtonModule
+    ButtonModule,
+    CalendarModule
   ],
   templateUrl: './subtask-dialog.component.html',
   styleUrls: ['./subtask-dialog.component.scss']

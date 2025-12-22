@@ -328,6 +328,9 @@
             label="Add Subtask"
             icon="pi pi-plus"
             size="small"
+            [disabled]="!selectedItem()!.taskId"
+            [pTooltip]="!selectedItem()!.taskId ? 'Please save the task first before adding subtasks' : ''"
+            tooltipPosition="left"
             (onClick)="openAddSubtaskDialog(selectedItem()!)">
           </p-button>
         </div>

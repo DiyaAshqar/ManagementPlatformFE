@@ -14,23 +14,29 @@
     <div class="grid">
       <div class="col-6">
         <label for="subtask-start-date" class="block text-sm font-medium mb-2">Start Date</label>
-        <input 
+        <p-calendar 
           id="subtask-start-date"
-          type="date" 
-          pInputText 
           [ngModel]="currentFormData.startDate"
           (ngModelChange)="updateFormField('startDate', $event)"
-          class="w-full">
+          dateFormat="mm/dd/yy"
+          [showIcon]="true"
+          [iconDisplay]="'input'"
+          styleClass="w-full"
+          placeholder="Select start date">
+        </p-calendar>
       </div>
       <div class="col-6">
         <label for="subtask-end-date" class="block text-sm font-medium mb-2">End Date</label>
-        <input 
+        <p-calendar 
           id="subtask-end-date"
-          type="date" 
-          pInputText 
           [ngModel]="currentFormData.endDate"
           (ngModelChange)="updateFormField('endDate', $event)"
-          class="w-full">
+          dateFormat="mm/dd/yy"
+          [showIcon]="true"
+          [iconDisplay]="'input'"
+          styleClass="w-full"
+          placeholder="Select end date">
+        </p-calendar>
       </div>
     </div>
     

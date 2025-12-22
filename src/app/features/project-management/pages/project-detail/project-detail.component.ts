@@ -21,7 +21,8 @@ import { ExcavationStageComponent } from '../../components/excavation-stage/exca
 import { MilestoneStageComponent } from '../../components/milestone-stage/milestone-stage.component';
 import { PreparingStageComponent } from '../../components/preparing-stage/preparing-stage.component';
 import { StageKanbanComponent } from '../../components/stage-kanban/stage-kanban.component';
-import { Project, ProjectStatus, Stage, Task, TaskStatus } from '../../models';
+import { Project, ProjectStatus, Stage, TaskStatus } from '../../models';
+import { GetProjectTaskDto } from '../../../../../nswag/api-client';
 import { ProjectApiService } from '../../services/project-api.service';
 
 interface ReportType {
@@ -260,7 +261,7 @@ export class ProjectDetailComponent implements OnInit {
     });
   }
 
-  getTasksByStage(stage: Stage): Task[] {
+  getTasksByStage(stage: Stage): GetProjectTaskDto[] {
     return stage.tasks || [];
   }
 }

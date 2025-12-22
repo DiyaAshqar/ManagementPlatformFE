@@ -10,7 +10,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { ToastModule } from 'primeng/toast';
-import { Task, TaskPriority, TaskStatus } from '../../../models';
+import { CreateTaskCommand } from '../../../../../../nswag/api-client';
 import { ProjectService } from '../../../services/project.service';
 import { TaskService } from '../../../services/task.service';
 
@@ -166,26 +166,22 @@ export class AddTaskDialogComponent implements OnInit {
     this.isLoading.set(true);
 
     // Create the task object to pass back
-    const newTask: Omit<Task, 'id'> = {
+    const newTask: Partial<CreateTaskCommand> = {
       title: this.formData.title,
-      name: this.formData.title,
       description: this.formData.description || '',
-      stageId: `stage-${this.formData.projectStageId}`,
-      assignedTo: this.formData.assignTo || '',
-      status: TaskStatus.TODO,
-      priority: (this.formData.priority as TaskPriority) || TaskPriority.MEDIUM,
-      dueDate: this.formData.endDate,
-      completedDate: undefined,
-      progress: 0,
-      estimatedHours: this.formData.taskPoints || 0,
+      assignTo: this.formData.assignTo ? parseInt(this.formData.assignTo, 10) : undefined,
       startDate: this.formData.startDate,
-      location: this.formData.location,
-      depth: this.formData.depth,
-      volume: this.formData.volume,
-      soilType: this.formData.soilType,
-      equipment: this.formData.equipment,
-      dependencies: [],
-      attachments: []
+      endDate: this.formData.endDate,
+      priority: this.mapPriorityToNumber(this.formData.priority),
+      taskPoint: this.formData.taskPoints || 0,
+      excavationLocation: this.formData.location,
+      excavationDepth: this.formData.depth,
+      excavationVolume: this.formData.volume,
+      excavationSoilType: this.formData.soilType,
+      excavationEquipment: this.formData.equipment,
+      status: 0, // TODO status
+      projectStageId: this.formData.projectStageId,
+      taskTypeId: this.formData.taskTypeId
     };
 
     // Close dialog and pass the data
@@ -200,5 +196,19 @@ export class AddTaskDialogComponent implements OnInit {
 
   cancel(): void {
     this.dialogRef.close(null);
+  }
+
+  /**
+   * Map priority string to number for API
+   */
+  private mapPriorityToNumber(priority: string): number {
+    switch (priority?.toLowerCase()) {
+      case 'low': return 0;
+      case 'medium': return 1;
+      case 'high': return 2;
+      case 'urgent':
+      case 'critical': return 3;
+      default: return 1;
+    }
   }
 }
