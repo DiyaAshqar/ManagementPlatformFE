@@ -1,0 +1,16 @@
+// ── Page header ─────────────────────────────────────────────────────────────
+.ms-header {
+  .ms-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-color);
+  }
+
+  .ms-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+    margin: 0.25rem 0 0;
+  }
+}
+

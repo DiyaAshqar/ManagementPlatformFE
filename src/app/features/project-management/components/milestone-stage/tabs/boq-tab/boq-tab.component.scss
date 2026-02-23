@@ -1,0 +1,84 @@
+.boq-card {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 1.5rem;
+
+  .boq-card-header {
+    margin-bottom: 1rem;
+
+    .boq-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text-color);
+    }
+
+    .boq-card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-color-secondary);
+      margin: 0.2rem 0 0;
+    }
+  }
+
+  .boq-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+
+    .boq-total-label {
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+    }
+  }
+}
+
+.boq-item-code {
+  font-family: monospace;
+  font-size: 0.85rem;
+  color: var(--text-color);
+}
+
+.boq-unit-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--blue-50, #eff6ff);
+  color: var(--blue-600, #2563eb);
+  border: 1px solid var(--blue-200, #bfdbfe);
+}
+
+.boq-subtotal {
+  font-weight: 600;
+}
+
+.boq-actions {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+.boq-grand-total-row {
+  td {
+    border-top: 2px solid var(--surface-border) !important;
+    background: transparent;
+  }
+
+  .boq-grand-total-label {
+    color: var(--text-color-secondary);
+    font-size: 0.9rem;
+  }
+
+  .boq-grand-total-value {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-color);
+  }
+}
+
+.text-right  { text-align: right;  }
+.text-center { text-align: center; }
