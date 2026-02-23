@@ -1,6 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, signal } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
+import { catchError, map, Observable, of } from 'rxjs';
+import { MOCK_PROJECTS } from './mock-projects.data';
 import { environment } from '../../../../environments/environment';
 import {
   ProjectStatus as ApiProjectStatus,
@@ -41,6 +42,10 @@ export class ProjectService {
   private apiUrl = environment.apiUrl;
 
   constructor(private http: HttpClient, private taskService: TaskService) {}
+
+  private get mockProjects(): Project[] { return MOCK_PROJECTS; }
+
+  // TODO: remove mockProjects getter and mock-projects.data.ts once the API is stable
 
   // Mapper: Convert API DTO to Project model
   private mapApiProjectToProject(apiProject: GetProjectDto, index: number): Project {
@@ -144,12 +149,16 @@ export class ProjectService {
         ...(searchParam && { filterByTitle: searchParam })
       }
     }).pipe(
-      map(response => {
-        if (!response.succeeded || !response.data || !response.data.data) {
-          return [];
+      catchError(() => of({ succeeded: false, data: null } as unknown as GetProjectDtoListPagedResponseResponse)),
+      map((response: GetProjectDtoListPagedResponseResponse) => {
+        if (!response.succeeded || !response.data || !response.data.data || response.data.data.length === 0) {
+          // ── Fallback to mock data when API is unavailable ──
+          this.updateStats(this.mockProjects);
+          this.projects.set(this.mockProjects);
+          return this.mockProjects;
         }
 
-        const projects = response.data.data.map((apiProject, index) => 
+        const projects = response.data.data.map((apiProject: GetProjectDto, index: number) => 
           this.mapApiProjectToProject(apiProject, index)
         );
 
@@ -213,6 +222,21 @@ export class ProjectService {
     this.projects.update(projects => projects.filter(p => p.id !== id));
     this.updateStats(this.projects());
     return of(void 0);
+  }
+
+  // Get a single project by ID — falls back to mock data if API fails
+  getProjectById(id: string): Observable<Project | null> {
+    const numericId = parseInt(id, 10);
+    return this.http.get<any>(`${this.apiUrl}/Project/${numericId}`).pipe(
+      catchError(() => of(null)),
+      map(response => {
+        if (response && response.succeeded && response.data) {
+          return this.mapApiProjectToProject(response.data, 0);
+        }
+        // Fallback: find in mock data
+        return this.mockProjects.find(p => p.id === id) ?? null;
+      })
+    );
   }
 
   // Add task to stage via API

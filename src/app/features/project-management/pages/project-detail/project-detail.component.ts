@@ -23,7 +23,7 @@ import { PreparingStageComponent } from '../../components/preparing-stage/prepar
 import { StageKanbanComponent } from '../../components/stage-kanban/stage-kanban.component';
 import { Project, ProjectStatus, Stage, TaskStatus } from '../../models';
 import { GetProjectTaskDto } from '../../../../../nswag/api-client';
-import { ProjectApiService } from '../../services/project-api.service';
+import { ProjectService } from '../../services/project.service';
 
 interface ReportType {
   label: string;
@@ -86,7 +86,7 @@ export class ProjectDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private projectApiService: ProjectApiService
+    private projectService: ProjectService
   ) {}
 
   ngOnInit(): void {
@@ -98,66 +98,22 @@ export class ProjectDetailComponent implements OnInit {
 
   loadProject(id: string): void {
     this.isLoading.set(true);
-    const numericId = parseInt(id, 10);
-    
-    // Make a single API call to get the project data using ProjectApiService
-    this.projectApiService.getProjectById(numericId).subscribe({
-      next: (response) => {
-        if (response.succeeded && response.data) {
-          // Store raw API data for stage IDs
-          this.projectData.set(response.data);
-          // Map the response data to Project model directly
-          const mappedProject = this.mapApiDataToProject(response.data);
-          this.project.set(mappedProject);
+
+    this.projectService.getProjectById(id).subscribe({
+      next: (project) => {
+        if (project) {
+          this.project.set(project);
+          this.projectData.set(null); // no raw DTO when using mock
         } else {
           this.router.navigate(['/projects']);
         }
         this.isLoading.set(false);
       },
-      error: (error: any) => {
-        console.error('Error loading project:', error);
+      error: () => {
         this.isLoading.set(false);
         this.router.navigate(['/projects']);
       }
     });
-  }
-
-  private mapApiDataToProject(apiProject: GetProjectDto): Project {
-    return {
-      id: (apiProject.id || 0).toString(),
-      name: apiProject.title || '',
-      description: apiProject.description || '',
-      status: this.mapApiStatus(apiProject.status),
-      priority: 'medium' as any,
-      startDate: apiProject.startDate ? new Date(apiProject.startDate) : new Date(),
-      endDate: apiProject.endDate ? new Date(apiProject.endDate) : new Date(),
-      progress: this.calculateProgress(apiProject),
-      budget: apiProject.budget || 0,
-      spent: 0,
-      clientName: apiProject.clinet || '',
-      projectManager: 'N/A',
-      team: [],
-      stages: [],
-      documents: [],
-      createdAt: apiProject.startDate ? new Date(apiProject.startDate) : new Date(),
-      updatedAt: new Date()
-    };
-  }
-
-  private mapApiStatus(status: any): ProjectStatus {
-    switch (status) {
-      case 0: return ProjectStatus.PLANNING;
-      case 1: return ProjectStatus.IN_PROGRESS;
-      case 2: return ProjectStatus.COMPLETED;
-      default: return ProjectStatus.PLANNING;
-    }
-  }
-
-  private calculateProgress(apiProject: GetProjectDto): number {
-    const total = (apiProject.countTodo || 0) + (apiProject.countInProgress || 0) + 
-                  (apiProject.countCompleted || 0) + (apiProject.countReview || 0);
-    if (total === 0) return 0;
-    return Math.round(((apiProject.countCompleted || 0) / total) * 100);
   }
 
   goBack(): void {

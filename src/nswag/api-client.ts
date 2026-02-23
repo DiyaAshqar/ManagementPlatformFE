@@ -427,6 +427,250 @@ export class AttachmentClient {
 }
 
 @Injectable()
+export class ConstructorClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createOrUpdate(body: CreateConstructorCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/Constructor";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return OK
+     */
+    delete(id: number | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/Constructor?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getAll(requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetConstructorDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/Constructor?";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetConstructorDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetConstructorDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<GetConstructorDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetConstructorDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getById(id: number): Observable<GetConstructorDtoResponse> {
+        let url_ = this.baseUrl + "/api/Constructor/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetConstructorDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetConstructorDtoResponse>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<GetConstructorDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetConstructorDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class LookupClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -483,6 +727,74 @@ export class LookupClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = StringLookupDtoListDictionaryResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class MilestoneClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param projectStageId (optional) 
+     * @return OK
+     */
+    getAllSubTask(projectStageId: number | undefined): Observable<MilestoneDtoResponse> {
+        let url_ = this.baseUrl + "/api/Milestone?";
+        if (projectStageId === null)
+            throw new globalThis.Error("The parameter 'projectStageId' cannot be null.");
+        else if (projectStageId !== undefined)
+            url_ += "ProjectStageId=" + encodeURIComponent("" + projectStageId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAllSubTask(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAllSubTask(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<MilestoneDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<MilestoneDtoResponse>;
+        }));
+    }
+
+    protected processGetAllSubTask(response: HttpResponseBase): Observable<MilestoneDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = MilestoneDtoResponse.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -671,6 +983,1276 @@ export class ProjectClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = GetProjectDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class ProjectBOQClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createOrUpdate(body: CreateProjectBOQCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/ProjectBOQ";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @param projectStageId (optional) 
+     * @return OK
+     */
+    delete(id: number | undefined, projectStageId: number | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/ProjectBOQ?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        if (projectStageId === null)
+            throw new globalThis.Error("The parameter 'projectStageId' cannot be null.");
+        else if (projectStageId !== undefined)
+            url_ += "ProjectStageId=" + encodeURIComponent("" + projectStageId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getById(id: number): Observable<GetProjectBOQDtoResponse> {
+        let url_ = this.baseUrl + "/api/ProjectBOQ/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectBOQDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectBOQDtoResponse>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<GetProjectBOQDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectBOQDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param stageId (optional) 
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getByStageId(stageId: number | undefined, requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetProjectBOQDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/ProjectBOQ/by-stage?";
+        if (stageId === null)
+            throw new globalThis.Error("The parameter 'stageId' cannot be null.");
+        else if (stageId !== undefined)
+            url_ += "StageId=" + encodeURIComponent("" + stageId) + "&";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByStageId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByStageId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectBOQDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectBOQDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetByStageId(response: HttpResponseBase): Observable<GetProjectBOQDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectBOQDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class ProjectMainContractorClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createOrUpdate(body: CreateProjectMainContractorCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/ProjectMainContractor";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @param projectStageId (optional) 
+     * @return OK
+     */
+    delete(id: number | undefined, projectStageId: number | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/ProjectMainContractor?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        if (projectStageId === null)
+            throw new globalThis.Error("The parameter 'projectStageId' cannot be null.");
+        else if (projectStageId !== undefined)
+            url_ += "ProjectStageId=" + encodeURIComponent("" + projectStageId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getById(id: number): Observable<GetProjectMainContractorDtoResponse> {
+        let url_ = this.baseUrl + "/api/ProjectMainContractor/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectMainContractorDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectMainContractorDtoResponse>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<GetProjectMainContractorDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectMainContractorDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param stageId (optional) 
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getByStageId(stageId: number | undefined, requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetProjectMainContractorDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/ProjectMainContractor/by-stage?";
+        if (stageId === null)
+            throw new globalThis.Error("The parameter 'stageId' cannot be null.");
+        else if (stageId !== undefined)
+            url_ += "StageId=" + encodeURIComponent("" + stageId) + "&";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByStageId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByStageId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectMainContractorDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectMainContractorDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetByStageId(response: HttpResponseBase): Observable<GetProjectMainContractorDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectMainContractorDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class ProjectPOClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createOrUpdate(body: CreateProjectPOCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/ProjectPO";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @param projectStageId (optional) 
+     * @return OK
+     */
+    delete(id: number | undefined, projectStageId: number | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/ProjectPO?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        if (projectStageId === null)
+            throw new globalThis.Error("The parameter 'projectStageId' cannot be null.");
+        else if (projectStageId !== undefined)
+            url_ += "ProjectStageId=" + encodeURIComponent("" + projectStageId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getById(id: number): Observable<GetProjectPODtoResponse> {
+        let url_ = this.baseUrl + "/api/ProjectPO/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectPODtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectPODtoResponse>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<GetProjectPODtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectPODtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param stageId (optional) 
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getByStageId(stageId: number | undefined, requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetProjectPODtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/ProjectPO/by-stage?";
+        if (stageId === null)
+            throw new globalThis.Error("The parameter 'stageId' cannot be null.");
+        else if (stageId !== undefined)
+            url_ += "StageId=" + encodeURIComponent("" + stageId) + "&";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByStageId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByStageId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectPODtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectPODtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetByStageId(response: HttpResponseBase): Observable<GetProjectPODtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectPODtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class ProjectSurveyingVisitClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createOrUpdate(body: CreateProjectSurveyingVisitCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/ProjectSurveyingVisit";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @param projectStageId (optional) 
+     * @return OK
+     */
+    delete(id: number | undefined, projectStageId: number | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/ProjectSurveyingVisit?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        if (projectStageId === null)
+            throw new globalThis.Error("The parameter 'projectStageId' cannot be null.");
+        else if (projectStageId !== undefined)
+            url_ += "ProjectStageId=" + encodeURIComponent("" + projectStageId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getById(id: number): Observable<GetProjectSurveyingVisitDtoResponse> {
+        let url_ = this.baseUrl + "/api/ProjectSurveyingVisit/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectSurveyingVisitDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectSurveyingVisitDtoResponse>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<GetProjectSurveyingVisitDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectSurveyingVisitDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param stageId (optional) 
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getByStageId(stageId: number | undefined, requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetProjectSurveyingVisitDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/ProjectSurveyingVisit/by-stage?";
+        if (stageId === null)
+            throw new globalThis.Error("The parameter 'stageId' cannot be null.");
+        else if (stageId !== undefined)
+            url_ += "StageId=" + encodeURIComponent("" + stageId) + "&";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByStageId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByStageId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectSurveyingVisitDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectSurveyingVisitDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetByStageId(response: HttpResponseBase): Observable<GetProjectSurveyingVisitDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectSurveyingVisitDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class ProjectVOClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createOrUpdate(body: CreateProjectVOCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/ProjectVO";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @param projectStageId (optional) 
+     * @return OK
+     */
+    delete(id: number | undefined, projectStageId: number | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/ProjectVO?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        if (projectStageId === null)
+            throw new globalThis.Error("The parameter 'projectStageId' cannot be null.");
+        else if (projectStageId !== undefined)
+            url_ += "ProjectStageId=" + encodeURIComponent("" + projectStageId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getById(id: number): Observable<GetProjectVODtoResponse> {
+        let url_ = this.baseUrl + "/api/ProjectVO/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectVODtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectVODtoResponse>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<GetProjectVODtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectVODtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param stageId (optional) 
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getByStageId(stageId: number | undefined, requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetProjectVODtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/ProjectVO/by-stage?";
+        if (stageId === null)
+            throw new globalThis.Error("The parameter 'stageId' cannot be null.");
+        else if (stageId !== undefined)
+            url_ += "StageId=" + encodeURIComponent("" + stageId) + "&";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByStageId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByStageId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectVODtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectVODtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetByStageId(response: HttpResponseBase): Observable<GetProjectVODtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectVODtoListPagedResponseResponse.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -1048,6 +2630,62 @@ export class SupplierClient {
     }
 
     /**
+     * @param body (optional) 
+     * @return OK
+     */
+    deleteSupplier(body: DeleteSupplierCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/Supplier";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDeleteSupplier(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDeleteSupplier(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDeleteSupplier(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param requestParameter_PageNumber (optional) 
      * @param requestParameter_PageSize (optional) 
      * @param requestParameter_Filter (optional) 
@@ -1103,60 +2741,6 @@ export class SupplierClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = SupplierListPagedResponseResponse.fromJS(resultData200);
-            return _observableOf(result200);
-            }));
-        } else if (status !== 200 && status !== 204) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
-            }));
-        }
-        return _observableOf(null as any);
-    }
-
-    /**
-     * @return OK
-     */
-    delete(id: number): Observable<BooleanResponse> {
-        let url_ = this.baseUrl + "/api/Supplier/{id}";
-        if (id === undefined || id === null)
-            throw new globalThis.Error("The parameter 'id' must be defined.");
-        url_ = url_.replace("{id}", encodeURIComponent("" + id));
-        url_ = url_.replace(/[?&]$/, "");
-
-        let options_ : any = {
-            observe: "response",
-            responseType: "blob",
-            headers: new HttpHeaders({
-                "Accept": "application/json"
-            })
-        };
-
-        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
-            return this.processDelete(response_);
-        })).pipe(_observableCatch((response_: any) => {
-            if (response_ instanceof HttpResponseBase) {
-                try {
-                    return this.processDelete(response_ as any);
-                } catch (e) {
-                    return _observableThrow(e) as any as Observable<BooleanResponse>;
-                }
-            } else
-                return _observableThrow(response_) as any as Observable<BooleanResponse>;
-        }));
-    }
-
-    protected processDelete(response: HttpResponseBase): Observable<BooleanResponse> {
-        const status = response.status;
-        const responseBlob =
-            response instanceof HttpResponse ? response.body :
-            (response as any).error instanceof Blob ? (response as any).error : undefined;
-
-        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
-        if (status === 200) {
-            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = BooleanResponse.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -1664,6 +3248,222 @@ export class TaskClient {
     }
 }
 
+export class Agreement implements IAgreement {
+    id?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    isDeleted?: boolean;
+    projectNumber?: string | undefined;
+    agreementDate?: Date;
+    projectName?: string | undefined;
+    businessSector?: string | undefined;
+    estimatedStartDate?: Date;
+    estimatedEndDate?: Date;
+    countryId?: number;
+    country?: Country;
+    cityId?: number;
+    city?: City;
+    drillingQuantity?: number;
+    projectArea?: number;
+    isSubmitted?: boolean;
+    agreementTypeId?: number;
+    agreementType?: AgreementType;
+    clientId?: number;
+    client?: Client;
+    landInformation?: LandInformation;
+    agreementPayment?: AgreementPayment;
+    services?: AgreementService[] | undefined;
+    mainContracts?: MainContract[] | undefined;
+    projectAreaUnits?: ProjectAreaUnit[] | undefined;
+    supplierServices?: SupplierService[] | undefined;
+    quantityBills?: QuantityBill[] | undefined;
+    attachments?: Attachment[] | undefined;
+    projects?: Project[] | undefined;
+
+    constructor(data?: IAgreement) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            this.isDeleted = _data["isDeleted"];
+            this.projectNumber = _data["projectNumber"];
+            this.agreementDate = _data["agreementDate"] ? new Date(_data["agreementDate"].toString()) : undefined as any;
+            this.projectName = _data["projectName"];
+            this.businessSector = _data["businessSector"];
+            this.estimatedStartDate = _data["estimatedStartDate"] ? new Date(_data["estimatedStartDate"].toString()) : undefined as any;
+            this.estimatedEndDate = _data["estimatedEndDate"] ? new Date(_data["estimatedEndDate"].toString()) : undefined as any;
+            this.countryId = _data["countryId"];
+            this.country = _data["country"] ? Country.fromJS(_data["country"]) : undefined as any;
+            this.cityId = _data["cityId"];
+            this.city = _data["city"] ? City.fromJS(_data["city"]) : undefined as any;
+            this.drillingQuantity = _data["drillingQuantity"];
+            this.projectArea = _data["projectArea"];
+            this.isSubmitted = _data["isSubmitted"];
+            this.agreementTypeId = _data["agreementTypeId"];
+            this.agreementType = _data["agreementType"] ? AgreementType.fromJS(_data["agreementType"]) : undefined as any;
+            this.clientId = _data["clientId"];
+            this.client = _data["client"] ? Client.fromJS(_data["client"]) : undefined as any;
+            this.landInformation = _data["landInformation"] ? LandInformation.fromJS(_data["landInformation"]) : undefined as any;
+            this.agreementPayment = _data["agreementPayment"] ? AgreementPayment.fromJS(_data["agreementPayment"]) : undefined as any;
+            if (Array.isArray(_data["services"])) {
+                this.services = [] as any;
+                for (let item of _data["services"])
+                    this.services!.push(AgreementService.fromJS(item));
+            }
+            if (Array.isArray(_data["mainContracts"])) {
+                this.mainContracts = [] as any;
+                for (let item of _data["mainContracts"])
+                    this.mainContracts!.push(MainContract.fromJS(item));
+            }
+            if (Array.isArray(_data["projectAreaUnits"])) {
+                this.projectAreaUnits = [] as any;
+                for (let item of _data["projectAreaUnits"])
+                    this.projectAreaUnits!.push(ProjectAreaUnit.fromJS(item));
+            }
+            if (Array.isArray(_data["supplierServices"])) {
+                this.supplierServices = [] as any;
+                for (let item of _data["supplierServices"])
+                    this.supplierServices!.push(SupplierService.fromJS(item));
+            }
+            if (Array.isArray(_data["quantityBills"])) {
+                this.quantityBills = [] as any;
+                for (let item of _data["quantityBills"])
+                    this.quantityBills!.push(QuantityBill.fromJS(item));
+            }
+            if (Array.isArray(_data["attachments"])) {
+                this.attachments = [] as any;
+                for (let item of _data["attachments"])
+                    this.attachments!.push(Attachment.fromJS(item));
+            }
+            if (Array.isArray(_data["projects"])) {
+                this.projects = [] as any;
+                for (let item of _data["projects"])
+                    this.projects!.push(Project.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Agreement {
+        data = typeof data === 'object' ? data : {};
+        let result = new Agreement();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        data["isDeleted"] = this.isDeleted;
+        data["projectNumber"] = this.projectNumber;
+        data["agreementDate"] = this.agreementDate ? formatDate(this.agreementDate) : undefined as any;
+        data["projectName"] = this.projectName;
+        data["businessSector"] = this.businessSector;
+        data["estimatedStartDate"] = this.estimatedStartDate ? formatDate(this.estimatedStartDate) : undefined as any;
+        data["estimatedEndDate"] = this.estimatedEndDate ? formatDate(this.estimatedEndDate) : undefined as any;
+        data["countryId"] = this.countryId;
+        data["country"] = this.country ? this.country.toJSON() : undefined as any;
+        data["cityId"] = this.cityId;
+        data["city"] = this.city ? this.city.toJSON() : undefined as any;
+        data["drillingQuantity"] = this.drillingQuantity;
+        data["projectArea"] = this.projectArea;
+        data["isSubmitted"] = this.isSubmitted;
+        data["agreementTypeId"] = this.agreementTypeId;
+        data["agreementType"] = this.agreementType ? this.agreementType.toJSON() : undefined as any;
+        data["clientId"] = this.clientId;
+        data["client"] = this.client ? this.client.toJSON() : undefined as any;
+        data["landInformation"] = this.landInformation ? this.landInformation.toJSON() : undefined as any;
+        data["agreementPayment"] = this.agreementPayment ? this.agreementPayment.toJSON() : undefined as any;
+        if (Array.isArray(this.services)) {
+            data["services"] = [];
+            for (let item of this.services)
+                data["services"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.mainContracts)) {
+            data["mainContracts"] = [];
+            for (let item of this.mainContracts)
+                data["mainContracts"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.projectAreaUnits)) {
+            data["projectAreaUnits"] = [];
+            for (let item of this.projectAreaUnits)
+                data["projectAreaUnits"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.supplierServices)) {
+            data["supplierServices"] = [];
+            for (let item of this.supplierServices)
+                data["supplierServices"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.quantityBills)) {
+            data["quantityBills"] = [];
+            for (let item of this.quantityBills)
+                data["quantityBills"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.attachments)) {
+            data["attachments"] = [];
+            for (let item of this.attachments)
+                data["attachments"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.projects)) {
+            data["projects"] = [];
+            for (let item of this.projects)
+                data["projects"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IAgreement {
+    id?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    isDeleted?: boolean;
+    projectNumber?: string | undefined;
+    agreementDate?: Date;
+    projectName?: string | undefined;
+    businessSector?: string | undefined;
+    estimatedStartDate?: Date;
+    estimatedEndDate?: Date;
+    countryId?: number;
+    country?: Country;
+    cityId?: number;
+    city?: City;
+    drillingQuantity?: number;
+    projectArea?: number;
+    isSubmitted?: boolean;
+    agreementTypeId?: number;
+    agreementType?: AgreementType;
+    clientId?: number;
+    client?: Client;
+    landInformation?: LandInformation;
+    agreementPayment?: AgreementPayment;
+    services?: AgreementService[] | undefined;
+    mainContracts?: MainContract[] | undefined;
+    projectAreaUnits?: ProjectAreaUnit[] | undefined;
+    supplierServices?: SupplierService[] | undefined;
+    quantityBills?: QuantityBill[] | undefined;
+    attachments?: Attachment[] | undefined;
+    projects?: Project[] | undefined;
+}
+
 export class AgreementDto implements IAgreementDto {
     id?: number | undefined;
     projectNumber?: string | undefined;
@@ -1756,6 +3556,86 @@ export interface IAgreementDto {
     isDeleted?: boolean;
 }
 
+export class AgreementPayment implements IAgreementPayment {
+    id?: number;
+    isDeleted?: boolean;
+    contractTypeId?: number | undefined;
+    contractType?: ContractType;
+    contractModelId?: number | undefined;
+    contractModel?: ContractModel;
+    paymentMethodId?: number | undefined;
+    paymentMethod?: PaymentMethod;
+    monthlyPaymentId?: number | undefined;
+    monthlyPayment?: MonthlyPayment;
+    agreementId?: number;
+    agreement?: Agreement;
+
+    constructor(data?: IAgreementPayment) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.contractTypeId = _data["contractTypeId"];
+            this.contractType = _data["contractType"] ? ContractType.fromJS(_data["contractType"]) : undefined as any;
+            this.contractModelId = _data["contractModelId"];
+            this.contractModel = _data["contractModel"] ? ContractModel.fromJS(_data["contractModel"]) : undefined as any;
+            this.paymentMethodId = _data["paymentMethodId"];
+            this.paymentMethod = _data["paymentMethod"] ? PaymentMethod.fromJS(_data["paymentMethod"]) : undefined as any;
+            this.monthlyPaymentId = _data["monthlyPaymentId"];
+            this.monthlyPayment = _data["monthlyPayment"] ? MonthlyPayment.fromJS(_data["monthlyPayment"]) : undefined as any;
+            this.agreementId = _data["agreementId"];
+            this.agreement = _data["agreement"] ? Agreement.fromJS(_data["agreement"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): AgreementPayment {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementPayment();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["contractTypeId"] = this.contractTypeId;
+        data["contractType"] = this.contractType ? this.contractType.toJSON() : undefined as any;
+        data["contractModelId"] = this.contractModelId;
+        data["contractModel"] = this.contractModel ? this.contractModel.toJSON() : undefined as any;
+        data["paymentMethodId"] = this.paymentMethodId;
+        data["paymentMethod"] = this.paymentMethod ? this.paymentMethod.toJSON() : undefined as any;
+        data["monthlyPaymentId"] = this.monthlyPaymentId;
+        data["monthlyPayment"] = this.monthlyPayment ? this.monthlyPayment.toJSON() : undefined as any;
+        data["agreementId"] = this.agreementId;
+        data["agreement"] = this.agreement ? this.agreement.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAgreementPayment {
+    id?: number;
+    isDeleted?: boolean;
+    contractTypeId?: number | undefined;
+    contractType?: ContractType;
+    contractModelId?: number | undefined;
+    contractModel?: ContractModel;
+    paymentMethodId?: number | undefined;
+    paymentMethod?: PaymentMethod;
+    monthlyPaymentId?: number | undefined;
+    monthlyPayment?: MonthlyPayment;
+    agreementId?: number;
+    agreement?: Agreement;
+}
+
 export class AgreementPaymentDto implements IAgreementPaymentDto {
     id?: number | undefined;
     contractTypeId?: number;
@@ -1816,6 +3696,54 @@ export interface IAgreementPaymentDto {
     monthlyPaymentDto?: MonthlyPaymentDto;
 }
 
+export class AgreementService implements IAgreementService {
+    agreementId?: number;
+    agreement?: Agreement;
+    serviceId?: number;
+    service?: Service;
+
+    constructor(data?: IAgreementService) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.agreementId = _data["agreementId"];
+            this.agreement = _data["agreement"] ? Agreement.fromJS(_data["agreement"]) : undefined as any;
+            this.serviceId = _data["serviceId"];
+            this.service = _data["service"] ? Service.fromJS(_data["service"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): AgreementService {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementService();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["agreementId"] = this.agreementId;
+        data["agreement"] = this.agreement ? this.agreement.toJSON() : undefined as any;
+        data["serviceId"] = this.serviceId;
+        data["service"] = this.service ? this.service.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAgreementService {
+    agreementId?: number;
+    agreement?: Agreement;
+    serviceId?: number;
+    service?: Service;
+}
+
 export class AgreementServiceDto implements IAgreementServiceDto {
     agreementId?: number;
     serviceId?: number;
@@ -1854,6 +3782,146 @@ export class AgreementServiceDto implements IAgreementServiceDto {
 export interface IAgreementServiceDto {
     agreementId?: number;
     serviceId?: number;
+}
+
+export class AgreementType implements IAgreementType {
+    id?: number;
+    name!: string | undefined;
+
+    constructor(data?: IAgreementType) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): AgreementType {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementType();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IAgreementType {
+    id?: number;
+    name: string | undefined;
+}
+
+export class Annex implements IAnnex {
+    id?: number;
+    name!: string | undefined;
+
+    constructor(data?: IAnnex) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): Annex {
+        data = typeof data === 'object' ? data : {};
+        let result = new Annex();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IAnnex {
+    id?: number;
+    name: string | undefined;
+}
+
+export class Attachment implements IAttachment {
+    id?: number;
+    isDeleted?: boolean;
+    fileUrl!: string | undefined;
+    fileName!: string | undefined;
+    filePath!: string | undefined;
+    agreementId?: number;
+    agreement?: Agreement;
+
+    constructor(data?: IAttachment) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.fileUrl = _data["fileUrl"];
+            this.fileName = _data["fileName"];
+            this.filePath = _data["filePath"];
+            this.agreementId = _data["agreementId"];
+            this.agreement = _data["agreement"] ? Agreement.fromJS(_data["agreement"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): Attachment {
+        data = typeof data === 'object' ? data : {};
+        let result = new Attachment();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["fileUrl"] = this.fileUrl;
+        data["fileName"] = this.fileName;
+        data["filePath"] = this.filePath;
+        data["agreementId"] = this.agreementId;
+        data["agreement"] = this.agreement ? this.agreement.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAttachment {
+    id?: number;
+    isDeleted?: boolean;
+    fileUrl: string | undefined;
+    fileName: string | undefined;
+    filePath: string | undefined;
+    agreementId?: number;
+    agreement?: Agreement;
 }
 
 export class AttachmentDto implements IAttachmentDto {
@@ -1968,6 +4036,122 @@ export interface IBooleanResponse {
     data?: boolean;
 }
 
+export class City implements ICity {
+    id?: number;
+    name!: string | undefined;
+    countryId?: number;
+    country?: Country;
+
+    constructor(data?: ICity) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.countryId = _data["countryId"];
+            this.country = _data["country"] ? Country.fromJS(_data["country"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): City {
+        data = typeof data === 'object' ? data : {};
+        let result = new City();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["countryId"] = this.countryId;
+        data["country"] = this.country ? this.country.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface ICity {
+    id?: number;
+    name: string | undefined;
+    countryId?: number;
+    country?: Country;
+}
+
+export class Client implements IClient {
+    id?: number;
+    isDeleted?: boolean;
+    contactPerson!: string | undefined;
+    contactPersonNumber!: number;
+    representerName!: string | undefined;
+    representerNameNumber!: number;
+    agreement?: Agreement[] | undefined;
+
+    constructor(data?: IClient) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.contactPerson = _data["contactPerson"];
+            this.contactPersonNumber = _data["contactPersonNumber"];
+            this.representerName = _data["representerName"];
+            this.representerNameNumber = _data["representerNameNumber"];
+            if (Array.isArray(_data["agreement"])) {
+                this.agreement = [] as any;
+                for (let item of _data["agreement"])
+                    this.agreement!.push(Agreement.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Client {
+        data = typeof data === 'object' ? data : {};
+        let result = new Client();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["contactPerson"] = this.contactPerson;
+        data["contactPersonNumber"] = this.contactPersonNumber;
+        data["representerName"] = this.representerName;
+        data["representerNameNumber"] = this.representerNameNumber;
+        if (Array.isArray(this.agreement)) {
+            data["agreement"] = [];
+            for (let item of this.agreement)
+                data["agreement"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IClient {
+    id?: number;
+    isDeleted?: boolean;
+    contactPerson: string | undefined;
+    contactPersonNumber: number;
+    representerName: string | undefined;
+    representerNameNumber: number;
+    agreement?: Agreement[] | undefined;
+}
+
 export class ClientDto implements IClientDto {
     id?: number | undefined;
     contactPerson!: string | undefined;
@@ -2018,6 +4202,230 @@ export interface IClientDto {
     contactPersonNumber: number;
     representerName: string | undefined;
     representerNameNumber: number;
+}
+
+export class Constructor implements IConstructor {
+    id?: number;
+    name!: string | undefined;
+    mainContractorTypeId?: number;
+    mainContractorType?: MainContractorType;
+    contracts?: MainContract[] | undefined;
+
+    constructor(data?: IConstructor) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.mainContractorTypeId = _data["mainContractorTypeId"];
+            this.mainContractorType = _data["mainContractorType"] ? MainContractorType.fromJS(_data["mainContractorType"]) : undefined as any;
+            if (Array.isArray(_data["contracts"])) {
+                this.contracts = [] as any;
+                for (let item of _data["contracts"])
+                    this.contracts!.push(MainContract.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Constructor {
+        data = typeof data === 'object' ? data : {};
+        let result = new Constructor();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["mainContractorTypeId"] = this.mainContractorTypeId;
+        data["mainContractorType"] = this.mainContractorType ? this.mainContractorType.toJSON() : undefined as any;
+        if (Array.isArray(this.contracts)) {
+            data["contracts"] = [];
+            for (let item of this.contracts)
+                data["contracts"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IConstructor {
+    id?: number;
+    name: string | undefined;
+    mainContractorTypeId?: number;
+    mainContractorType?: MainContractorType;
+    contracts?: MainContract[] | undefined;
+}
+
+export class ContractModel implements IContractModel {
+    id?: number;
+    name!: string | undefined;
+
+    constructor(data?: IContractModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): ContractModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContractModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IContractModel {
+    id?: number;
+    name: string | undefined;
+}
+
+export class ContractType implements IContractType {
+    id?: number;
+    name!: string | undefined;
+
+    constructor(data?: IContractType) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): ContractType {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContractType();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IContractType {
+    id?: number;
+    name: string | undefined;
+}
+
+export class ContractorDuty implements IContractorDuty {
+    id?: number;
+    isDeleted?: boolean;
+    subTotal?: number;
+    quantity?: number;
+    price?: number;
+    unitId?: number;
+    unit?: Unit;
+    dutyTypeId?: number;
+    dutyType?: DutyType;
+    dutyResponsibilityId?: number;
+    dutyResponsibility?: DutyResponsibility;
+    mainContractId?: number;
+    mainContract?: MainContract;
+
+    constructor(data?: IContractorDuty) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.subTotal = _data["subTotal"];
+            this.quantity = _data["quantity"];
+            this.price = _data["price"];
+            this.unitId = _data["unitId"];
+            this.unit = _data["unit"] ? Unit.fromJS(_data["unit"]) : undefined as any;
+            this.dutyTypeId = _data["dutyTypeId"];
+            this.dutyType = _data["dutyType"] ? DutyType.fromJS(_data["dutyType"]) : undefined as any;
+            this.dutyResponsibilityId = _data["dutyResponsibilityId"];
+            this.dutyResponsibility = _data["dutyResponsibility"] ? DutyResponsibility.fromJS(_data["dutyResponsibility"]) : undefined as any;
+            this.mainContractId = _data["mainContractId"];
+            this.mainContract = _data["mainContract"] ? MainContract.fromJS(_data["mainContract"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ContractorDuty {
+        data = typeof data === 'object' ? data : {};
+        let result = new ContractorDuty();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["subTotal"] = this.subTotal;
+        data["quantity"] = this.quantity;
+        data["price"] = this.price;
+        data["unitId"] = this.unitId;
+        data["unit"] = this.unit ? this.unit.toJSON() : undefined as any;
+        data["dutyTypeId"] = this.dutyTypeId;
+        data["dutyType"] = this.dutyType ? this.dutyType.toJSON() : undefined as any;
+        data["dutyResponsibilityId"] = this.dutyResponsibilityId;
+        data["dutyResponsibility"] = this.dutyResponsibility ? this.dutyResponsibility.toJSON() : undefined as any;
+        data["mainContractId"] = this.mainContractId;
+        data["mainContract"] = this.mainContract ? this.mainContract.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IContractorDuty {
+    id?: number;
+    isDeleted?: boolean;
+    subTotal?: number;
+    quantity?: number;
+    price?: number;
+    unitId?: number;
+    unit?: Unit;
+    dutyTypeId?: number;
+    dutyType?: DutyType;
+    dutyResponsibilityId?: number;
+    dutyResponsibility?: DutyResponsibility;
+    mainContractId?: number;
+    mainContract?: MainContract;
 }
 
 export class ContractorDutyDto implements IContractorDutyDto {
@@ -2088,6 +4496,170 @@ export interface IContractorDutyDto {
     isDeleted?: boolean;
 }
 
+export class Country implements ICountry {
+    id?: number;
+    name!: string | undefined;
+    city?: City[] | undefined;
+
+    constructor(data?: ICountry) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            if (Array.isArray(_data["city"])) {
+                this.city = [] as any;
+                for (let item of _data["city"])
+                    this.city!.push(City.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Country {
+        data = typeof data === 'object' ? data : {};
+        let result = new Country();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        if (Array.isArray(this.city)) {
+            data["city"] = [];
+            for (let item of this.city)
+                data["city"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface ICountry {
+    id?: number;
+    name: string | undefined;
+    city?: City[] | undefined;
+}
+
+export class CreateConstructorCommand implements ICreateConstructorCommand {
+    id?: number | undefined;
+    name?: string | undefined;
+    mainContractorTypeId?: number;
+
+    constructor(data?: ICreateConstructorCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.mainContractorTypeId = _data["mainContractorTypeId"];
+        }
+    }
+
+    static fromJS(data: any): CreateConstructorCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateConstructorCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["mainContractorTypeId"] = this.mainContractorTypeId;
+        return data;
+    }
+}
+
+export interface ICreateConstructorCommand {
+    id?: number | undefined;
+    name?: string | undefined;
+    mainContractorTypeId?: number;
+}
+
+export class CreateProjectBOQCommand implements ICreateProjectBOQCommand {
+    id?: number | undefined;
+    projectStageId?: number;
+    materialId?: number;
+    unitId?: number;
+    constructorId?: number;
+    price?: number;
+    actualQuantity?: number;
+    description?: string | undefined;
+    subTotal?: number;
+
+    constructor(data?: ICreateProjectBOQCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.materialId = _data["materialId"];
+            this.unitId = _data["unitId"];
+            this.constructorId = _data["constructorId"];
+            this.price = _data["price"];
+            this.actualQuantity = _data["actualQuantity"];
+            this.description = _data["description"];
+            this.subTotal = _data["subTotal"];
+        }
+    }
+
+    static fromJS(data: any): CreateProjectBOQCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateProjectBOQCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["materialId"] = this.materialId;
+        data["unitId"] = this.unitId;
+        data["constructorId"] = this.constructorId;
+        data["price"] = this.price;
+        data["actualQuantity"] = this.actualQuantity;
+        data["description"] = this.description;
+        data["subTotal"] = this.subTotal;
+        return data;
+    }
+}
+
+export interface ICreateProjectBOQCommand {
+    id?: number | undefined;
+    projectStageId?: number;
+    materialId?: number;
+    unitId?: number;
+    constructorId?: number;
+    price?: number;
+    actualQuantity?: number;
+    description?: string | undefined;
+    subTotal?: number;
+}
+
 export class CreateProjectCommand implements ICreateProjectCommand {
     id?: number;
     agreementId?: number;
@@ -2146,6 +4718,286 @@ export interface ICreateProjectCommand {
     endDate?: Date;
     status?: ProjectStatus;
     description?: string | undefined;
+}
+
+export class CreateProjectMainContractorCommand implements ICreateProjectMainContractorCommand {
+    id?: number | undefined;
+    projectStageId?: number;
+    constructorId?: number;
+    amount?: number;
+    startDate?: Date;
+    endDate?: Date;
+
+    constructor(data?: ICreateProjectMainContractorCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.constructorId = _data["constructorId"];
+            this.amount = _data["amount"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): CreateProjectMainContractorCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateProjectMainContractorCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["constructorId"] = this.constructorId;
+        data["amount"] = this.amount;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        return data;
+    }
+}
+
+export interface ICreateProjectMainContractorCommand {
+    id?: number | undefined;
+    projectStageId?: number;
+    constructorId?: number;
+    amount?: number;
+    startDate?: Date;
+    endDate?: Date;
+}
+
+export class CreateProjectPOCommand implements ICreateProjectPOCommand {
+    id?: number | undefined;
+    projectStageId?: number;
+    poNumber?: string | undefined;
+    supplierId?: number;
+    description?: string | undefined;
+    unitId?: number;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+
+    constructor(data?: ICreateProjectPOCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.poNumber = _data["poNumber"];
+            this.supplierId = _data["supplierId"];
+            this.description = _data["description"];
+            this.unitId = _data["unitId"];
+            this.price = _data["price"];
+            this.subTotal = _data["subTotal"];
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): CreateProjectPOCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateProjectPOCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["poNumber"] = this.poNumber;
+        data["supplierId"] = this.supplierId;
+        data["description"] = this.description;
+        data["unitId"] = this.unitId;
+        data["price"] = this.price;
+        data["subTotal"] = this.subTotal;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface ICreateProjectPOCommand {
+    id?: number | undefined;
+    projectStageId?: number;
+    poNumber?: string | undefined;
+    supplierId?: number;
+    description?: string | undefined;
+    unitId?: number;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+}
+
+export class CreateProjectSurveyingVisitCommand implements ICreateProjectSurveyingVisitCommand {
+    id?: number | undefined;
+    projectStageId?: number;
+    visitDate?: Date;
+    surveyor?: string | undefined;
+    purpose?: string | undefined;
+    quantity?: number;
+    unitId?: number;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+
+    constructor(data?: ICreateProjectSurveyingVisitCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.visitDate = _data["visitDate"] ? new Date(_data["visitDate"].toString()) : undefined as any;
+            this.surveyor = _data["surveyor"];
+            this.purpose = _data["purpose"];
+            this.quantity = _data["quantity"];
+            this.unitId = _data["unitId"];
+            this.price = _data["price"];
+            this.subTotal = _data["subTotal"];
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): CreateProjectSurveyingVisitCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateProjectSurveyingVisitCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["visitDate"] = this.visitDate ? this.visitDate.toISOString() : undefined as any;
+        data["surveyor"] = this.surveyor;
+        data["purpose"] = this.purpose;
+        data["quantity"] = this.quantity;
+        data["unitId"] = this.unitId;
+        data["price"] = this.price;
+        data["subTotal"] = this.subTotal;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface ICreateProjectSurveyingVisitCommand {
+    id?: number | undefined;
+    projectStageId?: number;
+    visitDate?: Date;
+    surveyor?: string | undefined;
+    purpose?: string | undefined;
+    quantity?: number;
+    unitId?: number;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+}
+
+export class CreateProjectVOCommand implements ICreateProjectVOCommand {
+    id?: number | undefined;
+    projectStageId?: number;
+    unitId?: number;
+    voNumber?: string | undefined;
+    item?: string | undefined;
+    description?: string | undefined;
+    quantity?: number;
+    price?: number;
+    subTotal?: number;
+    isEffected?: boolean;
+    effectedDateStart?: Date | undefined;
+    effectedDateEnd?: Date | undefined;
+    status?: string | undefined;
+
+    constructor(data?: ICreateProjectVOCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.unitId = _data["unitId"];
+            this.voNumber = _data["voNumber"];
+            this.item = _data["item"];
+            this.description = _data["description"];
+            this.quantity = _data["quantity"];
+            this.price = _data["price"];
+            this.subTotal = _data["subTotal"];
+            this.isEffected = _data["isEffected"];
+            this.effectedDateStart = _data["effectedDateStart"] ? new Date(_data["effectedDateStart"].toString()) : undefined as any;
+            this.effectedDateEnd = _data["effectedDateEnd"] ? new Date(_data["effectedDateEnd"].toString()) : undefined as any;
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): CreateProjectVOCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateProjectVOCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["unitId"] = this.unitId;
+        data["voNumber"] = this.voNumber;
+        data["item"] = this.item;
+        data["description"] = this.description;
+        data["quantity"] = this.quantity;
+        data["price"] = this.price;
+        data["subTotal"] = this.subTotal;
+        data["isEffected"] = this.isEffected;
+        data["effectedDateStart"] = this.effectedDateStart ? this.effectedDateStart.toISOString() : undefined as any;
+        data["effectedDateEnd"] = this.effectedDateEnd ? this.effectedDateEnd.toISOString() : undefined as any;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface ICreateProjectVOCommand {
+    id?: number | undefined;
+    projectStageId?: number;
+    unitId?: number;
+    voNumber?: string | undefined;
+    item?: string | undefined;
+    description?: string | undefined;
+    quantity?: number;
+    price?: number;
+    subTotal?: number;
+    isEffected?: boolean;
+    effectedDateStart?: Date | undefined;
+    effectedDateEnd?: Date | undefined;
+    status?: string | undefined;
 }
 
 export class CreateSubTaskCommand implements ICreateSubTaskCommand {
@@ -2396,6 +5248,42 @@ export interface IDeleteSubTaskCommand {
     id?: number;
 }
 
+export class DeleteSupplierCommand implements IDeleteSupplierCommand {
+    id?: number;
+
+    constructor(data?: IDeleteSupplierCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+        }
+    }
+
+    static fromJS(data: any): DeleteSupplierCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new DeleteSupplierCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        return data;
+    }
+}
+
+export interface IDeleteSupplierCommand {
+    id?: number;
+}
+
 export class DeleteTaskCommand implements IDeleteTaskCommand {
     id?: number;
 
@@ -2430,6 +5318,110 @@ export class DeleteTaskCommand implements IDeleteTaskCommand {
 
 export interface IDeleteTaskCommand {
     id?: number;
+}
+
+export class DutyResponsibility implements IDutyResponsibility {
+    id?: number;
+    name!: string | undefined;
+    contractsResponsibilities?: ContractorDuty[] | undefined;
+
+    constructor(data?: IDutyResponsibility) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            if (Array.isArray(_data["contractsResponsibilities"])) {
+                this.contractsResponsibilities = [] as any;
+                for (let item of _data["contractsResponsibilities"])
+                    this.contractsResponsibilities!.push(ContractorDuty.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): DutyResponsibility {
+        data = typeof data === 'object' ? data : {};
+        let result = new DutyResponsibility();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        if (Array.isArray(this.contractsResponsibilities)) {
+            data["contractsResponsibilities"] = [];
+            for (let item of this.contractsResponsibilities)
+                data["contractsResponsibilities"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IDutyResponsibility {
+    id?: number;
+    name: string | undefined;
+    contractsResponsibilities?: ContractorDuty[] | undefined;
+}
+
+export class DutyType implements IDutyType {
+    id?: number;
+    name!: string | undefined;
+    contractsDuties?: ContractorDuty[] | undefined;
+
+    constructor(data?: IDutyType) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            if (Array.isArray(_data["contractsDuties"])) {
+                this.contractsDuties = [] as any;
+                for (let item of _data["contractsDuties"])
+                    this.contractsDuties!.push(ContractorDuty.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): DutyType {
+        data = typeof data === 'object' ? data : {};
+        let result = new DutyType();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        if (Array.isArray(this.contractsDuties)) {
+            data["contractsDuties"] = [];
+            for (let item of this.contractsDuties)
+                data["contractsDuties"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IDutyType {
+    id?: number;
+    name: string | undefined;
+    contractsDuties?: ContractorDuty[] | undefined;
 }
 
 export class FifthStepDto implements IFifthStepDto {
@@ -3048,6 +6040,518 @@ export interface IGetAttachmentMetaDataResponse {
     data?: GetAttachmentMetaData;
 }
 
+export class GetConstructorDto implements IGetConstructorDto {
+    id?: number;
+    name?: string | undefined;
+    mainContractorTypeId?: number;
+
+    constructor(data?: IGetConstructorDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.mainContractorTypeId = _data["mainContractorTypeId"];
+        }
+    }
+
+    static fromJS(data: any): GetConstructorDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetConstructorDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["mainContractorTypeId"] = this.mainContractorTypeId;
+        return data;
+    }
+}
+
+export interface IGetConstructorDto {
+    id?: number;
+    name?: string | undefined;
+    mainContractorTypeId?: number;
+}
+
+export class GetConstructorDtoListPagedResponse implements IGetConstructorDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetConstructorDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IGetConstructorDtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetConstructorDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): GetConstructorDtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetConstructorDtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IGetConstructorDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetConstructorDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class GetConstructorDtoListPagedResponseResponse implements IGetConstructorDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetConstructorDtoListPagedResponse;
+
+    constructor(data?: IGetConstructorDtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetConstructorDtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetConstructorDtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetConstructorDtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetConstructorDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetConstructorDtoListPagedResponse;
+}
+
+export class GetConstructorDtoResponse implements IGetConstructorDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetConstructorDto;
+
+    constructor(data?: IGetConstructorDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetConstructorDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetConstructorDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetConstructorDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetConstructorDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetConstructorDto;
+}
+
+export class GetProjectBOQDto implements IGetProjectBOQDto {
+    id?: number;
+    projectStageId?: number;
+    materialId?: number;
+    unitId?: number;
+    constructorId?: number;
+    price?: number;
+    actualQuantity?: number;
+    description?: string | undefined;
+    subTotal?: number;
+
+    constructor(data?: IGetProjectBOQDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.materialId = _data["materialId"];
+            this.unitId = _data["unitId"];
+            this.constructorId = _data["constructorId"];
+            this.price = _data["price"];
+            this.actualQuantity = _data["actualQuantity"];
+            this.description = _data["description"];
+            this.subTotal = _data["subTotal"];
+        }
+    }
+
+    static fromJS(data: any): GetProjectBOQDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectBOQDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["materialId"] = this.materialId;
+        data["unitId"] = this.unitId;
+        data["constructorId"] = this.constructorId;
+        data["price"] = this.price;
+        data["actualQuantity"] = this.actualQuantity;
+        data["description"] = this.description;
+        data["subTotal"] = this.subTotal;
+        return data;
+    }
+}
+
+export interface IGetProjectBOQDto {
+    id?: number;
+    projectStageId?: number;
+    materialId?: number;
+    unitId?: number;
+    constructorId?: number;
+    price?: number;
+    actualQuantity?: number;
+    description?: string | undefined;
+    subTotal?: number;
+}
+
+export class GetProjectBOQDtoListPagedResponse implements IGetProjectBOQDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectBOQDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IGetProjectBOQDtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetProjectBOQDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): GetProjectBOQDtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectBOQDtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IGetProjectBOQDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectBOQDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class GetProjectBOQDtoListPagedResponseResponse implements IGetProjectBOQDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectBOQDtoListPagedResponse;
+
+    constructor(data?: IGetProjectBOQDtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectBOQDtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectBOQDtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectBOQDtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectBOQDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectBOQDtoListPagedResponse;
+}
+
+export class GetProjectBOQDtoResponse implements IGetProjectBOQDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectBOQDto;
+
+    constructor(data?: IGetProjectBOQDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectBOQDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectBOQDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectBOQDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectBOQDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectBOQDto;
+}
+
 export class GetProjectDto implements IGetProjectDto {
     id?: number | undefined;
     title?: string | undefined;
@@ -3352,6 +6856,802 @@ export interface IGetProjectDtoResponse {
     data?: GetProjectDto;
 }
 
+export class GetProjectMainContractorDto implements IGetProjectMainContractorDto {
+    id?: number;
+    projectStageId?: number;
+    constructorId?: number;
+    amount?: number;
+    startDate?: Date;
+    endDate?: Date;
+
+    constructor(data?: IGetProjectMainContractorDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.constructorId = _data["constructorId"];
+            this.amount = _data["amount"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectMainContractorDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectMainContractorDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["constructorId"] = this.constructorId;
+        data["amount"] = this.amount;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectMainContractorDto {
+    id?: number;
+    projectStageId?: number;
+    constructorId?: number;
+    amount?: number;
+    startDate?: Date;
+    endDate?: Date;
+}
+
+export class GetProjectMainContractorDtoListPagedResponse implements IGetProjectMainContractorDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectMainContractorDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IGetProjectMainContractorDtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetProjectMainContractorDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): GetProjectMainContractorDtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectMainContractorDtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IGetProjectMainContractorDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectMainContractorDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class GetProjectMainContractorDtoListPagedResponseResponse implements IGetProjectMainContractorDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectMainContractorDtoListPagedResponse;
+
+    constructor(data?: IGetProjectMainContractorDtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectMainContractorDtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectMainContractorDtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectMainContractorDtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectMainContractorDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectMainContractorDtoListPagedResponse;
+}
+
+export class GetProjectMainContractorDtoResponse implements IGetProjectMainContractorDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectMainContractorDto;
+
+    constructor(data?: IGetProjectMainContractorDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectMainContractorDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectMainContractorDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectMainContractorDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectMainContractorDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectMainContractorDto;
+}
+
+export class GetProjectPODto implements IGetProjectPODto {
+    id?: number;
+    projectStageId?: number;
+    poNumber?: string | undefined;
+    supplierId?: number;
+    description?: string | undefined;
+    unitId?: number;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+
+    constructor(data?: IGetProjectPODto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.poNumber = _data["poNumber"];
+            this.supplierId = _data["supplierId"];
+            this.description = _data["description"];
+            this.unitId = _data["unitId"];
+            this.price = _data["price"];
+            this.subTotal = _data["subTotal"];
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): GetProjectPODto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectPODto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["poNumber"] = this.poNumber;
+        data["supplierId"] = this.supplierId;
+        data["description"] = this.description;
+        data["unitId"] = this.unitId;
+        data["price"] = this.price;
+        data["subTotal"] = this.subTotal;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface IGetProjectPODto {
+    id?: number;
+    projectStageId?: number;
+    poNumber?: string | undefined;
+    supplierId?: number;
+    description?: string | undefined;
+    unitId?: number;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+}
+
+export class GetProjectPODtoListPagedResponse implements IGetProjectPODtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectPODto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IGetProjectPODtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetProjectPODto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): GetProjectPODtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectPODtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IGetProjectPODtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectPODto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class GetProjectPODtoListPagedResponseResponse implements IGetProjectPODtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectPODtoListPagedResponse;
+
+    constructor(data?: IGetProjectPODtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectPODtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectPODtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectPODtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectPODtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectPODtoListPagedResponse;
+}
+
+export class GetProjectPODtoResponse implements IGetProjectPODtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectPODto;
+
+    constructor(data?: IGetProjectPODtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectPODto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectPODtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectPODtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectPODtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectPODto;
+}
+
+export class GetProjectSurveyingVisitDto implements IGetProjectSurveyingVisitDto {
+    id?: number;
+    projectStageId?: number;
+    visitDate?: Date;
+    surveyor?: string | undefined;
+    purpose?: string | undefined;
+    quantity?: number;
+    unitId?: number;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+
+    constructor(data?: IGetProjectSurveyingVisitDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.visitDate = _data["visitDate"] ? new Date(_data["visitDate"].toString()) : undefined as any;
+            this.surveyor = _data["surveyor"];
+            this.purpose = _data["purpose"];
+            this.quantity = _data["quantity"];
+            this.unitId = _data["unitId"];
+            this.price = _data["price"];
+            this.subTotal = _data["subTotal"];
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): GetProjectSurveyingVisitDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectSurveyingVisitDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["visitDate"] = this.visitDate ? this.visitDate.toISOString() : undefined as any;
+        data["surveyor"] = this.surveyor;
+        data["purpose"] = this.purpose;
+        data["quantity"] = this.quantity;
+        data["unitId"] = this.unitId;
+        data["price"] = this.price;
+        data["subTotal"] = this.subTotal;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface IGetProjectSurveyingVisitDto {
+    id?: number;
+    projectStageId?: number;
+    visitDate?: Date;
+    surveyor?: string | undefined;
+    purpose?: string | undefined;
+    quantity?: number;
+    unitId?: number;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+}
+
+export class GetProjectSurveyingVisitDtoListPagedResponse implements IGetProjectSurveyingVisitDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectSurveyingVisitDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IGetProjectSurveyingVisitDtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetProjectSurveyingVisitDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): GetProjectSurveyingVisitDtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectSurveyingVisitDtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IGetProjectSurveyingVisitDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectSurveyingVisitDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class GetProjectSurveyingVisitDtoListPagedResponseResponse implements IGetProjectSurveyingVisitDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectSurveyingVisitDtoListPagedResponse;
+
+    constructor(data?: IGetProjectSurveyingVisitDtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectSurveyingVisitDtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectSurveyingVisitDtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectSurveyingVisitDtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectSurveyingVisitDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectSurveyingVisitDtoListPagedResponse;
+}
+
+export class GetProjectSurveyingVisitDtoResponse implements IGetProjectSurveyingVisitDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectSurveyingVisitDto;
+
+    constructor(data?: IGetProjectSurveyingVisitDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectSurveyingVisitDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectSurveyingVisitDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectSurveyingVisitDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectSurveyingVisitDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectSurveyingVisitDto;
+}
+
 export class GetProjectTaskDto implements IGetProjectTaskDto {
     id?: number | undefined;
     title?: string | undefined;
@@ -3648,6 +7948,290 @@ export interface IGetProjectTaskDtoResponse {
     data?: GetProjectTaskDto;
 }
 
+export class GetProjectVODto implements IGetProjectVODto {
+    id?: number;
+    projectStageId?: number;
+    unitId?: number;
+    voNumber?: string | undefined;
+    item?: string | undefined;
+    description?: string | undefined;
+    quantity?: number;
+    price?: number;
+    subTotal?: number;
+    isEffected?: boolean;
+    effectedDateStart?: Date | undefined;
+    effectedDateEnd?: Date | undefined;
+    status?: string | undefined;
+
+    constructor(data?: IGetProjectVODto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.unitId = _data["unitId"];
+            this.voNumber = _data["voNumber"];
+            this.item = _data["item"];
+            this.description = _data["description"];
+            this.quantity = _data["quantity"];
+            this.price = _data["price"];
+            this.subTotal = _data["subTotal"];
+            this.isEffected = _data["isEffected"];
+            this.effectedDateStart = _data["effectedDateStart"] ? new Date(_data["effectedDateStart"].toString()) : undefined as any;
+            this.effectedDateEnd = _data["effectedDateEnd"] ? new Date(_data["effectedDateEnd"].toString()) : undefined as any;
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): GetProjectVODto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectVODto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["unitId"] = this.unitId;
+        data["voNumber"] = this.voNumber;
+        data["item"] = this.item;
+        data["description"] = this.description;
+        data["quantity"] = this.quantity;
+        data["price"] = this.price;
+        data["subTotal"] = this.subTotal;
+        data["isEffected"] = this.isEffected;
+        data["effectedDateStart"] = this.effectedDateStart ? this.effectedDateStart.toISOString() : undefined as any;
+        data["effectedDateEnd"] = this.effectedDateEnd ? this.effectedDateEnd.toISOString() : undefined as any;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface IGetProjectVODto {
+    id?: number;
+    projectStageId?: number;
+    unitId?: number;
+    voNumber?: string | undefined;
+    item?: string | undefined;
+    description?: string | undefined;
+    quantity?: number;
+    price?: number;
+    subTotal?: number;
+    isEffected?: boolean;
+    effectedDateStart?: Date | undefined;
+    effectedDateEnd?: Date | undefined;
+    status?: string | undefined;
+}
+
+export class GetProjectVODtoListPagedResponse implements IGetProjectVODtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectVODto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IGetProjectVODtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetProjectVODto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): GetProjectVODtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectVODtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IGetProjectVODtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectVODto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class GetProjectVODtoListPagedResponseResponse implements IGetProjectVODtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectVODtoListPagedResponse;
+
+    constructor(data?: IGetProjectVODtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectVODtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectVODtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectVODtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectVODtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectVODtoListPagedResponse;
+}
+
+export class GetProjectVODtoResponse implements IGetProjectVODtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectVODto;
+
+    constructor(data?: IGetProjectVODtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectVODto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectVODtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectVODtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectVODtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectVODto;
+}
+
 export class Int32Response implements IInt32Response {
     succeeded?: boolean;
     message?: string | undefined;
@@ -3702,6 +8286,78 @@ export interface IInt32Response {
     message?: string | undefined;
     errors?: string[] | undefined;
     data?: number;
+}
+
+export class LandInformation implements ILandInformation {
+    id?: number;
+    isDeleted?: boolean;
+    plotNumber!: number;
+    directorate!: string | undefined;
+    village!: string | undefined;
+    basinName!: string | undefined;
+    basinNumber!: number;
+    floorNumber!: number;
+    agreementId!: number;
+    agreement?: Agreement;
+
+    constructor(data?: ILandInformation) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.plotNumber = _data["plotNumber"];
+            this.directorate = _data["directorate"];
+            this.village = _data["village"];
+            this.basinName = _data["basinName"];
+            this.basinNumber = _data["basinNumber"];
+            this.floorNumber = _data["floorNumber"];
+            this.agreementId = _data["agreementId"];
+            this.agreement = _data["agreement"] ? Agreement.fromJS(_data["agreement"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): LandInformation {
+        data = typeof data === 'object' ? data : {};
+        let result = new LandInformation();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["plotNumber"] = this.plotNumber;
+        data["directorate"] = this.directorate;
+        data["village"] = this.village;
+        data["basinName"] = this.basinName;
+        data["basinNumber"] = this.basinNumber;
+        data["floorNumber"] = this.floorNumber;
+        data["agreementId"] = this.agreementId;
+        data["agreement"] = this.agreement ? this.agreement.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface ILandInformation {
+    id?: number;
+    isDeleted?: boolean;
+    plotNumber: number;
+    directorate: string | undefined;
+    village: string | undefined;
+    basinName: string | undefined;
+    basinNumber: number;
+    floorNumber: number;
+    agreementId: number;
+    agreement?: Agreement;
 }
 
 export class LandInformationDto implements ILandInformationDto {
@@ -3808,6 +8464,102 @@ export interface ILookupDto {
     name?: string | undefined;
 }
 
+export class MainContract implements IMainContract {
+    id?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    isDeleted?: boolean;
+    total?: number;
+    startDate?: Date;
+    endDate?: Date;
+    agreementId?: number;
+    agreement?: Agreement;
+    constructorId?: number;
+    constructor_?: Constructor;
+    contractorDuty?: ContractorDuty[] | undefined;
+
+    constructor(data?: IMainContract) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            this.isDeleted = _data["isDeleted"];
+            this.total = _data["total"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.agreementId = _data["agreementId"];
+            this.agreement = _data["agreement"] ? Agreement.fromJS(_data["agreement"]) : undefined as any;
+            this.constructorId = _data["constructorId"];
+            this.constructor_ = _data["constructor"] ? Constructor.fromJS(_data["constructor"]) : undefined as any;
+            if (Array.isArray(_data["contractorDuty"])) {
+                this.contractorDuty = [] as any;
+                for (let item of _data["contractorDuty"])
+                    this.contractorDuty!.push(ContractorDuty.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): MainContract {
+        data = typeof data === 'object' ? data : {};
+        let result = new MainContract();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        data["isDeleted"] = this.isDeleted;
+        data["total"] = this.total;
+        data["startDate"] = this.startDate ? formatDate(this.startDate) : undefined as any;
+        data["endDate"] = this.endDate ? formatDate(this.endDate) : undefined as any;
+        data["agreementId"] = this.agreementId;
+        data["agreement"] = this.agreement ? this.agreement.toJSON() : undefined as any;
+        data["constructorId"] = this.constructorId;
+        data["constructor"] = this.constructor_ ? this.constructor_.toJSON() : undefined as any;
+        if (Array.isArray(this.contractorDuty)) {
+            data["contractorDuty"] = [];
+            for (let item of this.contractorDuty)
+                data["contractorDuty"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IMainContract {
+    id?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    isDeleted?: boolean;
+    total?: number;
+    startDate?: Date;
+    endDate?: Date;
+    agreementId?: number;
+    agreement?: Agreement;
+    constructorId?: number;
+    constructor_?: Constructor;
+    contractorDuty?: ContractorDuty[] | undefined;
+}
+
 export class MainContractDto implements IMainContractDto {
     id?: number | undefined;
     total?: number;
@@ -3884,6 +8636,334 @@ export interface IMainContractDto {
     contractorDutyDto?: ContractorDutyDto[] | undefined;
 }
 
+export class MainContractorType implements IMainContractorType {
+    id?: number;
+    name!: string | undefined;
+    contracts?: MainContract[] | undefined;
+
+    constructor(data?: IMainContractorType) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            if (Array.isArray(_data["contracts"])) {
+                this.contracts = [] as any;
+                for (let item of _data["contracts"])
+                    this.contracts!.push(MainContract.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): MainContractorType {
+        data = typeof data === 'object' ? data : {};
+        let result = new MainContractorType();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        if (Array.isArray(this.contracts)) {
+            data["contracts"] = [];
+            for (let item of this.contracts)
+                data["contracts"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IMainContractorType {
+    id?: number;
+    name: string | undefined;
+    contracts?: MainContract[] | undefined;
+}
+
+export class Material implements IMaterial {
+    id?: number;
+    name!: string | undefined;
+
+    constructor(data?: IMaterial) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): Material {
+        data = typeof data === 'object' ? data : {};
+        let result = new Material();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IMaterial {
+    id?: number;
+    name: string | undefined;
+}
+
+export class MileStones implements IMileStones {
+    id?: number;
+    name!: string | undefined;
+
+    constructor(data?: IMileStones) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): MileStones {
+        data = typeof data === 'object' ? data : {};
+        let result = new MileStones();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IMileStones {
+    id?: number;
+    name: string | undefined;
+}
+
+export class MilestoneDto implements IMilestoneDto {
+    projectPOs?: ProjectPO[] | undefined;
+    projectSurveyingVisits?: ProjectSurveyingVisit[] | undefined;
+    projectVO?: ProjectVO[] | undefined;
+    projectMainContractors?: ProjectMainContractor[] | undefined;
+    projectBOQs?: ProjectBOQ[] | undefined;
+
+    constructor(data?: IMilestoneDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["projectPOs"])) {
+                this.projectPOs = [] as any;
+                for (let item of _data["projectPOs"])
+                    this.projectPOs!.push(ProjectPO.fromJS(item));
+            }
+            if (Array.isArray(_data["projectSurveyingVisits"])) {
+                this.projectSurveyingVisits = [] as any;
+                for (let item of _data["projectSurveyingVisits"])
+                    this.projectSurveyingVisits!.push(ProjectSurveyingVisit.fromJS(item));
+            }
+            if (Array.isArray(_data["projectVO"])) {
+                this.projectVO = [] as any;
+                for (let item of _data["projectVO"])
+                    this.projectVO!.push(ProjectVO.fromJS(item));
+            }
+            if (Array.isArray(_data["projectMainContractors"])) {
+                this.projectMainContractors = [] as any;
+                for (let item of _data["projectMainContractors"])
+                    this.projectMainContractors!.push(ProjectMainContractor.fromJS(item));
+            }
+            if (Array.isArray(_data["projectBOQs"])) {
+                this.projectBOQs = [] as any;
+                for (let item of _data["projectBOQs"])
+                    this.projectBOQs!.push(ProjectBOQ.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): MilestoneDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new MilestoneDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.projectPOs)) {
+            data["projectPOs"] = [];
+            for (let item of this.projectPOs)
+                data["projectPOs"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.projectSurveyingVisits)) {
+            data["projectSurveyingVisits"] = [];
+            for (let item of this.projectSurveyingVisits)
+                data["projectSurveyingVisits"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.projectVO)) {
+            data["projectVO"] = [];
+            for (let item of this.projectVO)
+                data["projectVO"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.projectMainContractors)) {
+            data["projectMainContractors"] = [];
+            for (let item of this.projectMainContractors)
+                data["projectMainContractors"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.projectBOQs)) {
+            data["projectBOQs"] = [];
+            for (let item of this.projectBOQs)
+                data["projectBOQs"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IMilestoneDto {
+    projectPOs?: ProjectPO[] | undefined;
+    projectSurveyingVisits?: ProjectSurveyingVisit[] | undefined;
+    projectVO?: ProjectVO[] | undefined;
+    projectMainContractors?: ProjectMainContractor[] | undefined;
+    projectBOQs?: ProjectBOQ[] | undefined;
+}
+
+export class MilestoneDtoResponse implements IMilestoneDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: MilestoneDto;
+
+    constructor(data?: IMilestoneDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? MilestoneDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): MilestoneDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new MilestoneDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IMilestoneDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: MilestoneDto;
+}
+
+export class MonthlyPayment implements IMonthlyPayment {
+    id?: number;
+    isDeleted?: boolean;
+    amount?: number;
+    agreementPayment?: AgreementPayment;
+
+    constructor(data?: IMonthlyPayment) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.amount = _data["amount"];
+            this.agreementPayment = _data["agreementPayment"] ? AgreementPayment.fromJS(_data["agreementPayment"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): MonthlyPayment {
+        data = typeof data === 'object' ? data : {};
+        let result = new MonthlyPayment();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["amount"] = this.amount;
+        data["agreementPayment"] = this.agreementPayment ? this.agreementPayment.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IMonthlyPayment {
+    id?: number;
+    isDeleted?: boolean;
+    amount?: number;
+    agreementPayment?: AgreementPayment;
+}
+
 export class MonthlyPaymentDto implements IMonthlyPaymentDto {
     id?: number | undefined;
     amount?: number;
@@ -3922,6 +9002,242 @@ export class MonthlyPaymentDto implements IMonthlyPaymentDto {
 export interface IMonthlyPaymentDto {
     id?: number | undefined;
     amount?: number;
+}
+
+export class PaymentMethod implements IPaymentMethod {
+    id?: number;
+    name!: string | undefined;
+
+    constructor(data?: IPaymentMethod) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): PaymentMethod {
+        data = typeof data === 'object' ? data : {};
+        let result = new PaymentMethod();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IPaymentMethod {
+    id?: number;
+    name: string | undefined;
+}
+
+export class Project implements IProject {
+    id?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    isDeleted?: boolean;
+    title?: string | undefined;
+    status?: ProjectStatus;
+    description?: string | undefined;
+    projectNumber?: string | undefined;
+    startDate?: Date;
+    endDate?: Date;
+    managerId?: number | undefined;
+    budget?: number;
+    agreement?: Agreement;
+    agreementId?: number;
+    projectStages?: ProjectStage[] | undefined;
+    milestoneCount?: number;
+
+    constructor(data?: IProject) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            this.isDeleted = _data["isDeleted"];
+            this.title = _data["title"];
+            this.status = _data["status"];
+            this.description = _data["description"];
+            this.projectNumber = _data["projectNumber"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.managerId = _data["managerId"];
+            this.budget = _data["budget"];
+            this.agreement = _data["agreement"] ? Agreement.fromJS(_data["agreement"]) : undefined as any;
+            this.agreementId = _data["agreementId"];
+            if (Array.isArray(_data["projectStages"])) {
+                this.projectStages = [] as any;
+                for (let item of _data["projectStages"])
+                    this.projectStages!.push(ProjectStage.fromJS(item));
+            }
+            this.milestoneCount = _data["milestoneCount"];
+        }
+    }
+
+    static fromJS(data: any): Project {
+        data = typeof data === 'object' ? data : {};
+        let result = new Project();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        data["isDeleted"] = this.isDeleted;
+        data["title"] = this.title;
+        data["status"] = this.status;
+        data["description"] = this.description;
+        data["projectNumber"] = this.projectNumber;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        data["managerId"] = this.managerId;
+        data["budget"] = this.budget;
+        data["agreement"] = this.agreement ? this.agreement.toJSON() : undefined as any;
+        data["agreementId"] = this.agreementId;
+        if (Array.isArray(this.projectStages)) {
+            data["projectStages"] = [];
+            for (let item of this.projectStages)
+                data["projectStages"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["milestoneCount"] = this.milestoneCount;
+        return data;
+    }
+}
+
+export interface IProject {
+    id?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    isDeleted?: boolean;
+    title?: string | undefined;
+    status?: ProjectStatus;
+    description?: string | undefined;
+    projectNumber?: string | undefined;
+    startDate?: Date;
+    endDate?: Date;
+    managerId?: number | undefined;
+    budget?: number;
+    agreement?: Agreement;
+    agreementId?: number;
+    projectStages?: ProjectStage[] | undefined;
+    milestoneCount?: number;
+}
+
+export class ProjectAreaUnit implements IProjectAreaUnit {
+    id?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    isDeleted?: boolean;
+    annexId!: number;
+    annex?: Annex;
+    amount!: number;
+    unitId!: number;
+    unit?: Unit;
+    agreementId?: number;
+    agreement?: Agreement;
+
+    constructor(data?: IProjectAreaUnit) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            this.isDeleted = _data["isDeleted"];
+            this.annexId = _data["annexId"];
+            this.annex = _data["annex"] ? Annex.fromJS(_data["annex"]) : undefined as any;
+            this.amount = _data["amount"];
+            this.unitId = _data["unitId"];
+            this.unit = _data["unit"] ? Unit.fromJS(_data["unit"]) : undefined as any;
+            this.agreementId = _data["agreementId"];
+            this.agreement = _data["agreement"] ? Agreement.fromJS(_data["agreement"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ProjectAreaUnit {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectAreaUnit();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        data["isDeleted"] = this.isDeleted;
+        data["annexId"] = this.annexId;
+        data["annex"] = this.annex ? this.annex.toJSON() : undefined as any;
+        data["amount"] = this.amount;
+        data["unitId"] = this.unitId;
+        data["unit"] = this.unit ? this.unit.toJSON() : undefined as any;
+        data["agreementId"] = this.agreementId;
+        data["agreement"] = this.agreement ? this.agreement.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IProjectAreaUnit {
+    id?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    isDeleted?: boolean;
+    annexId: number;
+    annex?: Annex;
+    amount: number;
+    unitId: number;
+    unit?: Unit;
+    agreementId?: number;
+    agreement?: Agreement;
 }
 
 export class ProjectAreaUnitDto implements IProjectAreaUnitDto {
@@ -3976,6 +9292,322 @@ export interface IProjectAreaUnitDto {
     isDeleted?: boolean;
 }
 
+export class ProjectBOQ implements IProjectBOQ {
+    id?: number;
+    isDeleted?: boolean;
+    projectStage?: ProjectStage;
+    projectStageId?: number;
+    material?: Material;
+    materialId?: number;
+    unit?: Unit;
+    unitId?: number;
+    price?: number;
+    actualQuantity?: number;
+    description?: string | undefined;
+    subTotal?: number;
+    constructor_?: Constructor;
+    constructorId?: number;
+
+    constructor(data?: IProjectBOQ) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.projectStage = _data["projectStage"] ? ProjectStage.fromJS(_data["projectStage"]) : undefined as any;
+            this.projectStageId = _data["projectStageId"];
+            this.material = _data["material"] ? Material.fromJS(_data["material"]) : undefined as any;
+            this.materialId = _data["materialId"];
+            this.unit = _data["unit"] ? Unit.fromJS(_data["unit"]) : undefined as any;
+            this.unitId = _data["unitId"];
+            this.price = _data["price"];
+            this.actualQuantity = _data["actualQuantity"];
+            this.description = _data["description"];
+            this.subTotal = _data["subTotal"];
+            this.constructor_ = _data["constructor"] ? Constructor.fromJS(_data["constructor"]) : undefined as any;
+            this.constructorId = _data["constructorId"];
+        }
+    }
+
+    static fromJS(data: any): ProjectBOQ {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectBOQ();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["projectStage"] = this.projectStage ? this.projectStage.toJSON() : undefined as any;
+        data["projectStageId"] = this.projectStageId;
+        data["material"] = this.material ? this.material.toJSON() : undefined as any;
+        data["materialId"] = this.materialId;
+        data["unit"] = this.unit ? this.unit.toJSON() : undefined as any;
+        data["unitId"] = this.unitId;
+        data["price"] = this.price;
+        data["actualQuantity"] = this.actualQuantity;
+        data["description"] = this.description;
+        data["subTotal"] = this.subTotal;
+        data["constructor"] = this.constructor_ ? this.constructor_.toJSON() : undefined as any;
+        data["constructorId"] = this.constructorId;
+        return data;
+    }
+}
+
+export interface IProjectBOQ {
+    id?: number;
+    isDeleted?: boolean;
+    projectStage?: ProjectStage;
+    projectStageId?: number;
+    material?: Material;
+    materialId?: number;
+    unit?: Unit;
+    unitId?: number;
+    price?: number;
+    actualQuantity?: number;
+    description?: string | undefined;
+    subTotal?: number;
+    constructor_?: Constructor;
+    constructorId?: number;
+}
+
+export class ProjectMainContractor implements IProjectMainContractor {
+    id?: number;
+    isDeleted?: boolean;
+    projectStage?: ProjectStage;
+    projectStageId?: number;
+    constructor_?: Constructor;
+    constructorId?: number;
+    amount?: number;
+    startDate?: Date;
+    endDate?: Date;
+
+    constructor(data?: IProjectMainContractor) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.projectStage = _data["projectStage"] ? ProjectStage.fromJS(_data["projectStage"]) : undefined as any;
+            this.projectStageId = _data["projectStageId"];
+            this.constructor_ = _data["constructor"] ? Constructor.fromJS(_data["constructor"]) : undefined as any;
+            this.constructorId = _data["constructorId"];
+            this.amount = _data["amount"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ProjectMainContractor {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectMainContractor();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["projectStage"] = this.projectStage ? this.projectStage.toJSON() : undefined as any;
+        data["projectStageId"] = this.projectStageId;
+        data["constructor"] = this.constructor_ ? this.constructor_.toJSON() : undefined as any;
+        data["constructorId"] = this.constructorId;
+        data["amount"] = this.amount;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IProjectMainContractor {
+    id?: number;
+    isDeleted?: boolean;
+    projectStage?: ProjectStage;
+    projectStageId?: number;
+    constructor_?: Constructor;
+    constructorId?: number;
+    amount?: number;
+    startDate?: Date;
+    endDate?: Date;
+}
+
+export class ProjectPO implements IProjectPO {
+    id?: number;
+    isDeleted?: boolean;
+    projectStage?: ProjectStage;
+    projectStageId?: number;
+    poNumber?: string | undefined;
+    supplier?: Supplier;
+    supplierId?: number;
+    description?: string | undefined;
+    unit?: Unit;
+    unitId?: number;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+
+    constructor(data?: IProjectPO) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.projectStage = _data["projectStage"] ? ProjectStage.fromJS(_data["projectStage"]) : undefined as any;
+            this.projectStageId = _data["projectStageId"];
+            this.poNumber = _data["poNumber"];
+            this.supplier = _data["supplier"] ? Supplier.fromJS(_data["supplier"]) : undefined as any;
+            this.supplierId = _data["supplierId"];
+            this.description = _data["description"];
+            this.unit = _data["unit"] ? Unit.fromJS(_data["unit"]) : undefined as any;
+            this.unitId = _data["unitId"];
+            this.price = _data["price"];
+            this.subTotal = _data["subTotal"];
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): ProjectPO {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectPO();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["projectStage"] = this.projectStage ? this.projectStage.toJSON() : undefined as any;
+        data["projectStageId"] = this.projectStageId;
+        data["poNumber"] = this.poNumber;
+        data["supplier"] = this.supplier ? this.supplier.toJSON() : undefined as any;
+        data["supplierId"] = this.supplierId;
+        data["description"] = this.description;
+        data["unit"] = this.unit ? this.unit.toJSON() : undefined as any;
+        data["unitId"] = this.unitId;
+        data["price"] = this.price;
+        data["subTotal"] = this.subTotal;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface IProjectPO {
+    id?: number;
+    isDeleted?: boolean;
+    projectStage?: ProjectStage;
+    projectStageId?: number;
+    poNumber?: string | undefined;
+    supplier?: Supplier;
+    supplierId?: number;
+    description?: string | undefined;
+    unit?: Unit;
+    unitId?: number;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+}
+
+export class ProjectStage implements IProjectStage {
+    id?: number;
+    isDeleted?: boolean;
+    projectId?: number;
+    project?: Project;
+    status?: number | undefined;
+    stageType?: ProjectStageType;
+    projectStageTasks?: ProjectStageTask[] | undefined;
+    milestonesId?: number;
+    milestones?: MileStones;
+
+    constructor(data?: IProjectStage) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.projectId = _data["projectId"];
+            this.project = _data["project"] ? Project.fromJS(_data["project"]) : undefined as any;
+            this.status = _data["status"];
+            this.stageType = _data["stageType"];
+            if (Array.isArray(_data["projectStageTasks"])) {
+                this.projectStageTasks = [] as any;
+                for (let item of _data["projectStageTasks"])
+                    this.projectStageTasks!.push(ProjectStageTask.fromJS(item));
+            }
+            this.milestonesId = _data["milestonesId"];
+            this.milestones = _data["milestones"] ? MileStones.fromJS(_data["milestones"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ProjectStage {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectStage();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["projectId"] = this.projectId;
+        data["project"] = this.project ? this.project.toJSON() : undefined as any;
+        data["status"] = this.status;
+        data["stageType"] = this.stageType;
+        if (Array.isArray(this.projectStageTasks)) {
+            data["projectStageTasks"] = [];
+            for (let item of this.projectStageTasks)
+                data["projectStageTasks"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["milestonesId"] = this.milestonesId;
+        data["milestones"] = this.milestones ? this.milestones.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IProjectStage {
+    id?: number;
+    isDeleted?: boolean;
+    projectId?: number;
+    project?: Project;
+    status?: number | undefined;
+    stageType?: ProjectStageType;
+    projectStageTasks?: ProjectStageTask[] | undefined;
+    milestonesId?: number;
+    milestones?: MileStones;
+}
+
 export class ProjectStageDto implements IProjectStageDto {
     id?: number;
     projectId?: number;
@@ -4024,10 +9656,222 @@ export interface IProjectStageDto {
     stageType?: ProjectStageType;
 }
 
+export class ProjectStageTask implements IProjectStageTask {
+    id?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    isDeleted?: boolean;
+    title?: string | undefined;
+    description?: string | undefined;
+    assignTo?: number | undefined;
+    startDate?: Date;
+    endDate?: Date;
+    priority?: number | undefined;
+    taskPoint?: number | undefined;
+    excavationLocation?: string | undefined;
+    excavationDepth?: number | undefined;
+    excavationVolume?: number | undefined;
+    excavationSoilType?: string | undefined;
+    excavationEquipment?: string | undefined;
+    status?: StatusTask;
+    projectStageId?: number;
+    projectStage?: ProjectStage;
+    taskTypeId?: number;
+    taskType?: TaskType;
+    projectStagesSubTasks?: ProjectStagesSubTask[] | undefined;
+
+    constructor(data?: IProjectStageTask) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            this.isDeleted = _data["isDeleted"];
+            this.title = _data["title"];
+            this.description = _data["description"];
+            this.assignTo = _data["assignTo"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.priority = _data["priority"];
+            this.taskPoint = _data["taskPoint"];
+            this.excavationLocation = _data["excavationLocation"];
+            this.excavationDepth = _data["excavationDepth"];
+            this.excavationVolume = _data["excavationVolume"];
+            this.excavationSoilType = _data["excavationSoilType"];
+            this.excavationEquipment = _data["excavationEquipment"];
+            this.status = _data["status"];
+            this.projectStageId = _data["projectStageId"];
+            this.projectStage = _data["projectStage"] ? ProjectStage.fromJS(_data["projectStage"]) : undefined as any;
+            this.taskTypeId = _data["taskTypeId"];
+            this.taskType = _data["taskType"] ? TaskType.fromJS(_data["taskType"]) : undefined as any;
+            if (Array.isArray(_data["projectStagesSubTasks"])) {
+                this.projectStagesSubTasks = [] as any;
+                for (let item of _data["projectStagesSubTasks"])
+                    this.projectStagesSubTasks!.push(ProjectStagesSubTask.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ProjectStageTask {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectStageTask();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        data["isDeleted"] = this.isDeleted;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        data["assignTo"] = this.assignTo;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        data["priority"] = this.priority;
+        data["taskPoint"] = this.taskPoint;
+        data["excavationLocation"] = this.excavationLocation;
+        data["excavationDepth"] = this.excavationDepth;
+        data["excavationVolume"] = this.excavationVolume;
+        data["excavationSoilType"] = this.excavationSoilType;
+        data["excavationEquipment"] = this.excavationEquipment;
+        data["status"] = this.status;
+        data["projectStageId"] = this.projectStageId;
+        data["projectStage"] = this.projectStage ? this.projectStage.toJSON() : undefined as any;
+        data["taskTypeId"] = this.taskTypeId;
+        data["taskType"] = this.taskType ? this.taskType.toJSON() : undefined as any;
+        if (Array.isArray(this.projectStagesSubTasks)) {
+            data["projectStagesSubTasks"] = [];
+            for (let item of this.projectStagesSubTasks)
+                data["projectStagesSubTasks"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IProjectStageTask {
+    id?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    isDeleted?: boolean;
+    title?: string | undefined;
+    description?: string | undefined;
+    assignTo?: number | undefined;
+    startDate?: Date;
+    endDate?: Date;
+    priority?: number | undefined;
+    taskPoint?: number | undefined;
+    excavationLocation?: string | undefined;
+    excavationDepth?: number | undefined;
+    excavationVolume?: number | undefined;
+    excavationSoilType?: string | undefined;
+    excavationEquipment?: string | undefined;
+    status?: StatusTask;
+    projectStageId?: number;
+    projectStage?: ProjectStage;
+    taskTypeId?: number;
+    taskType?: TaskType;
+    projectStagesSubTasks?: ProjectStagesSubTask[] | undefined;
+}
+
 export enum ProjectStageType {
     _1 = 1,
     _2 = 2,
     _3 = 3,
+}
+
+export class ProjectStagesSubTask implements IProjectStagesSubTask {
+    id?: number;
+    isDeleted?: boolean;
+    title?: string | undefined;
+    startDate?: Date;
+    endDate?: Date | undefined;
+    status?: ProjectStatusSubTask;
+    type?: SubTaskType;
+    cost?: number | undefined;
+    qty?: number | undefined;
+    projectStageTask?: ProjectStageTask;
+    projectStageTaskId?: number;
+
+    constructor(data?: IProjectStagesSubTask) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.title = _data["title"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.status = _data["status"];
+            this.type = _data["type"];
+            this.cost = _data["cost"];
+            this.qty = _data["qty"];
+            this.projectStageTask = _data["projectStageTask"] ? ProjectStageTask.fromJS(_data["projectStageTask"]) : undefined as any;
+            this.projectStageTaskId = _data["projectStageTaskId"];
+        }
+    }
+
+    static fromJS(data: any): ProjectStagesSubTask {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectStagesSubTask();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["title"] = this.title;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        data["status"] = this.status;
+        data["type"] = this.type;
+        data["cost"] = this.cost;
+        data["qty"] = this.qty;
+        data["projectStageTask"] = this.projectStageTask ? this.projectStageTask.toJSON() : undefined as any;
+        data["projectStageTaskId"] = this.projectStageTaskId;
+        return data;
+    }
+}
+
+export interface IProjectStagesSubTask {
+    id?: number;
+    isDeleted?: boolean;
+    title?: string | undefined;
+    startDate?: Date;
+    endDate?: Date | undefined;
+    status?: ProjectStatusSubTask;
+    type?: SubTaskType;
+    cost?: number | undefined;
+    qty?: number | undefined;
+    projectStageTask?: ProjectStageTask;
+    projectStageTaskId?: number;
 }
 
 export enum ProjectStatus {
@@ -4374,6 +10218,290 @@ export interface IProjectSubTaskDtoResponse {
     data?: ProjectSubTaskDto;
 }
 
+export class ProjectSurveyingVisit implements IProjectSurveyingVisit {
+    id?: number;
+    isDeleted?: boolean;
+    projectStage?: ProjectStage;
+    projectStageId?: number;
+    visitDate?: Date;
+    surveyor?: string | undefined;
+    purpose?: string | undefined;
+    quantity?: number;
+    unit?: Unit;
+    unitId?: number;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+
+    constructor(data?: IProjectSurveyingVisit) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.projectStage = _data["projectStage"] ? ProjectStage.fromJS(_data["projectStage"]) : undefined as any;
+            this.projectStageId = _data["projectStageId"];
+            this.visitDate = _data["visitDate"] ? new Date(_data["visitDate"].toString()) : undefined as any;
+            this.surveyor = _data["surveyor"];
+            this.purpose = _data["purpose"];
+            this.quantity = _data["quantity"];
+            this.unit = _data["unit"] ? Unit.fromJS(_data["unit"]) : undefined as any;
+            this.unitId = _data["unitId"];
+            this.price = _data["price"];
+            this.subTotal = _data["subTotal"];
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): ProjectSurveyingVisit {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectSurveyingVisit();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["projectStage"] = this.projectStage ? this.projectStage.toJSON() : undefined as any;
+        data["projectStageId"] = this.projectStageId;
+        data["visitDate"] = this.visitDate ? this.visitDate.toISOString() : undefined as any;
+        data["surveyor"] = this.surveyor;
+        data["purpose"] = this.purpose;
+        data["quantity"] = this.quantity;
+        data["unit"] = this.unit ? this.unit.toJSON() : undefined as any;
+        data["unitId"] = this.unitId;
+        data["price"] = this.price;
+        data["subTotal"] = this.subTotal;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface IProjectSurveyingVisit {
+    id?: number;
+    isDeleted?: boolean;
+    projectStage?: ProjectStage;
+    projectStageId?: number;
+    visitDate?: Date;
+    surveyor?: string | undefined;
+    purpose?: string | undefined;
+    quantity?: number;
+    unit?: Unit;
+    unitId?: number;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+}
+
+export class ProjectVO implements IProjectVO {
+    id?: number;
+    isDeleted?: boolean;
+    projectStage?: ProjectStage;
+    projectStageId?: number;
+    unit?: Unit;
+    unitId?: number;
+    voNumber?: string | undefined;
+    item?: string | undefined;
+    description?: string | undefined;
+    quantity?: number;
+    price?: number;
+    subTotal?: number;
+    isEffected?: boolean;
+    effectedDateStart?: Date | undefined;
+    effectedDateEnd?: Date | undefined;
+    status?: string | undefined;
+
+    constructor(data?: IProjectVO) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.projectStage = _data["projectStage"] ? ProjectStage.fromJS(_data["projectStage"]) : undefined as any;
+            this.projectStageId = _data["projectStageId"];
+            this.unit = _data["unit"] ? Unit.fromJS(_data["unit"]) : undefined as any;
+            this.unitId = _data["unitId"];
+            this.voNumber = _data["voNumber"];
+            this.item = _data["item"];
+            this.description = _data["description"];
+            this.quantity = _data["quantity"];
+            this.price = _data["price"];
+            this.subTotal = _data["subTotal"];
+            this.isEffected = _data["isEffected"];
+            this.effectedDateStart = _data["effectedDateStart"] ? new Date(_data["effectedDateStart"].toString()) : undefined as any;
+            this.effectedDateEnd = _data["effectedDateEnd"] ? new Date(_data["effectedDateEnd"].toString()) : undefined as any;
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): ProjectVO {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectVO();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["projectStage"] = this.projectStage ? this.projectStage.toJSON() : undefined as any;
+        data["projectStageId"] = this.projectStageId;
+        data["unit"] = this.unit ? this.unit.toJSON() : undefined as any;
+        data["unitId"] = this.unitId;
+        data["voNumber"] = this.voNumber;
+        data["item"] = this.item;
+        data["description"] = this.description;
+        data["quantity"] = this.quantity;
+        data["price"] = this.price;
+        data["subTotal"] = this.subTotal;
+        data["isEffected"] = this.isEffected;
+        data["effectedDateStart"] = this.effectedDateStart ? this.effectedDateStart.toISOString() : undefined as any;
+        data["effectedDateEnd"] = this.effectedDateEnd ? this.effectedDateEnd.toISOString() : undefined as any;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface IProjectVO {
+    id?: number;
+    isDeleted?: boolean;
+    projectStage?: ProjectStage;
+    projectStageId?: number;
+    unit?: Unit;
+    unitId?: number;
+    voNumber?: string | undefined;
+    item?: string | undefined;
+    description?: string | undefined;
+    quantity?: number;
+    price?: number;
+    subTotal?: number;
+    isEffected?: boolean;
+    effectedDateStart?: Date | undefined;
+    effectedDateEnd?: Date | undefined;
+    status?: string | undefined;
+}
+
+export class QuantityBill implements IQuantityBill {
+    id?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    isDeleted?: boolean;
+    materialId?: number;
+    material?: Material;
+    unitId?: number;
+    unit?: Unit;
+    ammount?: number;
+    price?: number;
+    agreementId?: number;
+    agreement?: Agreement;
+    mileStoneId?: number;
+    mileStone?: MileStones;
+    constructor_?: Constructor;
+    constructorId?: number;
+
+    constructor(data?: IQuantityBill) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            this.isDeleted = _data["isDeleted"];
+            this.materialId = _data["materialId"];
+            this.material = _data["material"] ? Material.fromJS(_data["material"]) : undefined as any;
+            this.unitId = _data["unitId"];
+            this.unit = _data["unit"] ? Unit.fromJS(_data["unit"]) : undefined as any;
+            this.ammount = _data["ammount"];
+            this.price = _data["price"];
+            this.agreementId = _data["agreementId"];
+            this.agreement = _data["agreement"] ? Agreement.fromJS(_data["agreement"]) : undefined as any;
+            this.mileStoneId = _data["mileStoneId"];
+            this.mileStone = _data["mileStone"] ? MileStones.fromJS(_data["mileStone"]) : undefined as any;
+            this.constructor_ = _data["constructor"] ? Constructor.fromJS(_data["constructor"]) : undefined as any;
+            this.constructorId = _data["constructorId"];
+        }
+    }
+
+    static fromJS(data: any): QuantityBill {
+        data = typeof data === 'object' ? data : {};
+        let result = new QuantityBill();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        data["isDeleted"] = this.isDeleted;
+        data["materialId"] = this.materialId;
+        data["material"] = this.material ? this.material.toJSON() : undefined as any;
+        data["unitId"] = this.unitId;
+        data["unit"] = this.unit ? this.unit.toJSON() : undefined as any;
+        data["ammount"] = this.ammount;
+        data["price"] = this.price;
+        data["agreementId"] = this.agreementId;
+        data["agreement"] = this.agreement ? this.agreement.toJSON() : undefined as any;
+        data["mileStoneId"] = this.mileStoneId;
+        data["mileStone"] = this.mileStone ? this.mileStone.toJSON() : undefined as any;
+        data["constructor"] = this.constructor_ ? this.constructor_.toJSON() : undefined as any;
+        data["constructorId"] = this.constructorId;
+        return data;
+    }
+}
+
+export interface IQuantityBill {
+    id?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    isDeleted?: boolean;
+    materialId?: number;
+    material?: Material;
+    unitId?: number;
+    unit?: Unit;
+    ammount?: number;
+    price?: number;
+    agreementId?: number;
+    agreement?: Agreement;
+    mileStoneId?: number;
+    mileStone?: MileStones;
+    constructor_?: Constructor;
+    constructorId?: number;
+}
+
 export class QuantityBillDto implements IQuantityBillDto {
     id?: number | undefined;
     materialId!: number;
@@ -4668,6 +10796,58 @@ export class SecondStepDto implements ISecondStepDto {
 export interface ISecondStepDto {
     agreementPaymentDto?: AgreementPaymentDto;
     agreementServiceDto?: AgreementServiceDto[] | undefined;
+}
+
+export class Service implements IService {
+    id?: number;
+    name!: string | undefined;
+    agreements?: AgreementService[] | undefined;
+
+    constructor(data?: IService) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            if (Array.isArray(_data["agreements"])) {
+                this.agreements = [] as any;
+                for (let item of _data["agreements"])
+                    this.agreements!.push(AgreementService.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Service {
+        data = typeof data === 'object' ? data : {};
+        let result = new Service();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        if (Array.isArray(this.agreements)) {
+            data["agreements"] = [];
+            for (let item of this.agreements)
+                data["agreements"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IService {
+    id?: number;
+    name: string | undefined;
+    agreements?: AgreementService[] | undefined;
 }
 
 export class SeventhStepDto implements ISeventhStepDto {
@@ -5093,6 +11273,90 @@ export interface ISupplierResponse {
     data?: Supplier;
 }
 
+export class SupplierService implements ISupplierService {
+    id?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    isDeleted?: boolean;
+    representativeName!: string | undefined;
+    materialId!: number;
+    material?: Material;
+    supplierId?: number;
+    supplier?: Supplier;
+    agreementId?: number;
+    agreement?: Agreement;
+
+    constructor(data?: ISupplierService) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            this.isDeleted = _data["isDeleted"];
+            this.representativeName = _data["representativeName"];
+            this.materialId = _data["materialId"];
+            this.material = _data["material"] ? Material.fromJS(_data["material"]) : undefined as any;
+            this.supplierId = _data["supplierId"];
+            this.supplier = _data["supplier"] ? Supplier.fromJS(_data["supplier"]) : undefined as any;
+            this.agreementId = _data["agreementId"];
+            this.agreement = _data["agreement"] ? Agreement.fromJS(_data["agreement"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): SupplierService {
+        data = typeof data === 'object' ? data : {};
+        let result = new SupplierService();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        data["isDeleted"] = this.isDeleted;
+        data["representativeName"] = this.representativeName;
+        data["materialId"] = this.materialId;
+        data["material"] = this.material ? this.material.toJSON() : undefined as any;
+        data["supplierId"] = this.supplierId;
+        data["supplier"] = this.supplier ? this.supplier.toJSON() : undefined as any;
+        data["agreementId"] = this.agreementId;
+        data["agreement"] = this.agreement ? this.agreement.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface ISupplierService {
+    id?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    isDeleted?: boolean;
+    representativeName: string | undefined;
+    materialId: number;
+    material?: Material;
+    supplierId?: number;
+    supplier?: Supplier;
+    agreementId?: number;
+    agreement?: Agreement;
+}
+
 export class SupplierServiceDto implements ISupplierServiceDto {
     id?: number | undefined;
     representativeName!: string | undefined;
@@ -5149,6 +11413,58 @@ export interface ISupplierServiceDto {
     isDeleted?: boolean;
 }
 
+export class TaskType implements ITaskType {
+    id?: number;
+    name!: string | undefined;
+    projectStageTasks?: ProjectStageTask[] | undefined;
+
+    constructor(data?: ITaskType) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            if (Array.isArray(_data["projectStageTasks"])) {
+                this.projectStageTasks = [] as any;
+                for (let item of _data["projectStageTasks"])
+                    this.projectStageTasks!.push(ProjectStageTask.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): TaskType {
+        data = typeof data === 'object' ? data : {};
+        let result = new TaskType();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        if (Array.isArray(this.projectStageTasks)) {
+            data["projectStageTasks"] = [];
+            for (let item of this.projectStageTasks)
+                data["projectStageTasks"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface ITaskType {
+    id?: number;
+    name: string | undefined;
+    projectStageTasks?: ProjectStageTask[] | undefined;
+}
+
 export class ThirdStepDto implements IThirdStepDto {
     projectAreaUnitDto?: ProjectAreaUnitDto[] | undefined;
 
@@ -5191,6 +11507,46 @@ export class ThirdStepDto implements IThirdStepDto {
 
 export interface IThirdStepDto {
     projectAreaUnitDto?: ProjectAreaUnitDto[] | undefined;
+}
+
+export class Unit implements IUnit {
+    id?: number;
+    name!: string | undefined;
+
+    constructor(data?: IUnit) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+        }
+    }
+
+    static fromJS(data: any): Unit {
+        data = typeof data === 'object' ? data : {};
+        let result = new Unit();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        return data;
+    }
+}
+
+export interface IUnit {
+    id?: number;
+    name: string | undefined;
 }
 
 function formatDate(d: Date) {
