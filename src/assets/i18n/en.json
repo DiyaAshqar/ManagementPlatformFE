@@ -271,6 +271,8 @@
       "selectUnit": "Select a unit",
       "milestone": "Milestone",
       "selectMilestone": "Select a milestone",
+      "constructor": "Constructor",
+      "selectConstructor": "Select a constructor",
       "price": "Unit Price",
       "total": "Total",
       "entriesList": "Quantity Bill List",

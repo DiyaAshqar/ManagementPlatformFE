@@ -57,30 +57,10 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
         return qty * price;
     }
 
-    /** Unit options – IDs align with backend enum / lookup */
-    unitOptions = [
-        { label: 'm³', value: 1 },
-        { label: 'kg', value: 2 },
-        { label: 'm²', value: 3 },
-        { label: 'm', value: 4 },
-        { label: 'L', value: 5 },
-        { label: 'pcs', value: 6 },
-        { label: 'ton', value: 7 },
-        { label: 'hr', value: 8 }
-    ];
-
-    materialOptions = [
-        { label: 'Concrete Grade 30', value: 1 },
-        { label: 'Steel Reinforcement', value: 2 },
-        { label: 'Cement Bags', value: 3 },
-        { label: 'Sand', value: 4 },
-        { label: 'Gravel', value: 5 },
-        { label: 'Bricks', value: 6 },
-        { label: 'Timber', value: 7 },
-        { label: 'Waterproofing Membrane', value: 8 },
-        { label: 'PVC Pipes', value: 9 },
-        { label: 'Electrical Cable', value: 10 }
-    ];
+    /** Dynamic lookup options received from the parent (boq-tab) */
+    @Input() unitOptions: { label: string; value: number }[] = [];
+    @Input() materialOptions: { label: string; value: number }[] = [];
+    @Input() constructorOptions: { label: string; value: number }[] = [];
 
     constructor(private fb: FormBuilder, private messageService: MessageService) { }
 
@@ -100,6 +80,7 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
                 materialId: [null, Validators.required],
                 description: ['', Validators.required],
                 unitId: [null, Validators.required],
+                constructorId: [null, Validators.required],
                 actualQuantity: [null, [Validators.required, Validators.min(0.01)]],
                 price: [null, [Validators.required, Validators.min(0)]]
             });
@@ -110,6 +91,7 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
                 materialId: this.editItem.materialId,
                 description: this.editItem.description,
                 unitId: this.editItem.unitId,
+                constructorId: this.editItem.constructorId,
                 actualQuantity: this.editItem.actualQuantity,
                 price: this.editItem.price
             });
@@ -133,7 +115,7 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
             return;
         }
 
-        const { materialId, description, unitId, actualQuantity, price } = this.boqForm.value;
+        const { materialId, description, unitId, constructorId, actualQuantity, price } = this.boqForm.value;
         const subTotal = actualQuantity * price;
 
         const command = new CreateProjectBOQCommand({
@@ -141,7 +123,7 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
             projectStageId: this.projectStageId,
             materialId,
             unitId,
-            constructorId: undefined,
+            constructorId,
             price,
             actualQuantity,
             description,

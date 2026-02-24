@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, signal } from '@angular/core';
+import { forkJoin } from 'rxjs';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -11,16 +12,13 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 import {
+  ConstructorClient,
   CreateProjectBOQCommand,
   IGetProjectBOQDto,
+  LookupClient,
   ProjectBOQClient
 } from '../../../../../../../nswag/api-client';
 import { AddBoqDialogComponent } from '../../../dialog/add-boq-dialog/add-boq-dialog.component';
-
-// ─── Lookup maps ─────────────────────────────────────────────────────────────
-const UNIT_MAP: Record<number, string> = {
-  1: 'm³', 2: 'kg', 3: 'm²', 4: 'm', 5: 'L', 6: 'pcs', 7: 'ton', 8: 'hr'
-};
 
 // ─── Dummy seed data ──────────────────────────────────────────────────────────
 const DUMMY_BOQ: IGetProjectBOQDto[] = [
@@ -49,20 +47,28 @@ const DUMMY_BOQ: IGetProjectBOQDto[] = [
     ConfirmDialogModule,
     AddBoqDialogComponent
   ],
-  providers: [MessageService, ConfirmationService, ProjectBOQClient],
+  providers: [MessageService, ConfirmationService, ProjectBOQClient, LookupClient, ConstructorClient],
   templateUrl: './boq-tab.component.html',
   styleUrls: ['./boq-tab.component.scss']
 })
 export class BoqTabComponent implements OnInit {
   @Input() projectStageId: number = 0;
 
-  boqItems  = signal<IGetProjectBOQDto[]>([]);
+  boqItems = signal<IGetProjectBOQDto[]>([]);
   isLoading = signal(false);
 
   showBoqDialog = signal(false);
-  editBoqItem   = signal<IGetProjectBOQDto | null>(null);
+  editBoqItem = signal<IGetProjectBOQDto | null>(null);
 
-  readonly unitMap = UNIT_MAP;
+  // ─── Lookup maps (for table display) ───────────────────────────────────────
+  unitMap: Record<number, string> = {};
+  materialMap: Record<number, string> = {};
+  constructorMap: Record<number, string> = {};
+
+  // ─── Option arrays (passed to dialog) ──────────────────────────────────────
+  unitOptions: { label: string; value: number }[] = [];
+  materialOptions: { label: string; value: number }[] = [];
+  constructorOptions: { label: string; value: number }[] = [];
 
   get grandTotal(): number {
     return this.boqItems().reduce((sum, item) => sum + (item.subTotal ?? 0), 0);
@@ -74,12 +80,46 @@ export class BoqTabComponent implements OnInit {
 
   constructor(
     private boqClient: ProjectBOQClient,
+    private lookupClient: LookupClient,
+    private constructorClient: ConstructorClient,
     private messageService: MessageService,
     private confirmationService: ConfirmationService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
+    this.loadLookups();
     this.loadBoqItems();
+  }
+
+  // ── Lookups ───────────────────────────────────────────────────────────────
+
+  loadLookups(): void {
+    forkJoin({
+      lookups: this.lookupClient.getAllLookups(['material', 'unit']),
+      constructors: this.constructorClient.getAll(1, 200, undefined)
+    }).subscribe({
+      next: ({ lookups, constructors }) => {
+        const data = lookups.data as any;
+
+        if (data?.['material']) {
+          this.materialOptions = (data['material'] as { id: number; name: string }[])
+            .map(m => ({ label: m.name, value: m.id }));
+          this.materialMap = Object.fromEntries(this.materialOptions.map(o => [o.value, o.label]));
+        }
+
+        if (data?.['unit']) {
+          this.unitOptions = (data['unit'] as { id: number; name: string }[])
+            .map(u => ({ label: u.name, value: u.id }));
+          this.unitMap = Object.fromEntries(this.unitOptions.map(o => [o.value, o.label]));
+        }
+
+        const ctors = constructors.data?.data ?? [];
+        this.constructorOptions = ctors
+          .filter(c => c.id != null && c.name)
+          .map(c => ({ label: c.name!, value: c.id! }));
+        this.constructorMap = Object.fromEntries(this.constructorOptions.map(o => [o.value, o.label]));
+      }
+    });
   }
 
   // ── Load ─────────────────────────────────────────────────────────────────
@@ -137,7 +177,11 @@ export class BoqTabComponent implements OnInit {
     } else {
       // Add
       const nextId = Math.max(0, ...currentItems.map(i => i.id ?? 0)) + 1;
-      const newItem: IGetProjectBOQDto = { ...command, id: nextId };
+      const newItem: IGetProjectBOQDto = {
+        ...command,
+        id: nextId,
+        constructorId: command.constructorId
+      };
       this.boqItems.set([...currentItems, newItem]);
       this.messageService.add({ severity: 'success', summary: 'Added', detail: 'BoQ item added successfully.' });
     }

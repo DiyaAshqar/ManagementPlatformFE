@@ -268,6 +268,8 @@
       "selectUnit": "اختر وحدة",
       "milestone": "المرحلة",
       "selectMilestone": "اختر مرحلة",
+      "constructor": "المقاول",
+      "selectConstructor": "اختر مقاولاً",
       "price": "سعر الوحدة",
       "total": "الإجمالي",
       "entriesList": "قائمة كشف الكميات",

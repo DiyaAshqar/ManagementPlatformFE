@@ -44,6 +44,7 @@ export class Step6Component implements OnInit, OnDestroy {
   materials = signal<LookupDto[]>([]);
   units = signal<LookupDto[]>([]);
   milestones = signal<LookupDto[]>([]);
+  constructors = signal<LookupDto[]>([]);
   isLoading = signal(false);
   
   // Editing state
@@ -80,6 +81,7 @@ export class Step6Component implements OnInit, OnDestroy {
         materialId: [null, [Validators.required, Validators.min(1)]],
         unitId: [null, [Validators.required, Validators.min(1)]],
         mileStoneId: [null, [Validators.required, Validators.min(1)]],
+        constructorId: [null, [Validators.required, Validators.min(1)]],
         ammount: [null, [Validators.required, Validators.min(0)]],
         price: [null, [Validators.required, Validators.min(0)]],
         agreementId: [this.agreementId()]
@@ -97,6 +99,7 @@ export class Step6Component implements OnInit, OnDestroy {
           this.materials.set(response.materials || []);
           this.units.set(response.units || []);
           this.milestones.set(response.milestones || []);
+          this.constructors.set(response.constructors || []);
           this.isLoading.set(false);
         },
         error: (error) => {
@@ -182,6 +185,7 @@ export class Step6Component implements OnInit, OnDestroy {
       dto.materialId = entry.materialId;
       dto.unitId = entry.unitId;
       dto.mileStoneId = entry.mileStoneId;
+      dto.constructorId = entry.constructorId;
       dto.ammount = entry.ammount;
       dto.price = entry.price;
       dto.agreementId = this.agreementId();
@@ -200,8 +204,7 @@ export class Step6Component implements OnInit, OnDestroy {
         id: entry.id,
         materialId: entry.materialId,
         unitId: entry.unitId,
-        mileStoneId: entry.mileStoneId,
-        ammount: entry.ammount,
+        mileStoneId: entry.mileStoneId,        constructorId: entry.constructorId,        ammount: entry.ammount,
         price: entry.price,
         agreementId: this.agreementId(),
         isDeleted: entry.isDeleted || false
@@ -223,6 +226,7 @@ export class Step6Component implements OnInit, OnDestroy {
     entryData.materialId = formValue.materialId;
     entryData.unitId = formValue.unitId;
     entryData.mileStoneId = formValue.mileStoneId;
+    entryData.constructorId = formValue.constructorId;
     entryData.ammount = formValue.ammount;
     entryData.price = formValue.price;
     entryData.agreementId = this.agreementId();
@@ -263,6 +267,7 @@ export class Step6Component implements OnInit, OnDestroy {
         materialId: entry.materialId,
         unitId: entry.unitId,
         mileStoneId: entry.mileStoneId,
+        constructorId: entry.constructorId,
         ammount: entry.ammount,
         price: entry.price,
         agreementId: entry.agreementId
@@ -306,6 +311,7 @@ export class Step6Component implements OnInit, OnDestroy {
         materialId: null,
         unitId: null,
         mileStoneId: null,
+        constructorId: null,
         ammount: null,
         price: null,
         agreementId: this.agreementId()
@@ -340,6 +346,11 @@ export class Step6Component implements OnInit, OnDestroy {
     return milestone ? (milestone.name || 'Unknown') : 'Unknown';
   }
 
+  getConstructorName(constructorId: number): string {
+    const constructor = this.constructors().find(c => c.id === constructorId);
+    return constructor ? (constructor.name || 'Unknown') : 'Unknown';
+  }
+
   // Validation methods
   isFieldInvalid(fieldName: string): boolean {
     const field = this.step6Form.get('quantityBillDto')?.get(fieldName);
@@ -352,6 +363,7 @@ export class Step6Component implements OnInit, OnDestroy {
       if (field.errors['required']) return 'This field is required';
       if (field.errors['min']) {
         if (fieldName === 'mileStoneId') return 'Please select a valid milestone';
+        if (fieldName === 'constructorId') return 'Please select a valid constructor';
         return 'Value must be greater than 0';
       }
     }

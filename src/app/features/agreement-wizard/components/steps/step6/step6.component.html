@@ -77,6 +77,22 @@
                         </div>
                     </div>
 
+                    <!-- Constructor field -->
+                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                        <div class="field">
+                            <p-floatlabel variant="in">
+                                <p-select inputId="constructorId" formControlName="constructorId" [options]="constructors()"
+                                    optionLabel="name" optionValue="id"
+                                    [class]="isFieldInvalid('constructorId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'">
+                                </p-select>
+                                <label for="constructorId">{{ 'wizard.step6.constructor' | translate }}</label>
+                            </p-floatlabel>
+                            @if (isFieldInvalid('constructorId')) {
+                            <small class="text-red-500 block mt-1">{{ getFieldError('constructorId') }}</small>
+                            }
+                        </div>
+                    </div>
+
                     <!-- Price field -->
                     <div class="col-12 md:col-6 lg:col-3 mb-3">
                         <div class="field">
@@ -131,6 +147,7 @@
                         <th>{{ 'wizard.step6.quantity' | translate }}</th>
                         <th>{{ 'wizard.step6.unit' | translate }}</th>
                         <th>{{ 'wizard.step6.milestone' | translate }}</th>
+                        <th>{{ 'wizard.step6.constructor' | translate }}</th>
                         <th>{{ 'wizard.step6.price' | translate }}</th>
                         <th>{{ 'wizard.step6.total' | translate }}</th>
                         @if (!isViewMode()) {
@@ -145,6 +162,7 @@
                         <td>{{ entry.ammount | number }}</td>
                         <td>{{ getUnitName(entry.unitId) }}</td>
                         <td>{{ getMilestoneName(entry.mileStoneId) }}</td>
+                        <td>{{ getConstructorName(entry.constructorId) }}</td>
                         <td>{{ entry.price | currency:'USD':'symbol':'1.2-2' }}</td>
                         <td class="font-semibold">{{ calculateTotal(entry) | currency:'USD':'symbol':'1.2-2' }}</td>
                         @if (!isViewMode()) {
@@ -164,7 +182,7 @@
 
                 <ng-template pTemplate="emptymessage">
                     <tr>
-                        <td colspan="7" class="text-center p-6">
+                        <td colspan="8" class="text-center p-6">
                             <i class="pi pi-inbox text-4xl mb-3 block text-gray-400"></i>
                             <p class="text-gray-500">{{ 'wizard.step6.noData' | translate }}</p>
                         </td>

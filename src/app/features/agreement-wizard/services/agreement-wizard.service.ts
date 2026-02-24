@@ -190,17 +190,18 @@ export class AgreementWizardService {
   }
 
   // Get lookups for Step 6
-  getStep6Lookups(): Observable<{ materials: LookupDto[], units: LookupDto[], milestones: LookupDto[] }> {
-    return this.getAllLookups(['material', 'unit', 'milestones']).pipe(
+  getStep6Lookups(): Observable<{ materials: LookupDto[], units: LookupDto[], milestones: LookupDto[], constructors: LookupDto[] }> {
+    return this.getAllLookups(['material', 'unit', 'milestones', 'constructor']).pipe(
       map(response => {
         if (response.succeeded && response.data) {
           return {
             materials: response.data['material'] || [],
             units: response.data['unit'] || [],
-            milestones: response.data['milestones'] || []
+            milestones: response.data['milestones'] || [],
+            constructors: response.data['constructor'] || []
           };
         }
-        return { materials: [], units: [], milestones: [] };
+        return { materials: [], units: [], milestones: [], constructors: [] };
       })
     );
   }

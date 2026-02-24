@@ -55,6 +55,29 @@
         </div>
       </div>
 
+      <!-- Constructor -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="constructorId"
+              formControlName="constructorId"
+              [options]="constructorOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="true"
+              filterPlaceholder="Search constructor..."
+              [showClear]="true"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('constructorId')">
+            </p-select>
+            <label for="constructorId">Constructor *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('constructorId')" class="p-error">Constructor is required.</small>
+        </div>
+      </div>
+
       <!-- Description -->
       <div class="col-12">
         <div class="field">
