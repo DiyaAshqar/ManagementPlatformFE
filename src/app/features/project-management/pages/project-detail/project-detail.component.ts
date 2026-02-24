@@ -24,6 +24,7 @@ import { StageKanbanComponent } from '../../components/stage-kanban/stage-kanban
 import { Project, ProjectStatus, Stage, TaskStatus } from '../../models';
 import { GetProjectTaskDto } from '../../../../../nswag/api-client';
 import { ProjectService } from '../../services/project.service';
+import { ProjectApiService } from '../../services/project-api.service';
 
 interface ReportType {
   label: string;
@@ -74,6 +75,12 @@ export class ProjectDetailComponent implements OnInit {
     const stages = this.projectData()?.projectStages;
     return stages?.find((s: ProjectStageDto) => s.stageType === ProjectStageType._2)?.id || 0;
   });
+
+  // Get all milestone stages (stageType = 3) for accordion
+  milestoneStages = computed(() => {
+    const stages = this.projectData()?.projectStages;
+    return stages?.filter((s: ProjectStageDto) => s.stageType === ProjectStageType._3) || [];
+  });
   
   reportTypes: ReportType[] = [
     { label: 'Full Project Report', value: 'full' },
@@ -86,7 +93,8 @@ export class ProjectDetailComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private router: Router,
-    private projectService: ProjectService
+    private projectService: ProjectService,
+    private projectApiService: ProjectApiService
   ) {}
 
   ngOnInit(): void {
@@ -99,15 +107,28 @@ export class ProjectDetailComponent implements OnInit {
   loadProject(id: string): void {
     this.isLoading.set(true);
 
-    this.projectService.getProjectById(id).subscribe({
-      next: (project) => {
-        if (project) {
-          this.project.set(project);
-          this.projectData.set(null); // no raw DTO when using mock
+    // Fetch raw API data to get projectStages
+    this.projectApiService.getProjectById(Number(id)).subscribe({
+      next: (response) => {
+        if (response.succeeded && response.data) {
+          this.projectData.set(response.data);
+          
+          // Also fetch the mapped project for display
+          this.projectService.getProjectById(id).subscribe({
+            next: (project) => {
+              if (project) {
+                this.project.set(project);
+              }
+              this.isLoading.set(false);
+            },
+            error: () => {
+              this.isLoading.set(false);
+            }
+          });
         } else {
+          this.isLoading.set(false);
           this.router.navigate(['/projects']);
         }
-        this.isLoading.set(false);
       },
       error: () => {
         this.isLoading.set(false);

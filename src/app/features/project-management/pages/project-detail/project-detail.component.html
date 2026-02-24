@@ -191,7 +191,10 @@
             </p-tabpanel> -->
             <p-tabpanel value="4">
               <div class="py-4">
-                <app-milestone-stage [projectId]="project()!.id"></app-milestone-stage>
+                <app-milestone-stage 
+                  [projectId]="project()!.id"
+                  [milestoneStages]="milestoneStages()">
+                </app-milestone-stage>
               </div>
             </p-tabpanel>
             <p-tabpanel value="5">

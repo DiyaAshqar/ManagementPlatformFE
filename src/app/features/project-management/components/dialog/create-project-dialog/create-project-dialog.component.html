@@ -69,7 +69,7 @@
       </div>
 
       <!-- Status -->
-      <div class="col-12">
+      <div class="col-12 md:col-6">
         <div class="field">
           <p-floatlabel variant="in">
             <p-select inputId="status" formControlName="status" [options]="statusOptions" optionLabel="label"
@@ -79,6 +79,19 @@
             <label for="status">{{ 'projects.filters.status' | translate }} *</label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('status')" class="p-error">{{ getErrorMessage('status') }}</small>
+        </div>
+      </div>
+
+      <!-- Milestone Count -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-inputnumber inputId="milestoneCount" formControlName="milestoneCount" [min]="0" [showButtons]="true" class="w-full"
+              [class.ng-invalid]="isFieldInvalid('milestoneCount')">
+            </p-inputnumber>
+            <label for="milestoneCount">{{ 'projects.form.milestoneCount' | translate }} *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('milestoneCount')" class="p-error">{{ getErrorMessage('milestoneCount') }}</small>
         </div>
       </div>
     </div>

@@ -105,7 +105,8 @@
       "startDate": "Start Date",
       "endDate": "End Date",
       "budget": "Budget",
-      "priority": "Priority"
+      "priority": "Priority",
+      "milestoneCount": "Milestone Count"
     },
     "stages": {
       "title": "Stages",

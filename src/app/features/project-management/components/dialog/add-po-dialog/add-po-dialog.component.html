@@ -1,0 +1,160 @@
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [header]="dialogHeader"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '44rem' }"
+  [breakpoints]="{ '960px': '75vw', '640px': '95vw' }">
+
+  <form [formGroup]="poForm" (ngSubmit)="onSubmit()">
+    <div class="grid">
+
+      <!-- PO Number -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <input
+              pInputText
+              id="poNumber"
+              formControlName="poNumber"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('poNumber')" />
+            <label for="poNumber">PO Number *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('poNumber')" class="p-error">PO Number is required.</small>
+        </div>
+      </div>
+
+      <!-- Supplier -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="supplierId"
+              formControlName="supplierId"
+              [options]="supplierOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="true"
+              filterPlaceholder="Search supplier..."
+              [showClear]="true"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('supplierId')">
+            </p-select>
+            <label for="supplierId">Supplier *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('supplierId')" class="p-error">Supplier is required.</small>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="col-12">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <textarea
+              pTextarea
+              id="description"
+              formControlName="description"
+              rows="2"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('description')">
+            </textarea>
+            <label for="description">Description *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('description')" class="p-error">Description is required.</small>
+        </div>
+      </div>
+
+      <!-- Unit -->
+      <div class="col-12 md:col-4">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="unitId"
+              formControlName="unitId"
+              [options]="unitOptions"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('unitId')">
+            </p-select>
+            <label for="unitId">Unit *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('unitId')" class="p-error">Unit is required.</small>
+        </div>
+      </div>
+
+      <!-- Unit Price -->
+      <div class="col-12 md:col-4">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-inputnumber
+              inputId="price"
+              formControlName="price"
+              mode="currency"
+              currency="USD"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              [min]="0"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('price')">
+            </p-inputnumber>
+            <label for="price">Unit Price *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('price')" class="p-error">Unit price is required.</small>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="col-12 md:col-4">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="status"
+              formControlName="status"
+              [options]="statusOptions"
+              optionLabel="label"
+              optionValue="value"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('status')">
+            </p-select>
+            <label for="status">Status *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('status')" class="p-error">Status is required.</small>
+        </div>
+      </div>
+
+      <!-- Subtotal (readonly preview) -->
+      <div class="col-12">
+        <div class="po-subtotal-preview">
+          <span class="label">Subtotal:</span>
+          <span class="value">{{ computedSubTotal | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancel"
+      icon="pi pi-times"
+      (onClick)="onHide()"
+      severity="secondary"
+      [outlined]="true">
+    </p-button>
+    <p-button
+      [label]="isEditMode ? 'Update' : 'Create Order'"
+      icon="pi pi-check"
+      (onClick)="onSubmit()"
+      [loading]="isSubmitting()"
+      [disabled]="poForm.invalid">
+    </p-button>
+  </ng-template>
+</p-dialog>

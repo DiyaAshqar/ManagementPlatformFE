@@ -2,44 +2,74 @@
 
   <!-- ── Page Header ───────────────────────────────────────────────────── -->
   <div class="ms-header mb-4">
-    <h2 class="ms-title">Milestone: Phase 1 – Foundation Work</h2>
-    <p class="ms-subtitle">Manage all aspects of this milestone</p>
+    <h2 class="ms-title">Milestone Stages</h2>
+    <p class="ms-subtitle">Manage all milestone stages and their details</p>
   </div>
 
-  <!-- ── Tabs ─────────────────────────────────────────────────────────── -->
-  <p-tabs [(value)]="activeTab">
-    <p-tablist>
-      <p-tab value="0">Bill of Quantities</p-tab>
-      <p-tab value="1">Purchase Orders</p-tab>
-      <p-tab value="2">Surveying Visits</p-tab>
-      <p-tab value="3">Voucher Orders</p-tab>
-      <p-tab value="4">Documents</p-tab>
-    </p-tablist>
+  <!-- ── Accordion for Multiple Milestone Stages ──────────────────────── -->
+  <p-accordion [multiple]="true" [(value)]="activeAccordionPanels" (valueChange)="onAccordionChange({value: $event})">
+    @for (stage of milestoneStages; track stage.id; let i = $index) {
+      <p-accordion-panel [value]="stage.id!">
+        <p-accordion-header>
+          <span class="font-semibold">{{ getMilestoneTitle(i, stage) }}</span>
+        </p-accordion-header>
 
-    <p-tabpanels>
+        <p-accordion-content>
+          @if (isPanelLoaded(stage.id!)) {
+            <!-- ── Tabs for this Milestone Stage ─────────────────────────── -->
+            <p-tabs [(value)]="activeTabs[stage.id!]" (valueChange)="onTabChange(stage.id!, $event)">
+              <p-tablist>
+                <p-tab value="0">Bill of Quantities</p-tab>
+                <p-tab value="1">Purchase Orders</p-tab>
+                <p-tab value="2">Surveying Visits</p-tab>
+                <p-tab value="3">Voucher Orders</p-tab>
+                <p-tab value="4">Documents</p-tab>
+              </p-tablist>
 
-      <p-tabpanel value="0">
-        <app-boq-tab [projectStageId]="projectStageId" class="block mt-3"></app-boq-tab>
-      </p-tabpanel>
+              <p-tabpanels>
+                <p-tabpanel value="0">
+                  @if (shouldLoadTab(stage.id!, '0')) {
+                    <app-boq-tab [projectStageId]="stage.id!" class="block mt-3"></app-boq-tab>
+                  }
+                </p-tabpanel>
 
-      <p-tabpanel value="1">
-        <app-purchase-orders-tab [projectStageId]="projectStageId"></app-purchase-orders-tab>
-      </p-tabpanel>
+                <p-tabpanel value="1">
+                  @if (shouldLoadTab(stage.id!, '1')) {
+                    <app-purchase-orders-tab [projectStageId]="stage.id!"></app-purchase-orders-tab>
+                  }
+                </p-tabpanel>
 
-      <p-tabpanel value="2">
-        <app-surveying-visits-tab [projectStageId]="projectStageId"></app-surveying-visits-tab>
-      </p-tabpanel>
+                <p-tabpanel value="2">
+                  @if (shouldLoadTab(stage.id!, '2')) {
+                    <app-surveying-visits-tab [projectStageId]="stage.id!"></app-surveying-visits-tab>
+                  }
+                </p-tabpanel>
 
-      <p-tabpanel value="3">
-        <app-voucher-orders-tab [projectStageId]="projectStageId"></app-voucher-orders-tab>
-      </p-tabpanel>
+                <p-tabpanel value="3">
+                  @if (shouldLoadTab(stage.id!, '3')) {
+                    <app-voucher-orders-tab [projectStageId]="stage.id!"></app-voucher-orders-tab>
+                  }
+                </p-tabpanel>
 
-      <p-tabpanel value="4">
-        <app-milestone-documents-tab [projectStageId]="projectStageId"></app-milestone-documents-tab>
-      </p-tabpanel>
+                <p-tabpanel value="4">
+                  @if (shouldLoadTab(stage.id!, '4')) {
+                    <app-milestone-documents-tab [projectStageId]="stage.id!"></app-milestone-documents-tab>
+                  }
+                </p-tabpanel>
+              </p-tabpanels>
+            </p-tabs>
+          }
+        </p-accordion-content>
+      </p-accordion-panel>
+    }
+  </p-accordion>
 
-    </p-tabpanels>
-  </p-tabs>
+  @if (milestoneStages.length === 0) {
+    <div class="text-center py-6 text-muted-color">
+      <i class="pi pi-inbox" style="font-size: 3rem"></i>
+      <p class="mt-3">No milestone stages found for this project</p>
+    </div>
+  }
 
 </div>
 

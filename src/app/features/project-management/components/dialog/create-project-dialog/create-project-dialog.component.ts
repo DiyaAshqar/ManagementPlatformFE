@@ -78,7 +78,8 @@ export class CreateProjectDialogComponent implements OnInit {
       agreementId: [null, [Validators.required]],
       startDate: [new Date(), Validators.required],
       endDate: [null, Validators.required],
-      status: [ProjectStatus._0]
+      status: [ProjectStatus._0],
+      milestoneCount: [0, [Validators.required, Validators.min(0)]]
     });
   }
 
@@ -122,16 +123,29 @@ export class CreateProjectDialogComponent implements OnInit {
       agreementId: this.projectForm.get('agreementId')?.value || undefined,
       startDate: this.projectForm.get('startDate')?.value,
       endDate: this.projectForm.get('endDate')?.value,
-      status: this.projectForm.get('status')?.value
+      status: this.projectForm.get('status')?.value,
+      milestoneCount: this.projectForm.get('milestoneCount')?.value
     });
 
     this.projectApiService.createProject(command).subscribe({
       next: (response) => {
         if (response.succeeded) {
-          // Optionally emit the created project ID or refresh the list
-          this.visibleChange.emit(false);
-          this.isSubmitting.set(false);
-          this.projectForm.reset();
+          // Refresh the projects list
+          this.projectApiService.getAllProjects(1, 100).subscribe({
+            next: () => {
+              // Emit event to close dialog
+              this.visibleChange.emit(false);
+              this.isSubmitting.set(false);
+              this.projectForm.reset();
+              this.projectCreated.emit();
+            },
+            error: (error) => {
+              console.error('Error refreshing projects:', error);
+              this.visibleChange.emit(false);
+              this.isSubmitting.set(false);
+              this.projectForm.reset();
+            }
+          });
         } else {
           this.isSubmitting.set(false);
         }

@@ -20,20 +20,6 @@ import {
 } from '../../../../../../../nswag/api-client';
 import { AddBoqDialogComponent } from '../../../dialog/add-boq-dialog/add-boq-dialog.component';
 
-// ─── Dummy seed data ──────────────────────────────────────────────────────────
-const DUMMY_BOQ: IGetProjectBOQDto[] = [
-  {
-    id: 1, projectStageId: 0,
-    description: 'Concrete Grade 30', materialId: 1, unitId: 1,
-    actualQuantity: 150, price: 850, subTotal: 127500
-  },
-  {
-    id: 2, projectStageId: 0,
-    description: 'Steel Reinforcement', materialId: 2, unitId: 2,
-    actualQuantity: 5000, price: 12.5, subTotal: 62500
-  }
-];
-
 @Component({
   selector: 'app-boq-tab',
   standalone: true,
@@ -127,22 +113,25 @@ export class BoqTabComponent implements OnInit {
   loadBoqItems(): void {
     this.isLoading.set(true);
 
-    // TODO: switch to real API when backend is ready:
-    // this.boqClient.getByStageId(this.projectStageId, 1, 100, undefined).subscribe({
-    //   next: (res) => {
-    //     if (res.succeeded && res.data?.data) {
-    //       this.boqItems.set(res.data.data);
-    //     }
-    //     this.isLoading.set(false);
-    //   },
-    //   error: () => this.isLoading.set(false)
-    // });
-
-    // ── Dummy ──
-    setTimeout(() => {
-      this.boqItems.set(DUMMY_BOQ.map(item => ({ ...item, projectStageId: this.projectStageId })));
-      this.isLoading.set(false);
-    }, 400);
+    this.boqClient.getByStageId(this.projectStageId, 1, 100, undefined).subscribe({
+      next: (res) => {
+        if (res.succeeded && res.data?.data) {
+          this.boqItems.set(res.data.data);
+        } else {
+          this.boqItems.set([]);
+        }
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading BOQ items:', err);
+        this.messageService.add({ 
+          severity: 'error', 
+          summary: 'Error', 
+          detail: 'Failed to load Bill of Quantities items.' 
+        });
+        this.isLoading.set(false);
+      }
+    });
   }
 
   // ── Dialog ───────────────────────────────────────────────────────────────
@@ -158,35 +147,33 @@ export class BoqTabComponent implements OnInit {
   }
 
   onDialogSaved(command: CreateProjectBOQCommand): void {
-    // TODO: switch to real API when backend is ready:
-    // this.boqClient.createOrUpdate(command).subscribe({
-    //   next: () => { this.loadBoqItems(); this.showBoqDialog.set(false); },
-    //   error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to save.' })
-    // });
-
-    const currentItems = this.boqItems();
-
-    if (command.id) {
-      // Edit
-      this.boqItems.set(currentItems.map(item =>
-        item.id === command.id
-          ? { ...item, ...command }
-          : item
-      ));
-      this.messageService.add({ severity: 'success', summary: 'Updated', detail: 'BoQ item updated successfully.' });
-    } else {
-      // Add
-      const nextId = Math.max(0, ...currentItems.map(i => i.id ?? 0)) + 1;
-      const newItem: IGetProjectBOQDto = {
-        ...command,
-        id: nextId,
-        constructorId: command.constructorId
-      };
-      this.boqItems.set([...currentItems, newItem]);
-      this.messageService.add({ severity: 'success', summary: 'Added', detail: 'BoQ item added successfully.' });
-    }
-
-    this.showBoqDialog.set(false);
+    this.boqClient.createOrUpdate(command).subscribe({
+      next: (res) => {
+        if (res.succeeded) {
+          this.loadBoqItems();
+          this.showBoqDialog.set(false);
+          this.messageService.add({ 
+            severity: 'success', 
+            summary: command.id ? 'Updated' : 'Added', 
+            detail: command.id ? 'BoQ item updated successfully.' : 'BoQ item added successfully.' 
+          });
+        } else {
+          this.messageService.add({ 
+            severity: 'error', 
+            summary: 'Error', 
+            detail: res.message || 'Failed to save BoQ item.' 
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error saving BOQ item:', err);
+        this.messageService.add({ 
+          severity: 'error', 
+          summary: 'Error', 
+          detail: 'Failed to save BoQ item.' 
+        });
+      }
+    });
   }
 
   confirmDelete(item: IGetProjectBOQDto): void {
@@ -196,9 +183,32 @@ export class BoqTabComponent implements OnInit {
       icon: 'pi pi-exclamation-triangle',
       acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
-        // TODO: this.boqClient.delete(item.id!, item.projectStageId!).subscribe({ ... });
-        this.boqItems.set(this.boqItems().filter(i => i.id !== item.id));
-        this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'BoQ item removed.' });
+        this.boqClient.delete(item.id!, item.projectStageId!).subscribe({
+          next: (res) => {
+            if (res.succeeded) {
+              this.loadBoqItems();
+              this.messageService.add({ 
+                severity: 'success', 
+                summary: 'Deleted', 
+                detail: 'BoQ item removed successfully.' 
+              });
+            } else {
+              this.messageService.add({ 
+                severity: 'error', 
+                summary: 'Error', 
+                detail: res.message || 'Failed to delete BoQ item.' 
+              });
+            }
+          },
+          error: (err) => {
+            console.error('Error deleting BOQ item:', err);
+            this.messageService.add({ 
+              severity: 'error', 
+              summary: 'Error', 
+              detail: 'Failed to delete BoQ item.' 
+            });
+          }
+        });
       }
     });
   }
