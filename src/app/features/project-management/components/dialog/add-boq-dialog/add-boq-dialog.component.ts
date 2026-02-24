@@ -12,19 +12,7 @@ import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 
 import { MessageService } from 'primeng/api';
-import { BoqItemDisplay } from '../../../models/boq.model';
-
-export interface BoqFormResult {
-    id?: number;
-    projectStageId: number;
-    materialId: number;
-    unitId: number;
-    constructorId?: number;
-    price: number;
-    actualQuantity: number;
-    description: string;
-    subTotal: number;
-}
+import { CreateProjectBOQCommand, IGetProjectBOQDto } from '../../../../../../nswag/api-client';
 
 @Component({
     selector: 'app-add-boq-dialog',
@@ -47,10 +35,10 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
     @Input() visible = false;
     @Input() projectStageId!: number;
     /** When provided the dialog switches to edit mode */
-    @Input() editItem: BoqItemDisplay | null = null;
+    @Input() editItem: IGetProjectBOQDto | null = null;
 
     @Output() visibleChange = new EventEmitter<boolean>();
-    @Output() saved = new EventEmitter<BoqFormResult>();
+    @Output() saved = new EventEmitter<CreateProjectBOQCommand>();
 
     boqForm!: FormGroup;
     isSubmitting = signal(false);
@@ -148,7 +136,7 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
         const { materialId, description, unitId, actualQuantity, price } = this.boqForm.value;
         const subTotal = actualQuantity * price;
 
-        const result: BoqFormResult = {
+        const command = new CreateProjectBOQCommand({
             id: this.isEditMode ? this.editItem!.id : undefined,
             projectStageId: this.projectStageId,
             materialId,
@@ -158,10 +146,10 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
             actualQuantity,
             description,
             subTotal
-        };
+        });
 
         this.isSubmitting.set(true);
-        this.saved.emit(result);
+        this.saved.emit(command);
     }
 
     finishSubmit(): void {

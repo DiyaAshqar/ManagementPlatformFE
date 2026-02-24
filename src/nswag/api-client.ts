@@ -4668,6 +4668,7 @@ export class CreateProjectCommand implements ICreateProjectCommand {
     endDate?: Date;
     status?: ProjectStatus;
     description?: string | undefined;
+    milestoneCount?: number;
 
     constructor(data?: ICreateProjectCommand) {
         if (data) {
@@ -4687,6 +4688,7 @@ export class CreateProjectCommand implements ICreateProjectCommand {
             this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
             this.status = _data["status"];
             this.description = _data["description"];
+            this.milestoneCount = _data["milestoneCount"];
         }
     }
 
@@ -4706,6 +4708,7 @@ export class CreateProjectCommand implements ICreateProjectCommand {
         data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
         data["status"] = this.status;
         data["description"] = this.description;
+        data["milestoneCount"] = this.milestoneCount;
         return data;
     }
 }
@@ -4718,6 +4721,7 @@ export interface ICreateProjectCommand {
     endDate?: Date;
     status?: ProjectStatus;
     description?: string | undefined;
+    milestoneCount?: number;
 }
 
 export class CreateProjectMainContractorCommand implements ICreateProjectMainContractorCommand {
@@ -9540,7 +9544,7 @@ export class ProjectStage implements IProjectStage {
     status?: number | undefined;
     stageType?: ProjectStageType;
     projectStageTasks?: ProjectStageTask[] | undefined;
-    milestonesId?: number;
+    milestonesId?: number | undefined;
     milestones?: MileStones;
 
     constructor(data?: IProjectStage) {
@@ -9604,7 +9608,7 @@ export interface IProjectStage {
     status?: number | undefined;
     stageType?: ProjectStageType;
     projectStageTasks?: ProjectStageTask[] | undefined;
-    milestonesId?: number;
+    milestonesId?: number | undefined;
     milestones?: MileStones;
 }
 
@@ -10511,6 +10515,7 @@ export class QuantityBillDto implements IQuantityBillDto {
     agreementId?: number;
     mileStoneId?: number;
     isDeleted?: boolean;
+    constructorId?: number;
 
     constructor(data?: IQuantityBillDto) {
         if (data) {
@@ -10531,6 +10536,7 @@ export class QuantityBillDto implements IQuantityBillDto {
             this.agreementId = _data["agreementId"];
             this.mileStoneId = _data["mileStoneId"];
             this.isDeleted = _data["isDeleted"];
+            this.constructorId = _data["constructorId"];
         }
     }
 
@@ -10551,6 +10557,7 @@ export class QuantityBillDto implements IQuantityBillDto {
         data["agreementId"] = this.agreementId;
         data["mileStoneId"] = this.mileStoneId;
         data["isDeleted"] = this.isDeleted;
+        data["constructorId"] = this.constructorId;
         return data;
     }
 }
@@ -10564,6 +10571,7 @@ export interface IQuantityBillDto {
     agreementId?: number;
     mileStoneId?: number;
     isDeleted?: boolean;
+    constructorId?: number;
 }
 
 export class Result implements IResult {

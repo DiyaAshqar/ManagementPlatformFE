@@ -1,2 +1,1 @@
-// Re-export from the shared models folder
-export type { BoqItemDisplay } from '../../models/boq.model';
+// Milestone stage local models – extend here as needed
