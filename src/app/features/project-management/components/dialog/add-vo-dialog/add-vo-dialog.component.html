@@ -1,0 +1,225 @@
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [header]="dialogHeader"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '50rem' }"
+  [breakpoints]="{ '960px': '75vw', '640px': '95vw' }">
+
+  <form [formGroup]="voForm" (ngSubmit)="onSubmit()">
+    <div class="grid">
+
+      <!-- VO Number -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <input
+              pInputText
+              id="voNumber"
+              formControlName="voNumber"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('voNumber')" />
+            <label for="voNumber">VO Number *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('voNumber')" class="p-error">VO Number is required.</small>
+        </div>
+      </div>
+
+      <!-- Item -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <input
+              pInputText
+              id="item"
+              formControlName="item"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('item')" />
+            <label for="item">VO Item *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('item')" class="p-error">VO Item is required.</small>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="col-12">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <textarea
+              pTextarea
+              id="description"
+              formControlName="description"
+              rows="2"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('description')">
+            </textarea>
+            <label for="description">Description *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('description')" class="p-error">Description is required.</small>
+        </div>
+      </div>
+
+      <!-- Quantity -->
+      <div class="col-12 md:col-4">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-inputnumber
+              inputId="quantity"
+              formControlName="quantity"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="2"
+              [min]="0"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('quantity')">
+            </p-inputnumber>
+            <label for="quantity">Quantity *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('quantity')" class="p-error">Quantity is required.</small>
+        </div>
+      </div>
+
+      <!-- Unit -->
+      <div class="col-12 md:col-4">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="unitId"
+              formControlName="unitId"
+              [options]="unitOptions"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('unitId')">
+            </p-select>
+            <label for="unitId">Unit *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('unitId')" class="p-error">Unit is required.</small>
+        </div>
+      </div>
+
+      <!-- Price -->
+      <div class="col-12 md:col-4">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-inputnumber
+              inputId="price"
+              formControlName="price"
+              mode="currency"
+              currency="USD"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              [min]="0"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('price')">
+            </p-inputnumber>
+            <label for="price">Amount *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('price')" class="p-error">Amount is required.</small>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="status"
+              formControlName="status"
+              [options]="statusOptions"
+              optionLabel="label"
+              optionValue="value"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('status')">
+            </p-select>
+            <label for="status">Approval Status *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('status')" class="p-error">Status is required.</small>
+        </div>
+      </div>
+
+      <!-- Is Effected Checkbox -->
+      <div class="col-12">
+        <div class="field flex align-items-center">
+          <p-checkbox
+            inputId="isEffected"
+            formControlName="isEffected"
+            [binary]="true">
+          </p-checkbox>
+          <label for="isEffected" class="ml-2 cursor-pointer">Is Effected</label>
+        </div>
+      </div>
+
+      <!-- Effected Dates (only if isEffected is true) -->
+      @if (isEffectedValue) {
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-datepicker
+              inputId="effectedDateStart"
+              formControlName="effectedDateStart"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              iconDisplay="input"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('effectedDateStart')">
+            </p-datepicker>
+            <label for="effectedDateStart">Effected Date Start *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('effectedDateStart')" class="p-error">Effected Date Start is required when Is Effected is checked.</small>
+        </div>
+      </div>
+
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-datepicker
+              inputId="effectedDateEnd"
+              formControlName="effectedDateEnd"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              iconDisplay="input"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('effectedDateEnd')">
+            </p-datepicker>
+            <label for="effectedDateEnd">Effected Date End *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('effectedDateEnd')" class="p-error">Effected Date End is required when Is Effected is checked.</small>
+        </div>
+      </div>
+      }
+
+      <!-- Subtotal (readonly preview) -->
+      <div class="col-12">
+        <div class="vo-subtotal-preview">
+          <span class="label">Subtotal:</span>
+          <span class="value">{{ computedSubTotal | currency:'USD':'symbol':'1.2-2' }}</span>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      label="Cancel"
+      icon="pi pi-times"
+      (onClick)="onHide()"
+      severity="secondary"
+      [outlined]="true">
+    </p-button>
+    <p-button
+      [label]="isEditMode ? 'Update' : 'Create Order'"
+      icon="pi pi-check"
+      (onClick)="onSubmit()"
+      [loading]="isSubmitting()"
+      [disabled]="voForm.invalid">
+    </p-button>
+  </ng-template>
+</p-dialog>

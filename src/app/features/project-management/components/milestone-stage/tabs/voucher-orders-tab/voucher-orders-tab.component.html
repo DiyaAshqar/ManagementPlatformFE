@@ -1,0 +1,159 @@
+<p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
+
+<div class="vo-card">
+
+  <!-- Header -->
+  <div class="vo-card-header">
+    <div>
+      <h3 class="vo-card-title">Voucher Orders</h3>
+      <p class="vo-card-subtitle">Manage voucher orders and approvals</p>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="vo-toolbar">
+    <span class="vo-total-label">Total Voucher Orders: {{ voItems().length }}</span>
+    <p-button
+      label="Create Voucher Order"
+      icon="pi pi-plus"
+      (onClick)="openAddDialog()"
+      severity="contrast"
+      [raised]="true">
+    </p-button>
+  </div>
+
+  <!-- Table -->
+  <p-table
+    [value]="voItems()"
+    [tableStyle]="{ 'min-width': '80rem' }"
+    styleClass="p-datatable-gridlines"
+    responsiveLayout="scroll">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>VO Number</th>
+        <th>VO Item</th>
+        <th>Description</th>
+        <th class="text-right">Quantity</th>
+        <th>Unit</th>
+        <th class="text-right">Amount</th>
+        <th class="text-right">Subtotal</th>
+        <th class="text-center">Is Effected</th>
+        <th>Effected Date Start</th>
+        <th>Effected Date End</th>
+        <th>Approval Status</th>
+        <th class="text-center">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <td><span class="vo-number">{{ item.voNumber }}</span></td>
+        <td>{{ item.item }}</td>
+        <td>{{ item.description }}</td>
+        <td class="text-right">{{ item.quantity }}</td>
+        <td><span class="vo-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
+        <td class="text-right">{{ item.price | currency:'USD':'symbol':'1.2-2' }}</td>
+        <td class="text-right vo-subtotal">{{ item.subTotal | currency:'USD':'symbol':'1.0-0' }}</td>
+        <td class="text-center">
+          <p-badge 
+            [value]="item.isEffected ? 'Yes' : 'No'" 
+            [severity]="item.isEffected ? 'success' : 'secondary'">
+          </p-badge>
+        </td>
+        <td>
+          @if (item.effectedDateStart) {
+            {{ formatDate(item.effectedDateStart) }}
+          } @else {
+            <span class="text-muted-color">—</span>
+          }
+        </td>
+        <td>
+          @if (item.effectedDateEnd) {
+            {{ formatDate(item.effectedDateEnd) }}
+          } @else {
+            <span class="text-muted-color">—</span>
+          }
+        </td>
+        <td>
+          <p-badge 
+            [value]="getStatusLabel(item.status)" 
+            [severity]="getStatusSeverity(item.status)">
+          </p-badge>
+        </td>
+        <td class="text-center">
+          <div class="vo-actions">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              severity="secondary"
+              [text]="true"
+              size="small"
+              pTooltip="Edit"
+              tooltipPosition="top"
+              (onClick)="openEditDialog(item)">
+            </p-button>
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              severity="danger"
+              [text]="true"
+              size="small"
+              pTooltip="Delete"
+              tooltipPosition="top"
+              (onClick)="confirmDelete(item)">
+            </p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="12" class="text-center">
+          @if (isLoading()) {
+            <div class="flex flex-column gap-2 py-4">
+              <p-skeleton width="100%" height="2rem"></p-skeleton>
+              <p-skeleton width="100%" height="2rem"></p-skeleton>
+              <p-skeleton width="100%" height="2rem"></p-skeleton>
+            </div>
+          } @else {
+            <div class="py-4">
+              <i class="pi pi-receipt" style="font-size: 2rem; color: var(--text-color-secondary); opacity: 0.5;"></i>
+              <p style="margin-top: 1rem; color: var(--text-color-secondary);">No voucher orders found. Click "Create Voucher Order" to add one.</p>
+            </div>
+          }
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      @if (!isLoading()) {
+        <tr class="vo-grand-total-row">
+          <td colspan="6" class="text-right">
+            <span class="vo-grand-total-label">Total VO Value:</span>
+          </td>
+          <td class="text-right vo-grand-total-value">
+            {{ totalVOValue | currency:'USD':'symbol':'1.0-0' }}
+          </td>
+          <td colspan="5"></td>
+        </tr>
+      }
+    </ng-template>
+
+  </p-table>
+
+</div>
+
+<!-- Add/Edit Dialog -->
+@if (showVoDialog()) {
+  <app-add-vo-dialog
+    [visible]="showVoDialog()"
+    (visibleChange)="showVoDialog.set($event)"
+    [projectStageId]="projectStageId"
+    [editItem]="editVoItem()"
+    [unitOptions]="unitOptions"
+    (saved)="onDialogSaved($event)">
+  </app-add-vo-dialog>
+}
