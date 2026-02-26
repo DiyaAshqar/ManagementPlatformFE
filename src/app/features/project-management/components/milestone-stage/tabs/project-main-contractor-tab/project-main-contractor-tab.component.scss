@@ -1,61 +1,81 @@
 .contractor-card {
   background: var(--surface-card);
-  border-radius: var(--border-radius);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  overflow: hidden;
   padding: 1.5rem;
+
+  .contractor-card-header {
+    margin-bottom: 1rem;
+
+    .contractor-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text-color);
+    }
+
+    .contractor-card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-color-secondary);
+      margin: 0.2rem 0 0;
+    }
+  }
+
+  .contractor-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+
+    .contractor-stats {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .contractor-total-label {
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+    }
+
+    .contractor-value-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      background: var(--primary-50);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+    }
+  }
 }
 
-.contractor-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--surface-border);
-}
-
-.contractor-card-title {
-  font-size: 1.5rem;
+.contractor-name {
   font-weight: 600;
-  margin: 0;
   color: var(--text-color);
 }
 
-.contractor-card-subtitle {
-  font-size: 0.875rem;
-  color: var(--text-color-secondary);
-  margin: 0.25rem 0 0 0;
-}
-
-.contractor-toolbar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1.5rem;
-  padding: 1rem;
-  background: var(--surface-50);
-  border-radius: var(--border-radius);
-}
-
-.contractor-total-label {
+.contractor-amount {
   font-weight: 600;
-  color: var(--text-color);
+  color: var(--green-600, #16a34a);
 }
 
-.action-buttons {
+.contractor-actions {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.25rem;
   justify-content: center;
 }
 
-.badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 1rem;
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-}
-
-.badge-success {
-  background-color: var(--green-100);
-  color: var(--green-700);
+.empty-state {
+  padding: 3rem 1rem !important;
+  
+  p {
+    margin: 0.5rem 0;
+    color: var(--text-color-secondary);
+  }
+  
+  .text-muted-color {
+    font-size: 0.875rem;
+    opacity: 0.7;
+  }
 }

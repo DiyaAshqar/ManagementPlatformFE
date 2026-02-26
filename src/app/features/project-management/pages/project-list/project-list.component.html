@@ -145,11 +145,22 @@
           <div class="project-card" (click)="viewProject(project)">
             <div class="project-card-header">
               <h3 class="project-title">{{ project.name }}</h3>
-              <p-tag 
-                [value]="'projects.status.' + project.status | translate"
-                [severity]="getStatusSeverity(project.status)"
-                styleClass="project-status-tag">
-              </p-tag>
+              <div class="header-actions">
+                <p-tag 
+                  [value]="'projects.status.' + project.status | translate"
+                  [severity]="getStatusSeverity(project.status)"
+                  styleClass="project-status-tag">
+                </p-tag>
+                <p-button
+                  icon="pi pi-ellipsis-v"
+                  [text]="true"
+                  [rounded]="true"
+                  severity="secondary"
+                  (onClick)="onMenuToggle($event, menu, project)"
+                  styleClass="project-menu-btn">
+                </p-button>
+                <p-menu #menu [model]="projectMenuItems" [popup]="true" appendTo="body"></p-menu>
+              </div>
             </div>
             
             <div class="project-client">
@@ -207,10 +218,11 @@
   }
 </div>
 
-<!-- Create Project Dialog -->
+<!-- Create/Edit Project Dialog -->
 @if (showCreateDialog()) {
   <app-create-project-dialog
     [visible]="showCreateDialog()"
+    [project]="editingProject"
     (visibleChange)="closeCreateDialog()"
     (projectCreated)="onProjectCreated($event)">
   </app-create-project-dialog>

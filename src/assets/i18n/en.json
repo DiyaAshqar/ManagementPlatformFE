@@ -57,6 +57,7 @@
     "title": "Project Management",
     "subtitle": "Manage all construction projects and track progress",
     "createNew": "Create New Project",
+    "edit": "Edit Project",
     "noProjects": "No projects found",
     "searchPlaceholder": "Search projects...",
     "pagination": "Showing {first} to {last} of {totalRecords} projects",

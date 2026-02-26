@@ -1,4 +1,5 @@
 <p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
 
 <div class="contractor-card">
 
@@ -12,10 +13,14 @@
 
   <!-- Toolbar -->
   <div class="contractor-toolbar">
-    <span class="contractor-total-label">Total Contractors: {{ contractorData().length }}</span>
+    <div class="contractor-stats">
+      <span class="contractor-total-label">Total Contractors: {{ contractorItems().length }}</span>
+      <span class="contractor-value-label">Total Value: {{ totalContractValue | currency:'USD':'symbol':'1.0-0' }}</span>
+    </div>
     <p-button
       label="Add Contractor"
       icon="pi pi-plus"
+      (onClick)="openAddDialog()"
       severity="contrast"
       [raised]="true">
     </p-button>
@@ -23,50 +28,55 @@
 
   <!-- Table -->
   <p-table
-    [value]="contractorData()"
+    [value]="contractorItems()"
     [tableStyle]="{ 'min-width': '62rem' }"
     styleClass="p-datatable-gridlines"
+    responsiveLayout="scroll"
     [loading]="isLoading()">
 
     <ng-template pTemplate="header">
       <tr>
         <th style="width: 5rem">ID</th>
         <th>Contractor Name</th>
-        <th>Contact Person</th>
-        <th>Email</th>
-        <th>Phone</th>
-        <th>Status</th>
-        <th style="width: 10rem">Actions</th>
+        <th class="text-right">Contract Amount</th>
+        <th>Start Date</th>
+        <th>End Date</th>
+        <th class="text-center" style="width: 10rem">Actions</th>
       </tr>
     </ng-template>
 
     <ng-template pTemplate="body" let-item>
       <tr>
         <td>{{ item.id }}</td>
-        <td>{{ item.contractorName }}</td>
-        <td>{{ item.contactPerson }}</td>
-        <td>{{ item.email }}</td>
-        <td>{{ item.phone }}</td>
         <td>
-          <span class="badge badge-success">{{ item.status }}</span>
+          <span class="contractor-name">{{ contractorMap[item.constructorId ?? 0] || '—' }}</span>
         </td>
-        <td>
-          <div class="action-buttons">
+        <td class="text-right contractor-amount">
+          {{ item.amount | currency:'USD':'symbol':'1.0-0' }}
+        </td>
+        <td>{{ item.startDate | date:'yyyy-MM-dd' }}</td>
+        <td>{{ item.endDate | date:'yyyy-MM-dd' }}</td>
+        <td class="text-center">
+          <div class="contractor-actions">
             <p-button
               icon="pi pi-pencil"
-              [text]="true"
               [rounded]="true"
-              size="small"
               severity="secondary"
-              pTooltip="Edit">
+              [text]="true"
+              size="small"
+              pTooltip="Edit"
+              tooltipPosition="top"
+              (onClick)="openEditDialog(item)">
             </p-button>
             <p-button
               icon="pi pi-trash"
-              [text]="true"
               [rounded]="true"
-              size="small"
               severity="danger"
-              pTooltip="Delete">
+              [text]="true"
+              size="small"
+              pTooltip="Delete"
+              tooltipPosition="top"
+              (onClick)="confirmDelete(item)">
             </p-button>
           </div>
         </td>
@@ -75,10 +85,26 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="7" class="text-center">No contractors found</td>
+        <td colspan="6" class="text-center empty-state">
+          <i class="pi pi-users" style="font-size: 3rem; color: var(--text-color-secondary);"></i>
+          <p class="mt-3">No contractors found for this stage</p>
+          <p class="text-sm text-muted-color">Click "Add Contractor" to get started</p>
+        </td>
       </tr>
     </ng-template>
 
   </p-table>
 
 </div>
+
+<!-- ── Dialog ─────────────────────────────────────────────────────── -->
+@if (showContractorDialog()) {
+  <app-add-contractor-dialog
+    [visible]="showContractorDialog()"
+    (visibleChange)="showContractorDialog.set($event)"
+    [projectStageId]="projectStageId"
+    [editItem]="editContractorItem()"
+    [contractorOptions]="contractorOptions"
+    (saved)="onDialogSaved($event)">
+  </app-add-contractor-dialog>
+}

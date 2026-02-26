@@ -57,6 +57,7 @@
     "title": "إدارة المشاريع",
     "subtitle": "إدارة جميع مشاريع البناء وتتبع التقدم",
     "createNew": "إنشاء مشروع جديد",
+    "edit": "تعديل المشروع",
     "noProjects": "لم يتم العثور على مشاريع",
     "searchPlaceholder": "البحث في المشاريع...",
     "pagination": "عرض {first} إلى {last} من {totalRecords} مشروع",

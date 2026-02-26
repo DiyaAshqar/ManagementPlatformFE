@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, OnChanges, Output, signal } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
@@ -39,8 +39,9 @@ import { CreateProjectCommand, GetAllAgreementDto, ProjectStatus } from '../../.
   templateUrl: './create-project-dialog.component.html',
   styleUrls: ['./create-project-dialog.component.scss']
 })
-export class CreateProjectDialogComponent implements OnInit {
+export class CreateProjectDialogComponent implements OnInit, OnChanges {
   @Input() visible: boolean = false;
+  @Input() project: Project | null = null;
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() projectCreated = new EventEmitter<Project>();
 
@@ -71,6 +72,20 @@ export class CreateProjectDialogComponent implements OnInit {
     this.loadAgreements();
   }
 
+  ngOnChanges(): void {
+    if (this.project && this.projectForm) {
+      this.populateForm();
+    }
+  }
+
+  get isEditMode(): boolean {
+    return this.project !== null;
+  }
+
+  get dialogTitle(): string {
+    return this.isEditMode ? 'projects.edit' : 'projects.createNew';
+  }
+
   initializeForm(): void {
     this.projectForm = this.fb.group({
       title: ['', [Validators.required, Validators.minLength(3)]],
@@ -81,6 +96,31 @@ export class CreateProjectDialogComponent implements OnInit {
       status: [ProjectStatus._0],
       milestoneCount: [0, [Validators.required, Validators.min(0)]]
     });
+    
+    if (this.project) {
+      this.populateForm();
+    }
+  }
+
+  populateForm(): void {
+    if (!this.project) return;
+
+    this.projectForm.patchValue({
+      title: this.project.name,
+      description: this.project.description,
+      startDate: new Date(this.project.startDate),
+      endDate: new Date(this.project.endDate),
+      status: this.mapProjectStatus(this.project.status),
+      milestoneCount: this.project.stages?.length || 0
+    });
+  }
+
+  mapProjectStatus(status: any): ProjectStatus {
+    // Map from the local ProjectStatus enum to API ProjectStatus enum
+    if (status === 'planning') return ProjectStatus._0;
+    if (status === 'in_progress') return ProjectStatus._1;
+    if (status === 'completed') return ProjectStatus._3;
+    return ProjectStatus._0;
   }
 
   loadAgreements(): void {
@@ -118,6 +158,7 @@ export class CreateProjectDialogComponent implements OnInit {
     
     // Map form data to CreateProjectCommand
     const command = new CreateProjectCommand({
+      id: this.isEditMode && this.project ? parseInt(this.project.id) : undefined,
       title: this.projectForm.get('title')?.value,
       description: this.projectForm.get('description')?.value,
       agreementId: this.projectForm.get('agreementId')?.value || undefined,

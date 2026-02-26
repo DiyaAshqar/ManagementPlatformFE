@@ -17,6 +17,8 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { SkeletonModule } from 'primeng/skeleton';
+import { MenuModule } from 'primeng/menu';
+import { MenuItem } from 'primeng/api';
 
 import { ProjectService } from '../../services/project.service';
 import { Project, ProjectStatus, ProjectPriority, ProjectFilters } from '../../models';
@@ -41,6 +43,7 @@ import { CreateProjectDialogComponent } from '../../components/dialog/create-pro
     IconFieldModule,
     InputIconModule,
     SkeletonModule,
+    MenuModule,
     CreateProjectDialogComponent
   ],
   templateUrl: './project-list.component.html',
@@ -51,6 +54,11 @@ export class ProjectListComponent implements OnInit {
   filteredProjects = signal<Project[]>([]);
   isLoading = signal<boolean>(false);
   showCreateDialog = signal<boolean>(false);
+  editingProject: Project | null = null;
+  
+  // Menu items for project actions
+  projectMenuItems: MenuItem[] = [];
+  selectedProject: Project | null = null;
 
   // Filters
   searchText: string = '';
@@ -146,11 +154,13 @@ export class ProjectListComponent implements OnInit {
   }
 
   openCreateDialog(): void {
+    this.editingProject = null;
     this.showCreateDialog.set(true);
   }
 
   closeCreateDialog(): void {
     this.showCreateDialog.set(false);
+    this.editingProject = null;
   }
 
   onProjectCreated(project: Project): void {
@@ -162,9 +172,31 @@ export class ProjectListComponent implements OnInit {
     this.router.navigate(['/projects', project.id]);
   }
 
+  getProjectMenuItems(project: Project): MenuItem[] {
+    return [
+      {
+        label: 'View Details',
+        icon: 'pi pi-eye',
+        command: () => this.viewProject(project)
+      },
+      {
+        label: 'Edit Project',
+        icon: 'pi pi-pencil',
+        command: () => this.editProject(project)
+      }
+    ];
+  }
+
+  onMenuToggle(event: Event, menu: any, project: Project): void {
+    event.stopPropagation();
+    this.selectedProject = project;
+    this.projectMenuItems = this.getProjectMenuItems(project);
+    menu.toggle(event);
+  }
+
   editProject(project: Project): void {
-    // TODO: Implement edit functionality
-    console.log('Edit project:', project);
+    this.editingProject = project;
+    this.showCreateDialog.set(true);
   }
 
   deleteProject(project: Project): void {

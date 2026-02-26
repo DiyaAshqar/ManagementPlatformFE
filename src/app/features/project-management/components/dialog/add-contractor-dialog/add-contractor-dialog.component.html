@@ -1,0 +1,115 @@
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [header]="dialogHeader"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '44rem' }"
+  [breakpoints]="{ '960px': '75vw', '640px': '95vw' }">
+
+  <form [formGroup]="contractorForm" (ngSubmit)="onSubmit()">
+    <div class="grid">
+
+      <!-- Contractor -->
+      <div class="col-12">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="constructorId"
+              formControlName="constructorId"
+              [options]="contractorOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="true"
+              filterPlaceholder="Search contractor..."
+              [showClear]="true"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('constructorId')">
+            </p-select>
+            <label for="constructorId">Contractor *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('constructorId')" class="p-error">Contractor is required.</small>
+        </div>
+      </div>
+
+      <!-- Amount -->
+      <div class="col-12">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-inputnumber
+              inputId="amount"
+              formControlName="amount"
+              mode="currency"
+              currency="USD"
+              locale="en-US"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('amount')">
+            </p-inputnumber>
+            <label for="amount">Contract Amount *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('amount')" class="p-error">Amount is required and must be positive.</small>
+        </div>
+      </div>
+
+      <!-- Start Date -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-calendar
+              inputId="startDate"
+              formControlName="startDate"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              iconDisplay="input"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('startDate')">
+            </p-calendar>
+            <label for="startDate">Start Date *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('startDate')" class="p-error">Start date is required.</small>
+        </div>
+      </div>
+
+      <!-- End Date -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-calendar
+              inputId="endDate"
+              formControlName="endDate"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              iconDisplay="input"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('endDate')">
+            </p-calendar>
+            <label for="endDate">End Date *</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('endDate')" class="p-error">End date is required.</small>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-end gap-3 mt-4">
+      <p-button
+        label="Cancel"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="onHide()"
+        type="button">
+      </p-button>
+      <p-button
+        [label]="isEditMode ? 'Update' : 'Add'"
+        type="submit"
+        [loading]="isSubmitting()">
+      </p-button>
+    </div>
+  </form>
+
+</p-dialog>
