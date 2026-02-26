@@ -32,7 +32,6 @@
 
     <ng-template pTemplate="header">
       <tr>
-        <th>Item</th>
         <th>Material</th>
         <th>Description</th>
         <th>Unit</th>
@@ -48,13 +47,12 @@
     <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
       @if (isLoading()) {
         <tr>
-          <td colspan="10" class="text-center p-4">
+          <td colspan="9" class="text-center p-4">
             <i class="pi pi-spin pi-spinner mr-2"></i> Loading...
           </td>
         </tr>
       } @else {
         <tr>
-          <td class="boq-item-code">Item-{{ (rowIndex + 1) | number:'3.0-0' }}</td>
           <td>{{ materialMap[item.materialId ?? 0] || '—' }}</td>
           <td>{{ item.description }}</td>
           <td><span class="boq-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
@@ -92,7 +90,7 @@
     <ng-template pTemplate="footer">
       @if (!isLoading()) {
         <tr class="boq-grand-total-row">
-          <td colspan="8" class="text-right">
+          <td colspan="7" class="text-right">
             <span class="boq-grand-total-label">Grand Total:</span>
           </td>
           <td class="text-right boq-grand-total-value">

@@ -1,0 +1,84 @@
+<p-toast></p-toast>
+
+<div class="contractor-card">
+
+  <!-- Header -->
+  <div class="contractor-card-header">
+    <div>
+      <h3 class="contractor-card-title">Project Main Contractor</h3>
+      <p class="contractor-card-subtitle">Manage main contractor information for this stage</p>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="contractor-toolbar">
+    <span class="contractor-total-label">Total Contractors: {{ contractorData().length }}</span>
+    <p-button
+      label="Add Contractor"
+      icon="pi pi-plus"
+      severity="contrast"
+      [raised]="true">
+    </p-button>
+  </div>
+
+  <!-- Table -->
+  <p-table
+    [value]="contractorData()"
+    [tableStyle]="{ 'min-width': '62rem' }"
+    styleClass="p-datatable-gridlines"
+    [loading]="isLoading()">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 5rem">ID</th>
+        <th>Contractor Name</th>
+        <th>Contact Person</th>
+        <th>Email</th>
+        <th>Phone</th>
+        <th>Status</th>
+        <th style="width: 10rem">Actions</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <td>{{ item.id }}</td>
+        <td>{{ item.contractorName }}</td>
+        <td>{{ item.contactPerson }}</td>
+        <td>{{ item.email }}</td>
+        <td>{{ item.phone }}</td>
+        <td>
+          <span class="badge badge-success">{{ item.status }}</span>
+        </td>
+        <td>
+          <div class="action-buttons">
+            <p-button
+              icon="pi pi-pencil"
+              [text]="true"
+              [rounded]="true"
+              size="small"
+              severity="secondary"
+              pTooltip="Edit">
+            </p-button>
+            <p-button
+              icon="pi pi-trash"
+              [text]="true"
+              [rounded]="true"
+              size="small"
+              severity="danger"
+              pTooltip="Delete">
+            </p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" class="text-center">No contractors found</td>
+      </tr>
+    </ng-template>
+
+  </p-table>
+
+</div>

@@ -1,21 +1,21 @@
 <p-toast></p-toast>
 <p-confirmDialog></p-confirmDialog>
 
-<div class="po-card">
+<div class="sv-card">
 
   <!-- Header -->
-  <div class="po-card-header">
+  <div class="sv-card-header">
     <div>
-      <h3 class="po-card-title">Purchase Orders</h3>
-      <p class="po-card-subtitle">Create and manage purchase orders</p>
+      <h3 class="sv-card-title">Surveying Visits</h3>
+      <p class="sv-card-subtitle">Schedule and track site surveys</p>
     </div>
   </div>
 
   <!-- Toolbar -->
-  <div class="po-toolbar">
-    <span class="po-total-label">Total Purchase Orders: {{ poItems().length }}</span>
+  <div class="sv-toolbar">
+    <span class="sv-total-label">Total Surveying Visits: {{ visitItems().length }}</span>
     <p-button
-      label="Create Purchase Order"
+      label="Schedule Visit"
       icon="pi pi-plus"
       (onClick)="openAddDialog()"
       severity="contrast"
@@ -25,17 +25,18 @@
 
   <!-- Table -->
   <p-table
-    [value]="poItems()"
+    [value]="visitItems()"
     [tableStyle]="{ 'min-width': '62rem' }"
     styleClass="p-datatable-gridlines"
     responsiveLayout="scroll">
 
     <ng-template pTemplate="header">
       <tr>
-        <th>PO Number</th>
-        <th>Supplier</th>
-        <th>Description</th>
+        <th>Visit Date</th>
+        <th>Surveyor</th>
+        <th>Purpose</th>
         <th>Unit</th>
+        <th class="text-right">Quantity</th>
         <th class="text-right">Unit Price</th>
         <th class="text-right">Amount</th>
         <th class="text-right">Subtotal</th>
@@ -46,37 +47,27 @@
 
     <ng-template pTemplate="body" let-item>
       <tr>
-        <td><span class="po-number">{{ item.poNumber }}</span></td>
-        <td>{{ supplierMap[item.supplierId ?? 0] || '—' }}</td>
-        <td>{{ item.description }}</td>
-        <td><span class="po-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
+        <td>{{ item.visitDate | date:'yyyy-MM-dd' }}</td>
+        <td>{{ item.surveyor }}</td>
+        <td>{{ item.purpose }}</td>
+        <td><span class="sv-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
+        <td class="text-right">{{ item.quantity | number:'1.0-4' }}</td>
         <td class="text-right">{{ item.price | currency:'USD':'symbol':'1.2-2' }}</td>
         <td class="text-right">{{ getAmount(item) | currency:'USD':'symbol':'1.0-0' }}</td>
-        <td class="text-right po-subtotal">{{ item.subTotal | currency:'USD':'symbol':'1.0-0' }}</td>
+        <td class="text-right sv-subtotal">{{ item.subTotal | currency:'USD':'symbol':'1.0-0' }}</td>
         <td>
-          <p-badge 
-            [value]="getStatusLabel(item.status)" 
+          <p-badge
+            [value]="getStatusLabel(item.status)"
             [severity]="getStatusSeverity(item.status)">
           </p-badge>
         </td>
         <td class="text-center">
-          <div class="po-actions">
-            <p-button
-              icon="pi pi-eye"
-              [rounded]="true"
-              severity="secondary"
-              [text]="true"
-              size="small"
-              pTooltip="View"
-              tooltipPosition="top"
-              (onClick)="openEditDialog(item)">
-            </p-button>
+          <div class="sv-actions">
             <p-button
               icon="pi pi-pencil"
               [rounded]="true"
-              severity="secondary"
               [text]="true"
-              size="small"
+              severity="secondary"
               pTooltip="Edit"
               tooltipPosition="top"
               (onClick)="openEditDialog(item)">
@@ -84,9 +75,8 @@
             <p-button
               icon="pi pi-trash"
               [rounded]="true"
-              severity="danger"
               [text]="true"
-              size="small"
+              severity="danger"
               pTooltip="Delete"
               tooltipPosition="top"
               (onClick)="confirmDelete(item)">
@@ -98,7 +88,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="9" class="text-center">
+        <td colspan="10" class="text-center">
           @if (isLoading()) {
             <div class="flex flex-column gap-2 py-4">
               <p-skeleton width="100%" height="2rem"></p-skeleton>
@@ -107,8 +97,8 @@
             </div>
           } @else {
             <div class="py-4">
-              <i class="pi pi-shopping-cart" style="font-size: 2rem; color: var(--text-color-secondary); opacity: 0.5;"></i>
-              <p style="margin-top: 1rem; color: var(--text-color-secondary);">No purchase orders found. Click "Create Purchase Order" to add one.</p>
+              <i class="pi pi-map-marker" style="font-size: 2rem; color: var(--text-color-secondary); opacity: 0.5;"></i>
+              <p style="margin-top: 1rem; color: var(--text-color-secondary);">No surveying visits found. Click "Schedule Visit" to add one.</p>
             </div>
           }
         </td>
@@ -117,12 +107,12 @@
 
     <ng-template pTemplate="footer">
       @if (!isLoading()) {
-        <tr class="po-grand-total-row">
-          <td colspan="6" class="text-right">
-            <span class="po-grand-total-label">Total PO Value:</span>
+        <tr class="sv-grand-total-row">
+          <td colspan="7" class="text-right">
+            <span class="sv-grand-total-label">Total Survey Value:</span>
           </td>
-          <td class="text-right po-grand-total-value">
-            {{ totalPOValue | currency:'USD':'symbol':'1.0-0' }}
+          <td class="text-right sv-grand-total-value">
+            {{ totalSurveyValue | currency:'USD':'symbol':'1.0-0' }}
           </td>
           <td colspan="2"></td>
         </tr>
@@ -133,15 +123,14 @@
 
 </div>
 
-<!-- Add/Edit Dialog -->
-@if (showPoDialog()) {
-  <app-add-po-dialog
-    [visible]="showPoDialog()"
-    (visibleChange)="showPoDialog.set($event)"
+<!-- Add / Edit Dialog -->
+@if (showDialog()) {
+  <app-add-surveying-visit-dialog
+    [visible]="showDialog()"
+    (visibleChange)="showDialog.set($event)"
     [projectStageId]="projectStageId"
-    [editItem]="editPoItem()"
+    [editItem]="editItem()"
     [unitOptions]="unitOptions"
-    [supplierOptions]="supplierOptions"
     (saved)="onDialogSaved($event)">
-  </app-add-po-dialog>
+  </app-add-surveying-visit-dialog>
 }
