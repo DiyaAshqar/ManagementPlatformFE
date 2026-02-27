@@ -89,6 +89,26 @@ export const routes: Routes = [
               .then(m => m.ProjectDetailComponent)
           }
         ]
+      },
+      {
+        path: 'constructor',
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/constructor/pages/constructor-list/constructor-list.component')
+              .then(m => m.ConstructorListComponent)
+          },
+          {
+            path: 'new',
+            loadComponent: () => import('./features/constructor/pages/constructor-form/constructor-form.component')
+              .then(m => m.ConstructorFormComponent)
+          },
+          {
+            path: 'edit/:id',
+            loadComponent: () => import('./features/constructor/pages/constructor-form/constructor-form.component')
+              .then(m => m.ConstructorFormComponent)
+          }
+        ]
       }
     ]
   },

@@ -1,0 +1,38 @@
+.constructor-list-container {
+  margin: 0 auto;
+
+  h1 {
+    color: var(--text-color);
+  }
+
+  .text-color-secondary {
+    color: var(--text-color-secondary);
+  }
+
+  :host ::ng-deep {
+    .p-datatable {
+      .p-datatable-thead > tr > th {
+        background-color: var(--surface-section);
+        color: var(--text-color);
+        font-weight: 600;
+        border-bottom: 1px solid var(--surface-border);
+      }
+
+      .p-datatable-tbody > tr {
+        &:hover {
+          background-color: var(--surface-hover);
+        }
+
+        > td {
+          border-bottom: 1px solid var(--surface-border);
+        }
+      }
+    }
+
+    .p-button.p-button-text {
+      &:hover {
+        background-color: var(--surface-hover);
+      }
+    }
+  }
+}

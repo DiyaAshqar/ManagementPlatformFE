@@ -1,0 +1,108 @@
+<div class="constructor-form-container p-4">
+  <!-- Header -->
+  <div class="mb-4">
+    <div class="flex align-items-center gap-2 mb-2">
+      <p-button 
+        icon="pi pi-arrow-left"
+        [rounded]="true"
+        [text]="true"
+        (onClick)="onCancel()"
+        severity="secondary">
+      </p-button>
+      <h1 class="text-3xl font-bold m-0">
+        {{ isEditMode ? 'Edit Constructor' : 'Create Constructor' }}
+      </h1>
+    </div>
+    <p class="text-color-secondary ml-6">
+      {{ isEditMode ? 'Update constructor information' : 'Add a new main contractor' }}
+    </p>
+  </div>
+
+  <!-- Form Card -->
+  <p-card>
+    <form [formGroup]="constructorForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+      <div class="grid">
+        <!-- Name Field -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="name" class="block font-medium mb-2">
+              Name <span class="text-red-500">*</span>
+            </label>
+            <input 
+              id="name"
+              type="text" 
+              pInputText 
+              formControlName="name"
+              placeholder="Enter constructor name"
+              class="w-full"
+              [class.ng-invalid]="name?.invalid && name?.touched"
+              [class.ng-dirty]="name?.touched" />
+            <small 
+              *ngIf="name?.invalid && name?.touched" 
+              class="p-error block mt-1">
+              <span *ngIf="name?.errors?.['required']">Name is required</span>
+              <span *ngIf="name?.errors?.['minlength']">Name must be at least 2 characters</span>
+            </small>
+          </div>
+        </div>
+
+        <!-- Main Contractor Type Field -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="mainContractorTypeId" class="block font-medium mb-2">
+              Contractor Type <span class="text-red-500">*</span>
+            </label>
+            <p-dropdown
+              id="mainContractorTypeId"
+              formControlName="mainContractorTypeId"
+              [options]="mainContractorTypes"
+              optionLabel="name"
+              optionValue="id"
+              placeholder="Select contractor type"
+              [showClear]="true"
+              styleClass="w-full"
+              [class.ng-invalid]="mainContractorTypeId?.invalid && mainContractorTypeId?.touched"
+              [class.ng-dirty]="mainContractorTypeId?.touched">
+            </p-dropdown>
+            <small 
+              *ngIf="mainContractorTypeId?.invalid && mainContractorTypeId?.touched" 
+              class="p-error block mt-1">
+              Contractor type is required
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-content-end gap-2 mt-4 pt-4 border-top-1 surface-border">
+        <p-button 
+          label="Cancel"
+          icon="pi pi-times"
+          (onClick)="onCancel()"
+          severity="secondary"
+          [outlined]="true"
+          [disabled]="isSaving">
+        </p-button>
+        <p-button 
+          label="{{ isEditMode ? 'Update' : 'Create' }}"
+          icon="pi pi-check"
+          type="submit"
+          severity="primary"
+          [loading]="isSaving"
+          [disabled]="constructorForm.invalid">
+        </p-button>
+      </div>
+    </form>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="p-4">
+      <div class="flex flex-column gap-3">
+        <p-skeleton height="2rem"></p-skeleton>
+        <p-skeleton height="2rem"></p-skeleton>
+        <p-skeleton height="2rem"></p-skeleton>
+      </div>
+    </div>
+  </p-card>
+</div>
+
+<p-toast></p-toast>

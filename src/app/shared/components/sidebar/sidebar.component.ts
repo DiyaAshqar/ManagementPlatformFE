@@ -48,6 +48,7 @@ export class SidebarComponent implements OnInit {
       items: [
         { label: 'Project Management', icon: 'pi pi-th-large', route: '/projects' },
         { label: 'Agreement Wizard', icon: 'pi pi-briefcase', route: '/agreement-wizard' },
+        { label: 'Constructors', icon: 'pi pi-users', route: '/constructor' },
         // { label: 'Theme Showcase', icon: 'pi pi-palette', route: '/theme-showcase' },
       ]
     },
