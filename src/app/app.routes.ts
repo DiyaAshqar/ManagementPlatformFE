@@ -109,6 +109,26 @@ export const routes: Routes = [
               .then(m => m.ConstructorFormComponent)
           }
         ]
+      },
+      {
+        path: 'supplier',
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/supplier/pages/supplier-list/supplier-list.component')
+              .then(m => m.SupplierListComponent)
+          },
+          {
+            path: 'new',
+            loadComponent: () => import('./features/supplier/pages/supplier-form/supplier-form.component')
+              .then(m => m.SupplierFormComponent)
+          },
+          {
+            path: 'edit/:id',
+            loadComponent: () => import('./features/supplier/pages/supplier-form/supplier-form.component')
+              .then(m => m.SupplierFormComponent)
+          }
+        ]
       }
     ]
   },
