@@ -61,7 +61,6 @@ export class SupplierListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadSuppliers();
   }
 
   loadSuppliers(): void {

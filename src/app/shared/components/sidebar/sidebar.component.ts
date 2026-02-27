@@ -54,15 +54,15 @@ export class SidebarComponent implements OnInit {
       ]
     },
     {
-      title: 'Modules',
+      title: 'Additional Features',
       items: [
-        { label: 'Module 1', icon: 'pi pi-wallet', route: '/Module1' },
+        { label: 'Feature 1', icon: 'pi pi-wallet', route: '/Module1' },
       ]
     },
     {
-      title: 'Modules',
+      title: 'Extended Modules',
       items: [
-        { label: 'Module 1', icon: 'pi pi-users', route: '/Module1' },
+        { label: 'Feature 2', icon: 'pi pi-users', route: '/Module1' },
       ]
     }
   ];

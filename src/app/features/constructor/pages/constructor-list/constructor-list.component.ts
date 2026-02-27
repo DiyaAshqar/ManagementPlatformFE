@@ -61,7 +61,6 @@ export class ConstructorListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadConstructors();
   }
 
   loadConstructors(): void {
