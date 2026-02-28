@@ -1,11 +1,14 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 import {
   ConstructorClient,
   CreateConstructorCommand,
   GetConstructorDtoListPagedResponseResponse,
   GetConstructorDtoResponse,
-  BooleanResponse
+  BooleanResponse,
+  LookupClient,
+  LookupDto
 } from '../../../../nswag/api-client';
 
 @Injectable({
@@ -13,7 +16,10 @@ import {
 })
 export class ConstructorService {
 
-  constructor(private constructorClient: ConstructorClient) { }
+  constructor(
+    private constructorClient: ConstructorClient,
+    private lookupClient: LookupClient
+  ) { }
 
   // Get all constructors with pagination and filters
   getAllConstructors(
@@ -41,5 +47,17 @@ export class ConstructorService {
   // Delete constructor
   deleteConstructor(id: number): Observable<BooleanResponse> {
     return this.constructorClient.delete(id);
+  }
+
+  // Lookup methods
+  getMainContractorTypes(): Observable<LookupDto[]> {
+    return this.lookupClient.getAllLookups(['MainContractType']).pipe(
+      map(response => {
+        if (response.succeeded && response.data && response.data['MainContractType']) {
+          return response.data['MainContractType'];
+        }
+        return [];
+      })
+    );
   }
 }

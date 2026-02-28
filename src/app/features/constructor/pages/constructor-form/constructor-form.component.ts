@@ -14,11 +14,11 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService } from 'primeng/api';
 
 import { ConstructorService } from '../../services/constructor.service';
-import { CreateConstructorCommand } from '../../../../../nswag/api-client';
+import { CreateConstructorCommand, LookupDto } from '../../../../../nswag/api-client';
 
 interface MainContractorType {
-  id: number;
-  name: string;
+  id?: number;
+  name?: string;
 }
 
 @Component({
@@ -45,13 +45,10 @@ export class ConstructorFormComponent implements OnInit {
   constructorId?: number;
   isLoading: boolean = false;
   isSaving: boolean = false;
+  isLoadingDropdowns: boolean = false;
   
-  // Dropdown options - these should be loaded from lookup service
-  mainContractorTypes: MainContractorType[] = [
-    { id: 1, name: 'General Contractor' },
-    { id: 2, name: 'Subcontractor' },
-    { id: 3, name: 'Specialty Contractor' }
-  ];
+  // Dropdown options - loaded from lookup endpoint
+  mainContractorTypes: MainContractorType[] = [];
 
   constructor(
     private fb: FormBuilder,
@@ -64,6 +61,7 @@ export class ConstructorFormComponent implements OnInit {
   }
 
   ngOnInit(): void {
+    this.loadDropdownOptions();
     this.route.params.subscribe(params => {
       if (params['id'] && params['id'] !== 'new') {
         this.isEditMode = true;
@@ -77,6 +75,25 @@ export class ConstructorFormComponent implements OnInit {
     this.constructorForm = this.fb.group({
       name: ['', [Validators.required, Validators.minLength(2)]],
       mainContractorTypeId: [null, Validators.required]
+    });
+  }
+
+  loadDropdownOptions(): void {
+    this.isLoadingDropdowns = true;
+    this.constructorService.getMainContractorTypes().subscribe({
+      next: (data: LookupDto[]) => {
+        this.mainContractorTypes = data;
+        this.isLoadingDropdowns = false;
+      },
+      error: (error) => {
+        console.error('Error loading main contractor types:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load contractor types'
+        });
+        this.isLoadingDropdowns = false;
+      }
     });
   }
 

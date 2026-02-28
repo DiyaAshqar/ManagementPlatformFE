@@ -61,6 +61,7 @@
               placeholder="Select contractor type"
               [showClear]="true"
               styleClass="w-full"
+              [disabled]="isLoadingDropdowns"
               [class.ng-invalid]="mainContractorTypeId?.invalid && mainContractorTypeId?.touched"
               [class.ng-dirty]="mainContractorTypeId?.touched">
             </p-dropdown>
