@@ -39,6 +39,9 @@
             </p-select>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('agreementId')" class="p-error">{{ getErrorMessage('agreementId') }}</small>
+          <small *ngIf="!isLoadingAgreements() && agreementOptions().length === 0" class="text-yellow-500">
+            No agreements available. Please create an agreement first.
+          </small>
         </div>
       </div>
 

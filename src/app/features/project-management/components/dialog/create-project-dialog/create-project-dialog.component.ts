@@ -1,8 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, OnChanges, Output, signal } from '@angular/core';
-import { TranslateService } from '@ngx-translate/core';
+import { Component, EventEmitter, Input, OnInit, Output, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -15,10 +14,10 @@ import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 
 import { MessageService } from 'primeng/api';
+import { CreateProjectCommand, GetAllAgreementDto, ProjectStatus } from '../../../../../../nswag/api-client';
+import { AgreementWizardService } from '../../../../agreement-wizard/services/agreement-wizard.service';
 import { Project } from '../../../models';
 import { ProjectApiService } from '../../../services/project-api.service';
-import { AgreementWizardService } from '../../../../agreement-wizard/services/agreement-wizard.service';
-import { CreateProjectCommand, GetAllAgreementDto, ProjectStatus } from '../../../../../../nswag/api-client';
 
 @Component({
   selector: 'app-create-project-dialog',
@@ -39,7 +38,7 @@ import { CreateProjectCommand, GetAllAgreementDto, ProjectStatus } from '../../.
   templateUrl: './create-project-dialog.component.html',
   styleUrls: ['./create-project-dialog.component.scss']
 })
-export class CreateProjectDialogComponent implements OnInit, OnChanges {
+export class CreateProjectDialogComponent implements OnInit {
   @Input() visible: boolean = false;
   @Input() project: Project | null = null;
   @Output() visibleChange = new EventEmitter<boolean>();
@@ -72,11 +71,6 @@ export class CreateProjectDialogComponent implements OnInit, OnChanges {
     this.loadAgreements();
   }
 
-  ngOnChanges(): void {
-    if (this.project && this.projectForm) {
-      this.populateForm();
-    }
-  }
 
   get isEditMode(): boolean {
     return this.project !== null;
@@ -108,6 +102,7 @@ export class CreateProjectDialogComponent implements OnInit, OnChanges {
     this.projectForm.patchValue({
       title: this.project.name,
       description: this.project.description,
+      agreementId: this.project.agreementId || null, // Set agreementId when editing
       startDate: new Date(this.project.startDate),
       endDate: new Date(this.project.endDate),
       status: this.mapProjectStatus(this.project.status),
@@ -125,8 +120,12 @@ export class CreateProjectDialogComponent implements OnInit, OnChanges {
 
   loadAgreements(): void {
     this.isLoadingAgreements.set(true);
+    console.log('Loading agreements...');
+    
     this.agreementWizardService.getAllAgreements(1, 100).subscribe({
       next: (response) => {
+        console.log('Agreements API response:', response);
+        
         if (response.succeeded && response.data?.data) {
           this.agreements.set(response.data.data);
           const options = response.data.data.map(agreement => ({
@@ -134,10 +133,19 @@ export class CreateProjectDialogComponent implements OnInit, OnChanges {
             value: agreement.id!
           }));
           this.agreementOptions.set(options);
+          console.log('Agreement options created:', options);
+        } else {
+          console.warn('No agreements found or API call was not successful:', response);
         }
         this.isLoadingAgreements.set(false);
       },
       error: (error) => {
+        console.error('Error loading agreements:', error);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load agreements. Please try again.'
+        });
         this.isLoadingAgreements.set(false);
       }
     });

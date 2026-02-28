@@ -57,6 +57,7 @@ export class ProjectService {
       spent: 0, // API doesn't provide spent amount
       clientName: apiProject.clinet || '',
       projectManager: 'N/A', // API doesn't provide project manager
+      agreementId: apiProject.agreementId, // Add agreementId mapping
       team: [],
       stages: this.mapApiStagesToStages(apiProject.projectStages, (apiProject.id || 0).toString()),
       documents: [],

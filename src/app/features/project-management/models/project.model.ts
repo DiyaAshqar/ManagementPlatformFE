@@ -13,6 +13,7 @@ export interface Project {
   spent: number;
   clientName: string;
   projectManager: string;
+  agreementId?: number; // Add agreementId field
   team: TeamMember[];
   stages: Stage[];
   documents: ProjectDocument[];
