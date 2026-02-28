@@ -3248,6 +3248,12 @@ export class TaskClient {
     }
 }
 
+export enum AcceptenceStatus {
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+}
+
 export class Agreement implements IAgreement {
     id?: number;
     createdById?: number | undefined;
@@ -4933,7 +4939,7 @@ export class CreateProjectVOCommand implements ICreateProjectVOCommand {
     isEffected?: boolean;
     effectedDateStart?: Date | undefined;
     effectedDateEnd?: Date | undefined;
-    status?: string | undefined;
+    status?: AcceptenceStatus;
 
     constructor(data?: ICreateProjectVOCommand) {
         if (data) {
@@ -5001,7 +5007,7 @@ export interface ICreateProjectVOCommand {
     isEffected?: boolean;
     effectedDateStart?: Date | undefined;
     effectedDateEnd?: Date | undefined;
-    status?: string | undefined;
+    status?: AcceptenceStatus;
 }
 
 export class CreateSubTaskCommand implements ICreateSubTaskCommand {
@@ -6048,6 +6054,7 @@ export class GetConstructorDto implements IGetConstructorDto {
     id?: number;
     name?: string | undefined;
     mainContractorTypeId?: number;
+    mainContractorTypeName?: string | undefined;
 
     constructor(data?: IGetConstructorDto) {
         if (data) {
@@ -6063,6 +6070,7 @@ export class GetConstructorDto implements IGetConstructorDto {
             this.id = _data["id"];
             this.name = _data["name"];
             this.mainContractorTypeId = _data["mainContractorTypeId"];
+            this.mainContractorTypeName = _data["mainContractorTypeName"];
         }
     }
 
@@ -6078,6 +6086,7 @@ export class GetConstructorDto implements IGetConstructorDto {
         data["id"] = this.id;
         data["name"] = this.name;
         data["mainContractorTypeId"] = this.mainContractorTypeId;
+        data["mainContractorTypeName"] = this.mainContractorTypeName;
         return data;
     }
 }
@@ -6086,6 +6095,7 @@ export interface IGetConstructorDto {
     id?: number;
     name?: string | undefined;
     mainContractorTypeId?: number;
+    mainContractorTypeName?: string | undefined;
 }
 
 export class GetConstructorDtoListPagedResponse implements IGetConstructorDtoListPagedResponse {
@@ -6558,6 +6568,7 @@ export interface IGetProjectBOQDtoResponse {
 
 export class GetProjectDto implements IGetProjectDto {
     id?: number | undefined;
+    agreementId?: number;
     title?: string | undefined;
     status?: ProjectStatus;
     description?: string | undefined;
@@ -6586,6 +6597,7 @@ export class GetProjectDto implements IGetProjectDto {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.agreementId = _data["agreementId"];
             this.title = _data["title"];
             this.status = _data["status"];
             this.description = _data["description"];
@@ -6618,6 +6630,7 @@ export class GetProjectDto implements IGetProjectDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["agreementId"] = this.agreementId;
         data["title"] = this.title;
         data["status"] = this.status;
         data["description"] = this.description;
@@ -6643,6 +6656,7 @@ export class GetProjectDto implements IGetProjectDto {
 
 export interface IGetProjectDto {
     id?: number | undefined;
+    agreementId?: number;
     title?: string | undefined;
     status?: ProjectStatus;
     description?: string | undefined;
@@ -7965,7 +7979,7 @@ export class GetProjectVODto implements IGetProjectVODto {
     isEffected?: boolean;
     effectedDateStart?: Date | undefined;
     effectedDateEnd?: Date | undefined;
-    status?: string | undefined;
+    status?: AcceptenceStatus;
 
     constructor(data?: IGetProjectVODto) {
         if (data) {
@@ -8033,7 +8047,7 @@ export interface IGetProjectVODto {
     isEffected?: boolean;
     effectedDateStart?: Date | undefined;
     effectedDateEnd?: Date | undefined;
-    status?: string | undefined;
+    status?: AcceptenceStatus;
 }
 
 export class GetProjectVODtoListPagedResponse implements IGetProjectVODtoListPagedResponse {
@@ -10322,7 +10336,7 @@ export class ProjectVO implements IProjectVO {
     isEffected?: boolean;
     effectedDateStart?: Date | undefined;
     effectedDateEnd?: Date | undefined;
-    status?: string | undefined;
+    status?: AcceptenceStatus;
 
     constructor(data?: IProjectVO) {
         if (data) {
@@ -10399,7 +10413,7 @@ export interface IProjectVO {
     isEffected?: boolean;
     effectedDateStart?: Date | undefined;
     effectedDateEnd?: Date | undefined;
-    status?: string | undefined;
+    status?: AcceptenceStatus;
 }
 
 export class QuantityBill implements IQuantityBill {
