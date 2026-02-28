@@ -61,6 +61,7 @@ export class ConstructorListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    // this.loadConstructors();
   }
 
   loadConstructors(): void {
@@ -147,10 +148,5 @@ export class ConstructorListComponent implements OnInit {
         }
       }
     });
-  }
-
-  getMainContractorTypeName(typeId?: number): string {
-    // You can map this to actual type names from lookup service
-    return typeId ? `Type ${typeId}` : 'N/A';
   }
 }

@@ -49,9 +49,9 @@ export class AddVoDialogComponent implements OnInit, OnChanges {
 
     // Status options
     statusOptions = [
-        { label: 'Approved', value: 'Approved' },
-        { label: 'Pending', value: 'Pending' },
-        { label: 'Rejected', value: 'Rejected' }
+        { label: 'Approved', value: 1 },
+        { label: 'Pending', value: 2 },
+        { label: 'Rejected', value: 3 }
     ];
 
     get isEditMode(): boolean {
@@ -114,12 +114,12 @@ export class AddVoDialogComponent implements OnInit, OnChanges {
                 isEffected: this.editItem.isEffected,
                 effectedDateStart: this.editItem.effectedDateStart,
                 effectedDateEnd: this.editItem.effectedDateEnd,
-                status: this.editItem.status ?? 'Pending'
+                status: this.editItem.status ?? 2
             });
         } else {
             this.voForm.reset({
                 isEffected: false,
-                status: 'Pending' // Default to Pending for new VOs
+                status: 2 // Default to Pending for new VOs
             });
         }
 
@@ -147,7 +147,7 @@ export class AddVoDialogComponent implements OnInit, OnChanges {
         this.visibleChange.emit(false);
         this.voForm.reset({
             isEffected: false,
-            status: 'Pending' // Reset to Pending
+            status: 2 // Reset to Pending
         });
         this.isSubmitting.set(false);
     }

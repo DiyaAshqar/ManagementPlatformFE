@@ -22,9 +22,9 @@ import { AddVoDialogComponent } from '../../../dialog/add-vo-dialog/add-vo-dialo
 
 // VO Status enum matching the backend
 export enum VOStatus {
-  Approved = 'Approved',
-  Pending = 'Pending',
-  Rejected = 'Rejected'
+  Approved = 1,
+  Pending = 2,
+  Rejected = 3
 }
 
 @Component({
@@ -200,20 +200,20 @@ export class VoucherOrdersTabComponent implements OnInit {
     });
   }
 
-  getStatusSeverity(status?: string): 'success' | 'warn' | 'danger' | 'secondary' {
+  getStatusSeverity(status?: number): 'success' | 'warn' | 'danger' | 'secondary' {
     switch (status) {
-      case 'Approved': return 'success';
-      case 'Pending': return 'warn';
-      case 'Rejected': return 'danger';
+      case 1: return 'success'; // Approved
+      case 2: return 'warn';    // Pending
+      case 3: return 'danger';  // Rejected
       default: return 'secondary';
     }
   }
 
-  getStatusLabel(status?: string): string {
+  getStatusLabel(status?: number): string {
     switch (status) {
-      case 'Approved': return 'Approved';
-      case 'Pending': return 'Pending';
-      case 'Rejected': return 'Rejected';
+      case 1: return 'Approved';
+      case 2: return 'Pending';
+      case 3: return 'Rejected';
       default: return 'Unknown';
     }
   }
