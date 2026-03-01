@@ -12,6 +12,7 @@ import { MenuItem } from 'primeng/api';
 
 // Services
 import { SidebarService } from '../../../core/services/sidebar.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 interface NavItem {
   label: string;
@@ -74,10 +75,17 @@ export class SidebarComponent implements OnInit {
 
   constructor(
     private router: Router,
-    public sidebarService: SidebarService
+    public sidebarService: SidebarService,
+    public themeService: ThemeService
   ) {}
 
   ngOnInit(): void {}
+
+  get logoPath(): string {
+    return this.themeService.isDarkTheme() 
+      ? 'assets/logo/neuro code dark.png' 
+      : 'assets/logo/neuro code light.png';
+  }
 
   toggleMobileMenu(): void {
     this.sidebarService.toggleMobile();
