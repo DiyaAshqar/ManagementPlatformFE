@@ -1,9 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, signal } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
@@ -35,11 +35,10 @@ export enum VisitStatus {
     TooltipModule,
     SkeletonModule,
     ToastModule,
-    ConfirmDialogModule,
     BadgeModule,
     AddSurveyingVisitDialogComponent
   ],
-  providers: [MessageService, ConfirmationService, ProjectSurveyingVisitClient, LookupClient],
+  providers: [MessageService, ProjectSurveyingVisitClient, LookupClient],
   templateUrl: './surveying-visits-tab.component.html',
   styleUrls: ['./surveying-visits-tab.component.scss']
 })
@@ -72,7 +71,8 @@ export class SurveyingVisitsTabComponent implements OnInit {
     private svClient: ProjectSurveyingVisitClient,
     private lookupClient: LookupClient,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
@@ -150,19 +150,27 @@ export class SurveyingVisitsTabComponent implements OnInit {
   }
 
   confirmDelete(item: GetProjectSurveyingVisitDto): void {
+    const visitDate = item.visitDate ? new Date(item.visitDate).toLocaleDateString() : 'this visit';
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete this surveying visit?`,
-      header: 'Delete Surveying Visit',
+      message: this.translate.instant('projectTabs.surveyingVisit.confirmDelete.message', { name: visitDate }),
+      header: this.translate.instant('projectTabs.surveyingVisit.confirmDelete.header'),
       icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.svClient.delete(item.id!, item.projectStageId!).subscribe({
           next: (res) => {
             if (res.succeeded) {
               this.loadItems();
-              this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Visit removed successfully.' });
+              this.messageService.add({ 
+                severity: 'success', 
+                summary: this.translate.instant('common.success'), 
+                detail: 'Visit removed successfully.' 
+              });
             } else {
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: res.message || 'Failed to delete.' });
+              this.messageService.add({ 
+                severity: 'error', 
+                summary: this.translate.instant('common.error'), 
+                detail: res.message || 'Failed to delete.' 
+              });
             }
           },
           error: () => {

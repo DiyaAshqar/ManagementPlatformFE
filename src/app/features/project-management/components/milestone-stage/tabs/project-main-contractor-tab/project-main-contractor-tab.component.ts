@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { forkJoin } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
@@ -26,7 +26,6 @@ import { AddContractorDialogComponent } from '../../../dialog/add-contractor-dia
   imports: [
     CommonModule,
     ButtonModule,
-    ConfirmDialogModule,
     SkeletonModule,
     TableModule,
     ToastModule,
@@ -34,7 +33,7 @@ import { AddContractorDialogComponent } from '../../../dialog/add-contractor-dia
     BadgeModule,
     AddContractorDialogComponent
   ],
-  providers: [MessageService, ConfirmationService, ProjectMainContractorClient, SupplierClient],
+  providers: [MessageService, ProjectMainContractorClient, SupplierClient],
   templateUrl: './project-main-contractor-tab.component.html',
   styleUrl: './project-main-contractor-tab.component.scss'
 })
@@ -61,7 +60,8 @@ export class ProjectMainContractorTabComponent implements OnInit {
     private contractorClient: ProjectMainContractorClient,
     private supplierClient: SupplierClient,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
   ) { }
 
   ngOnInit(): void {
@@ -154,10 +154,9 @@ export class ProjectMainContractorTabComponent implements OnInit {
   confirmDelete(item: IGetProjectMainContractorDto): void {
     const contractorName = this.contractorMap[item.constructorId ?? 0] || 'this contractor';
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete "${contractorName}"?`,
-      header: 'Delete Main Contractor',
+      message: this.translate.instant('projectTabs.mainContractor.confirmDelete.message', { name: contractorName }),
+      header: this.translate.instant('projectTabs.mainContractor.confirmDelete.header'),
       icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.contractorClient.delete(item.id!, item.projectStageId!).subscribe({
           next: (res) => {
@@ -165,13 +164,13 @@ export class ProjectMainContractorTabComponent implements OnInit {
               this.loadContractorData();
               this.messageService.add({
                 severity: 'success',
-                summary: 'Deleted',
+                summary: this.translate.instant('common.success'),
                 detail: 'Main Contractor removed successfully.'
               });
             } else {
               this.messageService.add({
                 severity: 'error',
-                summary: 'Error',
+                summary: this.translate.instant('common.error'),
                 detail: res.message || 'Failed to delete Main Contractor.'
               });
             }

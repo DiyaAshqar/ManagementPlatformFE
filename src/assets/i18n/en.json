@@ -29,6 +29,7 @@
     "success": "Success",
     "error": "Error",
     "warning": "Warning",
+    "info": "Info",
     "view": "View",
     "clearFilters": "Clear Filters"
   },
@@ -51,6 +52,11 @@
       "view": "View Agreement",
       "edit": "Edit Agreement",
       "delete": "Delete Agreement"
+    },
+    "confirmDelete": {
+      "header": "Confirm Delete",
+      "message": "Are you sure you want to delete \"{{name}}\"?",
+      "notImplemented": "Delete functionality to be implemented"
     }
   },
   "projects": {
@@ -295,6 +301,38 @@
       "addFirstAttachment": "Add your first document using the form above",
       "view": "View",
       "download": "Download"
+    }
+  },
+  "projectTabs": {
+    "boq": {
+      "confirmDelete": {
+        "header": "Delete BoQ Item",
+        "message": "Are you sure you want to delete \"{{name}}\"?"
+      }
+    },
+    "vo": {
+      "confirmDelete": {
+        "header": "Delete Voucher Order",
+        "message": "Are you sure you want to delete VO \"{{name}}\"?"
+      }
+    },
+    "po": {
+      "confirmDelete": {
+        "header": "Delete Purchase Order",
+        "message": "Are you sure you want to delete PO \"{{name}}\"?"
+      }
+    },
+    "mainContractor": {
+      "confirmDelete": {
+        "header": "Delete Main Contractor",
+        "message": "Are you sure you want to delete \"{{name}}\"?"
+      }
+    },
+    "surveyingVisit": {
+      "confirmDelete": {
+        "header": "Delete Surveying Visit",
+        "message": "Are you sure you want to delete the visit on \"{{name}}\"?"
+      }
     }
   }
 }

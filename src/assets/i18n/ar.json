@@ -29,6 +29,7 @@
     "success": "نجح",
     "error": "خطأ",
     "warning": "تحذير",
+    "info": "معلومة",
     "view": "عرض",
     "clearFilters": "مسح الفلاتر"
   },
@@ -51,6 +52,11 @@
       "view": "عرض الاتفاقية",
       "edit": "تعديل الاتفاقية",
       "delete": "حذف الاتفاقية"
+    },
+    "confirmDelete": {
+      "header": "تأكيد الحذف",
+      "message": "هل أنت متأكد من حذف \"{{name}}\"؟",
+      "notImplemented": "وظيفة الحذف سيتم تنفيذها قريباً"
     }
   },
   "projects": {
@@ -292,6 +298,38 @@
       "addFirstAttachment": "أضف أول مستند باستخدام النموذج أعلاه",
       "view": "عرض",
       "download": "تحميل"
+    }
+  },
+  "projectTabs": {
+    "boq": {
+      "confirmDelete": {
+        "header": "حذف عنصر BoQ",
+        "message": "هل أنت متأكد من حذف \"{{name}}\"؟"
+      }
+    },
+    "vo": {
+      "confirmDelete": {
+        "header": "حذف أمر توريد",
+        "message": "هل أنت متأكد من حذف أمر التوريد \"{{name}}\"؟"
+      }
+    },
+    "po": {
+      "confirmDelete": {
+        "header": "حذف أمر شراء",
+        "message": "هل أنت متأكد من حذف أمر الشراء \"{{name}}\"؟"
+      }
+    },
+    "mainContractor": {
+      "confirmDelete": {
+        "header": "حذف المقاول الرئيسي",
+        "message": "هل أنت متأكد من حذف \"{{name}}\"؟"
+      }
+    },
+    "surveyingVisit": {
+      "confirmDelete": {
+        "header": "حذف زيارة مسح",
+        "message": "هل أنت متأكد من حذف الزيارة في \"{{name}}\"؟"
+      }
     }
   }
 }

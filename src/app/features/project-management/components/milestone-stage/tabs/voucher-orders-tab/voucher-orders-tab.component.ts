@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { forkJoin } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
@@ -37,11 +37,10 @@ export enum VOStatus {
     TooltipModule,
     SkeletonModule,
     ToastModule,
-    ConfirmDialogModule,
     BadgeModule,
     AddVoDialogComponent
   ],
-  providers: [MessageService, ConfirmationService, ProjectVOClient, LookupClient],
+  providers: [MessageService, ProjectVOClient, LookupClient],
   templateUrl: './voucher-orders-tab.component.html',
   styleUrls: ['./voucher-orders-tab.component.scss']
 })
@@ -71,7 +70,8 @@ export class VoucherOrdersTabComponent implements OnInit {
     private voClient: ProjectVOClient,
     private lookupClient: LookupClient,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
   ) { }
 
   ngOnInit(): void {
@@ -165,10 +165,9 @@ export class VoucherOrdersTabComponent implements OnInit {
 
   confirmDelete(item: IGetProjectVODto): void {
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete VO "${item.voNumber}"?`,
-      header: 'Delete Voucher Order',
+      message: this.translate.instant('projectTabs.vo.confirmDelete.message', { name: item.voNumber }),
+      header: this.translate.instant('projectTabs.vo.confirmDelete.header'),
       icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.voClient.delete(item.id!, item.projectStageId!).subscribe({
           next: (res) => {
@@ -176,13 +175,13 @@ export class VoucherOrdersTabComponent implements OnInit {
               this.loadVOItems();
               this.messageService.add({
                 severity: 'success',
-                summary: 'Deleted',
+                summary: this.translate.instant('common.success'),
                 detail: 'Voucher Order removed successfully.'
               });
             } else {
               this.messageService.add({
                 severity: 'error',
-                summary: 'Error',
+                summary: this.translate.instant('common.error'),
                 detail: res.message || 'Failed to delete Voucher Order.'
               });
             }

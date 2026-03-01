@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { forkJoin } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
@@ -38,11 +38,10 @@ export enum POStatus {
     TooltipModule,
     SkeletonModule,
     ToastModule,
-    ConfirmDialogModule,
     BadgeModule,
     AddPoDialogComponent
   ],
-  providers: [MessageService, ConfirmationService, ProjectPOClient, LookupClient, SupplierClient],
+  providers: [MessageService, ProjectPOClient, LookupClient, SupplierClient],
   templateUrl: './purchase-orders-tab.component.html',
   styleUrls: ['./purchase-orders-tab.component.scss']
 })
@@ -79,7 +78,8 @@ export class PurchaseOrdersTabComponent implements OnInit {
     private lookupClient: LookupClient,
     private supplierClient: SupplierClient,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
   ) { }
 
   ngOnInit(): void {
@@ -182,10 +182,9 @@ export class PurchaseOrdersTabComponent implements OnInit {
 
   confirmDelete(item: IGetProjectPODto): void {
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete PO "${item.poNumber}"?`,
-      header: 'Delete Purchase Order',
+      message: this.translate.instant('projectTabs.po.confirmDelete.message', { name: item.poNumber }),
+      header: this.translate.instant('projectTabs.po.confirmDelete.header'),
       icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.poClient.delete(item.id!, item.projectStageId!).subscribe({
           next: (res) => {
@@ -193,13 +192,13 @@ export class PurchaseOrdersTabComponent implements OnInit {
               this.loadPOItems();
               this.messageService.add({
                 severity: 'success',
-                summary: 'Deleted',
+                summary: this.translate.instant('common.success'),
                 detail: 'Purchase Order removed successfully.'
               });
             } else {
               this.messageService.add({
                 severity: 'error',
-                summary: 'Error',
+                summary: this.translate.instant('common.error'),
                 detail: res.message || 'Failed to delete Purchase Order.'
               });
             }

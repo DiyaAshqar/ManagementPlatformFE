@@ -1,10 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { forkJoin } from 'rxjs';
+import { TranslateService } from '@ngx-translate/core';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
@@ -30,10 +30,9 @@ import { AddBoqDialogComponent } from '../../../dialog/add-boq-dialog/add-boq-di
     TooltipModule,
     SkeletonModule,
     ToastModule,
-    ConfirmDialogModule,
     AddBoqDialogComponent
   ],
-  providers: [MessageService, ConfirmationService, ProjectBOQClient, LookupClient, ConstructorClient],
+  providers: [MessageService, ProjectBOQClient, LookupClient, ConstructorClient],
   templateUrl: './boq-tab.component.html',
   styleUrls: ['./boq-tab.component.scss']
 })
@@ -69,7 +68,8 @@ export class BoqTabComponent implements OnInit {
     private lookupClient: LookupClient,
     private constructorClient: ConstructorClient,
     private messageService: MessageService,
-    private confirmationService: ConfirmationService
+    private confirmationService: ConfirmationService,
+    private translate: TranslateService
   ) { }
 
   ngOnInit(): void {
@@ -178,10 +178,9 @@ export class BoqTabComponent implements OnInit {
 
   confirmDelete(item: IGetProjectBOQDto): void {
     this.confirmationService.confirm({
-      message: `Are you sure you want to delete "${item.description}"?`,
-      header: 'Delete BoQ Item',
+      message: this.translate.instant('projectTabs.boq.confirmDelete.message', { name: item.description }),
+      header: this.translate.instant('projectTabs.boq.confirmDelete.header'),
       icon: 'pi pi-exclamation-triangle',
-      acceptButtonStyleClass: 'p-button-danger',
       accept: () => {
         this.boqClient.delete(item.id!, item.projectStageId!).subscribe({
           next: (res) => {
@@ -189,13 +188,13 @@ export class BoqTabComponent implements OnInit {
               this.loadBoqItems();
               this.messageService.add({ 
                 severity: 'success', 
-                summary: 'Deleted', 
+                summary: this.translate.instant('common.success'), 
                 detail: 'BoQ item removed successfully.' 
               });
             } else {
               this.messageService.add({ 
                 severity: 'error', 
-                summary: 'Error', 
+                summary: this.translate.instant('common.error'), 
                 detail: res.message || 'Failed to delete BoQ item.' 
               });
             }

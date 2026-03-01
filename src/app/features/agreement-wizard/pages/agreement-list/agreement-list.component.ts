@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 // PrimeNG Imports
 import { TableModule } from 'primeng/table';
@@ -9,7 +9,6 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { ToastModule } from 'primeng/toast';
 
 // Services
@@ -28,10 +27,9 @@ import { ConfirmationService, MessageService } from 'primeng/api';
         CardModule,
         InputTextModule,
         TooltipModule,
-        ConfirmDialogModule,
         ToastModule
     ],
-    providers: [ConfirmationService, MessageService],
+    providers: [MessageService],
     templateUrl: './agreement-list.component.html',
     styleUrls: ['./agreement-list.component.scss']
 })
@@ -48,7 +46,8 @@ export class AgreementListComponent {
         private agreementService: AgreementWizardService,
         private router: Router,
         private confirmationService: ConfirmationService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private translate: TranslateService
     ) { }
 
 
@@ -97,17 +96,16 @@ export class AgreementListComponent {
 
     deleteAgreement(agreement: GetAllAgreementDto): void {
         this.confirmationService.confirm({
-            message: `Are you sure you want to delete agreement "${agreement.projectName}"?`,
-            header: 'Delete Confirmation',
+            message: this.translate.instant('agreements.confirmDelete.message', { name: agreement.projectName }),
+            header: this.translate.instant('agreements.confirmDelete.header'),
             icon: 'pi pi-exclamation-triangle',
-            acceptButtonStyleClass: 'p-button-danger',
             accept: () => {
                 // TODO: Implement delete API call when available
                 console.log('Delete agreement:', agreement.id);
                 this.messageService.add({
                     severity: 'info',
-                    summary: 'Info',
-                    detail: 'Delete functionality to be implemented'
+                    summary: this.translate.instant('common.info'),
+                    detail: this.translate.instant('agreements.confirmDelete.notImplemented')
                 });
 
                 // After successful deletion, reload the list
