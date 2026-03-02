@@ -1,6 +1,7 @@
 // Services
 export * from './services/loading.service';
 export * from './services/api.service';
+export * from './services/attachment.service';
 
 // Components
 export * from './components/sidebar/sidebar.component';
