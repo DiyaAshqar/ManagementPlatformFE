@@ -22,8 +22,9 @@
 
 
 .breadcrumbs-wrapper {
-  max-width: 18.75rem;
+  max-width: 100%;
   overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .top-nav-actions {

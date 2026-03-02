@@ -106,4 +106,9 @@ export class SidebarComponent implements OnInit {
     if (!route) return false;
     return this.router.url === route;
   }
+
+  goHome(): void {
+    this.router.navigate(['/agreement-wizard']);
+    this.closeMobileMenu();
+  }
 }

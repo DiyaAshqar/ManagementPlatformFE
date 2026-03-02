@@ -60,6 +60,14 @@
   display: flex;
   align-items: center;
   border-bottom: 1px solid var(--surface-border);
+
+  > div {
+    transition: opacity 0.2s;
+    
+    &:hover {
+      opacity: 0.8;
+    }
+  }
 }
 
 .sidebar-logo {
