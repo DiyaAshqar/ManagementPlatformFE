@@ -21,31 +21,9 @@
 
 
 
-.breadcrumbs {
-  font-size: 0.875rem;
+.breadcrumbs-wrapper {
   max-width: 18.75rem;
   overflow: hidden;
-
-  .breadcrumb-item {
-    color: var(--text-color);
-    text-decoration: none;
-    white-space: nowrap;
-    transition: color 0.2s;
-
-    &:hover {
-      color: var(--primary-color);
-    }
-
-    &.current {
-      color: var(--text-color-secondary);
-      font-weight: 500;
-    }
-  }
-
-  .breadcrumb-separator {
-    color: var(--text-color-secondary);
-    font-size: 0.75rem;
-  }
 }
 
 .top-nav-actions {

@@ -20,11 +20,11 @@
             <p-tabs [(value)]="activeTabs[stage.id!]" (valueChange)="onTabChange(stage.id!, $event)">
               <p-tablist>
                 <p-tab value="0">Bill of Quantities</p-tab>
-                <p-tab value="1">Purchase Orders</p-tab>
-                <p-tab value="2">Surveying Visits</p-tab>
-                <p-tab value="3">Voucher Orders</p-tab>
-                <p-tab value="4">Project Main Contractor</p-tab>
-                <p-tab value="5">Documents</p-tab>
+                <p-tab value="1">Project Main Contractor</p-tab>
+                <p-tab value="2">Purchase Orders</p-tab>
+                <p-tab value="3">Surveying Visits</p-tab>
+                <p-tab value="4">Voucher Orders</p-tab>
+                <p-tab value="5">Progect Documents</p-tab>
               </p-tablist>
 
               <p-tabpanels>
@@ -36,25 +36,25 @@
 
                 <p-tabpanel value="1">
                   @if (shouldLoadTab(stage.id!, '1')) {
-                    <app-purchase-orders-tab [projectStageId]="stage.id!"></app-purchase-orders-tab>
+                    <app-project-main-contractor-tab [projectStageId]="stage.id!"></app-project-main-contractor-tab>
                   }
                 </p-tabpanel>
 
                 <p-tabpanel value="2">
                   @if (shouldLoadTab(stage.id!, '2')) {
-                    <app-surveying-visits-tab [projectStageId]="stage.id!"></app-surveying-visits-tab>
+                    <app-purchase-orders-tab [projectStageId]="stage.id!"></app-purchase-orders-tab>
                   }
                 </p-tabpanel>
 
                 <p-tabpanel value="3">
                   @if (shouldLoadTab(stage.id!, '3')) {
-                    <app-voucher-orders-tab [projectStageId]="stage.id!"></app-voucher-orders-tab>
+                    <app-surveying-visits-tab [projectStageId]="stage.id!"></app-surveying-visits-tab>
                   }
                 </p-tabpanel>
 
                 <p-tabpanel value="4">
                   @if (shouldLoadTab(stage.id!, '4')) {
-                    <app-project-main-contractor-tab [projectStageId]="stage.id!"></app-project-main-contractor-tab>
+                    <app-voucher-orders-tab [projectStageId]="stage.id!"></app-voucher-orders-tab>
                   }
                 </p-tabpanel>
 

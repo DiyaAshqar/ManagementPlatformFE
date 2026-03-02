@@ -33,6 +33,24 @@
     "view": "View",
     "clearFilters": "Clear Filters"
   },
+  "breadcrumb": {
+    "home": "Home",
+    "management": "Management",
+    "dashboard": "Dashboard",
+    "agreementWizard": "Agreement Wizard",
+    "agreements": "Agreements",
+    "createAgreement": "Create Agreement",
+    "editAgreement": "Edit Agreement",
+    "viewAgreement": "View Agreement",
+    "projects": "Projects",
+    "projectDetails": "Project Details",
+    "constructor": "Constructors",
+    "newConstructor": "New Constructor",
+    "editConstructor": "Edit Constructor",
+    "supplier": "Suppliers",
+    "newSupplier": "New Supplier",
+    "editSupplier": "Edit Supplier"
+  },
   "agreements": {
     "title": "Agreements",
     "subtitle": "Manage all project agreements",

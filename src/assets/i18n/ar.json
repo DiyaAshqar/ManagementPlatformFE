@@ -33,6 +33,24 @@
     "view": "عرض",
     "clearFilters": "مسح الفلاتر"
   },
+  "breadcrumb": {
+    "home": "الرئيسية",
+    "management": "الإدارة",
+    "dashboard": "لوحة التحكم",
+    "agreementWizard": "معالج الاتفاقيات",
+    "agreements": "الاتفاقيات",
+    "createAgreement": "إنشاء اتفاقية",
+    "editAgreement": "تعديل اتفاقية",
+    "viewAgreement": "عرض اتفاقية",
+    "projects": "المشاريع",
+    "projectDetails": "تفاصيل المشروع",
+    "constructor": "المقاولون",
+    "newConstructor": "مقاول جديد",
+    "editConstructor": "تعديل مقاول",
+    "supplier": "الموردون",
+    "newSupplier": "مورد جديد",
+    "editSupplier": "تعديل مورد"
+  },
   "agreements": {
     "title": "الاتفاقيات",
     "subtitle": "إدارة جميع اتفاقيات المشاريع",

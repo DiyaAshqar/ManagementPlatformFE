@@ -84,7 +84,7 @@ export class MilestoneStageComponent implements OnInit {
   }
 
   getMilestoneTitle(index: number, stage: ProjectStageDto): string {
-    return `Milestone ${index + 1} - Stage #${stage.id}`;
+    return `Milestone ${index + 1}`;
   }
 }
 

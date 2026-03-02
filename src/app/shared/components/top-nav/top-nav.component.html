@@ -15,18 +15,8 @@
     </div>
 
     <!-- Breadcrumbs -->
-    <div class="breadcrumbs hidden sm:flex flex align-items-center gap-1">
-      <ng-container *ngFor="let crumb of breadcrumbs; let last = last">
-        <a *ngIf="crumb.url && !last" [href]="crumb.url" class="breadcrumb-item">
-          {{ crumb.label }}
-        </a>
-        <span *ngIf="!crumb.url || last" class="breadcrumb-item current">
-          {{ crumb.label }}
-        </span>
-        <i *ngIf="!last" class="pi breadcrumb-separator"
-          [ngClass]="languageService.isRightToLeft() ? 'pi-angle-left' : 'pi-angle-right'">
-        </i>
-      </ng-container>
+    <div class="breadcrumbs-wrapper hidden sm:flex">
+      <app-breadcrumb />
     </div>
 
     <!-- Actions -->
