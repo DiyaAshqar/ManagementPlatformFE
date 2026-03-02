@@ -51,7 +51,7 @@ export class AgreementWizardService {
   }
 
   getAttachmentsByAgreementId(agreementId: number): Observable<GetAttachmentMetaDataListResponse> {
-    return this.attachmentClient.getAttachmentsByAgreementId(agreementId);
+    return this.attachmentClient.getAttachmentsByAgreementId(agreementId, undefined);
   }
 
   downloadAttachment(id: number): Observable<void> {

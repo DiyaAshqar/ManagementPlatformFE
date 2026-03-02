@@ -47,6 +47,7 @@ export class SidebarComponent implements OnInit {
     {
       title: 'Overview',
       items: [
+        { label: 'Dashboard', icon: 'pi pi-home', route: '/dashboard' },
         { label: 'Project Management', icon: 'pi pi-th-large', route: '/projects' },
         { label: 'Agreement Wizard', icon: 'pi pi-briefcase', route: '/agreement-wizard' },
         { label: 'Constructors', icon: 'pi pi-users', route: '/constructor' },
@@ -108,7 +109,7 @@ export class SidebarComponent implements OnInit {
   }
 
   goHome(): void {
-    this.router.navigate(['/agreement-wizard']);
+    this.router.navigate(['/dashboard']);
     this.closeMobileMenu();
   }
 }

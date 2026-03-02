@@ -342,7 +342,7 @@ export class Step7Component implements OnInit, OnDestroy {
 
     this.isLoading.set(true);
     this.attachmentClient
-      .getAttachmentsByAgreementId(agreementId)
+      .getAttachmentsByAgreementId(agreementId, undefined)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.isLoading.set(false))

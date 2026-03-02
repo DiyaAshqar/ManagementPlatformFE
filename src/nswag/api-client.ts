@@ -322,13 +322,76 @@ export class AttachmentClient {
     }
 
     /**
+     * @param body (optional) 
      * @return OK
      */
-    getAttachmentsByAgreementId(agreementId: number): Observable<GetAttachmentMetaDataListResponse> {
-        let url_ = this.baseUrl + "/api/Attachment/agreement/{agreementId}";
-        if (agreementId === undefined || agreementId === null)
-            throw new globalThis.Error("The parameter 'agreementId' must be defined.");
-        url_ = url_.replace("{agreementId}", encodeURIComponent("" + agreementId));
+    createOrUpdate(body: UploadAttachmentCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/Attachment/upload";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param relationshipId (optional) 
+     * @param attachmentType (optional) 
+     * @return OK
+     */
+    getAttachmentsByAgreementId(relationshipId: number | undefined, attachmentType: AttachmentType | undefined): Observable<GetAttachmentMetaDataListResponse> {
+        let url_ = this.baseUrl + "/api/Attachment?";
+        if (relationshipId === null)
+            throw new globalThis.Error("The parameter 'relationshipId' cannot be null.");
+        else if (relationshipId !== undefined)
+            url_ += "relationshipId=" + encodeURIComponent("" + relationshipId) + "&";
+        if (attachmentType === null)
+            throw new globalThis.Error("The parameter 'attachmentType' cannot be null.");
+        else if (attachmentType !== undefined)
+            url_ += "attachmentType=" + encodeURIComponent("" + attachmentType) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -3285,7 +3348,6 @@ export class Agreement implements IAgreement {
     projectAreaUnits?: ProjectAreaUnit[] | undefined;
     supplierServices?: SupplierService[] | undefined;
     quantityBills?: QuantityBill[] | undefined;
-    attachments?: Attachment[] | undefined;
     projects?: Project[] | undefined;
 
     constructor(data?: IAgreement) {
@@ -3348,11 +3410,6 @@ export class Agreement implements IAgreement {
                 this.quantityBills = [] as any;
                 for (let item of _data["quantityBills"])
                     this.quantityBills!.push(QuantityBill.fromJS(item));
-            }
-            if (Array.isArray(_data["attachments"])) {
-                this.attachments = [] as any;
-                for (let item of _data["attachments"])
-                    this.attachments!.push(Attachment.fromJS(item));
             }
             if (Array.isArray(_data["projects"])) {
                 this.projects = [] as any;
@@ -3421,11 +3478,6 @@ export class Agreement implements IAgreement {
             for (let item of this.quantityBills)
                 data["quantityBills"].push(item ? item.toJSON() : undefined as any);
         }
-        if (Array.isArray(this.attachments)) {
-            data["attachments"] = [];
-            for (let item of this.attachments)
-                data["attachments"].push(item ? item.toJSON() : undefined as any);
-        }
         if (Array.isArray(this.projects)) {
             data["projects"] = [];
             for (let item of this.projects)
@@ -3466,7 +3518,6 @@ export interface IAgreement {
     projectAreaUnits?: ProjectAreaUnit[] | undefined;
     supplierServices?: SupplierService[] | undefined;
     quantityBills?: QuantityBill[] | undefined;
-    attachments?: Attachment[] | undefined;
     projects?: Project[] | undefined;
 }
 
@@ -3870,70 +3921,12 @@ export interface IAnnex {
     name: string | undefined;
 }
 
-export class Attachment implements IAttachment {
-    id?: number;
-    isDeleted?: boolean;
-    fileUrl!: string | undefined;
-    fileName!: string | undefined;
-    filePath!: string | undefined;
-    agreementId?: number;
-    agreement?: Agreement;
-
-    constructor(data?: IAttachment) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (this as any)[property] = (data as any)[property];
-            }
-        }
-    }
-
-    init(_data?: any) {
-        if (_data) {
-            this.id = _data["id"];
-            this.isDeleted = _data["isDeleted"];
-            this.fileUrl = _data["fileUrl"];
-            this.fileName = _data["fileName"];
-            this.filePath = _data["filePath"];
-            this.agreementId = _data["agreementId"];
-            this.agreement = _data["agreement"] ? Agreement.fromJS(_data["agreement"]) : undefined as any;
-        }
-    }
-
-    static fromJS(data: any): Attachment {
-        data = typeof data === 'object' ? data : {};
-        let result = new Attachment();
-        result.init(data);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {};
-        data["id"] = this.id;
-        data["isDeleted"] = this.isDeleted;
-        data["fileUrl"] = this.fileUrl;
-        data["fileName"] = this.fileName;
-        data["filePath"] = this.filePath;
-        data["agreementId"] = this.agreementId;
-        data["agreement"] = this.agreement ? this.agreement.toJSON() : undefined as any;
-        return data;
-    }
-}
-
-export interface IAttachment {
-    id?: number;
-    isDeleted?: boolean;
-    fileUrl: string | undefined;
-    fileName: string | undefined;
-    filePath: string | undefined;
-    agreementId?: number;
-    agreement?: Agreement;
-}
-
 export class AttachmentDto implements IAttachmentDto {
     id?: number;
-    fileName!: string | undefined;
-    filePath!: string | undefined;
+    attachmentType?: AttachmentType;
+    relationshipId?: number;
+    fileName?: string | undefined;
+    filePath?: string | undefined;
     base64Data?: string | undefined;
     contentType?: string | undefined;
     isDeleted?: boolean;
@@ -3950,6 +3943,8 @@ export class AttachmentDto implements IAttachmentDto {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.attachmentType = _data["attachmentType"];
+            this.relationshipId = _data["relationshipId"];
             this.fileName = _data["fileName"];
             this.filePath = _data["filePath"];
             this.base64Data = _data["base64Data"];
@@ -3968,6 +3963,8 @@ export class AttachmentDto implements IAttachmentDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["attachmentType"] = this.attachmentType;
+        data["relationshipId"] = this.relationshipId;
         data["fileName"] = this.fileName;
         data["filePath"] = this.filePath;
         data["base64Data"] = this.base64Data;
@@ -3979,11 +3976,22 @@ export class AttachmentDto implements IAttachmentDto {
 
 export interface IAttachmentDto {
     id?: number;
-    fileName: string | undefined;
-    filePath: string | undefined;
+    attachmentType?: AttachmentType;
+    relationshipId?: number;
+    fileName?: string | undefined;
+    filePath?: string | undefined;
     base64Data?: string | undefined;
     contentType?: string | undefined;
     isDeleted?: boolean;
+}
+
+export enum AttachmentType {
+    _1 = 1,
+    _2 = 2,
+    _3 = 3,
+    _4 = 4,
+    _5 = 5,
+    _6 = 6,
 }
 
 export class BooleanResponse implements IBooleanResponse {
@@ -5884,9 +5892,9 @@ export interface IGetAllAgreementDtoListPagedResponseResponse {
 
 export class GetAttachmentMetaData implements IGetAttachmentMetaData {
     id?: number;
-    fileName!: string | undefined;
-    filePath!: string | undefined;
-    agreementId?: number;
+    fileName?: string | undefined;
+    filePath?: string | undefined;
+    relationshipId?: number;
 
     constructor(data?: IGetAttachmentMetaData) {
         if (data) {
@@ -5902,7 +5910,7 @@ export class GetAttachmentMetaData implements IGetAttachmentMetaData {
             this.id = _data["id"];
             this.fileName = _data["fileName"];
             this.filePath = _data["filePath"];
-            this.agreementId = _data["agreementId"];
+            this.relationshipId = _data["relationshipId"];
         }
     }
 
@@ -5918,16 +5926,16 @@ export class GetAttachmentMetaData implements IGetAttachmentMetaData {
         data["id"] = this.id;
         data["fileName"] = this.fileName;
         data["filePath"] = this.filePath;
-        data["agreementId"] = this.agreementId;
+        data["relationshipId"] = this.relationshipId;
         return data;
     }
 }
 
 export interface IGetAttachmentMetaData {
     id?: number;
-    fileName: string | undefined;
-    filePath: string | undefined;
-    agreementId?: number;
+    fileName?: string | undefined;
+    filePath?: string | undefined;
+    relationshipId?: number;
 }
 
 export class GetAttachmentMetaDataListResponse implements IGetAttachmentMetaDataListResponse {
@@ -11569,6 +11577,62 @@ export class Unit implements IUnit {
 export interface IUnit {
     id?: number;
     name: string | undefined;
+}
+
+export class UploadAttachmentCommand implements IUploadAttachmentCommand {
+    attachmentType?: AttachmentType;
+    relationshipId?: number;
+    fileName?: string | undefined;
+    filePath?: string | undefined;
+    base64Data?: string | undefined;
+    contentType?: string | undefined;
+
+    constructor(data?: IUploadAttachmentCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.attachmentType = _data["attachmentType"];
+            this.relationshipId = _data["relationshipId"];
+            this.fileName = _data["fileName"];
+            this.filePath = _data["filePath"];
+            this.base64Data = _data["base64Data"];
+            this.contentType = _data["contentType"];
+        }
+    }
+
+    static fromJS(data: any): UploadAttachmentCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new UploadAttachmentCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["attachmentType"] = this.attachmentType;
+        data["relationshipId"] = this.relationshipId;
+        data["fileName"] = this.fileName;
+        data["filePath"] = this.filePath;
+        data["base64Data"] = this.base64Data;
+        data["contentType"] = this.contentType;
+        return data;
+    }
+}
+
+export interface IUploadAttachmentCommand {
+    attachmentType?: AttachmentType;
+    relationshipId?: number;
+    fileName?: string | undefined;
+    filePath?: string | undefined;
+    base64Data?: string | undefined;
+    contentType?: string | undefined;
 }
 
 function formatDate(d: Date) {
