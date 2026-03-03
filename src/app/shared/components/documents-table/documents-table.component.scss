@@ -1,20 +1,22 @@
 :host {
   display: block;
-  padding-top: 1rem;
 }
 
-// Drop zone active state
-.drop-zone--active {
-  border-color: var(--primary-color) !important;
-  background-color: color-mix(in srgb, var(--primary-color) 5%, transparent);
+.drop-zone {
+  &:hover {
+    background: var(--surface-hover);
+  }
+
+  &--active {
+    border-color: var(--primary-color) !important;
+    background-color: color-mix(in srgb, var(--primary-color) 5%, transparent);
+  }
 }
 
-// Constrain selected files list height
 .selected-files-list {
   max-height: 15rem;
 }
 
-// Table tweaks
 :deep(.p-datatable) {
   .p-datatable-thead > tr > th {
     background: var(--surface-ground);

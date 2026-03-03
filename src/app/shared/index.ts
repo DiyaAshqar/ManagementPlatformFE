@@ -4,6 +4,9 @@ export * from './services/api.service';
 export * from './services/attachment.service';
 
 // Components
+export * from './components/documents-table/documents-table.component';
+
+// Components
 export * from './components/sidebar/sidebar.component';
 export * from './components/top-nav/top-nav.component';
 export * from './components/breadcrumb/breadcrumb.component';
