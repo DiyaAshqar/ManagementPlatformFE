@@ -77,17 +77,18 @@
                 <div class="grid">
                     @for (service of services(); track service.id) {
                     <div class="col-12 md:col-6 lg:col-4 mb-2">
-                        <div class="service-item p-3 border-2 border-round cursor-pointer transition-all transition-duration-200"
+                        <div class="service-item p-3 border-2 border-round cursor-pointer transition-all transition-duration-200 surface-card"
                             [class.border-primary]="isServiceSelected(service.id)"
-                            [class.bg-primary-50]="isServiceSelected(service.id)"
-                            [class.border-surface-200]="!isServiceSelected(service.id)"
+                            [class.border-3]="isServiceSelected(service.id)"
+                            [class.surface-border]="!isServiceSelected(service.id)"
                             (click)="toggleService(service.id)">
                             <div class="flex align-items-center gap-2">
                                 <i class="pi transition-all" [class.pi-check-circle]="isServiceSelected(service.id)"
                                     [class.pi-circle]="!isServiceSelected(service.id)"
                                     [class.text-primary]="isServiceSelected(service.id)"
                                     [class.text-500]="!isServiceSelected(service.id)"></i>
-                                <span [class.font-semibold]="isServiceSelected(service.id)">{{ service.name }}</span>
+                                <span [class.font-semibold]="isServiceSelected(service.id)" 
+                                    [class.text-primary]="isServiceSelected(service.id)">{{ service.name }}</span>
                             </div>
                         </div>
                     </div>
