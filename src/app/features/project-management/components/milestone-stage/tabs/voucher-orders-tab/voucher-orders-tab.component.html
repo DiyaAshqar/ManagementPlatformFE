@@ -5,16 +5,16 @@
   <!-- Header -->
   <div class="vo-card-header">
     <div>
-      <h3 class="vo-card-title">Voucher Orders</h3>
-      <p class="vo-card-subtitle">Manage voucher orders and approvals</p>
+      <h3 class="vo-card-title">{{ 'projectTabs.voucherOrders.title' | translate }}</h3>
+      <p class="vo-card-subtitle">{{ 'projectTabs.voucherOrders.subtitle' | translate }}</p>
     </div>
   </div>
 
   <!-- Toolbar -->
   <div class="vo-toolbar">
-    <span class="vo-total-label">Total Voucher Orders: {{ voItems().length }}</span>
+    <span class="vo-total-label">{{ 'projectTabs.voucherOrders.totalLabel' | translate }}: {{ voItems().length }}</span>
     <p-button
-      label="Create Voucher Order"
+      [label]="'projectTabs.voucherOrders.createButton' | translate"
       icon="pi pi-plus"
       (onClick)="openAddDialog()"
       severity="contrast"
@@ -31,18 +31,18 @@
 
     <ng-template pTemplate="header">
       <tr>
-        <th>VO Number</th>
-        <th>VO Item</th>
-        <th>Description</th>
-        <th class="text-right">Quantity</th>
-        <th>Unit</th>
-        <th class="text-right">Amount</th>
-        <th class="text-right">Subtotal</th>
-        <th class="text-center">Is Effected</th>
-        <th>Effected Date Start</th>
-        <th>Effected Date End</th>
-        <th>Approval Status</th>
-        <th class="text-center">Actions</th>
+        <th>{{ 'projectTabs.voucherOrders.voNumber' | translate }}</th>
+        <th>{{ 'projectTabs.voucherOrders.voItem' | translate }}</th>
+        <th>{{ 'projectTabs.voucherOrders.description' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.voucherOrders.quantity' | translate }}</th>
+        <th>{{ 'projectTabs.voucherOrders.unit' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.voucherOrders.amount' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.voucherOrders.subtotal' | translate }}</th>
+        <th class="text-center">{{ 'projectTabs.voucherOrders.isEffected' | translate }}</th>
+        <th>{{ 'projectTabs.voucherOrders.effectedDateStart' | translate }}</th>
+        <th>{{ 'projectTabs.voucherOrders.effectedDateEnd' | translate }}</th>
+        <th>{{ 'projectTabs.voucherOrders.approvalStatus' | translate }}</th>
+        <th class="text-center">{{ 'projectTabs.voucherOrders.actions' | translate }}</th>
       </tr>
     </ng-template>
 
@@ -57,7 +57,7 @@
         <td class="text-right vo-subtotal">{{ item.subTotal | currency:'USD':'symbol':'1.0-0' }}</td>
         <td class="text-center">
           <p-badge 
-            [value]="item.isEffected ? 'Yes' : 'No'" 
+            [value]="item.isEffected ? ('projectTabs.voucherOrders.yes' | translate) : ('projectTabs.voucherOrders.no' | translate)" 
             [severity]="item.isEffected ? 'success' : 'secondary'">
           </p-badge>
         </td>
@@ -89,7 +89,7 @@
               severity="secondary"
               [text]="true"
               size="small"
-              pTooltip="Edit"
+              [pTooltip]="'projectTabs.voucherOrders.editTooltip' | translate"
               tooltipPosition="top"
               (onClick)="openEditDialog(item)">
             </p-button>
@@ -99,7 +99,7 @@
               severity="danger"
               [text]="true"
               size="small"
-              pTooltip="Delete"
+              [pTooltip]="'projectTabs.voucherOrders.deleteTooltip' | translate"
               tooltipPosition="top"
               (onClick)="confirmDelete(item)">
             </p-button>
@@ -120,7 +120,7 @@
           } @else {
             <div class="py-4">
               <i class="pi pi-receipt" style="font-size: 2rem; color: var(--text-color-secondary); opacity: 0.5;"></i>
-              <p style="margin-top: 1rem; color: var(--text-color-secondary);">No voucher orders found. Click "Create Voucher Order" to add one.</p>
+              <p style="margin-top: 1rem; color: var(--text-color-secondary);">{{ 'projectTabs.voucherOrders.emptyMessage' | translate }}</p>
             </div>
           }
         </td>
@@ -131,7 +131,7 @@
       @if (!isLoading()) {
         <tr class="vo-grand-total-row">
           <td colspan="6" class="text-right">
-            <span class="vo-grand-total-label">Total VO Value:</span>
+            <span class="vo-grand-total-label">{{ 'projectTabs.voucherOrders.totalVOValue' | translate }}:</span>
           </td>
           <td class="text-right vo-grand-total-value">
             {{ totalVOValue | currency:'USD':'symbol':'1.0-0' }}

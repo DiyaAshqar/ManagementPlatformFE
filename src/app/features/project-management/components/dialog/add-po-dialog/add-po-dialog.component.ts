@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -19,6 +20,7 @@ import { CreateProjectPOCommand, IGetProjectPODto } from '../../../../../../nswa
     standalone: true,
     imports: [
         CommonModule,
+        TranslateModule,
         ReactiveFormsModule,
         DialogModule,
         ButtonModule,
@@ -43,19 +45,22 @@ export class AddPoDialogComponent implements OnInit, OnChanges {
     poForm!: FormGroup;
     isSubmitting = signal(false);
 
-    // Status options
-    statusOptions = [
-        { label: 'Approved', value: 1 },
-        { label: 'Pending', value: 2 },
-        { label: 'Rejected', value: 3 }
-    ];
+    get statusOptions() {
+        return [
+            { label: this.translate.instant('projectTabs.po.statusApproved') || 'Approved', value: 1 },
+            { label: this.translate.instant('projectTabs.po.statusPending') || 'Pending', value: 2 },
+            { label: this.translate.instant('projectTabs.po.statusRejected') || 'Rejected', value: 3 }
+        ];
+    }
 
     get isEditMode(): boolean {
         return !!this.editItem;
     }
 
     get dialogHeader(): string {
-        return this.isEditMode ? 'Edit Purchase Order' : 'Create Purchase Order';
+        return this.isEditMode 
+            ? this.translate.instant('dialogs.purchaseOrder.editTitle')
+            : this.translate.instant('dialogs.purchaseOrder.addTitle');
     }
 
     get computedSubTotal(): number {
@@ -67,7 +72,7 @@ export class AddPoDialogComponent implements OnInit, OnChanges {
     @Input() unitOptions: { label: string; value: number }[] = [];
     @Input() supplierOptions: { label: string; value: number }[] = [];
 
-    constructor(private fb: FormBuilder, private messageService: MessageService) { }
+    constructor(private fb: FormBuilder, private messageService: MessageService, private translate: TranslateService) { }
 
     ngOnInit(): void {
         this.initForm();

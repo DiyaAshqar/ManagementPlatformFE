@@ -25,9 +25,9 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('visitDate')">
             </p-datepicker>
-            <label for="visitDate">Visit Date *</label>
+            <label for="visitDate">{{ 'dialogs.surveyingVisit.visitDate' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('visitDate')" class="p-error">Visit date is required.</small>
+          <small *ngIf="isFieldInvalid('visitDate')" class="p-error">{{ 'dialogs.surveyingVisit.visitDateRequired' | translate }}</small>
         </div>
       </div>
 
@@ -41,9 +41,9 @@
               formControlName="surveyor"
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('surveyor')" />
-            <label for="surveyor">Surveyor *</label>
+            <label for="surveyor">{{ 'dialogs.surveyingVisit.surveyor' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('surveyor')" class="p-error">Surveyor is required.</small>
+          <small *ngIf="isFieldInvalid('surveyor')" class="p-error">{{ 'dialogs.surveyingVisit.surveyorRequired' | translate }}</small>
         </div>
       </div>
 
@@ -59,9 +59,9 @@
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('purpose')">
             </textarea>
-            <label for="purpose">Purpose *</label>
+            <label for="purpose">{{ 'dialogs.surveyingVisit.purpose' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('purpose')" class="p-error">Purpose is required.</small>
+          <small *ngIf="isFieldInvalid('purpose')" class="p-error">{{ 'dialogs.surveyingVisit.purposeRequired' | translate }}</small>
         </div>
       </div>
 
@@ -80,9 +80,9 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('unitId')">
             </p-select>
-            <label for="unitId">Unit *</label>
+            <label for="unitId">{{ 'dialogs.surveyingVisit.unit' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('unitId')" class="p-error">Unit is required.</small>
+          <small *ngIf="isFieldInvalid('unitId')" class="p-error">{{ 'dialogs.surveyingVisit.unitRequired' | translate }}</small>
         </div>
       </div>
 
@@ -99,9 +99,9 @@
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('quantity')">
             </p-inputnumber>
-            <label for="quantity">Quantity *</label>
+            <label for="quantity">{{ 'dialogs.surveyingVisit.quantity' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('quantity')" class="p-error">Quantity is required.</small>
+          <small *ngIf="isFieldInvalid('quantity')" class="p-error">{{ 'dialogs.surveyingVisit.quantityRequired' | translate }}</small>
         </div>
       </div>
 
@@ -120,9 +120,9 @@
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('price')">
             </p-inputnumber>
-            <label for="price">Unit Price *</label>
+            <label for="price">{{ 'dialogs.surveyingVisit.unitPrice' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('price')" class="p-error">Unit price is required.</small>
+          <small *ngIf="isFieldInvalid('price')" class="p-error">{{ 'dialogs.surveyingVisit.unitPriceRequired' | translate }}</small>
         </div>
       </div>
 
@@ -140,16 +140,16 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('status')">
             </p-select>
-            <label for="status">Status *</label>
+            <label for="status">{{ 'dialogs.surveyingVisit.status' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('status')" class="p-error">Status is required.</small>
+          <small *ngIf="isFieldInvalid('status')" class="p-error">{{ 'dialogs.surveyingVisit.statusRequired' | translate }}</small>
         </div>
       </div>
 
       <!-- Subtotal preview -->
       <div class="col-12">
         <div class="sv-subtotal-preview">
-          <span class="label">Subtotal:</span>
+          <span class="label">{{ 'dialogs.surveyingVisit.subtotal' | translate }}:</span>
           <span class="value">{{ computedSubTotal | currency:'USD':'symbol':'1.2-2' }}</span>
         </div>
       </div>
@@ -159,14 +159,14 @@
 
   <ng-template pTemplate="footer">
     <p-button
-      label="Cancel"
+      [label]="'dialogs.surveyingVisit.cancel' | translate"
       icon="pi pi-times"
       (onClick)="onHide()"
       severity="secondary"
       [outlined]="true">
     </p-button>
     <p-button
-      [label]="isEditMode ? 'Update' : 'Schedule Visit'"
+      [label]="(isEditMode ? 'dialogs.surveyingVisit.update' : 'dialogs.surveyingVisit.schedule') | translate"
       icon="pi pi-check"
       (onClick)="onSubmit()"
       [loading]="isSubmitting()"

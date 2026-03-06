@@ -5,19 +5,19 @@
   <!-- Header -->
   <div class="contractor-card-header">
     <div>
-      <h3 class="contractor-card-title">Project Main Contractor</h3>
-      <p class="contractor-card-subtitle">Manage main contractor information for this stage</p>
+      <h3 class="contractor-card-title">{{ 'projectTabs.projectMainContractor.cardTitle' | translate }}</h3>
+      <p class="contractor-card-subtitle">{{ 'projectTabs.projectMainContractor.cardSubtitle' | translate }}</p>
     </div>
   </div>
 
   <!-- Toolbar -->
   <div class="contractor-toolbar">
     <div class="contractor-stats">
-      <span class="contractor-total-label">Total Contractors: {{ contractorItems().length }}</span>
-      <span class="contractor-value-label">Total Value: {{ totalContractValue | currency:'USD':'symbol':'1.0-0' }}</span>
+      <span class="contractor-total-label">{{ 'projectTabs.projectMainContractor.totalContractors' | translate }}: {{ contractorItems().length }}</span>
+      <span class="contractor-value-label">{{ 'projectTabs.projectMainContractor.totalValue' | translate }}: {{ totalContractValue | currency:'USD':'symbol':'1.0-0' }}</span>
     </div>
     <p-button
-      label="Add Contractor"
+      [label]="'projectTabs.projectMainContractor.addContractor' | translate"
       icon="pi pi-plus"
       (onClick)="openAddDialog()"
       severity="contrast"
@@ -35,12 +35,12 @@
 
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 5rem">ID</th>
-        <th>Contractor Name</th>
-        <th class="text-right">Contract Amount</th>
-        <th>Start Date</th>
-        <th>End Date</th>
-        <th class="text-center" style="width: 10rem">Actions</th>
+        <th style="width: 5rem">{{ 'projectTabs.projectMainContractor.columnId' | translate }}</th>
+        <th>{{ 'projectTabs.projectMainContractor.columnName' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.projectMainContractor.columnAmount' | translate }}</th>
+        <th>{{ 'projectTabs.projectMainContractor.columnStartDate' | translate }}</th>
+        <th>{{ 'projectTabs.projectMainContractor.columnEndDate' | translate }}</th>
+        <th class="text-center" style="width: 10rem">{{ 'common.actions' | translate }}</th>
       </tr>
     </ng-template>
 
@@ -63,7 +63,7 @@
               severity="secondary"
               [text]="true"
               size="small"
-              pTooltip="Edit"
+              [pTooltip]="'common.edit' | translate"
               tooltipPosition="top"
               (onClick)="openEditDialog(item)">
             </p-button>
@@ -73,7 +73,7 @@
               severity="danger"
               [text]="true"
               size="small"
-              pTooltip="Delete"
+              [pTooltip]="'common.delete' | translate"
               tooltipPosition="top"
               (onClick)="confirmDelete(item)">
             </p-button>
@@ -86,8 +86,8 @@
       <tr>
         <td colspan="6" class="text-center empty-state">
           <i class="pi pi-users" style="font-size: 3rem; color: var(--text-color-secondary);"></i>
-          <p class="mt-3">No contractors found for this stage</p>
-          <p class="text-sm text-muted-color">Click "Add Contractor" to get started</p>
+          <p class="mt-3">{{ 'projectTabs.projectMainContractor.emptyMessage' | translate }}</p>
+          <p class="text-sm text-muted-color">{{ 'projectTabs.projectMainContractor.emptySubMessage' | translate }}</p>
         </td>
       </tr>
     </ng-template>

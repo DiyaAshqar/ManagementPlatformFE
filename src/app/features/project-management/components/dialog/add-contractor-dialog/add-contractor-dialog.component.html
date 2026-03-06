@@ -22,15 +22,15 @@
               optionLabel="label"
               optionValue="value"
               [filter]="true"
-              filterPlaceholder="Search contractor..."
+              [filterPlaceholder]="'dialogs.contractor.searchContractor' | translate"
               [showClear]="true"
               class="w-full"
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('constructorId')">
             </p-select>
-            <label for="constructorId">Contractor *</label>
+            <label for="constructorId">{{ 'dialogs.contractor.contractor' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('constructorId')" class="p-error">Contractor is required.</small>
+          <small *ngIf="isFieldInvalid('constructorId')" class="p-error">{{ 'dialogs.contractor.contractorRequired' | translate }}</small>
         </div>
       </div>
 
@@ -47,9 +47,9 @@
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('amount')">
             </p-inputnumber>
-            <label for="amount">Contract Amount *</label>
+            <label for="amount">{{ 'dialogs.contractor.contractAmount' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('amount')" class="p-error">Amount is required and must be positive.</small>
+          <small *ngIf="isFieldInvalid('amount')" class="p-error">{{ 'dialogs.contractor.amountRequired' | translate }}</small>
         </div>
       </div>
 
@@ -67,9 +67,9 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('startDate')">
             </p-calendar>
-            <label for="startDate">Start Date *</label>
+            <label for="startDate">{{ 'dialogs.contractor.startDate' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('startDate')" class="p-error">Start date is required.</small>
+          <small *ngIf="isFieldInvalid('startDate')" class="p-error">{{ 'dialogs.contractor.startDateRequired' | translate }}</small>
         </div>
       </div>
 
@@ -87,9 +87,9 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('endDate')">
             </p-calendar>
-            <label for="endDate">End Date *</label>
+            <label for="endDate">{{ 'dialogs.contractor.endDate' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('endDate')" class="p-error">End date is required.</small>
+          <small *ngIf="isFieldInvalid('endDate')" class="p-error">{{ 'dialogs.contractor.endDateRequired' | translate }}</small>
         </div>
       </div>
 
@@ -98,14 +98,14 @@
     <!-- Actions -->
     <div class="flex justify-end gap-3 mt-4">
       <p-button
-        label="Cancel"
+        [label]="'common.cancel' | translate"
         severity="secondary"
         [outlined]="true"
         (onClick)="onHide()"
         type="button">
       </p-button>
       <p-button
-        [label]="isEditMode ? 'Update' : 'Add'"
+        [label]="isEditMode ? ('common.update' | translate) : ('dialogs.contractor.add' | translate)"
         type="submit"
         [loading]="isSubmitting()">
       </p-button>

@@ -11,6 +11,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import {
   CreateProjectSurveyingVisitCommand,
@@ -28,6 +29,7 @@ export enum VisitStatus {
   standalone: true,
   imports: [
     CommonModule,
+    TranslateModule,
     ReactiveFormsModule,
     DialogModule,
     ButtonModule,
@@ -53,14 +55,20 @@ export class AddSurveyingVisitDialogComponent implements OnInit, OnChanges {
   visitForm!: FormGroup;
   isSubmitting = signal(false);
 
-  readonly statusOptions = [
-    { label: 'In Progress', value: VisitStatus.InProgress },
-    { label: 'Scheduled', value: VisitStatus.Scheduled },
-    { label: 'Completed', value: VisitStatus.Completed }
-  ];
+  get statusOptions() {
+    return [
+      { label: this.translate.instant('dialogs.surveyingVisit.statusInProgress'), value: VisitStatus.InProgress },
+      { label: this.translate.instant('dialogs.surveyingVisit.statusScheduled'), value: VisitStatus.Scheduled },
+      { label: this.translate.instant('dialogs.surveyingVisit.statusCompleted'), value: VisitStatus.Completed }
+    ];
+  }
 
   get isEditMode(): boolean { return !!this.editItem; }
-  get dialogHeader(): string { return this.isEditMode ? 'Edit Surveying Visit' : 'Schedule Visit'; }
+  get dialogHeader(): string {
+    return this.translate.instant(
+      this.isEditMode ? 'dialogs.surveyingVisit.editTitle' : 'dialogs.surveyingVisit.createTitle'
+    );
+  }
 
   get computedSubTotal(): number {
     const price = this.visitForm?.get('price')?.value ?? 0;
@@ -68,7 +76,10 @@ export class AddSurveyingVisitDialogComponent implements OnInit, OnChanges {
     return price * quantity;
   }
 
-  constructor(private fb: FormBuilder) { }
+  constructor(
+    private fb: FormBuilder,
+    private translate: TranslateService
+  ) { }
 
   ngOnInit(): void { this.initForm(); }
 

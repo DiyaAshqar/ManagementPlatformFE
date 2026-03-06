@@ -12,6 +12,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { MessageService } from 'primeng/api';
 import { CreateProjectVOCommand, IGetProjectVODto } from '../../../../../../nswag/api-client';
@@ -28,6 +29,7 @@ import { CreateProjectVOCommand, IGetProjectVODto } from '../../../../../../nswa
         TextareaModule,
         InputNumberModule,
         SelectModule,
+        TranslateModule,
         FloatLabelModule,
         CheckboxModule,
         DatePickerModule
@@ -48,18 +50,22 @@ export class AddVoDialogComponent implements OnInit, OnChanges {
     isSubmitting = signal(false);
 
     // Status options
-    statusOptions = [
-        { label: 'Approved', value: 1 },
-        { label: 'Pending', value: 2 },
-        { label: 'Rejected', value: 3 }
-    ];
+    get statusOptions() {
+        return [
+            { label: this.translate.instant('dialogs.voucherOrder.statusApproved'), value: 1 },
+            { label: this.translate.instant('dialogs.voucherOrder.statusPending'), value: 2 },
+            { label: this.translate.instant('dialogs.voucherOrder.statusRejected'), value: 3 }
+        ];
+    }
 
     get isEditMode(): boolean {
         return !!this.editItem;
     }
 
     get dialogHeader(): string {
-        return this.isEditMode ? 'Edit Voucher Order' : 'Create Voucher Order';
+        return this.translate.instant(
+            this.isEditMode ? 'dialogs.voucherOrder.editTitle' : 'dialogs.voucherOrder.createTitle'
+        );
     }
 
     get computedSubTotal(): number {
@@ -75,7 +81,11 @@ export class AddVoDialogComponent implements OnInit, OnChanges {
     /** Dynamic lookup options received from the parent (voucher-orders-tab) */
     @Input() unitOptions: { label: string; value: number }[] = [];
 
-    constructor(private fb: FormBuilder, private messageService: MessageService) { }
+    constructor(
+        private fb: FormBuilder,
+        private messageService: MessageService,
+        private translate: TranslateService
+    ) { }
 
     ngOnInit(): void {
         this.initForm();

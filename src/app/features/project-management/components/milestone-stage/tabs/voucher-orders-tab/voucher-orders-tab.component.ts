@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { forkJoin } from 'rxjs';
-import { TranslateService } from '@ngx-translate/core';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -32,6 +32,7 @@ export enum VOStatus {
   standalone: true,
   imports: [
     CommonModule,
+    TranslateModule,
     TableModule,
     ButtonModule,
     TooltipModule,

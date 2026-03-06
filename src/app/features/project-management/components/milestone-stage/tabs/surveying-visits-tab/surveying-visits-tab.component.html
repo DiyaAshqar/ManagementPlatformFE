@@ -5,16 +5,16 @@
   <!-- Header -->
   <div class="sv-card-header">
     <div>
-      <h3 class="sv-card-title">Surveying Visits</h3>
-      <p class="sv-card-subtitle">Schedule and track site surveys</p>
+      <h3 class="sv-card-title">{{ 'projectTabs.surveyingVisits.title' | translate }}</h3>
+      <p class="sv-card-subtitle">{{ 'projectTabs.surveyingVisits.subtitle' | translate }}</p>
     </div>
   </div>
 
   <!-- Toolbar -->
   <div class="sv-toolbar">
-    <span class="sv-total-label">Total Surveying Visits: {{ visitItems().length }}</span>
+    <span class="sv-total-label">{{ 'projectTabs.surveyingVisits.totalLabel' | translate }}: {{ visitItems().length }}</span>
     <p-button
-      label="Schedule Visit"
+      [label]="'projectTabs.surveyingVisits.scheduleButton' | translate"
       icon="pi pi-plus"
       (onClick)="openAddDialog()"
       severity="contrast"
@@ -31,16 +31,16 @@
 
     <ng-template pTemplate="header">
       <tr>
-        <th>Visit Date</th>
-        <th>Surveyor</th>
-        <th>Purpose</th>
-        <th>Unit</th>
-        <th class="text-right">Quantity</th>
-        <th class="text-right">Unit Price</th>
-        <th class="text-right">Amount</th>
-        <th class="text-right">Subtotal</th>
-        <th>Status</th>
-        <th class="text-center">Actions</th>
+        <th>{{ 'projectTabs.surveyingVisits.visitDate' | translate }}</th>
+        <th>{{ 'projectTabs.surveyingVisits.surveyor' | translate }}</th>
+        <th>{{ 'projectTabs.surveyingVisits.purpose' | translate }}</th>
+        <th>{{ 'projectTabs.surveyingVisits.unit' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.surveyingVisits.quantity' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.surveyingVisits.unitPrice' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.surveyingVisits.amount' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.surveyingVisits.subtotal' | translate }}</th>
+        <th>{{ 'projectTabs.surveyingVisits.status' | translate }}</th>
+        <th class="text-center">{{ 'projectTabs.surveyingVisits.actions' | translate }}</th>
       </tr>
     </ng-template>
 
@@ -67,7 +67,7 @@
               [rounded]="true"
               [text]="true"
               severity="secondary"
-              pTooltip="Edit"
+              [pTooltip]="'projectTabs.surveyingVisits.editTooltip' | translate"
               tooltipPosition="top"
               (onClick)="openEditDialog(item)">
             </p-button>
@@ -76,7 +76,7 @@
               [rounded]="true"
               [text]="true"
               severity="danger"
-              pTooltip="Delete"
+              [pTooltip]="'projectTabs.surveyingVisits.deleteTooltip' | translate"
               tooltipPosition="top"
               (onClick)="confirmDelete(item)">
             </p-button>
@@ -97,7 +97,7 @@
           } @else {
             <div class="py-4">
               <i class="pi pi-map-marker" style="font-size: 2rem; color: var(--text-color-secondary); opacity: 0.5;"></i>
-              <p style="margin-top: 1rem; color: var(--text-color-secondary);">No surveying visits found. Click "Schedule Visit" to add one.</p>
+              <p style="margin-top: 1rem; color: var(--text-color-secondary);">{{ 'projectTabs.surveyingVisits.emptyMessage' | translate }}</p>
             </div>
           }
         </td>
@@ -108,7 +108,7 @@
       @if (!isLoading()) {
         <tr class="sv-grand-total-row">
           <td colspan="7" class="text-right">
-            <span class="sv-grand-total-label">Total Survey Value:</span>
+            <span class="sv-grand-total-label">{{ 'projectTabs.surveyingVisits.totalSurveyValue' | translate }}:</span>
           </td>
           <td class="text-right sv-grand-total-value">
             {{ totalSurveyValue | currency:'USD':'symbol':'1.0-0' }}

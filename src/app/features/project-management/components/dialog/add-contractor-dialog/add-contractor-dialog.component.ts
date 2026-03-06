@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslateService, TranslateModule } from '@ngx-translate/core';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -18,6 +19,7 @@ import { CreateProjectMainContractorCommand, IGetProjectMainContractorDto } from
   standalone: true,
   imports: [
     CommonModule,
+    TranslateModule,
     ReactiveFormsModule,
     DialogModule,
     ButtonModule,
@@ -46,13 +48,15 @@ export class AddContractorDialogComponent implements OnInit, OnChanges {
   }
 
   get dialogHeader(): string {
-    return this.isEditMode ? 'Edit Main Contractor' : 'Add Main Contractor';
+    return this.isEditMode 
+      ? this.translate.instant('dialogs.contractor.editTitle')
+      : this.translate.instant('dialogs.contractor.addTitle');
   }
 
   /** Dynamic contractor options received from the parent */
   @Input() contractorOptions: { label: string; value: number }[] = [];
 
-  constructor(private fb: FormBuilder, private messageService: MessageService) { }
+  constructor(private fb: FormBuilder, private messageService: MessageService, private translate: TranslateService) { }
 
   ngOnInit(): void {
     this.initForm();

@@ -21,9 +21,9 @@
               formControlName="poNumber"
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('poNumber')" />
-            <label for="poNumber">PO Number *</label>
+            <label for="poNumber">{{ 'dialogs.purchaseOrder.poNumber' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('poNumber')" class="p-error">PO Number is required.</small>
+          <small *ngIf="isFieldInvalid('poNumber')" class="p-error">{{ 'dialogs.purchaseOrder.poNumberRequired' | translate }}</small>
         </div>
       </div>
 
@@ -38,15 +38,15 @@
               optionLabel="label"
               optionValue="value"
               [filter]="true"
-              filterPlaceholder="Search supplier..."
+              [filterPlaceholder]="'dialogs.purchaseOrder.searchSupplier' | translate"
               [showClear]="true"
               class="w-full"
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('supplierId')">
             </p-select>
-            <label for="supplierId">Supplier *</label>
+            <label for="supplierId">{{ 'dialogs.purchaseOrder.supplier' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('supplierId')" class="p-error">Supplier is required.</small>
+          <small *ngIf="isFieldInvalid('supplierId')" class="p-error">{{ 'dialogs.purchaseOrder.supplierRequired' | translate }}</small>
         </div>
       </div>
 
@@ -62,9 +62,9 @@
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('description')">
             </textarea>
-            <label for="description">Description *</label>
+            <label for="description">{{ 'dialogs.purchaseOrder.description' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('description')" class="p-error">Description is required.</small>
+          <small *ngIf="isFieldInvalid('description')" class="p-error">{{ 'dialogs.purchaseOrder.descriptionRequired' | translate }}</small>
         </div>
       </div>
 
@@ -83,9 +83,9 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('unitId')">
             </p-select>
-            <label for="unitId">Unit *</label>
+            <label for="unitId">{{ 'dialogs.purchaseOrder.unit' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('unitId')" class="p-error">Unit is required.</small>
+          <small *ngIf="isFieldInvalid('unitId')" class="p-error">{{ 'dialogs.purchaseOrder.unitRequired' | translate }}</small>
         </div>
       </div>
 
@@ -104,9 +104,9 @@
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('price')">
             </p-inputnumber>
-            <label for="price">Unit Price *</label>
+            <label for="price">{{ 'dialogs.purchaseOrder.unitPrice' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('price')" class="p-error">Unit price is required.</small>
+          <small *ngIf="isFieldInvalid('price')" class="p-error">{{ 'dialogs.purchaseOrder.unitPriceRequired' | translate }}</small>
         </div>
       </div>
 
@@ -124,16 +124,16 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('status')">
             </p-select>
-            <label for="status">Status *</label>
+            <label for="status">{{ 'common.status' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('status')" class="p-error">Status is required.</small>
+          <small *ngIf="isFieldInvalid('status')" class="p-error">{{ 'dialogs.purchaseOrder.statusRequired' | translate }}</small>
         </div>
       </div>
 
       <!-- Subtotal (readonly preview) -->
       <div class="col-12">
         <div class="po-subtotal-preview">
-          <span class="label">Subtotal:</span>
+          <span class="label">{{ 'dialogs.purchaseOrder.subtotal' | translate }}:</span>
           <span class="value">{{ computedSubTotal | currency:'USD':'symbol':'1.2-2' }}</span>
         </div>
       </div>
@@ -143,14 +143,14 @@
 
   <ng-template pTemplate="footer">
     <p-button
-      label="Cancel"
+      [label]="'common.cancel' | translate"
       icon="pi pi-times"
       (onClick)="onHide()"
       severity="secondary"
       [outlined]="true">
     </p-button>
     <p-button
-      [label]="isEditMode ? 'Update' : 'Create Order'"
+      [label]="isEditMode ? ('common.update' | translate) : ('dialogs.purchaseOrder.createOrder' | translate)"
       icon="pi pi-check"
       (onClick)="onSubmit()"
       [loading]="isSubmitting()"
