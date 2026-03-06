@@ -18,16 +18,16 @@
   <div class="sidebar-content">
     <div class="nav-sections">
       <div *ngFor="let section of navSections" class="nav-section">
-        <div class="section-title">{{ section.title }}</div>
+        <div class="section-title">{{ section.title | translate }}</div>
         <div class="nav-items">
           <a 
             *ngFor="let item of section.items"
             class="nav-item"
             [class.active]="isActiveRoute(item.route)"
             (click)="navigateTo(item.route)"
-            [attr.aria-label]="item.label">
+            [attr.aria-label]="item.label | translate">
             <i [class]="item.icon + ' nav-icon'"></i>
-            <span class="nav-label" *ngIf="sidebarService.isOpen()">{{ item.label }}</span>
+            <span class="nav-label" *ngIf="sidebarService.isOpen()">{{ item.label | translate }}</span>
           </a>
         </div>
       </div>
@@ -42,9 +42,9 @@
         class="nav-item"
         [class.active]="isActiveRoute(item.route)"
         (click)="navigateTo(item.route)"
-        [attr.aria-label]="item.label">
+        [attr.aria-label]="item.label | translate">
         <i [class]="item.icon + ' nav-icon'"></i>
-        <span class="nav-label" *ngIf="sidebarService.isOpen()">{{ item.label }}</span>
+        <span class="nav-label" *ngIf="sidebarService.isOpen()">{{ item.label | translate }}</span>
       </a>
     </div>
   </div>

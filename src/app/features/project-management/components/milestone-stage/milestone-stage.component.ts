@@ -1,5 +1,6 @@
 import { Component, Input, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslateModule } from '@ngx-translate/core';
 import { AccordionModule } from 'primeng/accordion';
 import { TabsModule } from 'primeng/tabs';
 import { ProjectStageDto } from '../../../../../nswag/api-client';
@@ -15,6 +16,7 @@ import { ProjectMainContractorTabComponent } from './tabs/project-main-contracto
   standalone: true,
   imports: [
     CommonModule,
+    TranslateModule,
     AccordionModule,
     TabsModule,
     BoqTabComponent,

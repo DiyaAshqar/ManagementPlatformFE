@@ -163,6 +163,9 @@
   },
   "dashboard": {
     "title": "Dashboard",
+    "subtitle": "Welcome back! Here's an overview of your management platform.",
+    "newProject": "New Project",
+    "newAgreement": "New Agreement",
     "multiSelectDemo": "MultiSelect Demo",
     "selectItems": "Select Items",
     "selectItemsPlaceholder": "Select items",
@@ -177,7 +180,71 @@
     "salaryDeposit": "Salary Deposit",
     "rentPayment": "Rent Payment",
     "groceries": "Groceries",
-    "freelanceIncome": "Freelance Income"
+    "freelanceIncome": "Freelance Income",
+    "stats": {
+      "totalProjects": "Total Projects",
+      "activeAgreements": "Active Agreements",
+      "totalSuppliers": "Total Suppliers",
+      "constructors": "Constructors",
+      "vsLastMonth": "vs last month",
+      "newThisMonth": "new this month"
+    },
+    "charts": {
+      "projectStatus": "Project Status",
+      "monthlyProgress": "Monthly Progress",
+      "projectsStarted": "Projects Started",
+      "projectsCompleted": "Projects Completed"
+    },
+    "tables": {
+      "recentProjects": "Recent Projects",
+      "recentAgreements": "Recent Agreements",
+      "viewAll": "View All",
+      "upcomingTasks": "Upcoming Tasks",
+      "tasks": "tasks"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "viewProjects": "View Projects",
+      "agreements": "Agreements",
+      "suppliers": "Suppliers",
+      "constructors": "Constructors"
+    },
+    "statusLabels": {
+      "completed": "Completed",
+      "approved": "Approved",
+      "inProgress": "In Progress",
+      "pending": "Pending",
+      "planning": "Planning",
+      "draft": "Draft",
+      "onHold": "On Hold",
+      "rejected": "Rejected"
+    },
+    "priorityLabels": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    }
+  },
+  "sidebar": {
+    "sections": {
+      "overview": "Overview",
+      "additionalFeatures": "Additional Features",
+      "extendedModules": "Extended Modules"
+    },
+    "items": {
+      "dashboard": "Dashboard",
+      "projectManagement": "Project Management",
+      "agreementWizard": "Agreement Wizard",
+      "constructors": "Constructors",
+      "suppliers": "Suppliers",
+      "feature1": "Feature 1",
+      "feature2": "Feature 2"
+    },
+    "footer": {
+      "settings": "Settings",
+      "help": "Help"
+    }
   },
   "wizard": {
     "next": "Next",
@@ -321,12 +388,188 @@
       "download": "Download"
     }
   },
+  "constructor": {
+    "title": "Constructors",
+    "subtitle": "Manage main contractors and construction companies",
+    "create": "Create Constructor",
+    "createFirst": "Create First Constructor",
+    "searchPlaceholder": "Search constructors...",
+    "pagination": "Showing {first} to {last} of {totalRecords} constructors",
+    "columns": {
+      "name": "Name",
+      "contractorType": "Contractor Type",
+      "actions": "Actions"
+    },
+    "noData": "No constructors found",
+    "tooltips": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "form": {
+      "createTitle": "Create Constructor",
+      "editTitle": "Edit Constructor",
+      "createSubtitle": "Add a new main contractor",
+      "editSubtitle": "Update constructor information",
+      "name": "Name",
+      "contractorType": "Contractor Type",
+      "namePlaceholder": "Enter constructor name",
+      "contractorTypePlaceholder": "Select contractor type",
+      "nameRequired": "Name is required",
+      "nameMinLength": "Name must be at least 2 characters",
+      "contractorTypeRequired": "Contractor type is required",
+      "cancel": "Cancel",
+      "create": "Create",
+      "update": "Update"
+    }
+  },
+  "supplier": {
+    "title": "Suppliers",
+    "subtitle": "Manage suppliers and vendors",
+    "create": "Create Supplier",
+    "createFirst": "Create First Supplier",
+    "searchPlaceholder": "Search suppliers...",
+    "pagination": "Showing {first} to {last} of {totalRecords} suppliers",
+    "columns": {
+      "name": "Name",
+      "phoneNumber": "Phone Number",
+      "email": "Email",
+      "actions": "Actions"
+    },
+    "noData": "No suppliers found",
+    "tooltips": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "form": {
+      "createTitle": "Create Supplier",
+      "editTitle": "Edit Supplier",
+      "createSubtitle": "Add a new supplier",
+      "editSubtitle": "Update supplier information",
+      "name": "Name",
+      "phoneNumber": "Phone Number",
+      "email": "Email",
+      "namePlaceholder": "Enter supplier name",
+      "phoneNumberPlaceholder": "Enter phone number",
+      "emailPlaceholder": "Enter email address",
+      "nameRequired": "Name is required",
+      "nameMinLength": "Name must be at least 2 characters",
+      "phoneNumberRequired": "Phone number is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email format",
+      "cancel": "Cancel",
+      "create": "Create",
+      "update": "Update"
+    }
+  },
+  "projectDetail": {
+    "backToProjects": "Back to projects",
+    "printReport": "Print Report",
+    "overallProgress": "Overall Progress",
+    "budget": "Budget",
+    "spent": "spent",
+    "startDate": "Start Date",
+    "projectDescription": "Project Description",
+    "overviewDetails": "Overview and key details",
+    "tabs": {
+      "overview": "Overview",
+      "preparing": "Preparing",
+      "excavation": "Excavation",
+      "milestones": "Milestones",
+      "documents": "Documents"
+    },
+    "printDialog": {
+      "header": "Print Project Report",
+      "description": "Customize and print a comprehensive project report",
+      "reportType": "Report Type",
+      "selectReportType": "Select report type",
+      "cancel": "Cancel",
+      "downloadPdf": "Download PDF",
+      "print": "Print",
+      "reportTypes": {
+        "full": "Full Project Report",
+        "summary": "Executive Summary",
+        "progress": "Progress Report",
+        "financial": "Financial Report",
+        "custom": "Custom Report"
+      }
+    },
+    "milestoneStages": {
+      "title": "Milestone Stages",
+      "subtitle": "Manage all milestone stages and their details",
+      "noStages": "No milestone stages found for this project",
+      "milestone": "Milestone"
+    }
+  },
   "projectTabs": {
     "boq": {
+      "title": "Bill of Quantities",
+      "titleAbbr": "Bill of Quantities (BoQ)",
+      "subtitle": "Manage construction materials and quantities",
+      "totalItems": "Total Items",
+      "addItem": "Add BoQ Item",
+      "grandTotal": "Grand Total",
+      "loading": "Loading...",
+      "columns": {
+        "material": "Material",
+        "description": "Description",
+        "unit": "Unit",
+        "constructor": "Constructor",
+        "actualQty": "Actual Qty",
+        "unitPrice": "Unit Price",
+        "amount": "Amount",
+        "subtotal": "Subtotal",
+        "actions": "Actions"
+      },
+      "tooltips": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
       "confirmDelete": {
         "header": "Delete BoQ Item",
         "message": "Are you sure you want to delete \"{{name}}\"?"
+      },
+      "dialog": {
+        "addTitle": "Add BoQ Item",
+        "editTitle": "Edit BoQ Item",
+        "material": "Material",
+        "unit": "Unit",
+        "constructor": "Constructor",
+        "description": "Description",
+        "actualQuantity": "Actual Quantity",
+        "unitPrice": "Unit Price",
+        "subtotal": "Subtotal",
+        "searchMaterial": "Search material...",
+        "searchConstructor": "Search constructor...",
+        "materialRequired": "Material is required.",
+        "unitRequired": "Unit is required.",
+        "constructorRequired": "Constructor is required.",
+        "descriptionRequired": "Description is required.",
+        "quantityRequired": "Quantity is required.",
+        "priceRequired": "Unit price is required.",
+        "cancel": "Cancel",
+        "addItem": "Add Item",
+        "update": "Update"
       }
+    },
+    "milestoneDocuments": {
+      "title": "Project Documents",
+      "subtitle": "Manage project documents and attachments"
+    },
+    "voucherOrders": {
+      "title": "Voucher Orders",
+      "subtitle": "Manage voucher orders and requests"
+    },
+    "surveyingVisits": {
+      "title": "Surveying Visits",
+      "subtitle": "Track and manage site surveying visits"
+    },
+    "purchaseOrders": {
+      "title": "Purchase Orders",
+      "subtitle": "Manage material and service purchase orders"
+    },
+    "projectMainContractor": {
+      "title": "Project Main Contractor",
+      "subtitle": "Manage main contractor information and contracts"
     },
     "vo": {
       "confirmDelete": {
@@ -352,5 +595,58 @@
         "message": "Are you sure you want to delete the visit on \"{{name}}\"?"
       }
     }
+  },
+  "workItemDialog": {
+    "title": "Add Work Item",
+    "editTitle": "Edit Work Item",
+    "fields": {
+      "title": "Title",
+      "titlePlaceholder": "Foundation Excavation - Phase 1",
+      "type": "Type",
+      "typePlaceholder": "Select type",
+      "assignTo": "Assign To",
+      "assignToPlaceholder": "Mike Johnson",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "priority": "Priority",
+      "priorityPlaceholder": "Select priority",
+      "taskPoints": "Task Points",
+      "taskPointsPlaceholder": "8",
+      "location": "Location",
+      "locationPlaceholder": "Grid A1-A5",
+      "depth": "Depth",
+      "depthPlaceholder": "3.5m",
+      "volume": "Volume",
+      "volumePlaceholder": "450 m³",
+      "soilType": "Soil Type",
+      "soilTypePlaceholder": "Clay",
+      "equipment": "Equipment",
+      "equipmentPlaceholder": "Excavator CAT 320",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the excavation task..."
+    },
+    "subtasks": {
+      "title": "Subtasks",
+      "addSubtask": "Add Subtask",
+      "noSubtasks": "No subtasks yet. Click \"Add Subtask\" to create one.",
+      "saveTaskFirst": "Please save the task first before adding subtasks",
+      "columns": {
+        "title": "Title",
+        "dates": "Dates",
+        "type": "Type",
+        "status": "Status",
+        "cost": "Cost",
+        "quantity": "Quantity",
+        "actions": "Actions"
+      }
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save"
+    }
+  },
+  "excavationStage": {
+    "title": "Excavation Stage",
+    "subtitle": "Track excavation activities and measurements"
   }
 }

@@ -22,15 +22,15 @@
               optionLabel="label"
               optionValue="value"
               [filter]="true"
-              filterPlaceholder="Search material..."
+              [filterPlaceholder]="'projectTabs.boq.dialog.searchMaterial' | translate"
               [showClear]="true"
               class="w-full"
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('materialId')">
             </p-select>
-            <label for="materialId">Material *</label>
+            <label for="materialId">{{ 'projectTabs.boq.dialog.material' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('materialId')" class="p-error">Material is required.</small>
+          <small *ngIf="isFieldInvalid('materialId')" class="p-error">{{ 'projectTabs.boq.dialog.materialRequired' | translate }}</small>
         </div>
       </div>
 
@@ -49,9 +49,9 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('unitId')">
             </p-select>
-            <label for="unitId">Unit *</label>
+            <label for="unitId">{{ 'projectTabs.boq.dialog.unit' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('unitId')" class="p-error">Unit is required.</small>
+          <small *ngIf="isFieldInvalid('unitId')" class="p-error">{{ 'projectTabs.boq.dialog.unitRequired' | translate }}</small>
         </div>
       </div>
 
@@ -66,15 +66,15 @@
               optionLabel="label"
               optionValue="value"
               [filter]="true"
-              filterPlaceholder="Search constructor..."
+              [filterPlaceholder]="'projectTabs.boq.dialog.searchConstructor' | translate"
               [showClear]="true"
               class="w-full"
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('constructorId')">
             </p-select>
-            <label for="constructorId">Constructor *</label>
+            <label for="constructorId">{{ 'projectTabs.boq.dialog.constructor' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('constructorId')" class="p-error">Constructor is required.</small>
+          <small *ngIf="isFieldInvalid('constructorId')" class="p-error">{{ 'projectTabs.boq.dialog.constructorRequired' | translate }}</small>
         </div>
       </div>
 
@@ -90,9 +90,9 @@
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('description')">
             </textarea>
-            <label for="description">Description *</label>
+            <label for="description">{{ 'projectTabs.boq.dialog.description' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('description')" class="p-error">Description is required.</small>
+          <small *ngIf="isFieldInvalid('description')" class="p-error">{{ 'projectTabs.boq.dialog.descriptionRequired' | translate }}</small>
         </div>
       </div>
 
@@ -109,9 +109,9 @@
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('actualQuantity')">
             </p-inputnumber>
-            <label for="actualQuantity">Actual Quantity *</label>
+            <label for="actualQuantity">{{ 'projectTabs.boq.dialog.actualQuantity' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('actualQuantity')" class="p-error">Quantity is required.</small>
+          <small *ngIf="isFieldInvalid('actualQuantity')" class="p-error">{{ 'projectTabs.boq.dialog.quantityRequired' | translate }}</small>
         </div>
       </div>
 
@@ -130,16 +130,16 @@
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('price')">
             </p-inputnumber>
-            <label for="price">Unit Price *</label>
+            <label for="price">{{ 'projectTabs.boq.dialog.unitPrice' | translate }} *</label>
           </p-floatlabel>
-          <small *ngIf="isFieldInvalid('price')" class="p-error">Unit price is required.</small>
+          <small *ngIf="isFieldInvalid('price')" class="p-error">{{ 'projectTabs.boq.dialog.priceRequired' | translate }}</small>
         </div>
       </div>
 
       <!-- Subtotal (readonly preview) -->
       <div class="col-12">
         <div class="boq-subtotal-preview">
-          <span class="label">Subtotal:</span>
+          <span class="label">{{ 'projectTabs.boq.dialog.subtotal' | translate }}:</span>
           <span class="value">{{ computedSubTotal | currency:'USD':'symbol':'1.2-2' }}</span>
         </div>
       </div>
@@ -149,14 +149,14 @@
 
   <ng-template pTemplate="footer">
     <p-button
-      label="Cancel"
+      [label]="'projectTabs.boq.dialog.cancel' | translate"
       icon="pi pi-times"
       (onClick)="onHide()"
       severity="secondary"
       [outlined]="true">
     </p-button>
     <p-button
-      [label]="isEditMode ? 'Update' : 'Add Item'"
+      [label]="(isEditMode ? 'projectTabs.boq.dialog.update' : 'projectTabs.boq.dialog.addItem') | translate"
       icon="pi pi-check"
       (onClick)="onSubmit()"
       [loading]="isSubmitting()"

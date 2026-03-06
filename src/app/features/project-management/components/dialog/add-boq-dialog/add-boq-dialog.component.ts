@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -20,6 +21,7 @@ import { CreateProjectBOQCommand, IGetProjectBOQDto } from '../../../../../../ns
     imports: [
         CommonModule,
         ReactiveFormsModule,
+        TranslateModule,
         DialogModule,
         ButtonModule,
         InputTextModule,

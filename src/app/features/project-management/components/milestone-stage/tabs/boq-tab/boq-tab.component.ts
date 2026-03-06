@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { forkJoin } from 'rxjs';
 import { TranslateService } from '@ngx-translate/core';
+import { TranslateModule } from '@ngx-translate/core';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
@@ -25,6 +26,7 @@ import { AddBoqDialogComponent } from '../../../dialog/add-boq-dialog/add-boq-di
   standalone: true,
   imports: [
     CommonModule,
+    TranslateModule,
     TableModule,
     ButtonModule,
     TooltipModule,

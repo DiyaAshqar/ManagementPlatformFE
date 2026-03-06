@@ -2,11 +2,11 @@
   <!-- Header -->
   <div class="flex justify-content-between align-items-center mb-4">
     <div>
-      <h1 class="text-3xl font-bold m-0">Suppliers</h1>
-      <p class="text-color-secondary mt-2">Manage suppliers and vendors</p>
+      <h1 class="text-3xl font-bold m-0">{{ 'supplier.title' | translate }}</h1>
+      <p class="text-color-secondary mt-2">{{ 'supplier.subtitle' | translate }}</p>
     </div>
     <p-button 
-      label="Create Supplier"
+      [label]="'supplier.create' | translate"
       icon="pi pi-plus"
       (onClick)="createSupplier()"
       severity="primary"
@@ -23,7 +23,7 @@
         pInputText 
         [(ngModel)]="searchText"
         (ngModelChange)="onSearchChange()"
-        placeholder="Search suppliers..."
+        [placeholder]="'supplier.searchPlaceholder' | translate"
         class="w-full" />
     </p-iconfield>
   </div>
@@ -40,17 +40,17 @@
     [first]="first"
     [rowsPerPageOptions]="[10, 25, 50]"
     [showCurrentPageReport]="true"
-    currentPageReportTemplate="Showing {first} to {last} of {totalRecords} suppliers"
+    [currentPageReportTemplate]="'supplier.pagination' | translate"
     styleClass="p-datatable-striped"
     [tableStyle]="{ 'min-width': '50rem' }">
     
     <ng-template pTemplate="header">
       <tr>
         <th style="width: 5rem">#</th>
-        <th pSortableColumn="name">Name <p-sortIcon field="name"></p-sortIcon></th>
-        <th>Phone Number</th>
-        <th>Email</th>
-        <th style="width: 10rem">Actions</th>
+        <th pSortableColumn="name">{{ 'supplier.columns.name' | translate }} <p-sortIcon field="name"></p-sortIcon></th>
+        <th>{{ 'supplier.columns.phoneNumber' | translate }}</th>
+        <th>{{ 'supplier.columns.email' | translate }}</th>
+        <th style="width: 10rem">{{ 'supplier.columns.actions' | translate }}</th>
       </tr>
     </ng-template>
     
@@ -68,7 +68,7 @@
               [rounded]="true"
               [text]="true"
               severity="info"
-              pTooltip="Edit"
+              [pTooltip]="'supplier.tooltips.edit' | translate"
               tooltipPosition="top">
             </p-button>
             <p-button 
@@ -77,7 +77,7 @@
               [rounded]="true"
               [text]="true"
               severity="danger"
-              pTooltip="Delete"
+              [pTooltip]="'supplier.tooltips.delete' | translate"
               tooltipPosition="top">
             </p-button>
           </div>
@@ -90,9 +90,9 @@
         <td colspan="5" class="text-center py-4">
           <div class="flex flex-column align-items-center gap-3">
             <i class="pi pi-inbox text-4xl text-color-secondary"></i>
-            <p class="text-color-secondary m-0">No suppliers found</p>
+            <p class="text-color-secondary m-0">{{ 'supplier.noData' | translate }}</p>
             <p-button 
-              label="Create First Supplier"
+              [label]="'supplier.createFirst' | translate"
               icon="pi pi-plus"
               (onClick)="createSupplier()"
               severity="primary"

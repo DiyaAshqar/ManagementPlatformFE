@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 // PrimeNG Imports
 import { CardModule } from 'primeng/card';
@@ -67,42 +68,43 @@ interface UpcomingTask {
   templateUrl: './dashboard.component.html',
   styleUrls: ['./dashboard.component.scss']
 })
-export class DashboardComponent implements OnInit {
+export class DashboardComponent implements OnInit, OnDestroy {
   isLoading = true;
+  private langSub!: Subscription;
 
   // Statistics
   statCards: StatCard[] = [
     {
-      title: 'Total Projects',
+      title: 'dashboard.stats.totalProjects',
       value: 24,
       icon: 'pi pi-briefcase',
       iconClass: 'stat-icon-projects',
       trend: 12,
-      trendLabel: 'vs last month'
+      trendLabel: 'dashboard.stats.vsLastMonth'
     },
     {
-      title: 'Active Agreements',
+      title: 'dashboard.stats.activeAgreements',
       value: 18,
       icon: 'pi pi-file',
       iconClass: 'stat-icon-agreements',
       trend: 8,
-      trendLabel: 'vs last month'
+      trendLabel: 'dashboard.stats.vsLastMonth'
     },
     {
-      title: 'Total Suppliers',
+      title: 'dashboard.stats.totalSuppliers',
       value: 42,
       icon: 'pi pi-building',
       iconClass: 'stat-icon-suppliers',
       trend: 5,
-      trendLabel: 'new this month'
+      trendLabel: 'dashboard.stats.newThisMonth'
     },
     {
-      title: 'Constructors',
+      title: 'dashboard.stats.constructors',
       value: 15,
       icon: 'pi pi-users',
       iconClass: 'stat-icon-constructors',
       trend: 3,
-      trendLabel: 'new this month'
+      trendLabel: 'dashboard.stats.newThisMonth'
     }
   ];
 
@@ -137,14 +139,21 @@ export class DashboardComponent implements OnInit {
     { id: 4, title: 'Contractor meeting', project: 'Highway Extension Project', priority: 'low', dueDate: '2026-03-10' }
   ];
 
-  constructor(private router: Router) {}
+  constructor(private router: Router, private translate: TranslateService) {}
 
   ngOnInit(): void {
     this.initCharts();
+    this.langSub = this.translate.onLangChange.subscribe(() => {
+      this.initCharts();
+    });
     // Simulate loading
     setTimeout(() => {
       this.isLoading = false;
     }, 500);
+  }
+
+  ngOnDestroy(): void {
+    this.langSub?.unsubscribe();
   }
 
   initCharts(): void {
@@ -155,7 +164,12 @@ export class DashboardComponent implements OnInit {
 
     // Project Status Donut Chart
     this.projectStatusChartData = {
-      labels: ['In Progress', 'Planning', 'Completed', 'On Hold'],
+      labels: [
+        this.translate.instant('dashboard.statusLabels.inProgress'),
+        this.translate.instant('dashboard.statusLabels.planning'),
+        this.translate.instant('dashboard.statusLabels.completed'),
+        this.translate.instant('dashboard.statusLabels.onHold')
+      ],
       datasets: [
         {
           data: [10, 5, 6, 3],
@@ -194,13 +208,13 @@ export class DashboardComponent implements OnInit {
       labels: ['Sep', 'Oct', 'Nov', 'Dec', 'Jan', 'Feb'],
       datasets: [
         {
-          label: 'Projects Started',
+          label: this.translate.instant('dashboard.charts.projectsStarted'),
           backgroundColor: '#3b82f6',
           borderColor: '#3b82f6',
           data: [4, 6, 3, 5, 7, 4]
         },
         {
-          label: 'Projects Completed',
+          label: this.translate.instant('dashboard.charts.projectsCompleted'),
           backgroundColor: '#10b981',
           borderColor: '#10b981',
           data: [2, 4, 5, 3, 4, 6]
@@ -283,17 +297,17 @@ export class DashboardComponent implements OnInit {
   }
 
   getStatusLabel(status: string): string {
-    const labelMap: { [key: string]: string } = {
-      'completed': 'Completed',
-      'approved': 'Approved',
-      'in_progress': 'In Progress',
-      'pending': 'Pending',
-      'planning': 'Planning',
-      'draft': 'Draft',
-      'on_hold': 'On Hold',
-      'rejected': 'Rejected'
+    const keyMap: { [key: string]: string } = {
+      'completed': 'dashboard.statusLabels.completed',
+      'approved': 'dashboard.statusLabels.approved',
+      'in_progress': 'dashboard.statusLabels.inProgress',
+      'pending': 'dashboard.statusLabels.pending',
+      'planning': 'dashboard.statusLabels.planning',
+      'draft': 'dashboard.statusLabels.draft',
+      'on_hold': 'dashboard.statusLabels.onHold',
+      'rejected': 'dashboard.statusLabels.rejected'
     };
-    return labelMap[status] || status;
+    return keyMap[status] || status;
   }
 
   getPrioritySeverity(priority: string): 'success' | 'info' | 'warn' | 'danger' | 'secondary' | 'contrast' {
@@ -307,6 +321,12 @@ export class DashboardComponent implements OnInit {
   }
 
   getPriorityLabel(priority: string): string {
-    return priority.charAt(0).toUpperCase() + priority.slice(1);
+    const keyMap: { [key: string]: string } = {
+      'low': 'dashboard.priorityLabels.low',
+      'medium': 'dashboard.priorityLabels.medium',
+      'high': 'dashboard.priorityLabels.high',
+      'urgent': 'dashboard.priorityLabels.urgent'
+    };
+    return keyMap[priority] || priority;
   }
 }

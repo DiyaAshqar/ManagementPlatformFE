@@ -45,33 +45,33 @@ export class SidebarComponent implements OnInit {
   
   navSections: NavSection[] = [
     {
-      title: 'Overview',
+      title: 'sidebar.sections.overview',
       items: [
-        { label: 'Dashboard', icon: 'pi pi-home', route: '/dashboard' },
-        { label: 'Project Management', icon: 'pi pi-th-large', route: '/projects' },
-        { label: 'Agreement Wizard', icon: 'pi pi-briefcase', route: '/agreement-wizard' },
-        { label: 'Constructors', icon: 'pi pi-users', route: '/constructor' },
-        { label: 'Suppliers', icon: 'pi pi-building', route: '/supplier' },
-        // { label: 'Theme Showcase', icon: 'pi pi-palette', route: '/theme-showcase' },
+        { label: 'sidebar.items.dashboard', icon: 'pi pi-home', route: '/dashboard' },
+        { label: 'sidebar.items.projectManagement', icon: 'pi pi-th-large', route: '/projects' },
+        { label: 'sidebar.items.agreementWizard', icon: 'pi pi-briefcase', route: '/agreement-wizard' },
+        { label: 'sidebar.items.constructors', icon: 'pi pi-users', route: '/constructor' },
+        { label: 'sidebar.items.suppliers', icon: 'pi pi-building', route: '/supplier' },
+        // { label: 'sidebar.items.themeShowcase', icon: 'pi pi-palette', route: '/theme-showcase' },
       ]
     },
     {
-      title: 'Additional Features',
+      title: 'sidebar.sections.additionalFeatures',
       items: [
-        { label: 'Feature 1', icon: 'pi pi-wallet', route: '/Module1' },
+        { label: 'sidebar.items.feature1', icon: 'pi pi-wallet', route: '/Module1' },
       ]
     },
     {
-      title: 'Extended Modules',
+      title: 'sidebar.sections.extendedModules',
       items: [
-        { label: 'Feature 2', icon: 'pi pi-users', route: '/Module1' },
+        { label: 'sidebar.items.feature2', icon: 'pi pi-users', route: '/Module1' },
       ]
     }
   ];
 
   footerItems: NavItem[] = [
-    { label: 'Settings', icon: 'pi pi-cog', route: '/settings' },
-    { label: 'Help', icon: 'pi pi-question-circle', route: '/help' }
+    { label: 'sidebar.footer.settings', icon: 'pi pi-cog', route: '/settings' },
+    { label: 'sidebar.footer.help', icon: 'pi pi-question-circle', route: '/help' }
   ];
 
   constructor(

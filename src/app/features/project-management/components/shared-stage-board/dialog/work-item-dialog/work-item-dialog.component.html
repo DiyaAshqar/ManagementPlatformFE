@@ -1,19 +1,19 @@
 <div class="flex flex-column gap-3 p-3">
     <div>
-      <label for="item-title" class="block text-sm font-medium mb-2">Title *</label>
+      <label for="item-title" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.title' | translate }} *</label>
       <input 
         id="item-title"
         type="text" 
         pInputText 
         [ngModel]="currentFormData.title"
         (ngModelChange)="updateFormField('title', $event)"
-        placeholder="Foundation Excavation - Phase 1"
+        [placeholder]="'workItemDialog.fields.titlePlaceholder' | translate"
         class="w-full">
     </div>
     
     <div class="grid">
       <div class="col-6">
-        <label for="item-type" class="block text-sm font-medium mb-2">Type</label>
+        <label for="item-type" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.type' | translate }}</label>
         <p-select 
           id="item-type"
           [ngModel]="currentFormData.type"
@@ -21,27 +21,27 @@
           [options]="workItemTypes"
           optionLabel="label"
           optionValue="value"
-          placeholder="Select type"
+          [placeholder]="'workItemDialog.fields.typePlaceholder' | translate"
           [loading]="isLoadingTaskTypes()"
           styleClass="w-full">
         </p-select>
       </div>
       <div class="col-6">
-        <label for="item-assignTo" class="block text-sm font-medium mb-2">Assign To</label>
+        <label for="item-assignTo" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.assignTo' | translate }}</label>
         <input 
           id="item-assignTo"
           type="text" 
           pInputText 
           [ngModel]="currentFormData.assignTo"
           (ngModelChange)="updateFormField('assignTo', $event)"
-          placeholder="Mike Johnson"
+          [placeholder]="'workItemDialog.fields.assignToPlaceholder' | translate"
           class="w-full">
       </div>
     </div>
     
     <div class="grid">
       <div class="col-6">
-        <label for="item-start-date" class="block text-sm font-medium mb-2">Start Date</label>
+        <label for="item-start-date" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.startDate' | translate }}</label>
         <p-datepicker 
           id="item-start-date"
           [ngModel]="currentFormData.startDate"
@@ -54,7 +54,7 @@
         </p-datepicker>
       </div>
       <div class="col-6">
-        <label for="item-end-date" class="block text-sm font-medium mb-2">End Date</label>
+        <label for="item-end-date" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.endDate' | translate }}</label>
         <p-datepicker 
           id="item-end-date"
           [ngModel]="currentFormData.endDate"
@@ -70,7 +70,7 @@
     
     <div class="grid">
       <div class="col-6">
-        <label for="item-priority" class="block text-sm font-medium mb-2">Priority</label>
+        <label for="item-priority" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.priority' | translate }}</label>
         <p-select 
           id="item-priority"
           [ngModel]="currentFormData.priority"
@@ -78,19 +78,19 @@
           [options]="priorityOptions"
           optionLabel="label"
           optionValue="value"
-          placeholder="Select priority"
+          [placeholder]="'workItemDialog.fields.priorityPlaceholder' | translate"
           styleClass="w-full">
         </p-select>
       </div>
       <div class="col-6">
-        <label for="item-task-points" class="block text-sm font-medium mb-2">Task Points</label>
+        <label for="item-task-points" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.taskPoints' | translate }}</label>
         <input 
           id="item-task-points"
           type="text" 
           pInputText 
           [ngModel]="currentFormData.taskPoint"
           (ngModelChange)="updateFormField('taskPoint', $event)"
-          placeholder="8"
+          [placeholder]="'workItemDialog.fields.taskPointsPlaceholder' | translate"
           class="w-full">
       </div>
     </div>
@@ -98,75 +98,75 @@
     @if (shouldShowExcavationFields()) {
       <div class="grid">
         <div class="col-6">
-          <label for="item-location" class="block text-sm font-medium mb-2">Location</label>
+          <label for="item-location" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.location' | translate }}</label>
           <input 
             id="item-location"
             type="text" 
             pInputText 
             [ngModel]="currentFormData.excavationLocation"
             (ngModelChange)="updateFormField('excavationLocation', $event)"
-            placeholder="Grid A1-A5"
+            [placeholder]="'workItemDialog.fields.locationPlaceholder' | translate"
             class="w-full">
         </div>
         <div class="col-6">
-          <label for="item-depth" class="block text-sm font-medium mb-2">Depth</label>
+          <label for="item-depth" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.depth' | translate }}</label>
           <input 
             id="item-depth"
             type="text" 
             pInputText 
             [ngModel]="currentFormData.excavationDepth"
             (ngModelChange)="updateFormField('excavationDepth', $event)"
-            placeholder="3.5m"
+            [placeholder]="'workItemDialog.fields.depthPlaceholder' | translate"
             class="w-full">
         </div>
       </div>
       
       <div class="grid">
         <div class="col-6">
-          <label for="item-volume" class="block text-sm font-medium mb-2">Volume</label>
+          <label for="item-volume" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.volume' | translate }}</label>
           <input 
             id="item-volume"
             type="text" 
             pInputText 
             [ngModel]="currentFormData.excavationVolume"
             (ngModelChange)="updateFormField('excavationVolume', $event)"
-            placeholder="450 m³"
+            [placeholder]="'workItemDialog.fields.volumePlaceholder' | translate"
             class="w-full">
         </div>
         <div class="col-6">
-          <label for="item-soil-type" class="block text-sm font-medium mb-2">Soil Type</label>
+          <label for="item-soil-type" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.soilType' | translate }}</label>
           <input 
             id="item-soil-type"
             type="text" 
             pInputText 
             [ngModel]="currentFormData.excavationSoilType"
             (ngModelChange)="updateFormField('excavationSoilType', $event)"
-            placeholder="Clay"
+            [placeholder]="'workItemDialog.fields.soilTypePlaceholder' | translate"
             class="w-full">
         </div>
       </div>
       
       <div>
-        <label for="item-equipment" class="block text-sm font-medium mb-2">Equipment</label>
+        <label for="item-equipment" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.equipment' | translate }}</label>
         <input 
           id="item-equipment"
           type="text" 
           pInputText 
           [ngModel]="currentFormData.excavationEquipment"
           (ngModelChange)="updateFormField('excavationEquipment', $event)"
-          placeholder="Excavator CAT 320"
+          [placeholder]="'workItemDialog.fields.equipmentPlaceholder' | translate"
           class="w-full">
       </div>
     }
     
     <div>
-      <label for="item-description" class="block text-sm font-medium mb-2">Description</label>
+      <label for="item-description" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.description' | translate }}</label>
       <textarea 
         id="item-description"
         pTextarea
         [ngModel]="currentFormData.description"
         (ngModelChange)="updateFormField('description', $event)"
-        placeholder="Describe the excavation task..."
+        [placeholder]="'workItemDialog.fields.descriptionPlaceholder' | translate"
         [rows]="3"
         class="w-full">
       </textarea>
@@ -176,15 +176,15 @@
     <div class="border-top-1 surface-border pt-3">
       <div class="flex align-items-center justify-content-between mb-3">
         <label class="text-sm font-semibold m-0 text-color">
-          Subtasks ({{ subtasks().length }})
+          {{ 'workItemDialog.subtasks.title' | translate }} ({{ subtasks().length }})
         </label>
         <p-button 
-          label="Add Subtask"
+          [label]="'workItemDialog.subtasks.addSubtask' | translate"
           icon="pi pi-plus"
           size="small"
           [outlined]="true"
           [disabled]="!formData().backendTaskId"
-          [pTooltip]="!formData().backendTaskId ? 'Please save the task first before adding subtasks' : ''"
+          [pTooltip]="!formData().backendTaskId ? ('workItemDialog.subtasks.saveTaskFirst' | translate) : ''"
           tooltipPosition="left"
           (onClick)="openAddSubtaskDialog()">
         </p-button>
@@ -195,13 +195,13 @@
           <p-table [value]="subtasks()" styleClass="p-datatable-sm">
             <ng-template pTemplate="header">
               <tr>
-                <th style="width: 25%">Title</th>
-                <th style="width: 20%">Dates</th>
-                <th style="width: 15%">Type</th>
-                <th style="width: 15%">Status</th>
-                <th style="width: 10%">Cost</th>
-                <th style="width: 10%">Quantity</th>
-                <th style="width: 5%" class="text-center">Actions</th>
+                <th style="width: 25%">{{ 'workItemDialog.subtasks.columns.title' | translate }}</th>
+                <th style="width: 20%">{{ 'workItemDialog.subtasks.columns.dates' | translate }}</th>
+                <th style="width: 15%">{{ 'workItemDialog.subtasks.columns.type' | translate }}</th>
+                <th style="width: 15%">{{ 'workItemDialog.subtasks.columns.status' | translate }}</th>
+                <th style="width: 10%">{{ 'workItemDialog.subtasks.columns.cost' | translate }}</th>
+                <th style="width: 10%">{{ 'workItemDialog.subtasks.columns.quantity' | translate }}</th>
+                <th style="width: 5%" class="text-center">{{ 'workItemDialog.subtasks.columns.actions' | translate }}</th>
               </tr>
             </ng-template>
             <ng-template pTemplate="body" let-subtask>
@@ -252,7 +252,7 @@
       } @else {
         <div class="text-center p-3 surface-50 border-round border-1 surface-border">
           <i class="pi pi-list text-2xl text-400 mb-2"></i>
-          <p class="text-xs text-500 m-0">No subtasks yet. Click "Add Subtask" to create one.</p>
+          <p class="text-xs text-500 m-0">{{ 'workItemDialog.subtasks.noSubtasks' | translate }}</p>
         </div>
       }
     </div>
@@ -260,12 +260,12 @@
     <!-- Footer -->
     <div class="flex justify-content-end gap-2 border-top-1 surface-border pt-3">
       <p-button 
-        label="Cancel"
+        [label]="'workItemDialog.buttons.cancel' | translate"
         [outlined]="true"
         (onClick)="onCancel()">
       </p-button>
       <p-button 
-        label="Save"
+        [label]="'workItemDialog.buttons.save' | translate"
         (onClick)="onSave()">
       </p-button>
     </div>

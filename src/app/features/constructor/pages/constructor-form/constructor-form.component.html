@@ -10,11 +10,11 @@
         severity="secondary">
       </p-button>
       <h1 class="text-3xl font-bold m-0">
-        {{ isEditMode ? 'Edit Constructor' : 'Create Constructor' }}
+        {{ (isEditMode ? 'constructor.form.editTitle' : 'constructor.form.createTitle') | translate }}
       </h1>
     </div>
     <p class="text-color-secondary ml-6">
-      {{ isEditMode ? 'Update constructor information' : 'Add a new main contractor' }}
+      {{ (isEditMode ? 'constructor.form.editSubtitle' : 'constructor.form.createSubtitle') | translate }}
     </p>
   </div>
 
@@ -26,22 +26,22 @@
         <div class="col-12 md:col-6">
           <div class="field">
             <label for="name" class="block font-medium mb-2">
-              Name <span class="text-red-500">*</span>
+              {{ 'constructor.form.name' | translate }} <span class="text-red-500">*</span>
             </label>
             <input 
               id="name"
               type="text" 
               pInputText 
               formControlName="name"
-              placeholder="Enter constructor name"
+              [placeholder]="'constructor.form.namePlaceholder' | translate"
               class="w-full"
               [class.ng-invalid]="name?.invalid && name?.touched"
               [class.ng-dirty]="name?.touched" />
             <small 
               *ngIf="name?.invalid && name?.touched" 
               class="p-error block mt-1">
-              <span *ngIf="name?.errors?.['required']">Name is required</span>
-              <span *ngIf="name?.errors?.['minlength']">Name must be at least 2 characters</span>
+              <span *ngIf="name?.errors?.['required']">{{ 'constructor.form.nameRequired' | translate }}</span>
+              <span *ngIf="name?.errors?.['minlength']">{{ 'constructor.form.nameMinLength' | translate }}</span>
             </small>
           </div>
         </div>
@@ -50,7 +50,7 @@
         <div class="col-12 md:col-6">
           <div class="field">
             <label for="mainContractorTypeId" class="block font-medium mb-2">
-              Contractor Type <span class="text-red-500">*</span>
+              {{ 'constructor.form.contractorType' | translate }} <span class="text-red-500">*</span>
             </label>
             <p-dropdown
               id="mainContractorTypeId"
@@ -58,7 +58,7 @@
               [options]="mainContractorTypes"
               optionLabel="name"
               optionValue="id"
-              placeholder="Select contractor type"
+              [placeholder]="'constructor.form.contractorTypePlaceholder' | translate"
               [showClear]="true"
               styleClass="w-full"
               [disabled]="isLoadingDropdowns"
@@ -68,7 +68,7 @@
             <small 
               *ngIf="mainContractorTypeId?.invalid && mainContractorTypeId?.touched" 
               class="p-error block mt-1">
-              Contractor type is required
+              {{ 'constructor.form.contractorTypeRequired' | translate }}
             </small>
           </div>
         </div>
@@ -77,7 +77,7 @@
       <!-- Form Actions -->
       <div class="flex justify-content-end gap-2 mt-4 pt-4 border-top-1 surface-border">
         <p-button 
-          label="Cancel"
+          [label]="'constructor.form.cancel' | translate"
           icon="pi pi-times"
           (onClick)="onCancel()"
           severity="secondary"
@@ -85,7 +85,7 @@
           [disabled]="isSaving">
         </p-button>
         <p-button 
-          label="{{ isEditMode ? 'Update' : 'Create' }}"
+          [label]="(isEditMode ? 'constructor.form.update' : 'constructor.form.create') | translate"
           icon="pi pi-check"
           type="submit"
           severity="primary"

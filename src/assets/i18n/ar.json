@@ -160,6 +160,9 @@
   },
   "dashboard": {
     "title": "لوحة التحكم",
+    "subtitle": "مرحباً بعودتك! إليك نظرة عامة على منصة الإدارة.",
+    "newProject": "مشروع جديد",
+    "newAgreement": "اتفاقية جديدة",
     "multiSelectDemo": "عرض تجريبي متعدد الاختيار",
     "selectItems": "اختر العناصر",
     "selectItemsPlaceholder": "اختر العناصر",
@@ -174,7 +177,71 @@
     "salaryDeposit": "إيداع الراتب",
     "rentPayment": "دفع الإيجار",
     "groceries": "البقالة",
-    "freelanceIncome": "دخل العمل الحر"
+    "freelanceIncome": "دخل العمل الحر",
+    "stats": {
+      "totalProjects": "إجمالي المشاريع",
+      "activeAgreements": "الاتفاقيات النشطة",
+      "totalSuppliers": "إجمالي الموردين",
+      "constructors": "المقاولون",
+      "vsLastMonth": "مقارنة بالشهر الماضي",
+      "newThisMonth": "جديد هذا الشهر"
+    },
+    "charts": {
+      "projectStatus": "حالة المشاريع",
+      "monthlyProgress": "التقدم الشهري",
+      "projectsStarted": "المشاريع المبدوءة",
+      "projectsCompleted": "المشاريع المنجزة"
+    },
+    "tables": {
+      "recentProjects": "المشاريع الأخيرة",
+      "recentAgreements": "الاتفاقيات الأخيرة",
+      "viewAll": "عرض الكل",
+      "upcomingTasks": "المهام القادمة",
+      "tasks": "مهام"
+    },
+    "quickActions": {
+      "title": "الإجراءات السريعة",
+      "viewProjects": "عرض المشاريع",
+      "agreements": "الاتفاقيات",
+      "suppliers": "الموردون",
+      "constructors": "المقاولون"
+    },
+    "statusLabels": {
+      "completed": "مكتمل",
+      "approved": "موافق عليه",
+      "inProgress": "قيد التنفيذ",
+      "pending": "في الانتظار",
+      "planning": "التخطيط",
+      "draft": "مسودة",
+      "onHold": "معلق",
+      "rejected": "مرفوض"
+    },
+    "priorityLabels": {
+      "low": "منخفض",
+      "medium": "متوسط",
+      "high": "عالي",
+      "urgent": "عاجل"
+    }
+  },
+  "sidebar": {
+    "sections": {
+      "overview": "نظرة عامة",
+      "additionalFeatures": "مميزات إضافية",
+      "extendedModules": "وحدات موسعة"
+    },
+    "items": {
+      "dashboard": "لوحة التحكم",
+      "projectManagement": "إدارة المشاريع",
+      "agreementWizard": "معالج الاتفاقيات",
+      "constructors": "المقاولون",
+      "suppliers": "الموردون",
+      "feature1": "ميزة 1",
+      "feature2": "ميزة 2"
+    },
+    "footer": {
+      "settings": "الإعدادات",
+      "help": "المساعدة"
+    }
   },
   "wizard": {
     "next": "التالي",
@@ -318,12 +385,188 @@
       "download": "تحميل"
     }
   },
+  "constructor": {
+    "title": "المقاولون",
+    "subtitle": "إدارة المقاولين الرئيسيين وشركات البناء",
+    "create": "إضافة مقاول",
+    "createFirst": "إضافة أول مقاول",
+    "searchPlaceholder": "بحث في المقاولين...",
+    "pagination": "عرض {first} إلى {last} من {totalRecords} مقاول",
+    "columns": {
+      "name": "الاسم",
+      "contractorType": "نوع المقاول",
+      "actions": "الإجراءات"
+    },
+    "noData": "لم يتم العثور على مقاولين",
+    "tooltips": {
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "form": {
+      "createTitle": "إنشاء مقاول",
+      "editTitle": "تعديل مقاول",
+      "createSubtitle": "إضافة مقاول رئيسي جديد",
+      "editSubtitle": "تحديث معلومات المقاول",
+      "name": "الاسم",
+      "contractorType": "نوع المقاول",
+      "namePlaceholder": "أدخل اسم المقاول",
+      "contractorTypePlaceholder": "اختر نوع المقاول",
+      "nameRequired": "الاسم مطلوب",
+      "nameMinLength": "يجب أن يكون الاسم على الأقل حرفين",
+      "contractorTypeRequired": "نوع المقاول مطلوب",
+      "cancel": "إلغاء",
+      "create": "إنشاء",
+      "update": "تحديث"
+    }
+  },
+  "supplier": {
+    "title": "الموردون",
+    "subtitle": "إدارة الموردين والبائعين",
+    "create": "إضافة مورد",
+    "createFirst": "إضافة أول مورد",
+    "searchPlaceholder": "بحث في الموردين...",
+    "pagination": "عرض {first} إلى {last} من {totalRecords} مورد",
+    "columns": {
+      "name": "الاسم",
+      "phoneNumber": "رقم الهاتف",
+      "email": "البريد الإلكتروني",
+      "actions": "الإجراءات"
+    },
+    "noData": "لم يتم العثور على موردين",
+    "tooltips": {
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "form": {
+      "createTitle": "إنشاء مورد",
+      "editTitle": "تعديل مورد",
+      "createSubtitle": "إضافة مورد جديد",
+      "editSubtitle": "تحديث معلومات المورد",
+      "name": "الاسم",
+      "phoneNumber": "رقم الهاتف",
+      "email": "البريد الإلكتروني",
+      "namePlaceholder": "أدخل اسم المورد",
+      "phoneNumberPlaceholder": "أدخل رقم الهاتف",
+      "emailPlaceholder": "أدخل البريد الإلكتروني",
+      "nameRequired": "الاسم مطلوب",
+      "nameMinLength": "يجب أن يكون الاسم على الأقل حرفين",
+      "phoneNumberRequired": "رقم الهاتف مطلوب",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "صيغة البريد الإلكتروني غير صحيحة",
+      "cancel": "إلغاء",
+      "create": "إنشاء",
+      "update": "تحديث"
+    }
+  },
+  "projectDetail": {
+    "backToProjects": "العودة للمشاريع",
+    "printReport": "طباعة التقرير",
+    "overallProgress": "التقدم الكلي",
+    "budget": "الميزانية",
+    "spent": "مُنفق",
+    "startDate": "تاريخ البداية",
+    "projectDescription": "وصف المشروع",
+    "overviewDetails": "نظرة عامة والتفاصيل الرئيسية",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "preparing": "التحضير",
+      "excavation": "الحفر",
+      "milestones": "المعالم",
+      "documents": "المستندات"
+    },
+    "printDialog": {
+      "header": "طباعة تقرير المشروع",
+      "description": "تخصيص وطباعة تقرير شامل للمشروع",
+      "reportType": "نوع التقرير",
+      "selectReportType": "اختر نوع التقرير",
+      "cancel": "إلغاء",
+      "downloadPdf": "تحميل PDF",
+      "print": "طباعة",
+      "reportTypes": {
+        "full": "تقرير المشروع الكامل",
+        "summary": "الملخص التنفيذي",
+        "progress": "تقرير التقدم",
+        "financial": "التقرير المالي",
+        "custom": "تقرير مخصص"
+      }
+    },
+    "milestoneStages": {
+      "title": "مراحل المعالم",
+      "subtitle": "إدارة جميع مراحل المعالم وتفاصيلها",
+      "noStages": "لم يتم العثور على مراحل معالم لهذا المشروع",
+      "milestone": "معلم"
+    }
+  },
   "projectTabs": {
     "boq": {
+      "title": "كشف الكميات",
+      "titleAbbr": "كشف الكميات (BoQ)",
+      "subtitle": "إدارة مواد البناء والكميات",
+      "totalItems": "إجمالي العناصر",
+      "addItem": "إضافة عنصر",
+      "grandTotal": "المجموع الكلي",
+      "loading": "جاري التحميل...",
+      "columns": {
+        "material": "المادة",
+        "description": "الوصف",
+        "unit": "الوحدة",
+        "constructor": "المقاول",
+        "actualQty": "الكمية الفعلية",
+        "unitPrice": "سعر الوحدة",
+        "amount": "المبلغ",
+        "subtotal": "المجموع الفرعي",
+        "actions": "الإجراءات"
+      },
+      "tooltips": {
+        "edit": "تعديل",
+        "delete": "حذف"
+      },
       "confirmDelete": {
         "header": "حذف عنصر BoQ",
         "message": "هل أنت متأكد من حذف \"{{name}}\"؟"
+      },
+      "dialog": {
+        "addTitle": "إضافة عنصر كشف كميات",
+        "editTitle": "تعديل عنصر كشف كميات",
+        "material": "المادة",
+        "unit": "الوحدة",
+        "constructor": "المقاول",
+        "description": "الوصف",
+        "actualQuantity": "الكمية الفعلية",
+        "unitPrice": "سعر الوحدة",
+        "subtotal": "المجموع الفرعي",
+        "searchMaterial": "ابحث عن مادة...",
+        "searchConstructor": "ابحث عن مقاول...",
+        "materialRequired": "المادة مطلوبة.",
+        "unitRequired": "الوحدة مطلوبة.",
+        "constructorRequired": "المقاول مطلوب.",
+        "descriptionRequired": "الوصف مطلوب.",
+        "quantityRequired": "الكمية مطلوبة.",
+        "priceRequired": "سعر الوحدة مطلوب.",
+        "cancel": "إلغاء",
+        "addItem": "إضافة عنصر",
+        "update": "تحديث"
       }
+    },
+    "milestoneDocuments": {
+      "title": "مستندات المشروع",
+      "subtitle": "إدارة مستندات ومرفقات المشروع"
+    },
+    "voucherOrders": {
+      "title": "أوامر القسائم",
+      "subtitle": "إدارة أوامر القسائم والطلبات"
+    },
+    "surveyingVisits": {
+      "title": "زيارات المسح",
+      "subtitle": "تتبع وإدارة زيارات مسح الموقع"
+    },
+    "purchaseOrders": {
+      "title": "أوامر الشراء",
+      "subtitle": "إدارة طلبات شراء المواد والخدمات"
+    },
+    "projectMainContractor": {
+      "title": "المقاول الرئيسي للمشروع",
+      "subtitle": "إدارة معلومات وعقود المقاول الرئيسي"
     },
     "vo": {
       "confirmDelete": {
@@ -349,5 +592,58 @@
         "message": "هل أنت متأكد من حذف الزيارة في \"{{name}}\"؟"
       }
     }
+  },
+  "workItemDialog": {
+    "title": "إضافة عنصر عمل",
+    "editTitle": "تعديل عنصر عمل",
+    "fields": {
+      "title": "العنوان",
+      "titlePlaceholder": "حفر الأساسات - المرحلة الأولى",
+      "type": "النوع",
+      "typePlaceholder": "اختر النوع",
+      "assignTo": "تعيين إلى",
+      "assignToPlaceholder": "محمد أحمد",
+      "startDate": "تاريخ البداية",
+      "endDate": "تاريخ النهاية",
+      "priority": "الأولوية",
+      "priorityPlaceholder": "اختر الأولوية",
+      "taskPoints": "نقاط المهمة",
+      "taskPointsPlaceholder": "8",
+      "location": "الموقع",
+      "locationPlaceholder": "الشبكة أ1-أ5",
+      "depth": "العمق",
+      "depthPlaceholder": "3.5 متر",
+      "volume": "الحجم",
+      "volumePlaceholder": "450 متر مكعب",
+      "soilType": "نوع التربة",
+      "soilTypePlaceholder": "طين",
+      "equipment": "المعدات",
+      "equipmentPlaceholder": "حفار كات 320",
+      "description": "الوصف",
+      "descriptionPlaceholder": "صف مهمة الحفر..."
+    },
+    "subtasks": {
+      "title": "المهام الفرعية",
+      "addSubtask": "إضافة مهمة فرعية",
+      "noSubtasks": "لا توجد مهام فرعية بعد. انقر فوق \"إضافة مهمة فرعية\" لإنشاء واحدة.",
+      "saveTaskFirst": "الرجاء حفظ المهمة أولاً قبل إضافة المهام الفرعية",
+      "columns": {
+        "title": "العنوان",
+        "dates": "التواريخ",
+        "type": "النوع",
+        "status": "الحالة",
+        "cost": "التكلفة",
+        "quantity": "الكمية",
+        "actions": "الإجراءات"
+      }
+    },
+    "buttons": {
+      "cancel": "إلغاء",
+      "save": "حفظ"
+    }
+  },
+  "excavationStage": {
+    "title": "مرحلة الحفر",
+    "subtitle": "تتبع أنشطة وقياسات الحفر"
   }
 }

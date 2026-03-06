@@ -1,8 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, OnInit, signal } from '@angular/core';
+import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { Subscription } from 'rxjs';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -57,13 +58,14 @@ interface ReportType {
   templateUrl: './project-detail.component.html',
   styleUrls: ['./project-detail.component.scss']
 })
-export class ProjectDetailComponent implements OnInit {
+export class ProjectDetailComponent implements OnInit, OnDestroy {
   project = signal<Project | null>(null);
   projectData = signal<GetProjectDto | null>(null);
   isLoading = signal<boolean>(true);
   activeTabIndex = "0";
   showPrintDialog = false;
   selectedReportType = 'full';
+  private langSub!: Subscription;
   
   // Computed signals for stage IDs
   preparingStageId = computed(() => {
@@ -82,26 +84,37 @@ export class ProjectDetailComponent implements OnInit {
     return stages?.filter((s: ProjectStageDto) => s.stageType === ProjectStageType._3) || [];
   });
   
-  reportTypes: ReportType[] = [
-    { label: 'Full Project Report', value: 'full' },
-    { label: 'Executive Summary', value: 'summary' },
-    { label: 'Progress Report', value: 'progress' },
-    { label: 'Financial Report', value: 'financial' },
-    { label: 'Custom Report', value: 'custom' }
-  ];
+  reportTypes: ReportType[] = [];
+
+  private buildReportTypes(): void {
+    this.reportTypes = [
+      { label: this.translate.instant('projectDetail.printDialog.reportTypes.full'), value: 'full' },
+      { label: this.translate.instant('projectDetail.printDialog.reportTypes.summary'), value: 'summary' },
+      { label: this.translate.instant('projectDetail.printDialog.reportTypes.progress'), value: 'progress' },
+      { label: this.translate.instant('projectDetail.printDialog.reportTypes.financial'), value: 'financial' },
+      { label: this.translate.instant('projectDetail.printDialog.reportTypes.custom'), value: 'custom' }
+    ];
+  }
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private projectService: ProjectService,
-    private projectApiService: ProjectApiService
+    private projectApiService: ProjectApiService,
+    private translate: TranslateService
   ) {}
 
   ngOnInit(): void {
+    this.buildReportTypes();
+    this.langSub = this.translate.onLangChange.subscribe(() => this.buildReportTypes());
     const projectId = this.route.snapshot.paramMap.get('id');
     if (projectId) {
       this.loadProject(projectId);
     }
+  }
+
+  ngOnDestroy(): void {
+    this.langSub?.unsubscribe();
   }
 
   loadProject(id: string): void {
@@ -163,14 +176,14 @@ export class ProjectDetailComponent implements OnInit {
   }
 
   getStatusLabel(status: ProjectStatus): string {
-    const statusLabels: Record<ProjectStatus, string> = {
-      [ProjectStatus.PLANNING]: 'Planning',
-      [ProjectStatus.IN_PROGRESS]: 'In Progress',
-      [ProjectStatus.ON_HOLD]: 'On Hold',
-      [ProjectStatus.COMPLETED]: 'Completed',
-      [ProjectStatus.CANCELLED]: 'Cancelled'
+    const statusKeys: Record<ProjectStatus, string> = {
+      [ProjectStatus.PLANNING]: 'projects.status.planning',
+      [ProjectStatus.IN_PROGRESS]: 'projects.status.in_progress',
+      [ProjectStatus.ON_HOLD]: 'projects.status.on_hold',
+      [ProjectStatus.COMPLETED]: 'projects.status.completed',
+      [ProjectStatus.CANCELLED]: 'projects.status.cancelled'
     };
-    return statusLabels[status] || status;
+    return this.translate.instant(statusKeys[status] || status);
   }
 
   getStatusSeverity(status: ProjectStatus): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {

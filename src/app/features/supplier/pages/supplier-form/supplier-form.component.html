@@ -10,11 +10,11 @@
         severity="secondary">
       </p-button>
       <h1 class="text-3xl font-bold m-0">
-        {{ isEditMode ? 'Edit Supplier' : 'Create Supplier' }}
+        {{ (isEditMode ? 'supplier.form.editTitle' : 'supplier.form.createTitle') | translate }}
       </h1>
     </div>
     <p class="text-color-secondary ml-6">
-      {{ isEditMode ? 'Update supplier information' : 'Add a new supplier' }}
+      {{ (isEditMode ? 'supplier.form.editSubtitle' : 'supplier.form.createSubtitle') | translate }}
     </p>
   </div>
 
@@ -26,22 +26,22 @@
         <div class="col-12 md:col-6">
           <div class="field">
             <label for="name" class="block font-medium mb-2">
-              Name <span class="text-red-500">*</span>
+              {{ 'supplier.form.name' | translate }} <span class="text-red-500">*</span>
             </label>
             <input 
               id="name"
               type="text" 
               pInputText 
               formControlName="name"
-              placeholder="Enter supplier name"
+              [placeholder]="'supplier.form.namePlaceholder' | translate"
               class="w-full"
               [class.ng-invalid]="name?.invalid && name?.touched"
               [class.ng-dirty]="name?.touched" />
             <small 
               *ngIf="name?.invalid && name?.touched" 
               class="p-error block mt-1">
-              <span *ngIf="name?.errors?.['required']">Name is required</span>
-              <span *ngIf="name?.errors?.['minlength']">Name must be at least 2 characters</span>
+              <span *ngIf="name?.errors?.['required']">{{ 'supplier.form.nameRequired' | translate }}</span>
+              <span *ngIf="name?.errors?.['minlength']">{{ 'supplier.form.nameMinLength' | translate }}</span>
             </small>
           </div>
         </div>
@@ -50,21 +50,21 @@
         <div class="col-12 md:col-6">
           <div class="field">
             <label for="phoneNumber" class="block font-medium mb-2">
-              Phone Number <span class="text-red-500">*</span>
+              {{ 'supplier.form.phoneNumber' | translate }} <span class="text-red-500">*</span>
             </label>
             <input 
               id="phoneNumber"
               type="text" 
               pInputText 
               formControlName="phoneNumber"
-              placeholder="Enter phone number"
+              [placeholder]="'supplier.form.phoneNumberPlaceholder' | translate"
               class="w-full"
               [class.ng-invalid]="phoneNumber?.invalid && phoneNumber?.touched"
               [class.ng-dirty]="phoneNumber?.touched" />
             <small 
               *ngIf="phoneNumber?.invalid && phoneNumber?.touched" 
               class="p-error block mt-1">
-              Phone number is required
+              {{ 'supplier.form.phoneNumberRequired' | translate }}
             </small>
           </div>
         </div>
@@ -73,22 +73,22 @@
         <div class="col-12 md:col-6">
           <div class="field">
             <label for="email" class="block font-medium mb-2">
-              Email <span class="text-red-500">*</span>
+              {{ 'supplier.form.email' | translate }} <span class="text-red-500">*</span>
             </label>
             <input 
               id="email"
               type="email" 
               pInputText 
               formControlName="email"
-              placeholder="Enter email address"
+              [placeholder]="'supplier.form.emailPlaceholder' | translate"
               class="w-full"
               [class.ng-invalid]="email?.invalid && email?.touched"
               [class.ng-dirty]="email?.touched" />
             <small 
               *ngIf="email?.invalid && email?.touched" 
               class="p-error block mt-1">
-              <span *ngIf="email?.errors?.['required']">Email is required</span>
-              <span *ngIf="email?.errors?.['email']">Invalid email format</span>
+              <span *ngIf="email?.errors?.['required']">{{ 'supplier.form.emailRequired' | translate }}</span>
+              <span *ngIf="email?.errors?.['email']">{{ 'supplier.form.emailInvalid' | translate }}</span>
             </small>
           </div>
         </div>
@@ -97,7 +97,7 @@
       <!-- Form Actions -->
       <div class="flex justify-content-end gap-2 mt-4 pt-4 border-top-1 surface-border">
         <p-button 
-          label="Cancel"
+          [label]="'supplier.form.cancel' | translate"
           icon="pi pi-times"
           (onClick)="onCancel()"
           severity="secondary"
@@ -105,7 +105,7 @@
           [disabled]="isSaving">
         </p-button>
         <p-button 
-          label="{{ isEditMode ? 'Update' : 'Create' }}"
+          [label]="(isEditMode ? 'supplier.form.update' : 'supplier.form.create') | translate"
           icon="pi pi-check"
           type="submit"
           severity="primary"

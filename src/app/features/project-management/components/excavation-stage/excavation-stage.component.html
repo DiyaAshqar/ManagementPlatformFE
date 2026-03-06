@@ -1,8 +1,8 @@
 <app-shared-stage-board
   [projectId]="projectId"
   [projectStageId]="projectStageId"
-  [stageTitle]="'Excavation Stage'"
-  [stageDescription]="'Track excavation activities and measurements'"
+  [stageTitle]="'excavationStage.title' | translate"
+  [stageDescription]="'excavationStage.subtitle' | translate"
   [showExcavationFields]="true"
   [columnsInput]="columns"
   (taskCreated)="onTaskCreated()"

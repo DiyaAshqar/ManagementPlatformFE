@@ -17,7 +17,7 @@
               [rounded]="true"
               (onClick)="goBack()"
               severity="secondary"
-              pTooltip="Back to projects"
+              [pTooltip]="'projectDetail.backToProjects' | translate"
               tooltipPosition="bottom">
             </p-button>
             <div>
@@ -28,7 +28,7 @@
           <div class="flex align-items-center gap-2">
             <p-button 
               icon="pi pi-print"
-              label="Print Report"
+              [label]="'projectDetail.printReport' | translate"
               [outlined]="true"
               (onClick)="openPrintDialog()"
               severity="secondary">
@@ -54,7 +54,7 @@
                 <i class="pi pi-percentage text-primary text-xl"></i>
               </div>
               <div class="flex-1">
-                <div class="text-500 text-sm mb-1">Overall Progress</div>
+                <div class="text-500 text-sm mb-1">{{ 'projectDetail.overallProgress' | translate }}</div>
                 <div class="text-2xl font-bold text-primary">{{ project()!.progress }}%</div>
               </div>
             </div>
@@ -75,9 +75,9 @@
                 <i class="pi pi-dollar text-green-600 text-xl"></i>
               </div>
               <div class="flex-1">
-                <div class="text-500 text-sm mb-1">Budget</div>
+                <div class="text-500 text-sm mb-1">{{ 'projectDetail.budget' | translate }}</div>
                 <div class="text-2xl font-bold text-color">{{ formatCurrency(project()!.budget) }}</div>
-                <div class="text-xs text-500 mt-1">{{ formatCurrency(project()!.spent) }} spent</div>
+                <div class="text-xs text-500 mt-1">{{ formatCurrency(project()!.spent) }} {{ 'projectDetail.spent' | translate }}</div>
               </div>
             </div>
           </p-card>
@@ -91,7 +91,7 @@
                 <i class="pi pi-calendar text-blue-600 text-xl"></i>
               </div>
               <div class="flex-1">
-                <div class="text-500 text-sm mb-1">Start Date</div>
+                <div class="text-500 text-sm mb-1">{{ 'projectDetail.startDate' | translate }}</div>
                 <div class="text-xl font-semibold text-color">{{ formatDate(project()!.startDate) }}</div>
               </div>
             </div>
@@ -104,8 +104,8 @@
         <p-card styleClass="mb-4">
           <ng-template pTemplate="header">
             <div class="px-3 pt-3 pb-0">
-              <h3 class="text-lg font-semibold m-0 text-color">Project Description</h3>
-              <p class="text-sm text-500 mt-1 mb-0">Overview and key details</p>
+              <h3 class="text-lg font-semibold m-0 text-color">{{ 'projectDetail.projectDescription' | translate }}</h3>
+              <p class="text-sm text-500 mt-1 mb-0">{{ 'projectDetail.overviewDetails' | translate }}</p>
             </div>
           </ng-template>
           <div class="text-color-secondary line-height-3">
@@ -121,19 +121,19 @@
             <p-tab value="0">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-chart-bar"></i>
-                <span>Overview</span>
+                <span>{{ 'projectDetail.tabs.overview' | translate }}</span>
               </div>
             </p-tab>
             <p-tab value="1">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-wrench"></i>
-                <span>Preparing</span>
+                <span>{{ 'projectDetail.tabs.preparing' | translate }}</span>
               </div>
             </p-tab>
             <p-tab value="2">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-shield"></i>
-                <span>Excavation</span>
+                <span>{{ 'projectDetail.tabs.excavation' | translate }}</span>
               </div>
             </p-tab>
             <!-- <p-tab value="3">
@@ -145,13 +145,13 @@
             <p-tab value="4">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-flag"></i>
-                <span>Milestones</span>
+                <span>{{ 'projectDetail.tabs.milestones' | translate }}</span>
               </div>
             </p-tab>
             <p-tab value="5">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-file"></i>
-                <span>Documents</span>
+                <span>{{ 'projectDetail.tabs.documents' | translate }}</span>
               </div>
             </p-tab>
           </p-tablist>
@@ -214,37 +214,37 @@
   [(visible)]="showPrintDialog"
   [modal]="true"
   [style]="{ width: '40rem' }"
-  header="Print Project Report"
+  [header]="'projectDetail.printDialog.header' | translate"
   [draggable]="false"
   [resizable]="false">
-  <p class="text-color-secondary mb-4">Customize and print a comprehensive project report</p>
+  <p class="text-color-secondary mb-4">{{ 'projectDetail.printDialog.description' | translate }}</p>
   
   <div class="mb-4">
-    <label class="block text-sm font-medium mb-2 text-color">Report Type</label>
+    <label class="block text-sm font-medium mb-2 text-color">{{ 'projectDetail.printDialog.reportType' | translate }}</label>
     <p-select 
       [(ngModel)]="selectedReportType"
       [options]="reportTypes"
       optionLabel="label"
       optionValue="value"
-      placeholder="Select report type"
+      [placeholder]="'projectDetail.printDialog.selectReportType' | translate"
       styleClass="w-full">
     </p-select>
   </div>
   
   <ng-template pTemplate="footer">
     <p-button 
-      label="Cancel"
+      [label]="'projectDetail.printDialog.cancel' | translate"
       [outlined]="true"
       (onClick)="showPrintDialog = false">
     </p-button>
     <p-button 
-      label="Download PDF"
+      [label]="'projectDetail.printDialog.downloadPdf' | translate"
       icon="pi pi-download"
       [outlined]="true"
       (onClick)="downloadReport()">
     </p-button>
     <p-button 
-      label="Print"
+      [label]="'projectDetail.printDialog.print' | translate"
       icon="pi pi-print"
       (onClick)="printReport()">
     </p-button>

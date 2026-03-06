@@ -5,16 +5,16 @@
   <!-- Header -->
   <div class="boq-card-header">
     <div>
-      <h3 class="boq-card-title">Bill of Quantities (BoQ)</h3>
-      <p class="boq-card-subtitle">Manage construction materials and quantities</p>
+      <h3 class="boq-card-title">{{ 'projectTabs.boq.titleAbbr' | translate }}</h3>
+      <p class="boq-card-subtitle">{{ 'projectTabs.boq.subtitle' | translate }}</p>
     </div>
   </div>
 
   <!-- Toolbar -->
   <div class="boq-toolbar">
-    <span class="boq-total-label">Total Items: {{ boqItems().length }}</span>
+    <span class="boq-total-label">{{ 'projectTabs.boq.totalItems' | translate }}: {{ boqItems().length }}</span>
     <p-button
-      label="Add BoQ Item"
+      [label]="'projectTabs.boq.addItem' | translate"
       icon="pi pi-plus"
       (onClick)="openAddDialog()"
       severity="contrast"
@@ -31,15 +31,15 @@
 
     <ng-template pTemplate="header">
       <tr>
-        <th>Material</th>
-        <th>Description</th>
-        <th>Unit</th>
-        <th>Constructor</th>
-        <th class="text-right">Actual Qty</th>
-        <th class="text-right">Unit Price</th>
-        <th class="text-right">Amount</th>
-        <th class="text-right">Subtotal</th>
-        <th class="text-center">Actions</th>
+        <th>{{ 'projectTabs.boq.columns.material' | translate }}</th>
+        <th>{{ 'projectTabs.boq.columns.description' | translate }}</th>
+        <th>{{ 'projectTabs.boq.columns.unit' | translate }}</th>
+        <th>{{ 'projectTabs.boq.columns.constructor' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.boq.columns.actualQty' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.boq.columns.unitPrice' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.boq.columns.amount' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.boq.columns.subtotal' | translate }}</th>
+        <th class="text-center">{{ 'projectTabs.boq.columns.actions' | translate }}</th>
       </tr>
     </ng-template>
 
@@ -47,7 +47,7 @@
       @if (isLoading()) {
         <tr>
           <td colspan="9" class="text-center p-4">
-            <i class="pi pi-spin pi-spinner mr-2"></i> Loading...
+            <i class="pi pi-spin pi-spinner mr-2"></i> {{ 'projectTabs.boq.loading' | translate }}
           </td>
         </tr>
       } @else {
@@ -67,7 +67,7 @@
                 [rounded]="true"
                 [text]="true"
                 severity="secondary"
-                pTooltip="Edit"
+                [pTooltip]="'projectTabs.boq.tooltips.edit' | translate"
                 tooltipPosition="top"
                 (onClick)="openEditDialog(item)">
               </p-button>
@@ -76,7 +76,7 @@
                 [rounded]="true"
                 [text]="true"
                 severity="danger"
-                pTooltip="Delete"
+                [pTooltip]="'projectTabs.boq.tooltips.delete' | translate"
                 tooltipPosition="top"
                 (onClick)="confirmDelete(item)">
               </p-button>
@@ -90,7 +90,7 @@
       @if (!isLoading()) {
         <tr class="boq-grand-total-row">
           <td colspan="7" class="text-right">
-            <span class="boq-grand-total-label">Grand Total:</span>
+            <span class="boq-grand-total-label">{{ 'projectTabs.boq.grandTotal' | translate }}:</span>
           </td>
           <td class="text-right boq-grand-total-value">
             {{ grandTotal | currency:'USD':'symbol':'1.0-0' }}

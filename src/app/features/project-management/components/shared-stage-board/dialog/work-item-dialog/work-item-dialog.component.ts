@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';
 import { format } from 'date-fns';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -23,6 +24,7 @@ import { SubtaskDialogComponent } from '../subtask-dialog/subtask-dialog.compone
   imports: [
     CommonModule,
     FormsModule,
+    TranslateModule,
     InputTextModule,
     SelectModule,
     TextareaModule,

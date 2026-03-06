@@ -1,5 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
+import { TranslateModule } from '@ngx-translate/core';
 import { format } from 'date-fns';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { CreateTaskCommand, GetProjectTaskDto } from '../../../../../nswag/api-client';
@@ -14,6 +15,7 @@ import { TaskStatus as BoardTaskStatus, Column, SharedStageBoardComponent, WorkI
   standalone: true,
   imports: [
     CommonModule,
+    TranslateModule,
     SharedStageBoardComponent
   ],
   providers: [DialogService],
