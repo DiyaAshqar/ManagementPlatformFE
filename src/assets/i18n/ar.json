@@ -38,7 +38,7 @@
     "home": "الرئيسية",
     "management": "الإدارة",
     "dashboard": "لوحة التحكم",
-    "agreementWizard": "معالج الاتفاقيات",
+    "agreementWizard": "إدارة الاتفاقيات",
     "agreements": "الاتفاقيات",
     "createAgreement": "إنشاء اتفاقية",
     "editAgreement": "تعديل اتفاقية",
@@ -47,10 +47,10 @@
     "projectDetails": "تفاصيل المشروع",
     "constructor": "المقاولون",
     "newConstructor": "مقاول جديد",
-    "editConstructor": "تعديل مقاول",
+    "editConstructor": "تعديل المقاول",
     "supplier": "الموردون",
     "newSupplier": "مورد جديد",
-    "editSupplier": "تعديل مورد"
+    "editSupplier": "تعديل المورد"
   },
   "agreements": {
     "title": "الاتفاقيات",
@@ -129,10 +129,10 @@
       "endDate": "تاريخ الانتهاء",
       "budget": "الميزانية",
       "priority": "الأولوية",
-      "milestoneCount": "عدد المعالم"
+      "milestoneCount": "عدد المراحل الرئيسية"
     },
     "stages": {
-      "title": "المراحل",
+      "title": "المراحل الرئيسية للمشروع",
       "preparing": "التحضير",
       "excavation": "الحفر",
       "foundation": "الأساسات",
@@ -233,7 +233,7 @@
     "items": {
       "dashboard": "لوحة التحكم",
       "projectManagement": "إدارة المشاريع",
-      "agreementWizard": "معالج الاتفاقيات",
+      "agreementWizard": "إدارة الاتفاقيات",
       "constructors": "المقاولون",
       "suppliers": "الموردون",
       "feature1": "ميزة 1",
@@ -492,10 +492,10 @@
       }
     },
     "milestoneStages": {
-      "title": "مراحل المعالم",
-      "subtitle": "إدارة جميع مراحل المعالم وتفاصيلها",
-      "noStages": "لم يتم العثور على مراحل معالم لهذا المشروع",
-      "milestone": "معلم"
+      "title": "المراحل الرئيسية",
+      "subtitle": "إدارة جميع المراحل الرئيسية وتفاصيلها",
+      "noStages": "لم يتم العثور على المراحل الرئيسية لهذا المشروع",
+      "milestone": "مرحلة رئيسية"
     }
   },
   "projectTabs": {
@@ -554,12 +554,12 @@
       "subtitle": "إدارة مستندات ومرفقات المشروع"
     },
     "voucherOrders": {
-      "title": "أوامر القسائم",
-      "subtitle": "إدارة أوامر القسائم والموافقات",
-      "totalLabel": "إجمالي أوامر القسائم",
-      "createButton": "إنشاء أمر قسيمة",
-      "voNumber": "رقم القسيمة",
-      "voItem": "عنصر القسيمة",
+      "title": "أوامر التعديلات",
+      "subtitle": "إدارة أوامر التعديلات والموافقات",
+      "totalLabel": "إجمالي أوامر التعديلات",
+      "createButton": "إنشاء أمر تعديل",
+      "voNumber": "رقم أمر تعديل",
+      "voItem": "عنوان أمر التعديل",
       "description": "الوصف",
       "quantity": "الكمية",
       "unit": "الوحدة",
@@ -574,16 +574,16 @@
       "no": "لا",
       "editTooltip": "تعديل",
       "deleteTooltip": "حذف",
-      "emptyMessage": "لم يتم العثور على أوامر قسائم. اضغط على \"إنشاء أمر قسيمة\" لإضافة واحد.",
-      "totalVOValue": "إجمالي قيمة القسائم"
+      "emptyMessage": "لم يتم العثور على أوامر التعديل. اضغط على \"إنشاء أمر تعديل\" لإضافة واحد.",
+      "totalVOValue": "إجمالي قيمة التعديلات"
     },
     "surveyingVisits": {
-      "title": "زيارات المسح",
+      "title": "زيارات المساحة",
       "subtitle": "جدولة وتتبع مسوحات الموقع",
-      "totalLabel": "إجمالي زيارات المسح",
+      "totalLabel": "إجمالي زيارات المساحة",
       "scheduleButton": "جدولة زيارة",
       "visitDate": "تاريخ الزيارة",
-      "surveyor": "المساح",
+      "surveyor": "المساحة",
       "purpose": "الغرض",
       "unit": "الوحدة",
       "quantity": "الكمية",
@@ -594,8 +594,8 @@
       "actions": "الإجراءات",
       "editTooltip": "تعديل",
       "deleteTooltip": "حذف",
-      "emptyMessage": "لم يتم العثور على زيارات مسح. اضغط على \"جدولة زيارة\" لإضافة واحدة.",
-      "totalSurveyValue": "إجمالي قيمة المسح"
+      "emptyMessage": "لم يتم العثور على زيارات المساحة. اضغط على \"جدولة زيارة\" لإضافة واحدة.",
+      "totalSurveyValue": "إجمالي قيمة المساحة"
     },
     "purchaseOrders": {
       "title": "أوامر الشراء",
@@ -635,8 +635,8 @@
     },
     "vo": {
       "confirmDelete": {
-        "header": "حذف أمر توريد",
-        "message": "هل أنت متأكد من حذف أمر التوريد \"{{name}}\"؟"
+        "header": "حذف أمر التعديل",
+        "message": "هل أنت متأكد من حذف أمر التعديل \"{{name}}\"؟"
       }
     },
     "po": {
@@ -656,14 +656,14 @@
     },
     "surveyingVisit": {
       "confirmDelete": {
-        "header": "حذف زيارة مسح",
-        "message": "هل أنت متأكد من حذف الزيارة في \"{{name}}\"؟"
+        "header": "حذف زيارة مساحة",
+        "message": "هل أنت متأكد من حذف الزيارة \"{{name}}\"؟"
       }
     }
   },
   "workItemDialog": {
-    "title": "إضافة عنصر عمل",
-    "editTitle": "تعديل عنصر عمل",
+    "title": "إضافة مهمة عمل",
+    "editTitle": "تعديل مهمة عمل",
     "fields": {
       "title": "العنوان",
       "titlePlaceholder": "حفر الأساسات - المرحلة الأولى",
@@ -694,7 +694,7 @@
       "title": "المهام الفرعية",
       "addSubtask": "إضافة مهمة فرعية",
       "noSubtasks": "لا توجد مهام فرعية بعد. انقر فوق \"إضافة مهمة فرعية\" لإنشاء واحدة.",
-      "saveTaskFirst": "الرجاء حفظ المهمة أولاً قبل إضافة المهام الفرعية",
+      "saveTaskFirst": "الرجاء حفظ المهمة الرئيسية أولاً قبل إضافة المهام الفرعية",
       "columns": {
         "title": "العنوان",
         "dates": "التواريخ",
@@ -716,12 +716,12 @@
   },
   "dialogs": {
     "voucherOrder": {
-      "createTitle": "إنشاء أمر قسيمة",
-      "editTitle": "تعديل أمر القسيمة",
-      "voNumber": "رقم القسيمة",
-      "voNumberRequired": "رقم القسيمة مطلوب.",
-      "voItem": "عنصر القسيمة",
-      "voItemRequired": "عنصر القسيمة مطلوب.",
+      "createTitle": "إنشاء أمر تعديل",
+      "editTitle": "تعديل أمر التعديل",
+      "voNumber": "رقم أمر التعديل",
+      "voNumberRequired": "رقم أمر التعديل مطلوب.",
+      "voItem": "عنوان أمر التعديل",
+      "voItemRequired": "عنوان أمر التعديل مطلوب.",
       "description": "الوصف",
       "descriptionRequired": "الوصف مطلوب.",
       "quantity": "الكمية",
@@ -735,19 +735,19 @@
       "statusApproved": "موافق عليه",
       "statusPending": "قيد الانتظار",
       "statusRejected": "مرفوض",
-      "isEffected": "مؤثر",
+      "isEffected": "هل التعديل يؤثر على فترة المشروع؟",
       "effectedDateStart": "تاريخ بداية التأثير",
-      "effectedDateStartRequired": "تاريخ بداية التأثير مطلوب عندما يكون مؤثر محدد.",
+      "effectedDateStartRequired": "تاريخ بداية التأثير مطلوب.",
       "effectedDateEnd": "تاريخ نهاية التأثير",
-      "effectedDateEndRequired": "تاريخ نهاية التأثير مطلوب عندما يكون مؤثر محدد.",
+      "effectedDateEndRequired": "تاريخ نهاية التأثير مطلوب.",
       "subtotal": "المجموع الفرعي",
       "cancel": "إلغاء",
-      "create": "إنشاء أمر",
-      "update": "تحديث"
+      "create": "إنشاء أمر تعديل",
+      "update": "تحديث أمر التعديل"
     },
     "surveyingVisit": {
       "createTitle": "جدولة زيارة",
-      "editTitle": "تعديل زيارة المسح",
+      "editTitle": "تعديل زيارة المساحة",
       "visitDate": "تاريخ الزيارة",
       "visitDateRequired": "تاريخ الزيارة مطلوب.",
       "surveyor": "المساح",
@@ -789,7 +789,7 @@
       "createOrder": "إنشاء أمر"
     },
     "contractor": {
-      "addTitle": "إضافة المقاول الرئيسي",
+      "addTitle": "إضافة مقاول الرئيسي",
       "editTitle": "تعديل المقاول الرئيسي",
       "contractor": "المقاول",
       "contractorRequired": "المقاول مطلوب.",
