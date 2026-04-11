@@ -247,7 +247,7 @@
   "wizard": {
     "next": "التالي",
     "back": "رجوع",
-    "submit": "إرسال",
+    "submit": "حفظ الكل",
     "success": {
       "title": "تم إنشاء الاتفاقية بنجاح!",
       "message": "تم إرسال وحفظ اتفاقيتك بنجاح. يمكنك الآن عرضها في قائمة الاتفاقيات أو إنشاء اتفاقية جديدة.",
@@ -320,14 +320,14 @@
       "showingEntries": "عرض {first} إلى {last} من {totalRecords} إدخالات"
     },
     "step4": {
-      "title": "العقود الرئيسية",
-      "contractType": "نوع العقد الرئيسي",
+      "title": "المقاوليين الرئيسية",
+      "contractType": "نوع المقاول الرئيسي",
       "contractor": "المقاول",
       "totalAmount": "المبلغ الإجمالي",
       "startDate": "تاريخ البداية المتوقع",
       "endDate": "تاريخ النهاية المتوقع",
-      "contractsList": "قائمة العقود الرئيسية",
-      "noContracts": "لم تتم إضافة أي عقود بعد. أضف أول عقد رئيسي أعلاه.",
+      "contractsList": "قائمة المقاوليين الرئيسيين",
+      "noContracts": "لم تتم إضافة أي عقود مقاولات بعد. أضف أول عقد رئيسي أعلاه.",
       "showingContracts": "عرض {first} إلى {last} من {totalRecords} عقود",
       "contractorDuties": "واجبات المقاول",
       "addContractorDuty": "إضافة واجب مقاول",
