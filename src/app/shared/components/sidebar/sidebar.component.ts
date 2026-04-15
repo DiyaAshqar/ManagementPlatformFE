@@ -9,6 +9,7 @@ import { SidebarModule } from 'primeng/sidebar';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
+import { TooltipModule } from 'primeng/tooltip';
 
 // Services
 import { SidebarService } from '../../../core/services/sidebar.service';
@@ -36,7 +37,8 @@ interface NavSection {
     ButtonModule,
     SidebarModule,
     AvatarModule,
-    MenuModule
+    MenuModule,
+    TooltipModule
   ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
@@ -52,19 +54,6 @@ export class SidebarComponent implements OnInit {
         { label: 'sidebar.items.agreementWizard', icon: 'pi pi-briefcase', route: '/agreement-wizard' },
         { label: 'sidebar.items.constructors', icon: 'pi pi-users', route: '/constructor' },
         { label: 'sidebar.items.suppliers', icon: 'pi pi-building', route: '/supplier' },
-        // { label: 'sidebar.items.themeShowcase', icon: 'pi pi-palette', route: '/theme-showcase' },
-      ]
-    },
-    {
-      title: 'sidebar.sections.additionalFeatures',
-      items: [
-        { label: 'sidebar.items.feature1', icon: 'pi pi-wallet', route: '/Module1' },
-      ]
-    },
-    {
-      title: 'sidebar.sections.extendedModules',
-      items: [
-        { label: 'sidebar.items.feature2', icon: 'pi pi-users', route: '/Module1' },
       ]
     }
   ];
@@ -105,7 +94,8 @@ export class SidebarComponent implements OnInit {
 
   isActiveRoute(route: string | undefined): boolean {
     if (!route) return false;
-    return this.router.url === route;
+    if (route === '/dashboard') return this.router.url === '/dashboard';
+    return this.router.url.startsWith(route);
   }
 
   goHome(): void {

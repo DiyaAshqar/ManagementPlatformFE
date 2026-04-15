@@ -100,6 +100,19 @@ h1, h2, h3, h4, h5, h6 {
   }
 }
 
+// Focus Styles for keyboard navigation
+*:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+// Selection highlight
+::selection {
+  background: rgba(0, 82, 204, 0.2);
+  color: var(--text-color);
+}
+
 // Form Validation Styles
 input.ng-invalid.ng-touched,
 input.ng-invalid.ng-dirty,

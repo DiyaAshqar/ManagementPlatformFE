@@ -34,7 +34,25 @@
   padding: 1.5rem;
   background: var(--surface-ground);
 
+  > * {
+    max-width: 1600px;
+    margin-left: auto;
+    margin-right: auto;
+    animation: fadeIn 0.25s ease-out;
+  }
+
   @media (max-width: 575px) {
     padding: 1rem;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }

@@ -24,9 +24,7 @@
       }
 
       .section-title {
-        text-align: center;
-        font-size: 0.625rem;
-        padding: 0;
+        display: none;
       }
 
       .nav-item {
@@ -85,6 +83,8 @@
 .sidebar-content {
   flex: 1;
   padding: 4px;
+  overflow-y: auto;
+  overflow-x: hidden;
 
   &::-webkit-scrollbar {
     width: 4px;

@@ -60,6 +60,14 @@
   }
 }
 
+.language-toggle-btn {
+  .language-label {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+}
+
 ::ng-deep {
   .profile-menu {
     margin-top: 0.5rem;

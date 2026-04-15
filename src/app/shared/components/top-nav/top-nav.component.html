@@ -37,8 +37,9 @@
       </button>
 
       <!-- Language Toggle -->
-      <button pButton type="button" icon="pi pi-globe" class="p-button-text p-button-rounded" (click)="toggleLanguage()"
+      <button pButton type="button" class="p-button-text p-button-rounded language-toggle-btn" (click)="toggleLanguage()"
         [attr.aria-label]="'TOGGLE_LANGUAGE' | translate">
+        <span class="language-label">{{ languageService.currentLanguage() === 'ar' ? 'EN' : 'عر' }}</span>
       </button>
 
       <!-- User Profile -->

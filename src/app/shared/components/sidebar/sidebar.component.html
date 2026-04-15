@@ -25,7 +25,9 @@
             class="nav-item"
             [class.active]="isActiveRoute(item.route)"
             (click)="navigateTo(item.route)"
-            [attr.aria-label]="item.label | translate">
+            [attr.aria-label]="item.label | translate"
+            [pTooltip]="!sidebarService.isOpen() ? (item.label | translate) : ''"
+            tooltipPosition="right">
             <i [class]="item.icon + ' nav-icon'"></i>
             <span class="nav-label" *ngIf="sidebarService.isOpen()">{{ item.label | translate }}</span>
           </a>
@@ -42,7 +44,9 @@
         class="nav-item"
         [class.active]="isActiveRoute(item.route)"
         (click)="navigateTo(item.route)"
-        [attr.aria-label]="item.label | translate">
+        [attr.aria-label]="item.label | translate"
+        [pTooltip]="!sidebarService.isOpen() ? (item.label | translate) : ''"
+        tooltipPosition="right">
         <i [class]="item.icon + ' nav-icon'"></i>
         <span class="nav-label" *ngIf="sidebarService.isOpen()">{{ item.label | translate }}</span>
       </a>
