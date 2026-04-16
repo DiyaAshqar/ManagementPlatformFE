@@ -39,7 +39,7 @@ const EXPENSE_ATTACHMENT_TYPE = 6 as AttachmentType;
 let _rowSeq = 0;
 const tempId = (): number => --_rowSeq; // negative IDs for unsaved rows
 
-const createEmptyDetail = (): IExpenseDetailDto => ({ id: tempId() });
+const createEmptyDetail = (): IExpenseDetailDto => ({ id: tempId(), currencyId: 1 });
 const emptyDetails = (): IExpenseDetailDto[] => [createEmptyDetail()];
 
 // -- Component -----------------------------------------------------------------
