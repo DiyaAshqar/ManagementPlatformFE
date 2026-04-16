@@ -21,6 +21,7 @@ import { DocumentsStageComponent } from '../../components/documents-stage/docume
 import { ExcavationStageComponent } from '../../components/excavation-stage/excavation-stage.component';
 import { MilestoneStageComponent } from '../../components/milestone-stage/milestone-stage.component';
 import { PreparingStageComponent } from '../../components/preparing-stage/preparing-stage.component';
+import { ProjectExpenseManagementComponent } from '../../components/project-expense-management/project-expense-management.component';
 import { StageKanbanComponent } from '../../components/stage-kanban/stage-kanban.component';
 import { Project, ProjectStatus, Stage, TaskStatus } from '../../models';
 import { GetProjectTaskDto } from '../../../../../nswag/api-client';
@@ -53,6 +54,7 @@ interface ReportType {
     MilestoneStageComponent,
     StageKanbanComponent,
     DocumentsStageComponent,
+    ProjectExpenseManagementComponent,
     // StagingBoardComponent
   ],
   templateUrl: './project-detail.component.html',

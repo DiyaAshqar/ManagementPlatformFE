@@ -473,7 +473,8 @@
       "preparing": "التحضير",
       "excavation": "الحفر",
       "milestones": "المعالم",
-      "documents": "المستندات"
+      "documents": "المستندات",
+      "expenses": "المصروفات"
     },
     "printDialog": {
       "header": "طباعة تقرير المشروع",
@@ -658,6 +659,61 @@
       "confirmDelete": {
         "header": "حذف زيارة مساحة",
         "message": "هل أنت متأكد من حذف الزيارة \"{{name}}\"؟"
+      }
+    },
+    "expenses": {
+      "title": "إدارة المصروفات",
+      "subtitle": "إنشاء وإدارة سجلات المصروفات",
+      "columns": {
+        "expenseNo": "رقم المصروف",
+        "supplier": "المورد",
+        "date": "التاريخ",
+        "total": "الإجمالي",
+        "notes": "ملاحظات"
+      },
+      "list": {
+        "newExpense": "مصروف جديد",
+        "totalRecords": "إجمالي المصروفات",
+        "totalAmount": "المبلغ الإجمالي",
+        "empty": "لا توجد مصروفات مسجلة حتى الآن.",
+        "pagination": "عرض {first} إلى {last} من {totalRecords} مصروف"
+      },
+      "form": {
+        "newTitle": "مصروف جديد",
+        "editTitle": "تعديل المصروف",
+        "subtitle": "أدخل تفاصيل المصروف وبنوده أدناه",
+        "backToList": "عودة للقائمة",
+        "expenseNoPlaceholder": "مثال: EXP-2026-001",
+        "selectSupplier": "اختر المورد",
+        "notesPlaceholder": "ملاحظات اختيارية...",
+        "save": "حفظ المصروف"
+      },
+      "lineItems": {
+        "title": "بنود الصرف",
+        "subtitle": "أضف عناصر لهذا المصروف",
+        "addRow": "إضافة صف",
+        "total": "الإجمالي",
+        "selectItem": "اختر عنصر",
+        "selectCurrency": "اختر العملة",
+        "columns": {
+          "item": "العنصر",
+          "qty": "الكمية",
+          "unitPrice": "سعر الوحدة",
+          "subTotal": "المجموع الفرعي",
+          "currency": "العملة"
+        }
+      },
+      "confirmDelete": {
+        "header": "حذف المصروف",
+        "message": "هل أنت متأكد من حذف المصروف \"{{name}}\"؟"
+      },
+      "messages": {
+        "saved": "تم حفظ المصروف بنجاح.",
+        "deleted": "تم حذف المصروف بنجاح."
+      },
+      "attachments": {
+        "title": "المرفقات",
+        "saveFirst": "احفظ المصروف أولاً لإضافة المرفقات."
       }
     }
   },

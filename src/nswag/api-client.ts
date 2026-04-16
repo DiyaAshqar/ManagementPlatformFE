@@ -734,6 +734,565 @@ export class ConstructorClient {
 }
 
 @Injectable()
+export class CurrencyClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createOrUpdate(body: CreateCurrencyCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/Currency";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return OK
+     */
+    delete(id: number | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/Currency?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getAll(requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<CurrencyDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/Currency?";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<CurrencyDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<CurrencyDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<CurrencyDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CurrencyDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getById(id: number): Observable<CurrencyDtoResponse> {
+        let url_ = this.baseUrl + "/api/Currency/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<CurrencyDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<CurrencyDtoResponse>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<CurrencyDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = CurrencyDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class ExpenseClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createOrUpdate(body: CreateExpenseCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/Expense";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return OK
+     */
+    delete(id: number | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/Expense?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getAll(requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetExpenseDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/Expense?";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetExpenseDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetExpenseDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<GetExpenseDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetExpenseDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getById(id: number): Observable<GetExpenseDtoResponse> {
+        let url_ = this.baseUrl + "/api/Expense/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetExpenseDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetExpenseDtoResponse>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<GetExpenseDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetExpenseDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param projectId (optional) 
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getByProjectId(projectId: number | undefined, requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetExpenseDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/Expense/by-project?";
+        if (projectId === null)
+            throw new globalThis.Error("The parameter 'projectId' cannot be null.");
+        else if (projectId !== undefined)
+            url_ += "ProjectId=" + encodeURIComponent("" + projectId) + "&";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByProjectId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByProjectId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetExpenseDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetExpenseDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetByProjectId(response: HttpResponseBase): Observable<GetExpenseDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetExpenseDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class LookupClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -3921,6 +4480,78 @@ export interface IAnnex {
     name: string | undefined;
 }
 
+export class Attachment implements IAttachment {
+    id?: number;
+    isDeleted?: boolean;
+    fileUrl?: string | undefined;
+    fileName?: string | undefined;
+    filePath?: string | undefined;
+    originalName?: string | undefined;
+    attachmentType?: AttachmentType;
+    relationshipId?: number;
+    expenseId?: number | undefined;
+    expense?: Expense;
+
+    constructor(data?: IAttachment) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.fileUrl = _data["fileUrl"];
+            this.fileName = _data["fileName"];
+            this.filePath = _data["filePath"];
+            this.originalName = _data["originalName"];
+            this.attachmentType = _data["attachmentType"];
+            this.relationshipId = _data["relationshipId"];
+            this.expenseId = _data["expenseId"];
+            this.expense = _data["expense"] ? Expense.fromJS(_data["expense"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): Attachment {
+        data = typeof data === 'object' ? data : {};
+        let result = new Attachment();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["fileUrl"] = this.fileUrl;
+        data["fileName"] = this.fileName;
+        data["filePath"] = this.filePath;
+        data["originalName"] = this.originalName;
+        data["attachmentType"] = this.attachmentType;
+        data["relationshipId"] = this.relationshipId;
+        data["expenseId"] = this.expenseId;
+        data["expense"] = this.expense ? this.expense.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAttachment {
+    id?: number;
+    isDeleted?: boolean;
+    fileUrl?: string | undefined;
+    fileName?: string | undefined;
+    filePath?: string | undefined;
+    originalName?: string | undefined;
+    attachmentType?: AttachmentType;
+    relationshipId?: number;
+    expenseId?: number | undefined;
+    expense?: Expense;
+}
+
 export class AttachmentDto implements IAttachmentDto {
     id?: number;
     attachmentType?: AttachmentType;
@@ -4606,6 +5237,190 @@ export interface ICreateConstructorCommand {
     mainContractorTypeId?: number;
 }
 
+export class CreateCurrencyCommand implements ICreateCurrencyCommand {
+    id?: number | undefined;
+    name?: string | undefined;
+    abb?: string | undefined;
+    rate?: number;
+
+    constructor(data?: ICreateCurrencyCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.abb = _data["abb"];
+            this.rate = _data["rate"];
+        }
+    }
+
+    static fromJS(data: any): CreateCurrencyCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateCurrencyCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["abb"] = this.abb;
+        data["rate"] = this.rate;
+        return data;
+    }
+}
+
+export interface ICreateCurrencyCommand {
+    id?: number | undefined;
+    name?: string | undefined;
+    abb?: string | undefined;
+    rate?: number;
+}
+
+export class CreateExpenseCommand implements ICreateExpenseCommand {
+    id?: number | undefined;
+    expenseDate?: Date;
+    expenseNo?: string | undefined;
+    totalAmount?: number;
+    notes?: string | undefined;
+    autoPost?: boolean;
+    projectId?: number;
+    supplierId?: number;
+    expenseDetails?: CreateExpenseDetailModel[] | undefined;
+
+    constructor(data?: ICreateExpenseCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.expenseDate = _data["expenseDate"] ? new Date(_data["expenseDate"].toString()) : undefined as any;
+            this.expenseNo = _data["expenseNo"];
+            this.totalAmount = _data["totalAmount"];
+            this.notes = _data["notes"];
+            this.autoPost = _data["autoPost"];
+            this.projectId = _data["projectId"];
+            this.supplierId = _data["supplierId"];
+            if (Array.isArray(_data["expenseDetails"])) {
+                this.expenseDetails = [] as any;
+                for (let item of _data["expenseDetails"])
+                    this.expenseDetails!.push(CreateExpenseDetailModel.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CreateExpenseCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateExpenseCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["expenseDate"] = this.expenseDate ? this.expenseDate.toISOString() : undefined as any;
+        data["expenseNo"] = this.expenseNo;
+        data["totalAmount"] = this.totalAmount;
+        data["notes"] = this.notes;
+        data["autoPost"] = this.autoPost;
+        data["projectId"] = this.projectId;
+        data["supplierId"] = this.supplierId;
+        if (Array.isArray(this.expenseDetails)) {
+            data["expenseDetails"] = [];
+            for (let item of this.expenseDetails)
+                data["expenseDetails"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface ICreateExpenseCommand {
+    id?: number | undefined;
+    expenseDate?: Date;
+    expenseNo?: string | undefined;
+    totalAmount?: number;
+    notes?: string | undefined;
+    autoPost?: boolean;
+    projectId?: number;
+    supplierId?: number;
+    expenseDetails?: CreateExpenseDetailModel[] | undefined;
+}
+
+export class CreateExpenseDetailModel implements ICreateExpenseDetailModel {
+    id?: number | undefined;
+    itemId?: number;
+    qty?: number;
+    unitPrice?: number;
+    subTotal?: number;
+    notes?: string | undefined;
+    currencyId?: number;
+
+    constructor(data?: ICreateExpenseDetailModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.itemId = _data["itemId"];
+            this.qty = _data["qty"];
+            this.unitPrice = _data["unitPrice"];
+            this.subTotal = _data["subTotal"];
+            this.notes = _data["notes"];
+            this.currencyId = _data["currencyId"];
+        }
+    }
+
+    static fromJS(data: any): CreateExpenseDetailModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateExpenseDetailModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["itemId"] = this.itemId;
+        data["qty"] = this.qty;
+        data["unitPrice"] = this.unitPrice;
+        data["subTotal"] = this.subTotal;
+        data["notes"] = this.notes;
+        data["currencyId"] = this.currencyId;
+        return data;
+    }
+}
+
+export interface ICreateExpenseDetailModel {
+    id?: number | undefined;
+    itemId?: number;
+    qty?: number;
+    unitPrice?: number;
+    subTotal?: number;
+    notes?: string | undefined;
+    currencyId?: number;
+}
+
 export class CreateProjectBOQCommand implements ICreateProjectBOQCommand {
     id?: number | undefined;
     projectStageId?: number;
@@ -5230,6 +6045,318 @@ export interface ICreateTaskCommand {
     taskTypeId?: number;
 }
 
+export class Currency implements ICurrency {
+    id?: number;
+    isDeleted?: boolean;
+    name?: string | undefined;
+    abb?: string | undefined;
+    rate?: number;
+    expenseDetails?: ExpenseDetail[] | undefined;
+
+    constructor(data?: ICurrency) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.name = _data["name"];
+            this.abb = _data["abb"];
+            this.rate = _data["rate"];
+            if (Array.isArray(_data["expenseDetails"])) {
+                this.expenseDetails = [] as any;
+                for (let item of _data["expenseDetails"])
+                    this.expenseDetails!.push(ExpenseDetail.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Currency {
+        data = typeof data === 'object' ? data : {};
+        let result = new Currency();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["name"] = this.name;
+        data["abb"] = this.abb;
+        data["rate"] = this.rate;
+        if (Array.isArray(this.expenseDetails)) {
+            data["expenseDetails"] = [];
+            for (let item of this.expenseDetails)
+                data["expenseDetails"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface ICurrency {
+    id?: number;
+    isDeleted?: boolean;
+    name?: string | undefined;
+    abb?: string | undefined;
+    rate?: number;
+    expenseDetails?: ExpenseDetail[] | undefined;
+}
+
+export class CurrencyDto implements ICurrencyDto {
+    id?: number;
+    name?: string | undefined;
+    abb?: string | undefined;
+    rate?: number;
+
+    constructor(data?: ICurrencyDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.abb = _data["abb"];
+            this.rate = _data["rate"];
+        }
+    }
+
+    static fromJS(data: any): CurrencyDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new CurrencyDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["abb"] = this.abb;
+        data["rate"] = this.rate;
+        return data;
+    }
+}
+
+export interface ICurrencyDto {
+    id?: number;
+    name?: string | undefined;
+    abb?: string | undefined;
+    rate?: number;
+}
+
+export class CurrencyDtoListPagedResponse implements ICurrencyDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: CurrencyDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: ICurrencyDtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(CurrencyDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): CurrencyDtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new CurrencyDtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface ICurrencyDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: CurrencyDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class CurrencyDtoListPagedResponseResponse implements ICurrencyDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: CurrencyDtoListPagedResponse;
+
+    constructor(data?: ICurrencyDtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? CurrencyDtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): CurrencyDtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new CurrencyDtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface ICurrencyDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: CurrencyDtoListPagedResponse;
+}
+
+export class CurrencyDtoResponse implements ICurrencyDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: CurrencyDto;
+
+    constructor(data?: ICurrencyDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? CurrencyDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): CurrencyDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new CurrencyDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface ICurrencyDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: CurrencyDto;
+}
+
 export class DeleteSubTaskCommand implements IDeleteSubTaskCommand {
     id?: number;
 
@@ -5440,6 +6567,254 @@ export interface IDutyType {
     id?: number;
     name: string | undefined;
     contractsDuties?: ContractorDuty[] | undefined;
+}
+
+export class Expense implements IExpense {
+    id?: number;
+    isDeleted?: boolean;
+    expenseDate?: Date;
+    expenseNo?: string | undefined;
+    totalAmount?: number;
+    notes?: string | undefined;
+    autoPost?: boolean;
+    project?: Project;
+    projectId?: number;
+    supplierId?: number;
+    supplier?: Supplier;
+    expenseDetails?: ExpenseDetail[] | undefined;
+    attachments?: Attachment[] | undefined;
+
+    constructor(data?: IExpense) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.expenseDate = _data["expenseDate"] ? new Date(_data["expenseDate"].toString()) : undefined as any;
+            this.expenseNo = _data["expenseNo"];
+            this.totalAmount = _data["totalAmount"];
+            this.notes = _data["notes"];
+            this.autoPost = _data["autoPost"];
+            this.project = _data["project"] ? Project.fromJS(_data["project"]) : undefined as any;
+            this.projectId = _data["projectId"];
+            this.supplierId = _data["supplierId"];
+            this.supplier = _data["supplier"] ? Supplier.fromJS(_data["supplier"]) : undefined as any;
+            if (Array.isArray(_data["expenseDetails"])) {
+                this.expenseDetails = [] as any;
+                for (let item of _data["expenseDetails"])
+                    this.expenseDetails!.push(ExpenseDetail.fromJS(item));
+            }
+            if (Array.isArray(_data["attachments"])) {
+                this.attachments = [] as any;
+                for (let item of _data["attachments"])
+                    this.attachments!.push(Attachment.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Expense {
+        data = typeof data === 'object' ? data : {};
+        let result = new Expense();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["expenseDate"] = this.expenseDate ? this.expenseDate.toISOString() : undefined as any;
+        data["expenseNo"] = this.expenseNo;
+        data["totalAmount"] = this.totalAmount;
+        data["notes"] = this.notes;
+        data["autoPost"] = this.autoPost;
+        data["project"] = this.project ? this.project.toJSON() : undefined as any;
+        data["projectId"] = this.projectId;
+        data["supplierId"] = this.supplierId;
+        data["supplier"] = this.supplier ? this.supplier.toJSON() : undefined as any;
+        if (Array.isArray(this.expenseDetails)) {
+            data["expenseDetails"] = [];
+            for (let item of this.expenseDetails)
+                data["expenseDetails"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.attachments)) {
+            data["attachments"] = [];
+            for (let item of this.attachments)
+                data["attachments"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IExpense {
+    id?: number;
+    isDeleted?: boolean;
+    expenseDate?: Date;
+    expenseNo?: string | undefined;
+    totalAmount?: number;
+    notes?: string | undefined;
+    autoPost?: boolean;
+    project?: Project;
+    projectId?: number;
+    supplierId?: number;
+    supplier?: Supplier;
+    expenseDetails?: ExpenseDetail[] | undefined;
+    attachments?: Attachment[] | undefined;
+}
+
+export class ExpenseDetail implements IExpenseDetail {
+    id?: number;
+    isDeleted?: boolean;
+    itemId?: number;
+    qty?: number;
+    unitPrice?: number;
+    subTotal?: number;
+    notes?: string | undefined;
+    expenseId?: number;
+    currencyId?: number;
+    expense?: Expense;
+    currency?: Currency;
+
+    constructor(data?: IExpenseDetail) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.itemId = _data["itemId"];
+            this.qty = _data["qty"];
+            this.unitPrice = _data["unitPrice"];
+            this.subTotal = _data["subTotal"];
+            this.notes = _data["notes"];
+            this.expenseId = _data["expenseId"];
+            this.currencyId = _data["currencyId"];
+            this.expense = _data["expense"] ? Expense.fromJS(_data["expense"]) : undefined as any;
+            this.currency = _data["currency"] ? Currency.fromJS(_data["currency"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): ExpenseDetail {
+        data = typeof data === 'object' ? data : {};
+        let result = new ExpenseDetail();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["itemId"] = this.itemId;
+        data["qty"] = this.qty;
+        data["unitPrice"] = this.unitPrice;
+        data["subTotal"] = this.subTotal;
+        data["notes"] = this.notes;
+        data["expenseId"] = this.expenseId;
+        data["currencyId"] = this.currencyId;
+        data["expense"] = this.expense ? this.expense.toJSON() : undefined as any;
+        data["currency"] = this.currency ? this.currency.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IExpenseDetail {
+    id?: number;
+    isDeleted?: boolean;
+    itemId?: number;
+    qty?: number;
+    unitPrice?: number;
+    subTotal?: number;
+    notes?: string | undefined;
+    expenseId?: number;
+    currencyId?: number;
+    expense?: Expense;
+    currency?: Currency;
+}
+
+export class ExpenseDetailDto implements IExpenseDetailDto {
+    id?: number;
+    itemId?: number;
+    qty?: number;
+    unitPrice?: number;
+    subTotal?: number;
+    notes?: string | undefined;
+    currencyId?: number;
+    currencyName?: string | undefined;
+    currencyAbb?: string | undefined;
+    currencyRate?: number;
+
+    constructor(data?: IExpenseDetailDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.itemId = _data["itemId"];
+            this.qty = _data["qty"];
+            this.unitPrice = _data["unitPrice"];
+            this.subTotal = _data["subTotal"];
+            this.notes = _data["notes"];
+            this.currencyId = _data["currencyId"];
+            this.currencyName = _data["currencyName"];
+            this.currencyAbb = _data["currencyAbb"];
+            this.currencyRate = _data["currencyRate"];
+        }
+    }
+
+    static fromJS(data: any): ExpenseDetailDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ExpenseDetailDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["itemId"] = this.itemId;
+        data["qty"] = this.qty;
+        data["unitPrice"] = this.unitPrice;
+        data["subTotal"] = this.subTotal;
+        data["notes"] = this.notes;
+        data["currencyId"] = this.currencyId;
+        data["currencyName"] = this.currencyName;
+        data["currencyAbb"] = this.currencyAbb;
+        data["currencyRate"] = this.currencyRate;
+        return data;
+    }
+}
+
+export interface IExpenseDetailDto {
+    id?: number;
+    itemId?: number;
+    qty?: number;
+    unitPrice?: number;
+    subTotal?: number;
+    notes?: string | undefined;
+    currencyId?: number;
+    currencyName?: string | undefined;
+    currencyAbb?: string | undefined;
+    currencyRate?: number;
 }
 
 export class FifthStepDto implements IFifthStepDto {
@@ -5894,6 +7269,7 @@ export class GetAttachmentMetaData implements IGetAttachmentMetaData {
     id?: number;
     fileName?: string | undefined;
     filePath?: string | undefined;
+    originalName?: string | undefined;
     relationshipId?: number;
 
     constructor(data?: IGetAttachmentMetaData) {
@@ -5910,6 +7286,7 @@ export class GetAttachmentMetaData implements IGetAttachmentMetaData {
             this.id = _data["id"];
             this.fileName = _data["fileName"];
             this.filePath = _data["filePath"];
+            this.originalName = _data["originalName"];
             this.relationshipId = _data["relationshipId"];
         }
     }
@@ -5926,6 +7303,7 @@ export class GetAttachmentMetaData implements IGetAttachmentMetaData {
         data["id"] = this.id;
         data["fileName"] = this.fileName;
         data["filePath"] = this.filePath;
+        data["originalName"] = this.originalName;
         data["relationshipId"] = this.relationshipId;
         return data;
     }
@@ -5935,6 +7313,7 @@ export interface IGetAttachmentMetaData {
     id?: number;
     fileName?: string | undefined;
     filePath?: string | undefined;
+    originalName?: string | undefined;
     relationshipId?: number;
 }
 
@@ -6304,6 +7683,286 @@ export interface IGetConstructorDtoResponse {
     message?: string | undefined;
     errors?: string[] | undefined;
     data?: GetConstructorDto;
+}
+
+export class GetExpenseDto implements IGetExpenseDto {
+    id?: number;
+    expenseDate?: Date;
+    expenseNo?: string | undefined;
+    totalAmount?: number;
+    notes?: string | undefined;
+    autoPost?: boolean;
+    projectId?: number;
+    supplierId?: number;
+    supplierName?: string | undefined;
+    expenseDetails?: ExpenseDetailDto[] | undefined;
+
+    constructor(data?: IGetExpenseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.expenseDate = _data["expenseDate"] ? new Date(_data["expenseDate"].toString()) : undefined as any;
+            this.expenseNo = _data["expenseNo"];
+            this.totalAmount = _data["totalAmount"];
+            this.notes = _data["notes"];
+            this.autoPost = _data["autoPost"];
+            this.projectId = _data["projectId"];
+            this.supplierId = _data["supplierId"];
+            this.supplierName = _data["supplierName"];
+            if (Array.isArray(_data["expenseDetails"])) {
+                this.expenseDetails = [] as any;
+                for (let item of _data["expenseDetails"])
+                    this.expenseDetails!.push(ExpenseDetailDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GetExpenseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetExpenseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["expenseDate"] = this.expenseDate ? this.expenseDate.toISOString() : undefined as any;
+        data["expenseNo"] = this.expenseNo;
+        data["totalAmount"] = this.totalAmount;
+        data["notes"] = this.notes;
+        data["autoPost"] = this.autoPost;
+        data["projectId"] = this.projectId;
+        data["supplierId"] = this.supplierId;
+        data["supplierName"] = this.supplierName;
+        if (Array.isArray(this.expenseDetails)) {
+            data["expenseDetails"] = [];
+            for (let item of this.expenseDetails)
+                data["expenseDetails"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IGetExpenseDto {
+    id?: number;
+    expenseDate?: Date;
+    expenseNo?: string | undefined;
+    totalAmount?: number;
+    notes?: string | undefined;
+    autoPost?: boolean;
+    projectId?: number;
+    supplierId?: number;
+    supplierName?: string | undefined;
+    expenseDetails?: ExpenseDetailDto[] | undefined;
+}
+
+export class GetExpenseDtoListPagedResponse implements IGetExpenseDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetExpenseDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IGetExpenseDtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetExpenseDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): GetExpenseDtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetExpenseDtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IGetExpenseDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetExpenseDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class GetExpenseDtoListPagedResponseResponse implements IGetExpenseDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetExpenseDtoListPagedResponse;
+
+    constructor(data?: IGetExpenseDtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetExpenseDtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetExpenseDtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetExpenseDtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetExpenseDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetExpenseDtoListPagedResponse;
+}
+
+export class GetExpenseDtoResponse implements IGetExpenseDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetExpenseDto;
+
+    constructor(data?: IGetExpenseDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetExpenseDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetExpenseDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetExpenseDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetExpenseDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetExpenseDto;
 }
 
 export class GetProjectBOQDto implements IGetProjectBOQDto {
@@ -9089,6 +10748,7 @@ export class Project implements IProject {
     agreementId?: number;
     projectStages?: ProjectStage[] | undefined;
     milestoneCount?: number;
+    expenses?: Expense[] | undefined;
 
     constructor(data?: IProject) {
         if (data) {
@@ -9123,6 +10783,11 @@ export class Project implements IProject {
                     this.projectStages!.push(ProjectStage.fromJS(item));
             }
             this.milestoneCount = _data["milestoneCount"];
+            if (Array.isArray(_data["expenses"])) {
+                this.expenses = [] as any;
+                for (let item of _data["expenses"])
+                    this.expenses!.push(Expense.fromJS(item));
+            }
         }
     }
 
@@ -9157,6 +10822,11 @@ export class Project implements IProject {
                 data["projectStages"].push(item ? item.toJSON() : undefined as any);
         }
         data["milestoneCount"] = this.milestoneCount;
+        if (Array.isArray(this.expenses)) {
+            data["expenses"] = [];
+            for (let item of this.expenses)
+                data["expenses"].push(item ? item.toJSON() : undefined as any);
+        }
         return data;
     }
 }
@@ -9180,6 +10850,7 @@ export interface IProject {
     agreementId?: number;
     projectStages?: ProjectStage[] | undefined;
     milestoneCount?: number;
+    expenses?: Expense[] | undefined;
 }
 
 export class ProjectAreaUnit implements IProjectAreaUnit {
@@ -11057,6 +12728,7 @@ export class Supplier implements ISupplier {
     name?: string | undefined;
     phoneNumber?: string | undefined;
     email?: string | undefined;
+    expenses?: Expense[] | undefined;
 
     constructor(data?: ISupplier) {
         if (data) {
@@ -11074,6 +12746,11 @@ export class Supplier implements ISupplier {
             this.name = _data["name"];
             this.phoneNumber = _data["phoneNumber"];
             this.email = _data["email"];
+            if (Array.isArray(_data["expenses"])) {
+                this.expenses = [] as any;
+                for (let item of _data["expenses"])
+                    this.expenses!.push(Expense.fromJS(item));
+            }
         }
     }
 
@@ -11091,6 +12768,11 @@ export class Supplier implements ISupplier {
         data["name"] = this.name;
         data["phoneNumber"] = this.phoneNumber;
         data["email"] = this.email;
+        if (Array.isArray(this.expenses)) {
+            data["expenses"] = [];
+            for (let item of this.expenses)
+                data["expenses"].push(item ? item.toJSON() : undefined as any);
+        }
         return data;
     }
 }
@@ -11101,6 +12783,7 @@ export interface ISupplier {
     name?: string | undefined;
     phoneNumber?: string | undefined;
     email?: string | undefined;
+    expenses?: Expense[] | undefined;
 }
 
 export class SupplierListPagedResponse implements ISupplierListPagedResponse {

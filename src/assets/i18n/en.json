@@ -476,7 +476,8 @@
       "preparing": "Preparing",
       "excavation": "Excavation",
       "milestones": "Milestones",
-      "documents": "Documents"
+      "documents": "Documents",
+      "expenses": "Expenses"
     },
     "printDialog": {
       "header": "Print Project Report",
@@ -661,6 +662,61 @@
       "confirmDelete": {
         "header": "Delete Surveying Visit",
         "message": "Are you sure you want to delete the visit on \"{{name}}\"?"
+      }
+    },
+    "expenses": {
+      "title": "Expense Management",
+      "subtitle": "Create and manage expense records",
+      "columns": {
+        "expenseNo": "Expense No",
+        "supplier": "Supplier",
+        "date": "Date",
+        "total": "Total",
+        "notes": "Notes"
+      },
+      "list": {
+        "newExpense": "New Expense",
+        "totalRecords": "Total Expenses",
+        "totalAmount": "Total Amount",
+        "empty": "No expenses recorded yet. Click \"New Expense\" to add one.",
+        "pagination": "Showing {first} to {last} of {totalRecords} expenses"
+      },
+      "form": {
+        "newTitle": "New Expense",
+        "editTitle": "Edit Expense",
+        "subtitle": "Fill in the expense details and line items below",
+        "backToList": "Back to list",
+        "expenseNoPlaceholder": "e.g. EXP-2026-001",
+        "selectSupplier": "Select supplier",
+        "notesPlaceholder": "Optional notes...",
+        "save": "Save Expense"
+      },
+      "lineItems": {
+        "title": "Line Items",
+        "subtitle": "Add items to this expense",
+        "addRow": "Add Row",
+        "total": "Total",
+        "selectItem": "Select item",
+        "selectCurrency": "Select currency",
+        "columns": {
+          "item": "Item",
+          "qty": "Qty",
+          "unitPrice": "Unit Price",
+          "subTotal": "SubTotal",
+          "currency": "Currency"
+        }
+      },
+      "confirmDelete": {
+        "header": "Delete Expense",
+        "message": "Are you sure you want to delete expense \"{{name}}\"?"
+      },
+      "messages": {
+        "saved": "Expense saved successfully.",
+        "deleted": "Expense deleted successfully."
+      },
+      "attachments": {
+        "title": "Attachments",
+        "saveFirst": "Save the expense first to add attachments."
       }
     }
   },
