@@ -173,7 +173,7 @@
                 [ngModel]="formSupplierId()" (ngModelChange)="formSupplierId.set($event)"
                 [options]="suppliers()" optionLabel="name" optionValue="id"
                 [placeholder]="'projectTabs.expenses.form.selectSupplier' | translate"
-                [loading]="isLoadingSuppliers()" styleClass="w-full">
+                [loading]="isLoadingLookups()" styleClass="w-full">
               </p-select>
             </div>
           </div>
@@ -228,7 +228,8 @@
             <td class="text-center text-500 font-medium">{{ i + 1 }}</td>
             <td>
               <p-select [ngModel]="detail.itemId" (ngModelChange)="updateDetail(detail.id, 'itemId', $event)"
-                [options]="items" optionLabel="name" optionValue="id"
+                [options]="items()" optionLabel="name" optionValue="id" appendTo="body"
+                [loading]="isLoadingLookups()"
                 [placeholder]="'projectTabs.expenses.lineItems.selectItem' | translate" styleClass="w-full">
               </p-select>
             </td>
@@ -247,7 +248,7 @@
                 class="w-full surface-100 font-medium" />
             </td>
             <td>
-              <p-select [ngModel]="detail.currencyId" (ngModelChange)="updateDetail(detail.id, 'currencyId', $event)"
+              <p-select appendTo="body" [ngModel]="detail.currencyId" (ngModelChange)="updateDetail(detail.id, 'currencyId', $event)"
                 [options]="currencies()" optionLabel="abb" optionValue="id"
                 [loading]="isLoadingCurrencies()"
                 [placeholder]="'projectTabs.expenses.lineItems.selectCurrency' | translate" styleClass="w-full">

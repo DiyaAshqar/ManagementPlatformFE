@@ -25,67 +25,22 @@ import {
   CreateExpenseDetailModel,
   CurrencyClient,
   CurrencyDto,
+  GetExpenseDto,
+  IExpenseDetailDto,
+  LookupClient,
+  LookupDto,
 } from '../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../shared/components/documents-table/documents-table.component';
-import { SupplierService } from '../../../supplier/services/supplier.service';
 import { ExpenseApiService } from '../../services/expense-api.service';
 
 // Expense attachment type: backend uses 6 for Expense (expenseId FK on Attachment entity)
 const EXPENSE_ATTACHMENT_TYPE = 6 as AttachmentType;
 
-// -- Interfaces ----------------------------------------------------------------
-
-interface SupplierOption {
-  id: number;
-  name: string;
-}
-
-interface ItemOption {
-  id: number;
-  name: string;
-}
-
-export interface ExpenseDetail {
-  id: number | null;
-  itemId: number | null;
-  qty: number | null;
-  unitPrice: number | null;
-  currencyId: number | null;
-}
-
-export interface ExpenseRecord {
-  id: number;
-  expenseNo: string;
-  expenseDate: Date;
-  supplierId: number | null;
-  supplierName: string;
-  notes: string;
-  totalAmount: number;
-  details: ExpenseDetail[];
-}
-
-// -- Constants -----------------------------------------------------------------
-
-const ITEMS: ItemOption[] = [
-  { id: 1, name: 'Cable 2.5mm' },
-  { id: 2, name: 'Switch 16A' },
-  { id: 3, name: 'Socket Outlet' },
-  { id: 4, name: 'Circuit Breaker 32A' },
-  { id: 5, name: 'Conduit Pipe 20mm' },
-];
-
 let _rowSeq = 0;
 const tempId = (): number => --_rowSeq; // negative IDs for unsaved rows
 
-const createEmptyDetail = (): ExpenseDetail => ({
-  id: tempId(),
-  itemId: null,
-  qty: null,
-  unitPrice: null,
-  currencyId: null,
-});
-
-const emptyDetails = (): ExpenseDetail[] => Array.from({ length: 5 }, createEmptyDetail);
+const createEmptyDetail = (): IExpenseDetailDto => ({ id: tempId() });
+const emptyDetails = (): IExpenseDetailDto[] => [createEmptyDetail()];
 
 // -- Component -----------------------------------------------------------------
 
@@ -111,7 +66,7 @@ const emptyDetails = (): ExpenseDetail[] => Array.from({ length: 5 }, createEmpt
     ConfirmDialogModule,
     DocumentsTableComponent,
   ],
-  providers: [ConfirmationService, MessageService],
+  providers: [ConfirmationService, MessageService, LookupClient],
   templateUrl: './project-expense-management.component.html',
   styleUrls: ['./project-expense-management.component.scss'],
 })
@@ -123,7 +78,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
   editingExpenseId = signal<number | null>(null);
 
   // -- Master list -------------------------------------------------------------
-  expenses = signal<ExpenseRecord[]>([]);
+  expenses = signal<GetExpenseDto[]>([]);
   isLoadingList = signal<boolean>(false);
 
   // -- Form state --------------------------------------------------------------
@@ -131,17 +86,17 @@ export class ProjectExpenseManagementComponent implements OnInit {
   formExpenseDate = signal<Date>(new Date());
   formSupplierId = signal<number | null>(null);
   formNotes = signal<string>('');
-  formDetails = signal<ExpenseDetail[]>(emptyDetails());
+  formDetails = signal<IExpenseDetailDto[]>(emptyDetails());
   isSaving = signal<boolean>(false);
 
   // -- Lookups -----------------------------------------------------------------
-  suppliers = signal<SupplierOption[]>([]);
-  isLoadingSuppliers = signal<boolean>(false);
+  suppliers = signal<LookupDto[]>([]);
+  items = signal<LookupDto[]>([]);
+  isLoadingLookups = signal<boolean>(false);
 
   currencies = signal<CurrencyDto[]>([]);
   isLoadingCurrencies = signal<boolean>(false);
 
-  readonly items: ItemOption[] = ITEMS;
   readonly expenseAttachmentType = EXPENSE_ATTACHMENT_TYPE;
 
   // -- Computed -----------------------------------------------------------------
@@ -152,12 +107,12 @@ export class ProjectExpenseManagementComponent implements OnInit {
   );
 
   totalExpensesAmount = computed(() =>
-    this.expenses().reduce((sum, e) => sum + e.totalAmount, 0)
+    this.expenses().reduce((sum, e) => sum + (e.totalAmount ?? 0), 0)
   );
 
   constructor(
     private expenseService: ExpenseApiService,
-    private supplierService: SupplierService,
+    private lookupClient: LookupClient,
     private currencyClient: CurrencyClient,
     private confirmationService: ConfirmationService,
     private messageService: MessageService,
@@ -165,7 +120,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.loadSuppliers();
+    this.loadLookups();
     this.loadCurrencies();
     this.loadExpenses();
   }
@@ -177,24 +132,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
     this.expenseService.getByProjectId(+this.projectId).subscribe({
       next: (response) => {
         if (response.succeeded && response.data?.data) {
-          this.expenses.set(
-            response.data.data.map((e) => ({
-              id: e.id!,
-              expenseNo: e.expenseNo ?? '',
-              expenseDate: e.expenseDate ?? new Date(),
-              supplierId: e.supplierId ?? null,
-              supplierName: e.supplierName ?? '�',
-              notes: e.notes ?? '',
-              totalAmount: e.totalAmount ?? 0,
-              details: (e.expenseDetails ?? []).map((d) => ({
-                id: d.id ?? null,
-                itemId: d.itemId ?? null,
-                qty: d.qty ?? null,
-                unitPrice: d.unitPrice ?? null,
-                currencyId: d.currencyId ?? null,
-              })),
-            }))
-          );
+          this.expenses.set(response.data.data);
         }
         this.isLoadingList.set(false);
       },
@@ -202,20 +140,16 @@ export class ProjectExpenseManagementComponent implements OnInit {
     });
   }
 
-  private loadSuppliers(): void {
-    this.isLoadingSuppliers.set(true);
-    this.supplierService.getAllSuppliers(1, 100).subscribe({
+  private loadLookups(): void {
+    this.isLoadingLookups.set(true);
+    this.lookupClient.getAllLookups(['supplier', 'material']).subscribe({
       next: (response) => {
-        if (response.succeeded && response.data?.data) {
-          this.suppliers.set(
-            response.data.data
-              .filter((s) => s.id != null && s.name != null)
-              .map((s) => ({ id: s.id!, name: s.name! }))
-          );
-        }
-        this.isLoadingSuppliers.set(false);
+        const data = response.data as Record<string, LookupDto[]>;
+        this.suppliers.set(data?.['supplier'] ?? []);
+        this.items.set(data?.['material'] ?? []);
+        this.isLoadingLookups.set(false);
       },
-      error: () => this.isLoadingSuppliers.set(false),
+      error: () => this.isLoadingLookups.set(false),
     });
   }
 
@@ -240,14 +174,14 @@ export class ProjectExpenseManagementComponent implements OnInit {
     this.currentView.set('form');
   }
 
-  openEditForm(expense: ExpenseRecord): void {
-    this.editingExpenseId.set(expense.id);
-    this.formExpenseNo.set(expense.expenseNo);
-    this.formExpenseDate.set(new Date(expense.expenseDate));
-    this.formSupplierId.set(expense.supplierId);
-    this.formNotes.set(expense.notes);
+  openEditForm(expense: GetExpenseDto): void {
+    this.editingExpenseId.set(expense.id ?? null);
+    this.formExpenseNo.set(expense.expenseNo ?? '');
+    this.formExpenseDate.set(expense.expenseDate ? new Date(expense.expenseDate) : new Date());
+    this.formSupplierId.set(expense.supplierId ?? null);
+    this.formNotes.set(expense.notes ?? '');
     this.formDetails.set(
-      expense.details.length > 0 ? [...expense.details] : emptyDetails()
+      expense.expenseDetails?.length ? [...expense.expenseDetails] : emptyDetails()
     );
     this.currentView.set('form');
   }
@@ -268,7 +202,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
     this.formDetails.set(emptyDetails());
   }
 
-  calculateSubTotal(detail: ExpenseDetail): number {
+  calculateSubTotal(detail: IExpenseDetailDto): number {
     return (detail.qty ?? 0) * (detail.unitPrice ?? 0);
   }
 
@@ -280,27 +214,41 @@ export class ProjectExpenseManagementComponent implements OnInit {
     this.formDetails.update((prev) => [...prev, createEmptyDetail()]);
   }
 
-  removeRow(id: number | null): void {
+  removeRow(id: number | undefined): void {
     if (this.formDetails().length > 1) {
       this.formDetails.update((prev) => prev.filter((d) => d.id !== id));
     }
   }
 
-  updateDetail(id: number | null, field: keyof ExpenseDetail, value: number | null): void {
+  updateDetail(id: number | undefined, field: keyof IExpenseDetailDto, value: number | undefined): void {
     this.formDetails.update((prev) =>
       prev.map((d) => (d.id === id ? { ...d, [field]: value } : d))
     );
   }
 
   getSupplierName(supplierId: number | null): string {
-    if (!supplierId) return '�';
-    return this.suppliers().find((s) => s.id === supplierId)?.name ?? '�';
+    if (!supplierId) return '—';
+    return this.suppliers().find((s) => s.id === supplierId)?.name ?? '—';
   }
 
   // -- Save / Delete -------------------------------------------------------------
 
   handleSave(): void {
     this.isSaving.set(true);
+
+    const details: CreateExpenseDetailModel[] = [];
+    for (const d of this.formDetails()) {
+      if (d.itemId != null) {
+        details.push(new CreateExpenseDetailModel({
+          id: d.id && d.id > 0 ? d.id : undefined,
+          itemId: d.itemId,
+          qty: d.qty ?? 0,
+          unitPrice: d.unitPrice ?? 0,
+          subTotal: this.calculateSubTotal(d),
+          currencyId: d.currencyId ?? undefined,
+        }));
+      }
+    }
 
     const command = new CreateExpenseCommand({
       id: this.editingExpenseId() ?? undefined,
@@ -310,19 +258,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
       notes: this.formNotes(),
       projectId: +this.projectId,
       supplierId: this.formSupplierId() ?? undefined,
-      expenseDetails: this.formDetails()
-        .filter((d) => d.itemId !== null)
-        .map(
-          (d) =>
-            new CreateExpenseDetailModel({
-              id: d.id !== null && d.id > 0 ? d.id : undefined,
-              itemId: d.itemId!,
-              qty: d.qty ?? 0,
-              unitPrice: d.unitPrice ?? 0,
-              subTotal: this.calculateSubTotal(d),
-              currencyId: d.currencyId ?? undefined,
-            })
-        ),
+      expenseDetails: details,
     });
 
     this.expenseService.createOrUpdate(command).subscribe({
@@ -348,7 +284,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
     });
   }
 
-  confirmDelete(expense: ExpenseRecord): void {
+  confirmDelete(expense: GetExpenseDto): void {
     this.confirmationService.confirm({
       message: this.translate.instant('projectTabs.expenses.confirmDelete.message', {
         name: expense.expenseNo || expense.id,
@@ -358,7 +294,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
       acceptButtonProps: { severity: 'danger', label: this.translate.instant('common.delete') },
       rejectButtonProps: { severity: 'secondary', outlined: true, label: this.translate.instant('common.cancel') },
       accept: () => {
-        this.expenseService.delete(expense.id).subscribe({
+        this.expenseService.delete(expense.id!).subscribe({
           next: (response) => {
             if (response.succeeded) {
               this.expenses.update((prev) => prev.filter((e) => e.id !== expense.id));
