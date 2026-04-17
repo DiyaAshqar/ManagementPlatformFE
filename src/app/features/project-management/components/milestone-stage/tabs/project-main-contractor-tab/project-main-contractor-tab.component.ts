@@ -13,10 +13,10 @@ import { BadgeModule } from 'primeng/badge';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 import {
+  ConstructorClient,
   CreateProjectMainContractorCommand,
   IGetProjectMainContractorDto,
-  ProjectMainContractorClient,
-  SupplierClient
+  ProjectMainContractorClient
 } from '../../../../../../../nswag/api-client';
 import { AddContractorDialogComponent } from '../../../dialog/add-contractor-dialog/add-contractor-dialog.component';
 
@@ -34,7 +34,7 @@ import { AddContractorDialogComponent } from '../../../dialog/add-contractor-dia
     BadgeModule,
     AddContractorDialogComponent
   ],
-  providers: [MessageService, ProjectMainContractorClient, SupplierClient],
+  providers: [MessageService, ProjectMainContractorClient, ConstructorClient],
   templateUrl: './project-main-contractor-tab.component.html',
   styleUrl: './project-main-contractor-tab.component.scss'
 })
@@ -59,7 +59,7 @@ export class ProjectMainContractorTabComponent implements OnInit {
 
   constructor(
     private contractorClient: ProjectMainContractorClient,
-    private supplierClient: SupplierClient,
+    private constructorClient: ConstructorClient,
     private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private translate: TranslateService
@@ -73,12 +73,12 @@ export class ProjectMainContractorTabComponent implements OnInit {
   // ── Lookups ───────────────────────────────────────────────────────────────
 
   loadLookups(): void {
-    this.supplierClient.getAllSuppliers(1, 200, undefined).subscribe({
-      next: (suppliers) => {
-        const supplierData = suppliers.data?.data ?? [];
-        this.contractorOptions = supplierData
-          .filter(s => s.id != null && s.name)
-          .map(s => ({ label: s.name!, value: s.id! }));
+    this.constructorClient.getAll(1, 10, undefined).subscribe({
+      next: (res) => {
+        const data = res.data?.data ?? [];
+        this.contractorOptions = data
+          .filter(c => c.id != null && c.name)
+          .map(c => ({ label: c.name!, value: c.id! }));
         this.contractorMap = Object.fromEntries(this.contractorOptions.map(o => [o.value, o.label]));
       }
     });

@@ -86,7 +86,9 @@ export class ProjectExpenseManagementComponent implements OnInit {
   formExpenseDate = signal<Date>(new Date());
   formSupplierId = signal<number | null>(null);
   formNotes = signal<string>('');
-  formDetails = signal<IExpenseDetailDto[]>(emptyDetails());
+  /** Plain array — NOT a signal. Using a signal caused p-inputNumber to lose focus
+   *  on every keystroke because signal updates trigger full row re-creation. */
+  formDetails: IExpenseDetailDto[] = emptyDetails();
   isSaving = signal<boolean>(false);
 
   // -- Lookups -----------------------------------------------------------------
@@ -180,9 +182,9 @@ export class ProjectExpenseManagementComponent implements OnInit {
     this.formExpenseDate.set(expense.expenseDate ? new Date(expense.expenseDate) : new Date());
     this.formSupplierId.set(expense.supplierId ?? null);
     this.formNotes.set(expense.notes ?? '');
-    this.formDetails.set(
-      expense.expenseDetails?.length ? [...expense.expenseDetails] : emptyDetails()
-    );
+    this.formDetails = expense.expenseDetails?.length
+      ? expense.expenseDetails.map(d => ({ ...d }))   // shallow-copy each row
+      : emptyDetails();
     this.currentView.set('form');
   }
 
@@ -199,7 +201,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
     this.formExpenseDate.set(new Date());
     this.formSupplierId.set(null);
     this.formNotes.set('');
-    this.formDetails.set(emptyDetails());
+    this.formDetails = emptyDetails();
   }
 
   calculateSubTotal(detail: IExpenseDetailDto): number {
@@ -207,23 +209,24 @@ export class ProjectExpenseManagementComponent implements OnInit {
   }
 
   calculateFormTotal(): number {
-    return this.formDetails().reduce((sum, d) => sum + this.calculateSubTotal(d), 0);
+    return this.formDetails.reduce((sum, d) => sum + this.calculateSubTotal(d), 0);
   }
 
   addRow(): void {
-    this.formDetails.update((prev) => [...prev, createEmptyDetail()]);
+    const newRow = createEmptyDetail();
+    this.formDetails = [...this.formDetails, newRow];
   }
 
   removeRow(id: number | undefined): void {
-    if (this.formDetails().length > 1) {
-      this.formDetails.update((prev) => prev.filter((d) => d.id !== id));
+    if (this.formDetails.length > 1) {
+      this.formDetails = this.formDetails.filter((d) => d.id !== id);
     }
   }
 
-  updateDetail(id: number | undefined, field: keyof IExpenseDetailDto, value: number | undefined): void {
-    this.formDetails.update((prev) =>
-      prev.map((d) => (d.id === id ? { ...d, [field]: value } : d))
-    );
+  /** Called only for p-select fields (itemId, currencyId).
+   *  p-inputNumber fields use [(ngModel)] direct binding — no method needed. */
+  updateSelectField(detail: IExpenseDetailDto, field: 'itemId' | 'currencyId', value: number | undefined): void {
+    (detail as any)[field] = value;
   }
 
   getSupplierName(supplierId: number | null): string {
@@ -237,7 +240,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
     this.isSaving.set(true);
 
     const details: CreateExpenseDetailModel[] = [];
-    for (const d of this.formDetails()) {
+    for (const d of this.formDetails) {
       if (d.itemId != null) {
         details.push(new CreateExpenseDetailModel({
           id: d.id && d.id > 0 ? d.id : undefined,

@@ -210,8 +210,8 @@
         </p-button>
       </div>
 
-      <p-table [value]="formDetails()" [tableStyle]="{ 'min-width': '60rem' }"
-               styleClass="p-datatable-striped p-datatable-sm">
+      <p-table [value]="formDetails" [tableStyle]="{ 'min-width': '60rem' }"
+               styleClass="p-datatable-striped p-datatable-sm" dataKey="id">
         <ng-template pTemplate="header">
           <tr>
             <th class="text-center" style="width: 4rem;">#</th>
@@ -227,19 +227,19 @@
           <tr>
             <td class="text-center text-500 font-medium">{{ i + 1 }}</td>
             <td>
-              <p-select [ngModel]="detail.itemId" (ngModelChange)="updateDetail(detail.id, 'itemId', $event)"
+              <p-select [(ngModel)]="detail.itemId" (ngModelChange)="updateSelectField(detail, 'itemId', $event)"
                 [options]="items()" optionLabel="name" optionValue="id" appendTo="body"
                 [loading]="isLoadingLookups()"
                 [placeholder]="'projectTabs.expenses.lineItems.selectItem' | translate" styleClass="w-full">
               </p-select>
             </td>
             <td>
-              <p-inputNumber [ngModel]="detail.qty" (ngModelChange)="updateDetail(detail.id, 'qty', $event)"
+              <p-inputNumber [(ngModel)]="detail.qty"
                 [min]="0" [minFractionDigits]="0" [maxFractionDigits]="2" placeholder="0" inputStyleClass="w-full">
               </p-inputNumber>
             </td>
             <td>
-              <p-inputNumber [ngModel]="detail.unitPrice" (ngModelChange)="updateDetail(detail.id, 'unitPrice', $event)"
+              <p-inputNumber [(ngModel)]="detail.unitPrice"
                 [min]="0" [minFractionDigits]="0" [maxFractionDigits]="2" placeholder="0.00" inputStyleClass="w-full">
               </p-inputNumber>
             </td>
@@ -248,7 +248,7 @@
                 class="w-full surface-100 font-medium" />
             </td>
             <td>
-              <p-select appendTo="body" [ngModel]="detail.currencyId" (ngModelChange)="updateDetail(detail.id, 'currencyId', $event)"
+              <p-select appendTo="body" [(ngModel)]="detail.currencyId" (ngModelChange)="updateSelectField(detail, 'currencyId', $event)"
                 [options]="currencies()" optionLabel="abb" optionValue="id"
                 [loading]="isLoadingCurrencies()"
                 [placeholder]="'projectTabs.expenses.lineItems.selectCurrency' | translate" styleClass="w-full">
@@ -256,7 +256,7 @@
             </td>
             <td class="text-center">
               <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger" size="small"
-                [disabled]="formDetails().length === 1"
+                [disabled]="formDetails.length === 1"
                 [pTooltip]="'common.delete' | translate" tooltipPosition="top"
                 (onClick)="removeRow(detail.id)">
               </p-button>

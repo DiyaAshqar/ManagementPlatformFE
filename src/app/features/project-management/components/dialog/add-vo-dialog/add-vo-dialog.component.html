@@ -1,4 +1,4 @@
-<p-dialog
+﻿<p-dialog
   [(visible)]="visible"
   (onHide)="onHide()"
   [header]="dialogHeader"
@@ -21,7 +21,7 @@
               formControlName="voNumber"
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('voNumber')" />
-            <label for="voNumber">{{ 'dialogs.voucherOrder.voNumber' | translate }} *</label>
+            <label for="voNumber">{{ 'dialogs.voucherOrder.voNumber' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('voNumber')" class="p-error">{{ 'dialogs.voucherOrder.voNumberRequired' | translate }}</small>
         </div>
@@ -37,7 +37,7 @@
               formControlName="item"
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('item')" />
-            <label for="item">{{ 'dialogs.voucherOrder.voItem' | translate }} *</label>
+            <label for="item">{{ 'dialogs.voucherOrder.voItem' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('item')" class="p-error">{{ 'dialogs.voucherOrder.voItemRequired' | translate }}</small>
         </div>
@@ -55,7 +55,7 @@
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('description')">
             </textarea>
-            <label for="description">{{ 'dialogs.voucherOrder.description' | translate }} *</label>
+            <label for="description">{{ 'dialogs.voucherOrder.description' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('description')" class="p-error">{{ 'dialogs.voucherOrder.descriptionRequired' | translate }}</small>
         </div>
@@ -74,7 +74,7 @@
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('quantity')">
             </p-inputnumber>
-            <label for="quantity">{{ 'dialogs.voucherOrder.quantity' | translate }} *</label>
+            <label for="quantity">{{ 'dialogs.voucherOrder.quantity' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('quantity')" class="p-error">{{ 'dialogs.voucherOrder.quantityRequired' | translate }}</small>
         </div>
@@ -95,7 +95,7 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('unitId')">
             </p-select>
-            <label for="unitId">{{ 'dialogs.voucherOrder.unit' | translate }} *</label>
+            <label for="unitId">{{ 'dialogs.voucherOrder.unit' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('unitId')" class="p-error">{{ 'dialogs.voucherOrder.unitRequired' | translate }}</small>
         </div>
@@ -116,7 +116,7 @@
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('price')">
             </p-inputnumber>
-            <label for="price">{{ 'dialogs.voucherOrder.amount' | translate }} *</label>
+            <label for="price">{{ 'dialogs.voucherOrder.amount' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('price')" class="p-error">{{ 'dialogs.voucherOrder.amountRequired' | translate }}</small>
         </div>
@@ -136,7 +136,7 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('status')">
             </p-select>
-            <label for="status">{{ 'dialogs.voucherOrder.approvalStatus' | translate }} *</label>
+            <label for="status">{{ 'dialogs.voucherOrder.approvalStatus' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('status')" class="p-error">{{ 'dialogs.voucherOrder.statusRequired' | translate }}</small>
         </div>
@@ -169,7 +169,7 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('effectedDateStart')">
             </p-datepicker>
-            <label for="effectedDateStart">{{ 'dialogs.voucherOrder.effectedDateStart' | translate }} *</label>
+            <label for="effectedDateStart">{{ 'dialogs.voucherOrder.effectedDateStart' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('effectedDateStart')" class="p-error">{{ 'dialogs.voucherOrder.effectedDateStartRequired' | translate }}</small>
         </div>
@@ -188,7 +188,7 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('effectedDateEnd')">
             </p-datepicker>
-            <label for="effectedDateEnd">{{ 'dialogs.voucherOrder.effectedDateEnd' | translate }} *</label>
+            <label for="effectedDateEnd">{{ 'dialogs.voucherOrder.effectedDateEnd' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('effectedDateEnd')" class="p-error">{{ 'dialogs.voucherOrder.effectedDateEndRequired' | translate }}</small>
         </div>

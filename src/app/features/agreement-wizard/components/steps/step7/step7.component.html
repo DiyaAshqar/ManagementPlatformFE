@@ -1,4 +1,4 @@
-<div class="p-4">
+﻿<div class="p-4">
     @if (isLoading()) {
     <div class="flex justify-center align-items-center p-6">
         <p-progressSpinner></p-progressSpinner>
@@ -16,7 +16,7 @@
                 <!-- File Upload Field -->
                 <div class="col-12 md:col-6 mb-3">
                     <div class="field">
-                        <label for="fileInput" class="block mb-2 font-semibold">{{ 'wizard.step7.file' | translate }} *</label>
+                        <label for="fileInput" class="block mb-2 font-semibold">{{ 'wizard.step7.file' | translate }} <span class="required-asterisk">*</span></label>
                         <div class="file-upload-wrapper">
                             <input
                                 type="file"
@@ -70,7 +70,7 @@
                 <!-- Attachment Name Field -->
                 <div class="col-12 md:col-6 mb-3">
                     <div class="field">
-                        <label for="attachmentName" class="block mb-2 font-semibold">{{ 'wizard.step7.attachmentName' | translate }} *</label>
+                        <label for="attachmentName" class="block mb-2 font-semibold">{{ 'wizard.step7.attachmentName' | translate }} <span class="required-asterisk">*</span></label>
                         <input
                             pInputText
                             id="attachmentName"

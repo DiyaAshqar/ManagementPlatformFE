@@ -155,3 +155,21 @@ p-datepicker.ng-invalid.ng-dirty {
 .p-inputnumber {
     width: 100%;
 }
+
+// ── Required field asterisk ───────────────────────────────────────────────────
+// Usage: wrap * in <span class="required-asterisk">*</span>
+.required-asterisk {
+  color: #ef4444;
+  font-weight: 600;
+  margin-inline-start: 2px;
+}
+
+// ── Validation error messages ─────────────────────────────────────────────────
+// PrimeNG .p-error (used with <small class="p-error"> or <p-message severity="error">)
+.p-error,
+small.p-error {
+  color: #ef4444 !important;
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+  display: block;
+}

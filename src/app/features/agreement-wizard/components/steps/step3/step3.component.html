@@ -1,4 +1,4 @@
-<div class="p-4">
+﻿<div class="p-4">
     <form [formGroup]="step3Form" (ngSubmit)="onSubmit()">
         @if (isLoading()) {
         <div class="flex justify-center align-items-center p-6">
@@ -21,7 +21,7 @@
                                     optionLabel="name" optionValue="id"
                                     [class]="isFieldInvalid('annexId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
                                 </p-select>
-                                <label for="annexId">{{ 'wizard.step3.annexName' | translate }}*</label>
+                                <label for="annexId">{{ 'wizard.step3.annexName' | translate }} <span class="required-asterisk">*</span></label>
                             </p-floatlabel>
                             @if (isFieldInvalid('annexId')) {
                             <small class="text-red-500">{{ getFieldError('annexId') }}</small>
@@ -36,7 +36,7 @@
                                 <p-inputNumber inputId="amount" formControlName="amount" [min]="0" [showButtons]="true"
                                     [ngClass]="{'ng-invalid': isFieldInvalid('amount')}" inputStyleClass="w-full">
                                 </p-inputNumber>
-                                <label for="amount">{{ 'wizard.step3.quantity' | translate }}*</label>
+                                <label for="amount">{{ 'wizard.step3.quantity' | translate }} <span class="required-asterisk">*</span></label>
                             </p-floatlabel>
                             @if (isFieldInvalid('amount')) {
                             <small class="text-red-500">{{ getFieldError('amount') }}</small>
@@ -52,7 +52,7 @@
                                     optionLabel="name" optionValue="id"
                                     [class]="isFieldInvalid('unitId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
                                 </p-select>
-                                <label for="unitId">{{ 'wizard.step3.unit' | translate }}*</label>
+                                <label for="unitId">{{ 'wizard.step3.unit' | translate }} <span class="required-asterisk">*</span></label>
                             </p-floatlabel>
                             @if (isFieldInvalid('unitId')) {
                             <small class="text-red-500">{{ getFieldError('unitId') }}</small>

@@ -1,4 +1,4 @@
-<p-dialog
+﻿<p-dialog
   [(visible)]="visible"
   (onHide)="onHide()"
   [header]="dialogHeader"
@@ -28,7 +28,7 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('constructorId')">
             </p-select>
-            <label for="constructorId">{{ 'dialogs.contractor.contractor' | translate }} *</label>
+            <label for="constructorId">{{ 'dialogs.contractor.contractor' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('constructorId')" class="p-error">{{ 'dialogs.contractor.contractorRequired' | translate }}</small>
         </div>
@@ -47,7 +47,7 @@
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('amount')">
             </p-inputnumber>
-            <label for="amount">{{ 'dialogs.contractor.contractAmount' | translate }} *</label>
+            <label for="amount">{{ 'dialogs.contractor.contractAmount' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('amount')" class="p-error">{{ 'dialogs.contractor.amountRequired' | translate }}</small>
         </div>
@@ -67,7 +67,7 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('startDate')">
             </p-calendar>
-            <label for="startDate">{{ 'dialogs.contractor.startDate' | translate }} *</label>
+            <label for="startDate">{{ 'dialogs.contractor.startDate' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('startDate')" class="p-error">{{ 'dialogs.contractor.startDateRequired' | translate }}</small>
         </div>
@@ -87,7 +87,7 @@
               appendTo="body"
               [class.ng-invalid]="isFieldInvalid('endDate')">
             </p-calendar>
-            <label for="endDate">{{ 'dialogs.contractor.endDate' | translate }} *</label>
+            <label for="endDate">{{ 'dialogs.contractor.endDate' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('endDate')" class="p-error">{{ 'dialogs.contractor.endDateRequired' | translate }}</small>
         </div>
