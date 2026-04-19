@@ -152,7 +152,7 @@ private initializeForm(): void {
 Each section follows this structure:
 ```html
 <div class="col-12">
-  <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step3.sectionTitle' | translate }}</h3>
+  <h3 class="text-xl font-semibold mb-2">{{ 'wizard.step3.sectionTitle' | translate }}</h3>
   
   <div formGroupName="sectionDto">
     <div class="grid">

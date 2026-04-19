@@ -861,5 +861,31 @@
       "endDateRequired": "End date is required.",
       "add": "Add"
     }
+  },
+  "documentsTable": {
+    "totalDocuments": "Total Documents",
+    "uploadDocument": "Upload Document",
+    "noDocuments": "No documents yet",
+    "uploadFilesHint": "Upload files and documents",
+    "columnName": "Document Name",
+    "columnType": "Type",
+    "columnUploadDate": "Upload Date",
+    "columnSize": "Size",
+    "columnUploadedBy": "Uploaded By",
+    "columnActions": "Actions",
+    "uploadDialogHeader": "Upload Documents",
+    "uploadDialogHint": "Upload documents, images, and files for",
+    "dropZoneTitle": "Click to upload or drag and drop",
+    "dropZoneHint": "PDF, DOC, JPG, PNG, XLS up to 50 MB each",
+    "selectedFiles": "Selected Files",
+    "noDocumentsFound": "No documents found",
+    "typePdf": "PDF",
+    "typeExcel": "Excel",
+    "typeImages": "Images",
+    "download": "Download",
+    "delete": "Delete",
+    "cancel": "Cancel",
+    "upload": "Upload",
+    "uploading": "Uploading..."
   }
 }

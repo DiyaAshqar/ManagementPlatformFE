@@ -1,5 +1,6 @@
 import { Component, Input, OnInit, OnDestroy, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { TranslatePipe } from '@ngx-translate/core';
 import { Subject, takeUntil, finalize, forkJoin } from 'rxjs';
 import { ConfirmationService, MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
@@ -25,6 +26,7 @@ export interface UploadedFile {
   standalone: true,
   imports: [
     CommonModule,
+    TranslatePipe,
     ButtonModule,
     ConfirmDialogModule,
     DialogModule,

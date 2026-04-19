@@ -228,7 +228,7 @@ export class StepXComponent {
 Use PrimeFlex utility classes:
 ```html
 <div class="card p-4">
-  <h3 class="text-xl font-semibold mb-4">{{ 'wizard.stepX.title' | translate }}</h3>
+  <h3 class="text-xl font-semibold mb-2">{{ 'wizard.stepX.title' | translate }}</h3>
   
   <form [formGroup]="form" class="flex flex-col gap-4">
     <div class="grid">

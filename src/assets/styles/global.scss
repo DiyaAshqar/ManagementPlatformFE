@@ -173,3 +173,42 @@ small.p-error {
   margin-top: 0.25rem;
   display: block;
 }
+
+// ── RTL Calendar / DatePicker fixes ──────────────────────────────────────────
+[dir="rtl"] {
+  // Flip navigation chevron icons so < points forward and > points back in RTL
+  .p-datepicker-prev-button .p-icon,
+  .p-datepicker-next-button .p-icon {
+    transform: scaleX(-1);
+  }
+
+  // Fix calendar trigger icon position inside input (iconDisplay="input")
+  // In RTL the icon container should sit on the LEFT (inline-start) side
+  .p-datepicker .p-datepicker-input-icon-container {
+    inset-inline-end: auto;
+    inset-inline-start: 0.75rem;
+  }
+
+  .p-datepicker .p-datepicker-input {
+    padding-inline-start: 2.5rem;
+    padding-inline-end: 0.75rem;
+  }
+
+  // p-calendar (legacy alias) – same fix
+  .p-calendar .p-datepicker-input-icon-container {
+    inset-inline-end: auto;
+    inset-inline-start: 0.75rem;
+  }
+
+  .p-calendar .p-datepicker-input {
+    padding-inline-start: 2.5rem;
+    padding-inline-end: 0.75rem;
+  }
+
+  // Fix p-floatlabel label position when a datepicker icon is inside the input
+  // Shift the floating label to not overlap with the icon on the left
+  .p-floatlabel .p-datepicker .p-datepicker-input ~ label,
+  .p-floatlabel .p-calendar .p-datepicker-input ~ label {
+    inset-inline-start: 2.75rem;
+  }
+}

@@ -858,5 +858,31 @@
       "endDateRequired": "تاريخ النهاية مطلوب.",
       "add": "إضافة"
     }
+  },
+  "documentsTable": {
+    "totalDocuments": "إجمالي المستندات",
+    "uploadDocument": "رفع مستند",
+    "noDocuments": "لا توجد مستندات بعد",
+    "uploadFilesHint": "ارفع الملفات والمستندات",
+    "columnName": "اسم المستند",
+    "columnType": "النوع",
+    "columnUploadDate": "تاريخ الرفع",
+    "columnSize": "الحجم",
+    "columnUploadedBy": "رُفع بواسطة",
+    "columnActions": "الإجراءات",
+    "uploadDialogHeader": "رفع المستندات",
+    "uploadDialogHint": "ارفع المستندات والصور والملفات لـ",
+    "dropZoneTitle": "انقر للرفع أو اسحب وأفلت",
+    "dropZoneHint": "PDF, DOC, JPG, PNG, XLS حتى 50 ميجابايت لكل ملف",
+    "selectedFiles": "الملفات المحددة",
+    "noDocumentsFound": "لم يتم العثور على مستندات",
+    "typePdf": "PDF",
+    "typeExcel": "Excel",
+    "typeImages": "صور",
+    "download": "تحميل",
+    "delete": "حذف",
+    "cancel": "إلغاء",
+    "upload": "رفع",
+    "uploading": "جاري الرفع..."
   }
 }
