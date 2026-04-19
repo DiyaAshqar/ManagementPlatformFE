@@ -1,11 +1,13 @@
 <p-dialog 
+  #dutiesDialog
   [header]="'wizard.step4.contractorDuties' | translate" 
   [visible]="visible()" 
-  (onHide)="onDialogHide()"
+  (visibleChange)="onVisibleChange($event)"
   [modal]="true"
   [style]="{ width: '90vw', maxWidth: '1200px' }"
   [dismissableMask]="false"
-  [closeOnEscape]="true">
+  [closeOnEscape]="true"
+  [showHeader]="true">
   
   @if (isLoading()) {
     <div class="flex justify-center align-items-center p-6">
@@ -51,8 +53,7 @@
                 formControlName="price" 
                 [min]="0.01" 
                 [showButtons]="false"
-                mode="currency" 
-                currency="USD" 
+                mode="decimal" 
                 locale="en-US"
                 [ngClass]="{'ng-invalid': isFieldInvalid('price')}"
                 inputStyleClass="w-full">
@@ -73,8 +74,7 @@
                 inputId="subTotal" 
                 formControlName="subTotal" 
                 [readonly]="true"
-                mode="currency" 
-                currency="USD" 
+                mode="decimal" 
                 locale="en-US"
                 inputStyleClass="w-full">
               </p-inputNumber>
@@ -198,8 +198,8 @@
         <ng-template pTemplate="body" let-duty let-rowIndex="rowIndex">
           <tr>
             <td>{{ duty.quantity | number:'1.2-2' }}</td>
-            <td>{{ duty.price | currency:'USD':'symbol':'1.2-2' }}</td>
-            <td>{{ duty.subTotal | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td>{{ duty.price | number:'1.2-2' }}</td>
+            <td>{{ duty.subTotal | number:'1.2-2' }}</td>
             <td>{{ getUnitName(duty.unitId) }}</td>
             <td>{{ getDutyTypeName(duty.dutyTypeId) }}</td>
             <td>{{ getDutyResponsibilityName(duty.dutyResponsibilityId) }}</td>
@@ -245,7 +245,7 @@
         [label]="isViewMode() ? ('common.close' | translate) : ('common.cancel' | translate)" 
         severity="secondary" 
         [icon]="isViewMode() ? 'pi pi-check' : 'pi pi-times'"
-        (onClick)="onDialogHide()">
+        (onClick)="closeContractorDutiesDialog()">
       </p-button>
       @if (!isViewMode()) {
       <p-button 

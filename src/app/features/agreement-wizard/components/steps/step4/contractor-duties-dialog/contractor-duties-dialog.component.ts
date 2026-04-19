@@ -260,7 +260,13 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
     this.contractorDutyData.emit(this.contractorDuties());
   }
 
-  onDialogHide(): void {
+  onVisibleChange(isVisible: boolean): void {
+    if (!isVisible) {
+      this.closeDialog.emit();
+    }
+  }
+
+  closeContractorDutiesDialog(): void {
     this.closeDialog.emit();
   }
 

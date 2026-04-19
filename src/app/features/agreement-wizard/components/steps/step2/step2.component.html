@@ -57,7 +57,7 @@
                     <div class="field">
                         <p-floatlabel variant="in">
                             <p-inputNumber inputId="amount" formControlName="amount" [min]="0" [showButtons]="false"
-                                mode="currency" currency="USD" locale="en-US"
+                                mode="decimal" locale="en-US"
                                 [ngClass]="{'ng-invalid': isFieldInvalid('amount')}"
                                 inputStyleClass="w-full"></p-inputNumber>
                             <label for="amount">{{ 'wizard.step2.monthlyPayment' | translate }}</label>

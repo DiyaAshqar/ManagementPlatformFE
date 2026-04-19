@@ -57,9 +57,9 @@
           <td><span class="boq-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
           <td>{{ constructorMap[item.constructorId ?? 0] || '—' }}</td>
           <td class="text-right">{{ item.actualQuantity | number:'1.0-4' }}</td>
-          <td class="text-right">{{ item.price | currency:'USD':'symbol':'1.2-2' }}</td>
-          <td class="text-right">{{ getAmount(item) | currency:'USD':'symbol':'1.0-0' }}</td>
-          <td class="text-right boq-subtotal">{{ item.subTotal | currency:'USD':'symbol':'1.0-0' }}</td>
+          <td class="text-right">{{ item.price | number:'1.2-2' }}</td>
+          <td class="text-right">{{ getAmount(item) | number:'1.0-0' }}</td>
+          <td class="text-right boq-subtotal">{{ item.subTotal | number:'1.0-0' }}</td>
           <td class="text-center">
             <div class="boq-actions">
               <p-button
@@ -93,7 +93,7 @@
             <span class="boq-grand-total-label">{{ 'projectTabs.boq.grandTotal' | translate }}:</span>
           </td>
           <td class="text-right boq-grand-total-value">
-            {{ grandTotal | currency:'USD':'symbol':'1.0-0' }}
+            {{ grandTotal | number:'1.0-0' }}
           </td>
           <td></td>
         </tr>

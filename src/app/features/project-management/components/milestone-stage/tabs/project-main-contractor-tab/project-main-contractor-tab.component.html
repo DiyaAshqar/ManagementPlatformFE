@@ -14,7 +14,7 @@
   <div class="contractor-toolbar">
     <div class="contractor-stats">
       <span class="contractor-total-label">{{ 'projectTabs.projectMainContractor.totalContractors' | translate }}: {{ contractorItems().length }}</span>
-      <span class="contractor-value-label">{{ 'projectTabs.projectMainContractor.totalValue' | translate }}: {{ totalContractValue | currency:'USD':'symbol':'1.0-0' }}</span>
+      <span class="contractor-value-label">{{ 'projectTabs.projectMainContractor.totalValue' | translate }}: {{ totalContractValue | number:'1.0-0' }}</span>
     </div>
     <p-button
       [label]="'projectTabs.projectMainContractor.addContractor' | translate"
@@ -51,7 +51,7 @@
           <span class="contractor-name">{{ contractorMap[item.constructorId ?? 0] || '—' }}</span>
         </td>
         <td class="text-right contractor-amount">
-          {{ item.amount | currency:'USD':'symbol':'1.0-0' }}
+          {{ item.amount | number:'1.0-0' }}
         </td>
         <td>{{ item.startDate | date:'yyyy-MM-dd' }}</td>
         <td>{{ item.endDate | date:'yyyy-MM-dd' }}</td>

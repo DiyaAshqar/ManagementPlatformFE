@@ -1,4 +1,4 @@
-﻿<p-dialog
+<p-dialog
   [(visible)]="visible"
   (onHide)="onHide()"
   [header]="dialogHeader"
@@ -112,8 +112,7 @@
             <p-inputnumber
               inputId="price"
               formControlName="price"
-              mode="currency"
-              currency="USD"
+              mode="decimal"
               [minFractionDigits]="2"
               [maxFractionDigits]="2"
               [min]="0"
@@ -150,7 +149,7 @@
       <div class="col-12">
         <div class="sv-subtotal-preview">
           <span class="label">{{ 'dialogs.surveyingVisit.subtotal' | translate }}:</span>
-          <span class="value">{{ computedSubTotal | currency:'USD':'symbol':'1.2-2' }}</span>
+          <span class="value">{{ computedSubTotal | number:'1.2-2' }}</span>
         </div>
       </div>
 

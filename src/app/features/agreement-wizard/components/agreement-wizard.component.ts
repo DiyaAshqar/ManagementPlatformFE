@@ -11,6 +11,7 @@ import { Step5Component } from './steps/step5/step5.component';
 import { Step6Component } from './steps/step6/step6.component';
 import { Step7Component } from './steps/step7/step7.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { LanguageService } from '../../../core/services/language.service';
 
 @Component({
   selector: 'app-agreement-wizard',
@@ -33,6 +34,9 @@ import { TranslateModule } from '@ngx-translate/core';
 export class AgreementWizardComponent implements OnInit {
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private languageService = inject(LanguageService);
+
+  isRTL = this.languageService.isRTL;
   
   currentStep = signal(1);
   agreementId = signal(0);

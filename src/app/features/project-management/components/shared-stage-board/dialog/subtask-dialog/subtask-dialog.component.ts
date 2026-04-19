@@ -6,6 +6,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
+import { TooltipModule } from 'primeng/tooltip';
 import { MessageService } from 'primeng/api';
 import { SubtaskApiService } from '../../../../services/subtask-api.service';
 import { SubtaskService } from '../../../../services/subtask.service';
@@ -30,7 +31,8 @@ export interface SubTaskFormData {
     InputTextModule,
     SelectModule,
     ButtonModule,
-    CalendarModule
+    CalendarModule,
+    TooltipModule
   ],
   templateUrl: './subtask-dialog.component.html',
   styleUrls: ['./subtask-dialog.component.scss']

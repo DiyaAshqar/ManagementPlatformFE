@@ -1,4 +1,4 @@
-﻿<p-dialog
+<p-dialog
   [(visible)]="visible"
   (onHide)="onHide()"
   [header]="dialogHeader"
@@ -41,8 +41,7 @@
             <p-inputnumber
               inputId="amount"
               formControlName="amount"
-              mode="currency"
-              currency="USD"
+              mode="decimal"
               locale="en-US"
               class="w-full"
               [class.ng-invalid]="isFieldInvalid('amount')">

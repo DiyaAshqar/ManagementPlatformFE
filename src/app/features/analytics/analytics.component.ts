@@ -39,7 +39,7 @@ export class AnalyticsComponent implements OnInit {
   metrics: AnalyticsMetric[] = [
     {
       title: 'Total Revenue',
-      value: '$124,563',
+      value: '124,563',
       change: '+12.5%',
       changeType: 'positive',
       icon: 'pi pi-dollar'

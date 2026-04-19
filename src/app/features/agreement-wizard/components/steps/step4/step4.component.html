@@ -13,12 +13,12 @@
         <form [formGroup]="mainContractForm">
             <div class="grid">
                 <!-- Main Contract Type -->
-                <div class="col-12 md:col-6 lg:col-3 mb-3">
+                <div class="col-12 md:col-6 lg:col-2 mb-3">
                     <div class="field">
                         <p-floatlabel variant="in">
                             <p-select inputId="typeId" formControlName="typeId" [options]="mainContractTypes()"
                                 optionLabel="name" optionValue="id"
-                                [class]="isFieldInvalid('typeId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'"></p-select>
+                                [class]="isFieldInvalid('typeId') ? 'ng-dirty ng-invalid w-full md:w-44' : 'w-full md:w-44'"></p-select>
                             <label for="typeId">{{ 'wizard.step4.contractType' | translate }}</label>
                         </p-floatlabel>
                         @if (isFieldInvalid('typeId')) {
@@ -33,7 +33,7 @@
                         <p-floatlabel variant="in">
                             <p-select inputId="constructorId" formControlName="constructorId"
                                 [options]="constructors()" optionLabel="name" optionValue="id"
-                                [class]="isFieldInvalid('constructorId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'"></p-select>
+                                [class]="isFieldInvalid('constructorId') ? 'ng-dirty ng-invalid w-full md:w-44' : 'w-full md:w-44'"></p-select>
                             <label for="constructorId">{{ 'wizard.step4.contractor' | translate }}</label>
                         </p-floatlabel>
                         @if (isFieldInvalid('constructorId')) {
@@ -43,13 +43,13 @@
                 </div>
 
                 <!-- Total Amount -->
-                <div class="col-12 md:col-6 lg:col-1 mb-3">
+                <div class="col-12 md:col-6 lg:col-2 mb-3">
                     <div class="field">
                         <p-floatlabel variant="in">
                             <p-inputNumber inputId="total" formControlName="total" [min]="0.01" [showButtons]="false"
-                                mode="currency" currency="USD" locale="en-US"
+                                mode="decimal" locale="en-US"
                                 [ngClass]="{'ng-invalid': isFieldInvalid('total')}"
-                                inputStyleClass="w-full"></p-inputNumber>
+                                styleClass="w-full" inputStyleClass="w-full md:min-w-9rem"></p-inputNumber>
                             <label for="total">{{ 'wizard.step4.totalAmount' | translate }}</label>
                         </p-floatlabel>
                         @if (isFieldInvalid('total')) {
@@ -137,7 +137,7 @@
                     <tr>
                         <td>{{ getMainContractTypeName(contract.typeId) }}</td>
                         <td>{{ getConstructorName(contract.constructorId) }}</td>
-                        <td>{{ contract.total | currency:'USD':'symbol':'1.2-2' }}</td>
+                        <td>{{ contract.total | number:'1.2-2' }}</td>
                         <td>{{ formatDate(contract.startDate) }}</td>
                         <td>{{ formatDate(contract.endDate) }}</td>
                         <td class="text-center">

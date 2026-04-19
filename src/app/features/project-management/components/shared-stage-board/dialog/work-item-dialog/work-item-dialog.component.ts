@@ -273,9 +273,9 @@ export class WorkItemDialogComponent implements OnInit {
     
     const dialogRef = this.dialogService.open(SubtaskDialogComponent, {
       header: 'Add Subtask',
-      width: '500px',
+      width: '700px',
       modal: true,
-      maximizable: true,
+      closable: true,
       data: {
         mode: 'add',
         projectStageTaskId: taskId,
@@ -308,9 +308,9 @@ export class WorkItemDialogComponent implements OnInit {
     
     const dialogRef = this.dialogService.open(SubtaskDialogComponent, {
       header: 'Edit Subtask',
-      width: '500px',
+      width: '700px',
       modal: true,
-      maximizable: true,
+      closable: true,
       data: {
         mode: 'edit',
         projectStageTaskId: taskId,

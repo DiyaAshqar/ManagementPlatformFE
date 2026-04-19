@@ -222,10 +222,10 @@ export class SharedStageBoardComponent implements OnInit {
     
     this.dialogRef = this.dialogService.open(WorkItemDialogComponent, {
       header: 'Edit Work Item',
-      width: '900px',
+      width: '1200px',
       height: '900px',
       modal: true,
-      maximizable: true,
+      closable: true,
       data: {
         mode: 'edit',
         showExcavationFields: this.showExcavationFields,
@@ -294,10 +294,10 @@ export class SharedStageBoardComponent implements OnInit {
     
     this.dialogRef = this.dialogService.open(WorkItemDialogComponent, {
       header: 'Add Work Item',
-      width: '900px',
+      width: '1200px',
       height: '900px',
       modal: true,
-      maximizable: true,
+      closable: true,
       data: {
         mode: 'add',
         projectStageId: this.projectStageId,
@@ -363,6 +363,7 @@ export class SharedStageBoardComponent implements OnInit {
       header: 'Add Subtask',
       width: '600px',
       modal: true,
+      closable: true,
       data: {
         mode: 'add',
         projectStageTaskId: item.taskId, // Pass the backend task ID
@@ -391,6 +392,7 @@ export class SharedStageBoardComponent implements OnInit {
       header: 'Edit Subtask',
       width: '600px',
       modal: true,
+      closable: true,
       data: {
         mode: 'edit',
         projectStageTaskId: item.taskId, // Pass the backend task ID
