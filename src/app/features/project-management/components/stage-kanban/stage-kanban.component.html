@@ -1,5 +1,5 @@
 <div class="stage-kanban-container">
-  <div class="flex justify-content-between align-items-center mb-4">
+  <div class="flex justify-content-between align-items-center mb-2">
     <div>
       <h2 class="text-2xl font-semibold m-0 text-color">Stage Overview</h2>
       <p class="text-sm text-500 mt-1 mb-0">Track progress across all construction stages</p>
@@ -25,7 +25,7 @@
         </div>
         <div class="space-y-3">
           @for (card of stages.preparing; track card.id) {
-            <p-card class="stage-card cursor-pointer" styleClass="h-full mb-4">
+            <p-card class="stage-card cursor-pointer" styleClass="h-full mb-2">
               <ng-template pTemplate="header">
                 <div class="flex justify-content-between align-items-start p-3 pb-0">
                   <h4 class="text-base font-semibold m-0 text-color line-height-3">{{ card.title }}</h4>
@@ -78,7 +78,7 @@
         </div>
         <div class="space-y-3">
           @for (card of stages.excavation; track card.id) {
-            <p-card class="stage-card cursor-pointer" styleClass="h-full mb-4">
+            <p-card class="stage-card cursor-pointer" styleClass="h-full mb-2">
               <ng-template pTemplate="header">
                 <div class="flex justify-content-between align-items-start p-3 pb-0">
                   <h4 class="text-base font-semibold m-0 text-color line-height-3">{{ card.title }}</h4>
@@ -131,7 +131,7 @@
         </div>
         <div class="space-y-3">
           @for (card of stages.milestones; track card.id) {
-            <p-card class="stage-card cursor-pointer" styleClass="h-full mb-4">
+            <p-card class="stage-card cursor-pointer" styleClass="h-full mb-2">
               <ng-template pTemplate="header">
                 <div class="flex justify-content-between align-items-start p-3 pb-0">
                   <h4 class="text-base font-semibold m-0 text-color line-height-3">{{ card.title }}</h4>

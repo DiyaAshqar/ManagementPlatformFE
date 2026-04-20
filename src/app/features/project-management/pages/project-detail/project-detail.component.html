@@ -45,7 +45,7 @@
 
     <div class="p-4">
       <!-- Overview Cards -->
-      <div class="grid mb-4">
+      <div class="grid mb-2">
         <div class="col-12 md:col-6 lg:col-3">
           <p-card styleClass="h-full">
             <div class="flex align-items-center gap-3">
@@ -101,7 +101,7 @@
 
       <!-- Project Description Card -->
       @if (project()!.description) {
-        <p-card styleClass="mb-4">
+        <p-card styleClass="mb-2">
           <ng-template pTemplate="header">
             <div class="px-3 pt-3 pb-0">
               <h3 class="text-lg font-semibold m-0 text-color">{{ 'projectDetail.projectDescription' | translate }}</h3>
@@ -230,9 +230,9 @@
   [header]="'projectDetail.printDialog.header' | translate"
   [draggable]="false"
   [resizable]="false">
-  <p class="text-color-secondary mb-4">{{ 'projectDetail.printDialog.description' | translate }}</p>
+  <p class="text-color-secondary mb-2">{{ 'projectDetail.printDialog.description' | translate }}</p>
   
-  <div class="mb-4">
+  <div class="mb-2">
     <label class="block text-sm font-medium mb-2 text-color">{{ 'projectDetail.printDialog.reportType' | translate }}</label>
     <p-select 
       [(ngModel)]="selectedReportType"
