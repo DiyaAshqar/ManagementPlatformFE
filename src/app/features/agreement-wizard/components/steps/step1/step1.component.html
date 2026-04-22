@@ -153,6 +153,17 @@
               </p-floatlabel>
             </div>
           </div>
+
+          <div class="col-12 md:col-6 mb-3">
+            <div class="field">
+              <p-floatlabel variant="in">
+                <textarea pTextarea id="description" formControlName="description"
+                  [class.ng-invalid]="isFieldInvalid('agreementDto.description')"
+                  rows="1" style="resize: none; width: 100%;" class="w-full"></textarea>
+                <label for="description">{{ 'wizard.step1.description' | translate }}</label>
+              </p-floatlabel>
+            </div>
+          </div>
         </div>
       </div>
     </div>

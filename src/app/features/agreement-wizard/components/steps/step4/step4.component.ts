@@ -52,6 +52,7 @@ export class Step4Component implements OnInit, OnDestroy {
   mainContractForm!: FormGroup;
   mainContractTypes = signal<LookupDto[]>([]);
   constructors = signal<LookupDto[]>([]);
+  milestones = signal<LookupDto[]>([]);
   mainContracts = signal<MainContractDto[]>([]);
   isLoading = signal(false);
   isFormValid = signal(false);
@@ -101,7 +102,8 @@ export class Step4Component implements OnInit, OnDestroy {
         endDate: [today, Validators.required],
         agreementId: [this.agreementId()],
         typeId: [0, [Validators.required, Validators.min(1)]],
-        constructorId: [0, [Validators.required, Validators.min(1)]]
+        constructorId: [0, [Validators.required, Validators.min(1)]],
+        mileStoneId: [null, [Validators.required, Validators.min(1)]]
       },
       { validators: this.dateRangeValidator }
     );
@@ -126,6 +128,7 @@ export class Step4Component implements OnInit, OnDestroy {
         next: (lookups) => {
           this.mainContractTypes.set(lookups.mainContractTypes);
           this.constructors.set(lookups.constructors);
+          this.milestones.set(lookups.milestones);
           this.isLoading.set(false);
         },
         error: (error) => {
@@ -195,6 +198,7 @@ export class Step4Component implements OnInit, OnDestroy {
       dto.agreementId = this.agreementId() || 0;
       dto.typeId = contract.typeId || 0;
       dto.constructorId = contract.constructorId || 0;
+      dto.mileStoneId = contract.mileStoneId || undefined;
       dto.isDeleted = contract.isDeleted || false;
       return dto;
     });
@@ -220,6 +224,7 @@ export class Step4Component implements OnInit, OnDestroy {
         agreementId: this.agreementId(),
         typeId: contract.typeId,
         constructorId: contract.constructorId,
+        mileStoneId: contract.mileStoneId,
         isDeleted: contract.isDeleted
       }))
     };
@@ -249,6 +254,7 @@ export class Step4Component implements OnInit, OnDestroy {
     contractData.agreementId = this.agreementId();
     contractData.typeId = formValue.typeId;
     contractData.constructorId = formValue.constructorId;
+    contractData.mileStoneId = formValue.mileStoneId;
     contractData.contractorDutyDto = []; // Initialize as empty array
     contractData.isDeleted = false;
 
@@ -317,7 +323,8 @@ export class Step4Component implements OnInit, OnDestroy {
       endDate: contract.endDate || new Date(),
       agreementId: contract.agreementId,
       typeId: contract.typeId,
-      constructorId: contract.constructorId
+      constructorId: contract.constructorId,
+      mileStoneId: contract.mileStoneId || null
     });
   }
 
@@ -336,7 +343,8 @@ export class Step4Component implements OnInit, OnDestroy {
       endDate: today,
       agreementId: this.agreementId(),
       typeId: 0,
-      constructorId: 0
+      constructorId: 0,
+      mileStoneId: null
     });
     this.editingIndex.set(null);
     this.minEndDate.set(null);
@@ -352,6 +360,12 @@ export class Step4Component implements OnInit, OnDestroy {
   getConstructorName(constructorId: number): string {
     const constructor = this.constructors().find(c => c.id === constructorId);
     return constructor?.name || 'Unknown';
+  }
+
+  getMilestoneName(mileStoneId: number | undefined): string {
+    if (!mileStoneId) return '-';
+    const milestone = this.milestones().find(m => m.id === mileStoneId);
+    return milestone?.name || 'Unknown';
   }
 
   formatDate(date: Date | string | undefined): string {

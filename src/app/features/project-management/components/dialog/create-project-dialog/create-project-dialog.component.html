@@ -85,18 +85,7 @@
         </div>
       </div>
 
-      <!-- Milestone Count -->
-      <div class="col-12 md:col-6">
-        <div class="field">
-          <p-floatlabel variant="in">
-            <p-inputnumber inputId="milestoneCount" formControlName="milestoneCount" [min]="0" [showButtons]="true" class="w-full"
-              [class.ng-invalid]="isFieldInvalid('milestoneCount')">
-            </p-inputnumber>
-            <label for="milestoneCount">{{ 'projects.form.milestoneCount' | translate }} <span class="required-asterisk">*</span></label>
-          </p-floatlabel>
-          <small *ngIf="isFieldInvalid('milestoneCount')" class="p-error">{{ getErrorMessage('milestoneCount') }}</small>
-        </div>
-      </div>
+
     </div>
   </form>
 

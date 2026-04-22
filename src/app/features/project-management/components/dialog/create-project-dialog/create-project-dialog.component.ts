@@ -87,8 +87,7 @@ export class CreateProjectDialogComponent implements OnInit {
       agreementId: [null, [Validators.required]],
       startDate: [new Date(), Validators.required],
       endDate: [null, Validators.required],
-      status: [ProjectStatus._0],
-      milestoneCount: [0, [Validators.required, Validators.min(0)]]
+      status: [ProjectStatus._0]
     });
     
     if (this.project) {
@@ -105,8 +104,7 @@ export class CreateProjectDialogComponent implements OnInit {
       agreementId: this.project.agreementId || null, // Set agreementId when editing
       startDate: new Date(this.project.startDate),
       endDate: new Date(this.project.endDate),
-      status: this.mapProjectStatus(this.project.status),
-      milestoneCount: this.project.stages?.length || 0
+      status: this.mapProjectStatus(this.project.status)
     });
   }
 
@@ -172,8 +170,7 @@ export class CreateProjectDialogComponent implements OnInit {
       agreementId: this.projectForm.get('agreementId')?.value || undefined,
       startDate: this.projectForm.get('startDate')?.value,
       endDate: this.projectForm.get('endDate')?.value,
-      status: this.projectForm.get('status')?.value,
-      milestoneCount: this.projectForm.get('milestoneCount')?.value
+      status: this.projectForm.get('status')?.value
     });
 
     this.projectApiService.createProject(command).subscribe({

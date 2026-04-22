@@ -277,6 +277,7 @@
       "selectAgreementType": "Select Agreement Type",
       "projectArea": "Project Area",
       "drillingQuantity": "Excavation Quantity",
+      "description": "Description",
       "contactPerson": "Contact Person",
       "contactPersonNumber": "Contact Person Number",
       "representerName": "Representative Name",
@@ -342,7 +343,8 @@
       "subTotal": "Sub Total",
       "unit": "Unit",
       "dutyType": "Duty Type",
-      "dutyResponsibility": "Duty Responsibility"
+      "dutyResponsibility": "Duty Responsibility",
+      "milestone": "Milestone"
     },
     "step5": {
       "title": "Supplier Services",

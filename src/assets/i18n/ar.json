@@ -274,6 +274,7 @@
       "selectAgreementType": "اختر نوع الاتفاقية",
       "projectArea": "مساحة المشروع",
       "drillingQuantity": "كمية الحفر",
+      "description": "الوصف",
       "contactPerson": "شخص الاتصال",
       "contactPersonNumber": "رقم شخص الاتصال",
       "representerName": "اسم الممثل",
@@ -339,7 +340,8 @@
       "subTotal": "المجموع الفرعي",
       "unit": "الوحدة",
       "dutyType": "نوع الواجب",
-      "dutyResponsibility": "مسؤولية الواجب"
+      "dutyResponsibility": "مسؤولية الواجب",
+      "milestone": "المرحلة"
     },
     "step5": {
       "title": "خدمات الموردين",

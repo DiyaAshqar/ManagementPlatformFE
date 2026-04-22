@@ -50,8 +50,8 @@ export class SidebarComponent implements OnInit {
       title: 'sidebar.sections.overview',
       items: [
         { label: 'sidebar.items.dashboard', icon: 'pi pi-home', route: '/dashboard' },
-        { label: 'sidebar.items.projectManagement', icon: 'pi pi-th-large', route: '/projects' },
         { label: 'sidebar.items.agreementWizard', icon: 'pi pi-briefcase', route: '/agreement-wizard' },
+        { label: 'sidebar.items.projectManagement', icon: 'pi pi-th-large', route: '/projects' },
         { label: 'sidebar.items.constructors', icon: 'pi pi-users', route: '/constructor' },
         { label: 'sidebar.items.suppliers', icon: 'pi pi-building', route: '/supplier' },
       ]

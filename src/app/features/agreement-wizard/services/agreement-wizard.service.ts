@@ -156,9 +156,10 @@ export class AgreementWizardService {
     constructors: LookupDto[],
     units: LookupDto[],
     dutyTypes: LookupDto[],
-    dutyResponsibilities: LookupDto[]
+    dutyResponsibilities: LookupDto[],
+    milestones: LookupDto[]
   }> {
-    return this.getAllLookups(['maincontracttype', 'constructor', 'unit', 'dutytype', 'dutyresponsibility']).pipe(
+    return this.getAllLookups(['maincontracttype', 'constructor', 'unit', 'dutytype', 'dutyresponsibility', 'milestones']).pipe(
       map(response => {
         if (response.succeeded && response.data) {
           return {
@@ -166,10 +167,11 @@ export class AgreementWizardService {
             constructors: response.data['constructor'] || [],
             units: response.data['unit'] || [],
             dutyTypes: response.data['dutytype'] || [],
-            dutyResponsibilities: response.data['dutyresponsibility'] || []
+            dutyResponsibilities: response.data['dutyresponsibility'] || [],
+            milestones: response.data['milestones'] || []
           };
         }
-        return { mainContractTypes: [], constructors: [], units: [], dutyTypes: [], dutyResponsibilities: [] };
+        return { mainContractTypes: [], constructors: [], units: [], dutyTypes: [], dutyResponsibilities: [], milestones: [] };
       })
     );
   }
