@@ -10253,6 +10253,7 @@ export class MainContractDto implements IMainContractDto {
     agreementId?: number;
     typeId?: number;
     constructorId?: number;
+    mileStoneId?: number | undefined;
     isDeleted?: boolean;
     contractorDutyDto?: ContractorDutyDto[] | undefined;
 
@@ -10274,6 +10275,7 @@ export class MainContractDto implements IMainContractDto {
             this.agreementId = _data["agreementId"];
             this.typeId = _data["typeId"];
             this.constructorId = _data["constructorId"];
+            this.mileStoneId = _data["mileStoneId"];
             this.isDeleted = _data["isDeleted"];
             if (Array.isArray(_data["contractorDutyDto"])) {
                 this.contractorDutyDto = [] as any;
@@ -10299,6 +10301,7 @@ export class MainContractDto implements IMainContractDto {
         data["agreementId"] = this.agreementId;
         data["typeId"] = this.typeId;
         data["constructorId"] = this.constructorId;
+        data["mileStoneId"] = this.mileStoneId;
         data["isDeleted"] = this.isDeleted;
         if (Array.isArray(this.contractorDutyDto)) {
             data["contractorDutyDto"] = [];
@@ -10317,6 +10320,7 @@ export interface IMainContractDto {
     agreementId?: number;
     typeId?: number;
     constructorId?: number;
+    mileStoneId?: number | undefined;
     isDeleted?: boolean;
     contractorDutyDto?: ContractorDutyDto[] | undefined;
 }

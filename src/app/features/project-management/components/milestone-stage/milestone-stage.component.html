@@ -25,6 +25,7 @@
                 <p-tab value="3">{{ 'projectTabs.surveyingVisits.title' | translate }}</p-tab>
                 <p-tab value="4">{{ 'projectTabs.voucherOrders.title' | translate }}</p-tab>
                 <p-tab value="5">{{ 'projectTabs.milestoneDocuments.title' | translate }}</p-tab>
+                <p-tab value="6">{{ 'projectDetail.tabs.expenses' | translate }}</p-tab>
               </p-tablist>
 
               <p-tabpanels>
@@ -61,6 +62,12 @@
                 <p-tabpanel value="5">
                   @if (shouldLoadTab(stage.id!, '5')) {
                     <app-milestone-documents-tab [projectStageId]="stage.id!"></app-milestone-documents-tab>
+                  }
+                </p-tabpanel>
+
+                <p-tabpanel value="6">
+                  @if (shouldLoadTab(stage.id!, '6')) {
+                    <app-project-expense-management [projectId]="projectId" class="block mt-3"></app-project-expense-management>
                   }
                 </p-tabpanel>
               </p-tabpanels>
