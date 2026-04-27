@@ -121,7 +121,7 @@ export class Step3Component implements OnInit, OnDestroy {
     // Only load data in edit mode (when agreementId > 0)
     if (this.agreementId() > 0) {
       this.isLoading.set(true);
-      this.agreementWizardService.getAgreementById(this.agreementId(), 3)
+      this.agreementWizardService.getAgreementById(this.agreementId(), 4)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
@@ -200,7 +200,7 @@ export class Step3Component implements OnInit, OnDestroy {
     
     // Create the FullAgreementDto
     const fullAgreementDto = new FullAgreementDto();
-    fullAgreementDto.step = 3;
+    fullAgreementDto.step = 4;
     fullAgreementDto.agreementId = this.agreementId() || 0;
     fullAgreementDto.thirdStepDto = thirdStepDto;
     

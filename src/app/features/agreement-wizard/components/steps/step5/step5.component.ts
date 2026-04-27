@@ -106,7 +106,7 @@ export class Step5Component implements OnInit, OnDestroy {
     // Only load data in edit mode (when agreementId > 0)
     if (this.agreementId() > 0) {
       this.isLoading.set(true);
-      this.agreementWizardService.getAgreementById(this.agreementId(), 5)
+      this.agreementWizardService.getAgreementById(this.agreementId(), 6)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
@@ -167,7 +167,7 @@ export class Step5Component implements OnInit, OnDestroy {
 
   private prepareFullAgreementDto(): FullAgreementDto {
     const fullAgreementDto = new FullAgreementDto();
-    fullAgreementDto.step = 5;
+    fullAgreementDto.step = 6;
     fullAgreementDto.agreementId = this.agreementId();
     
     const fifthStepDto = new FifthStepDto();

@@ -304,6 +304,21 @@
       "placeholder": "Step 2 content will be added here",
       "validate": "Validate Step 2"
     },
+    "stepMilestones": {
+      "title": "Milestones",
+      "name": "Name",
+      "orderNo": "Order No",
+      "description": "Description",
+      "cancel": "Cancel",
+      "add": "Add",
+      "update": "Update",
+      "entriesList": "Milestones List",
+      "actions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete",
+      "noData": "No milestones added yet. Add entries using the form above.",
+      "showingEntries": "Showing {first} to {last} of {totalRecords} entries"
+    },
     "step3": {
       "title": "Material & Quality Specifications",
       "projectAreaUnits": "Project Area Units",

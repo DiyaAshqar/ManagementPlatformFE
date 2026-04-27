@@ -259,7 +259,6 @@ export class ProjectExpenseManagementComponent implements OnInit {
       expenseNo: this.formExpenseNo(),
       totalAmount: this.calculateFormTotal(),
       notes: this.formNotes(),
-      projectId: +this.projectId,
       supplierId: this.formSupplierId() ?? undefined,
       expenseDetails: details,
     });

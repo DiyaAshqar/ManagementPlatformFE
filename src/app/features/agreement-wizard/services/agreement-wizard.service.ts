@@ -211,7 +211,7 @@ export class AgreementWizardService {
   // Create individual main contract for Step 4
   createMainContract(agreementId: number, mainContractData: any): Observable<Int32Response> {
     const fourthStepDto = new FullAgreementDto();
-    fourthStepDto.step = 4;
+    fourthStepDto.step = 5;
     fourthStepDto.agreementId = agreementId;
     
     const fourthStep = new FourthStepDto();

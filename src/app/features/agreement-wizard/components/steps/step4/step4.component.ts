@@ -14,12 +14,12 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 import { AgreementWizardService } from '../../../services/agreement-wizard.service';
-import { 
-  FullAgreementDto, 
-  FourthStepDto, 
+import {
+  FullAgreementDto,
+  FourthStepDto,
   MainContractDto,
   ContractorDutyDto,
-  LookupDto 
+  LookupDto
 } from '../../../../../../nswag/api-client';
 import { ContractorDutiesDialogComponent } from './contractor-duties-dialog/contractor-duties-dialog.component';
 
@@ -56,14 +56,14 @@ export class Step4Component implements OnInit, OnDestroy {
   mainContracts = signal<MainContractDto[]>([]);
   isLoading = signal(false);
   isFormValid = signal(false);
-  
+
   // Editing state
   editingIndex = signal<number | null>(null);
-  
+
   // Dialog state
   showContractorDutiesDialog = signal(false);
   selectedMainContractId = signal<number>(0);
-  
+
   // Date restrictions
   minEndDate = signal<Date | null>(null);
   maxStartDate = signal<Date | null>(null);
@@ -74,13 +74,13 @@ export class Step4Component implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private messageService: MessageService,
     private agreementWizardService: AgreementWizardService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookups();
     this.loadAgreementData();
-    
+
     // Disable all fields if in view mode
     if (this.isViewMode()) {
       this.mainContractForm.disable();
@@ -114,14 +114,14 @@ export class Step4Component implements OnInit, OnDestroy {
       .subscribe(() => {
         this.isFormValid.set(this.mainContractForm.valid);
       });
-    
+
     // Set initial validity
     this.isFormValid.set(this.mainContractForm.valid);
   }
 
   private loadLookups(): void {
     this.isLoading.set(true);
-    
+
     this.agreementWizardService.getStep4Lookups()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -142,7 +142,7 @@ export class Step4Component implements OnInit, OnDestroy {
     // Only load data in edit mode (when agreementId > 0)
     if (this.agreementId() > 0) {
       this.isLoading.set(true);
-      this.agreementWizardService.getAgreementById(this.agreementId(), 4)
+      this.agreementWizardService.getAgreementById(this.agreementId(), 5)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
@@ -184,10 +184,10 @@ export class Step4Component implements OnInit, OnDestroy {
 
   private prepareFullAgreementDto(): FullAgreementDto {
     const contracts = this.mainContracts();
-    
+
     // Create the FourthStepDto
     const fourthStepDto = new FourthStepDto();
-    
+
     // Map MainContractDto array
     const mainContractDtos = contracts.map(contract => {
       const dto = new MainContractDto();
@@ -198,19 +198,19 @@ export class Step4Component implements OnInit, OnDestroy {
       dto.agreementId = this.agreementId() || 0;
       dto.typeId = contract.typeId || 0;
       dto.constructorId = contract.constructorId || 0;
-      dto.mileStoneId = contract.mileStoneId || undefined;
+      (dto as any).mileStoneId = (contract as any).mileStoneId || undefined;
       dto.isDeleted = contract.isDeleted || false;
       return dto;
     });
-    
+
     fourthStepDto.mainContractDto = mainContractDtos;
-    
+
     // Create the FullAgreementDto
     const fullAgreementDto = new FullAgreementDto();
-    fullAgreementDto.step = 4;
+    fullAgreementDto.step = 5;
     fullAgreementDto.agreementId = this.agreementId() || 0;
     fullAgreementDto.fourthStepDto = fourthStepDto;
-    
+
     return fullAgreementDto;
   }
 
@@ -224,7 +224,7 @@ export class Step4Component implements OnInit, OnDestroy {
         agreementId: this.agreementId(),
         typeId: contract.typeId,
         constructorId: contract.constructorId,
-        mileStoneId: contract.mileStoneId,
+        mileStoneId: (contract as any).mileStoneId,
         isDeleted: contract.isDeleted
       }))
     };
@@ -244,7 +244,7 @@ export class Step4Component implements OnInit, OnDestroy {
 
     this.isLoading.set(true);
     const formValue = this.mainContractForm.value;
-    
+
     // Prepare contract data in the required format
     const contractData = new MainContractDto();
     contractData.id = formValue.id || 0;
@@ -254,7 +254,7 @@ export class Step4Component implements OnInit, OnDestroy {
     contractData.agreementId = this.agreementId();
     contractData.typeId = formValue.typeId;
     contractData.constructorId = formValue.constructorId;
-    contractData.mileStoneId = formValue.mileStoneId;
+    (contractData as any).mileStoneId = formValue.mileStoneId;
     contractData.contractorDutyDto = []; // Initialize as empty array
     contractData.isDeleted = false;
 
@@ -266,7 +266,7 @@ export class Step4Component implements OnInit, OnDestroy {
           if (response.succeeded && response.data !== undefined && response.data !== null) {
             // Update the contract with the returned ID
             contractData.id = response.data;
-            
+
             const editIndex = this.editingIndex();
             if (editIndex !== null) {
               // Update existing contract
@@ -274,7 +274,7 @@ export class Step4Component implements OnInit, OnDestroy {
               contracts[editIndex] = contractData;
               this.mainContracts.set(contracts);
               this.editingIndex.set(null);
-              
+
               this.messageService.add({
                 severity: 'success',
                 summary: 'Success',
@@ -284,7 +284,7 @@ export class Step4Component implements OnInit, OnDestroy {
             } else {
               // Add new contract
               this.mainContracts.set([...this.mainContracts(), contractData]);
-              
+
             }
 
             this.clearForm();
@@ -314,7 +314,7 @@ export class Step4Component implements OnInit, OnDestroy {
 
   editContract(index: number): void {
     const contract = this.mainContracts()[index];
-    
+
     this.editingIndex.set(index);
     this.mainContractForm.patchValue({
       id: contract.id,
@@ -324,7 +324,7 @@ export class Step4Component implements OnInit, OnDestroy {
       agreementId: contract.agreementId,
       typeId: contract.typeId,
       constructorId: contract.constructorId,
-      mileStoneId: contract.mileStoneId || null
+      mileStoneId: (contract as any).mileStoneId || null
     });
   }
 
@@ -370,7 +370,7 @@ export class Step4Component implements OnInit, OnDestroy {
 
   formatDate(date: Date | string | undefined): string {
     if (!date) return '';
-    
+
     const dateObj = date instanceof Date ? date : new Date(date);
     const year = dateObj.getFullYear();
     const month = String(dateObj.getMonth() + 1).padStart(2, '0');
@@ -392,7 +392,7 @@ export class Step4Component implements OnInit, OnDestroy {
       const minEndDate = new Date(startDate);
       minEndDate.setDate(minEndDate.getDate() + 1);
       this.minEndDate.set(minEndDate);
-      
+
       this.mainContractForm.updateValueAndValidity();
     } else {
       this.minEndDate.set(null);
@@ -405,7 +405,7 @@ export class Step4Component implements OnInit, OnDestroy {
       const maxStartDate = new Date(endDate);
       maxStartDate.setDate(maxStartDate.getDate() - 1);
       this.maxStartDate.set(maxStartDate);
-      
+
       this.mainContractForm.updateValueAndValidity();
     } else {
       this.maxStartDate.set(null);
@@ -467,39 +467,39 @@ export class Step4Component implements OnInit, OnDestroy {
   onContractorDutyDataReceived(contractorDuties: ContractorDutyDto[]): void {
     const contractId = this.selectedMainContractId();
     const contractIndex = this.mainContracts().findIndex(c => c.id === contractId);
-    
+
     if (contractIndex !== -1) {
       // Update the contract with new contractor duties
       const updatedContracts = [...this.mainContracts()];
       updatedContracts[contractIndex].contractorDutyDto = contractorDuties;
       this.mainContracts.set(updatedContracts);
-      
+
       // Save to backend with the correct payload structure
       this.saveMainContractWithDuties(updatedContracts[contractIndex]);
     }
-    
+
     this.showContractorDutiesDialog.set(false);
     this.selectedMainContractId.set(0);
   }
 
   private saveMainContractWithDuties(mainContract: MainContractDto): void {
     this.isLoading.set(true);
-    
+
     // Prepare the FullAgreementDto payload as specified
     const fullAgreementDto = new FullAgreementDto();
-    fullAgreementDto.step = 4;
+    fullAgreementDto.step = 5;
     fullAgreementDto.agreementId = this.agreementId();
-    
+
     const fourthStepDto = new FourthStepDto();
     fourthStepDto.mainContractDto = [mainContract];
     fullAgreementDto.fourthStepDto = fourthStepDto;
-    
+
     this.agreementWizardService.createAgreement(fullAgreementDto)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
           if (response.succeeded && response.data !== undefined && response.data !== null) {
-          } 
+          }
           this.isLoading.set(false);
         },
         error: (error) => {

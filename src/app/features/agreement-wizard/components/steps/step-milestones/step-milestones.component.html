@@ -1,0 +1,154 @@
+<div class="p-4">
+  <form [formGroup]="milestoneForm" (ngSubmit)="onSubmit()">
+    @if (isLoading()) {
+    <div class="flex justify-center align-items-center p-6">
+      <p-progressSpinner></p-progressSpinner>
+    </div>
+    }
+
+    <!-- Input Form Section -->
+    @if (!isViewMode()) {
+    <div class="col-12 mb-2">
+      <h3 class="text-xl font-semibold mb-2">{{ 'wizard.stepMilestones.title' | translate }}</h3>
+
+      <div class="grid">
+        <!-- Name field -->
+        <div class="col-12 md:col-6 lg:col-3 mb-3">
+          <div class="field">
+            <p-floatlabel variant="in">
+              <input
+                id="name"
+                pInputText
+                formControlName="name"
+                [class]="isFieldInvalid('name') ? 'ng-dirty ng-invalid w-full' : 'w-full'"
+              />
+              <label for="name">{{ 'wizard.stepMilestones.name' | translate }} <span class="required-asterisk">*</span></label>
+            </p-floatlabel>
+            @if (isFieldInvalid('name')) {
+            <small class="text-red-500">{{ getFieldError('name') }}</small>
+            }
+          </div>
+        </div>
+
+        <!-- OrderNo field -->
+        <div class="col-12 md:col-6 lg:col-3 mb-3">
+          <div class="field">
+            <p-floatlabel variant="in">
+              <p-inputNumber
+                inputId="order"
+                formControlName="order"
+                [min]="1"
+                [showButtons]="true"
+                [ngClass]="{'ng-invalid': isFieldInvalid('order')}"
+                inputStyleClass="w-full"
+              ></p-inputNumber>
+              <label for="order">{{ 'wizard.stepMilestones.orderNo' | translate }} <span class="required-asterisk">*</span></label>
+            </p-floatlabel>
+            @if (isFieldInvalid('order')) {
+            <small class="text-red-500">{{ getFieldError('order') }}</small>
+            }
+          </div>
+        </div>
+
+        <!-- Description field -->
+        <div class="col-12 md:col-6 lg:col-3 mb-3">
+          <div class="field">
+            <p-floatlabel variant="in">
+              <input
+                id="description"
+                pInputText
+                formControlName="description"
+                [class]="isFieldInvalid('description') ? 'ng-dirty ng-invalid w-full' : 'w-full'"
+              />
+              <label for="description">{{ 'wizard.stepMilestones.description' | translate }} <span class="required-asterisk">*</span></label>
+            </p-floatlabel>
+            @if (isFieldInvalid('description')) {
+            <small class="text-red-500">{{ getFieldError('description') }}</small>
+            }
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="col-12 md:col-6 lg:col-3 mb-3">
+          <div class="flex gap-2 justify-end mt-2">
+            <button type="button" class="p-button p-button-secondary" (click)="clearForm()" pButton
+              [label]="'wizard.stepMilestones.cancel' | translate">
+              <i class="pi pi-times mr-2"></i>
+            </button>
+            <button type="button" class="p-button p-button-success" (click)="addEntry()" pButton
+              [disabled]="milestoneForm.invalid"
+              [label]="editingIndex() !== null ? ('wizard.stepMilestones.update' | translate) : ('wizard.stepMilestones.add' | translate)">
+              <i class="pi pi-check mr-2"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    }
+
+    <!-- Data Table Section -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header border-b border-gray-200 pb-3 mb-1">
+          <h4 class="text-lg font-semibold">{{ 'wizard.stepMilestones.entriesList' | translate }}</h4>
+        </div>
+
+        <p-table
+          [value]="getActiveEntries()"
+          [paginator]="true"
+          [rows]="5"
+          [showCurrentPageReport]="true"
+          currentPageReportTemplate="{{ 'wizard.stepMilestones.showingEntries' | translate }}"
+          [rowsPerPageOptions]="[5, 10, 25, 50]"
+          [tableStyle]="{ 'min-width': '40rem' }"
+          styleClass="p-datatable-striped"
+        >
+          <ng-template pTemplate="header">
+            <tr>
+              <th style="width: 80px">#</th>
+              <th>{{ 'wizard.stepMilestones.name' | translate }}</th>
+              <th>{{ 'wizard.stepMilestones.orderNo' | translate }}</th>
+              <th>{{ 'wizard.stepMilestones.description' | translate }}</th>
+              @if (!isViewMode()) {
+              <th class="text-center" style="width: 150px">{{ 'wizard.stepMilestones.actions' | translate }}</th>
+              }
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="body" let-entry let-rowIndex="rowIndex">
+            <tr>
+              <td>{{ entry.id || '-' }}</td>
+              <td>{{ entry.name }}</td>
+              <td>{{ entry.order }}</td>
+              <td>{{ entry.description }}</td>
+              @if (!isViewMode()) {
+              <td class="text-center">
+                <button type="button" class="p-button-rounded p-button-text p-button-warning mr-2"
+                  (click)="editEntry(rowIndex)" pButton icon="pi pi-pencil"
+                  [pTooltip]="'wizard.stepMilestones.edit' | translate">
+                </button>
+                <button type="button" class="p-button-rounded p-button-text p-button-danger"
+                  (click)="deleteEntry(rowIndex)" pButton icon="pi pi-trash"
+                  [pTooltip]="'wizard.stepMilestones.delete' | translate">
+                </button>
+              </td>
+              }
+            </tr>
+          </ng-template>
+
+          <ng-template pTemplate="emptymessage">
+            <tr>
+              <td [attr.colspan]="isViewMode() ? 4 : 5" class="text-center p-6">
+                <i class="pi pi-inbox text-4xl mb-3 block text-gray-400"></i>
+                <p class="text-gray-500">{{ 'wizard.stepMilestones.noData' | translate }}</p>
+              </td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <!-- Hidden Submit Button -->
+    <button type="button" (click)="onSubmit()" style="display: none;"></button>
+  </form>
+</div>

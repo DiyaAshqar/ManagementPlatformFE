@@ -279,7 +279,7 @@ export class Step7Component implements OnInit, OnDestroy {
 
       // Create FullAgreementDto with step 7 data
       const fullAgreementDto = new FullAgreementDto();
-      fullAgreementDto.step = 7;
+      fullAgreementDto.step = 8;
       fullAgreementDto.agreementId = this.agreementId();
       fullAgreementDto.seventhStepDto = stepDataValue;
 

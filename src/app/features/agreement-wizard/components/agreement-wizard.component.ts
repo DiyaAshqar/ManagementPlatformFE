@@ -10,6 +10,7 @@ import { Step4Component } from './steps/step4/step4.component';
 import { Step5Component } from './steps/step5/step5.component';
 import { Step6Component } from './steps/step6/step6.component';
 import { Step7Component } from './steps/step7/step7.component';
+import { StepMilestonesComponent } from './steps/step-milestones/step-milestones.component';
 import { TranslateModule } from '@ngx-translate/core';
 import { LanguageService } from '../../../core/services/language.service';
 
@@ -27,7 +28,8 @@ import { LanguageService } from '../../../core/services/language.service';
     Step4Component,
     Step5Component,
     Step6Component,
-    Step7Component
+    Step7Component,
+    StepMilestonesComponent
   ],
   templateUrl: './agreement-wizard.component.html'
 })
@@ -45,6 +47,7 @@ export class AgreementWizardComponent implements OnInit {
   // Store data from each step
   step1Data = signal<any>(null);
   step2Data = signal<any>(null);
+  stepMilestonesData = signal<any>(null);
   step3Data = signal<any>(null);
   step4Data = signal<any>(null);
   step5Data = signal<any>(null);
@@ -60,14 +63,16 @@ export class AgreementWizardComponent implements OnInit {
       case 2:
         return this.step2Data() !== null;
       case 3:
-        return this.step3Data() !== null;
+        return this.stepMilestonesData() !== null;
       case 4:
-        return this.step4Data() !== null;
+        return this.step3Data() !== null;
       case 5:
-        return this.step5Data() !== null;
+        return this.step4Data() !== null;
       case 6:
-        return this.step6Data() !== null;
+        return this.step5Data() !== null;
       case 7:
+        return this.step6Data() !== null;
+      case 8:
         return this.step7Data() !== null;
       default:
         return false;
@@ -77,6 +82,7 @@ export class AgreementWizardComponent implements OnInit {
   stepLabels = [
     'wizard.step1.title',
     'wizard.step2.title',
+    'wizard.stepMilestones.title',
     'wizard.step3.title',
     'wizard.step4.title',
     'wizard.step5.title',
@@ -109,7 +115,7 @@ export class AgreementWizardComponent implements OnInit {
       const step = queryParams['step'];
       if (step) {
         const parsedStep = parseInt(step, 10);
-        if (!isNaN(parsedStep) && parsedStep >= 1 && parsedStep <= 7) {
+        if (!isNaN(parsedStep) && parsedStep >= 1 && parsedStep <= 8) {
           this.currentStep.set(parsedStep);
         } else {
           // Invalid step, default to step 1
@@ -161,28 +167,34 @@ export class AgreementWizardComponent implements OnInit {
     this.goToStep(3);
   }
 
+  onStepMilestonesData(data: any) {
+    this.stepMilestonesData.set(data);
+    // Move to next step after successful submission
+    this.goToStep(4);
+  }
+
   onStep3Data(data: any) {
     this.step3Data.set(data);
     // Move to next step after successful submission
-    this.goToStep(4);
+    this.goToStep(5);
   }
 
   onStep4Data(data: any) {
     this.step4Data.set(data);
     // Move to next step after successful submission
-    this.goToStep(5);
+    this.goToStep(6);
   }
 
   onStep5Data(data: any) {
     this.step5Data.set(data);
     // Move to next step after successful submission
-    this.goToStep(6);
+    this.goToStep(7);
   }
 
   onStep6Data(data: any) {
     this.step6Data.set(data);
     // Move to next step after successful submission
-    this.goToStep(7);
+    this.goToStep(8);
   }
 
   onStep7Data(data: any) {

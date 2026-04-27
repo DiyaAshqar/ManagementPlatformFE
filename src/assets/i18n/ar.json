@@ -301,6 +301,21 @@
       "placeholder": "سيتم إضافة محتوى الخطوة 2 هنا",
       "validate": "التحقق من الخطوة 2"
     },
+    "stepMilestones": {
+      "title": "المراحل",
+      "name": "الاسم",
+      "orderNo": "رقم الترتيب",
+      "description": "الوصف",
+      "cancel": "إلغاء",
+      "add": "إضافة",
+      "update": "تحديث",
+      "entriesList": "قائمة المراحل",
+      "actions": "الإجراءات",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "noData": "لم تتم إضافة أي مراحل بعد. أضف إدخالات باستخدام النموذج أعلاه.",
+      "showingEntries": "عرض {first} إلى {last} من {totalRecords} إدخالات"
+    },
     "step3": {
       "title": "مواصفات المواد والجودة",
       "projectAreaUnits": "وحدات مساحة المشروع",

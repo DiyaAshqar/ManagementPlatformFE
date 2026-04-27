@@ -66,7 +66,7 @@ export class Step2Component implements OnInit, OnDestroy {
     this.initializeForm();
     this.loadLookups();
     this.loadAgreementData();
-    
+
     // Disable all fields if in view mode
     if (this.isViewMode()) {
       this.step2Form.disable();
@@ -147,20 +147,20 @@ export class Step2Component implements OnInit, OnDestroy {
       this.step2Form.patchValue({
         contractTypeId: data.agreementPaymentDto.contractTypeId,
         contractModelId: data.agreementPaymentDto.contractModelId,
-        paymentMethodId: data.agreementPaymentDto.paymentMethodId,
+        paymentMethodId: (data.agreementPaymentDto as any).paymentMethodId,
         amount: data.agreementPaymentDto.monthlyPaymentDto?.amount
       });
-      
+
       // Enable/disable amount field based on payment method
-      if (data.agreementPaymentDto.paymentMethodId === 1) {
+      if ((data.agreementPaymentDto as any).paymentMethodId === 1) {
         this.step2Form.get('amount')?.enable();
       }
     }
-    
+
     if (data.agreementServiceDto && Array.isArray(data.agreementServiceDto)) {
       // Clear existing services
       this.selectedServicesArray.clear();
-      
+
       // Add selected services
       data.agreementServiceDto.forEach(service => {
         if (service.serviceId) {
@@ -240,7 +240,7 @@ export class Step2Component implements OnInit, OnDestroy {
     agreementPaymentDto.id = this.agreementPaymentId;
     agreementPaymentDto.contractTypeId = formValue.contractTypeId || 0;
     agreementPaymentDto.contractModelId = formValue.contractModelId || 0;
-    agreementPaymentDto.paymentMethodId = formValue.paymentMethodId || 0;
+    (agreementPaymentDto as any).paymentMethodId = formValue.paymentMethodId || 0;
     // Use stored monthly payment ID if in edit mode
     agreementPaymentDto.monthlyPaymentId = this.monthlyPaymentId;
     agreementPaymentDto.agreementId = this.agreementId() || 0;

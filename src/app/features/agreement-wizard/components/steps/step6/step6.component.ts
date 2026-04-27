@@ -46,7 +46,7 @@ export class Step6Component implements OnInit, OnDestroy {
   milestones = signal<LookupDto[]>([]);
   constructors = signal<LookupDto[]>([]);
   isLoading = signal(false);
-  
+
   // Editing state
   editingIndex = signal<number | null>(null);
 
@@ -56,13 +56,13 @@ export class Step6Component implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private messageService: MessageService,
     private agreementWizardService: AgreementWizardService
-  ) {}
+  ) { }
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookups();
     this.loadAgreementData();
-    
+
     // Disable all fields if in view mode
     if (this.isViewMode()) {
       this.step6Form.disable();
@@ -91,7 +91,7 @@ export class Step6Component implements OnInit, OnDestroy {
 
   private loadLookups(): void {
     this.isLoading.set(true);
-    
+
     this.agreementWizardService.getStep6Lookups()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -113,7 +113,7 @@ export class Step6Component implements OnInit, OnDestroy {
     // Only load data in edit mode (when agreementId > 0)
     if (this.agreementId() > 0) {
       this.isLoading.set(true);
-      this.agreementWizardService.getAgreementById(this.agreementId(), 6)
+      this.agreementWizardService.getAgreementById(this.agreementId(), 7)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
@@ -139,17 +139,17 @@ export class Step6Component implements OnInit, OnDestroy {
 
   onSubmit(): void {
     const activeEntries = this.getActiveEntries();
-    
+
     if (activeEntries.length === 0) {
       // No entries to submit
       return;
     }
 
     this.isLoading.set(true);
-    
+
     // Prepare the FullAgreementDto payload
     const fullAgreementDto = this.prepareFullAgreementDto();
-    
+
     // Call the API
     this.agreementWizardService.createAgreement(fullAgreementDto)
       .pipe(takeUntil(this.destroy$))
@@ -174,9 +174,9 @@ export class Step6Component implements OnInit, OnDestroy {
 
   private prepareFullAgreementDto(): FullAgreementDto {
     const fullAgreementDto = new FullAgreementDto();
-    fullAgreementDto.step = 6;
+    fullAgreementDto.step = 7;
     fullAgreementDto.agreementId = this.agreementId();
-    
+
     const sixthStepDto = new SixthStepDto();
     // Map to match the expected payload structure
     sixthStepDto.quantityBillDto = this.quantityBills().map(entry => {
@@ -186,15 +186,15 @@ export class Step6Component implements OnInit, OnDestroy {
       dto.unitId = entry.unitId;
       dto.mileStoneId = entry.mileStoneId;
       dto.constructorId = entry.constructorId;
-      dto.ammount = entry.ammount;
+      dto.quantity = entry.quantity;
       dto.price = entry.price;
       dto.agreementId = this.agreementId();
       dto.isDeleted = entry.isDeleted || false;
       return dto;
     });
-    
+
     fullAgreementDto.sixthStepDto = sixthStepDto;
-    
+
     return fullAgreementDto;
   }
 
@@ -204,7 +204,7 @@ export class Step6Component implements OnInit, OnDestroy {
         id: entry.id,
         materialId: entry.materialId,
         unitId: entry.unitId,
-        mileStoneId: entry.mileStoneId,        constructorId: entry.constructorId,        ammount: entry.ammount,
+        mileStoneId: entry.mileStoneId, constructorId: entry.constructorId, quantity: entry.quantity,
         price: entry.price,
         agreementId: this.agreementId(),
         isDeleted: entry.isDeleted || false
@@ -220,14 +220,14 @@ export class Step6Component implements OnInit, OnDestroy {
 
     const formValue = this.step6Form.get('quantityBillDto')?.value;
     const editIndex = this.editingIndex();
-    
+
     const entryData = new QuantityBillDto();
     entryData.id = formValue.id || 0;
     entryData.materialId = formValue.materialId;
     entryData.unitId = formValue.unitId;
     entryData.mileStoneId = formValue.mileStoneId;
     entryData.constructorId = formValue.constructorId;
-    entryData.ammount = formValue.ammount;
+    entryData.quantity = formValue.ammount;
     entryData.price = formValue.price;
     entryData.agreementId = this.agreementId();
     entryData.isDeleted = false;
@@ -249,17 +249,17 @@ export class Step6Component implements OnInit, OnDestroy {
   editEntry(index: number): void {
     const activeEntries = this.getActiveEntries();
     const entry = activeEntries[index];
-    
+
     // Find the actual index in the full array
-    const actualIndex = this.quantityBills().findIndex(e => 
-      e.id === entry.id && 
+    const actualIndex = this.quantityBills().findIndex(e =>
+      e.id === entry.id &&
       e.materialId === entry.materialId &&
-      e.unitId === entry.unitId && 
+      e.unitId === entry.unitId &&
       e.mileStoneId === entry.mileStoneId &&
-      e.ammount === entry.ammount &&
+      e.quantity === entry.quantity &&
       e.price === entry.price
     );
-    
+
     this.editingIndex.set(actualIndex);
     this.step6Form.patchValue({
       quantityBillDto: {
@@ -268,9 +268,9 @@ export class Step6Component implements OnInit, OnDestroy {
         unitId: entry.unitId,
         mileStoneId: entry.mileStoneId,
         constructorId: entry.constructorId,
-        ammount: entry.ammount,
+        ammount: entry.quantity,
         price: entry.price,
-        agreementId: entry.agreementId
+        agreementId: entry.agreementId,
       }
     });
   }
@@ -279,14 +279,14 @@ export class Step6Component implements OnInit, OnDestroy {
     const activeEntries = this.getActiveEntries();
     const entry = activeEntries[index];
     const entries = [...this.quantityBills()];
-    
+
     // Find the actual index in the full array
-    const actualIndex = entries.findIndex(e => 
-      e.id === entry.id && 
+    const actualIndex = entries.findIndex(e =>
+      e.id === entry.id &&
       e.materialId === entry.materialId &&
-      e.unitId === entry.unitId && 
+      e.unitId === entry.unitId &&
       e.mileStoneId === entry.mileStoneId &&
-      e.ammount === entry.ammount &&
+      e.quantity === entry.quantity &&
       e.price === entry.price
     );
 
@@ -327,7 +327,7 @@ export class Step6Component implements OnInit, OnDestroy {
 
   // Calculate total for display
   calculateTotal(entry: QuantityBillDto): number {
-    return entry.ammount * entry.price;
+    return (entry.quantity ?? 0) * (entry.price ?? 0);
   }
 
   // Helper methods to get names
