@@ -48,9 +48,9 @@
       <!-- Start Date -->
       <div class="col-12 md:col-6">
         <div class="field">
-          <p-floatlabel variant="in">
-            <p-datepicker inputId="startDate" formControlName="startDate" [showIcon]="true" dateFormat="yy-mm-dd"
-              class="w-full" [class.ng-invalid]="isFieldInvalid('startDate')">
+          <p-floatlabel variant="in" class="w-full">
+            <p-datepicker appendTo="body" inputId="startDate" formControlName="startDate" [showIcon]="true" dateFormat="yy-mm-dd"
+              class="w-full" styleClass="w-full" inputStyleClass="w-full" [class.ng-invalid]="isFieldInvalid('startDate')">
             </p-datepicker>
             <label for="startDate">{{ 'projects.form.startDate' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
@@ -61,9 +61,9 @@
       <!-- End Date -->
       <div class="col-12 md:col-6">
         <div class="field">
-          <p-floatlabel variant="in">
-            <p-datepicker inputId="endDate" formControlName="endDate" [showIcon]="true" dateFormat="yy-mm-dd"
-              class="w-full" [class.ng-invalid]="isFieldInvalid('endDate')">
+          <p-floatlabel variant="in" class="w-full">
+            <p-datepicker appendTo="body" inputId="endDate" formControlName="endDate" [showIcon]="true" dateFormat="yy-mm-dd"
+              class="w-full" styleClass="w-full" inputStyleClass="w-full" [class.ng-invalid]="isFieldInvalid('endDate')">
             </p-datepicker>
             <label for="endDate">{{ 'projects.form.endDate' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
@@ -72,7 +72,7 @@
       </div>
 
       <!-- Status -->
-      <div class="col-12 md:col-6">
+      <div class="col-12">
         <div class="field">
           <p-floatlabel variant="in">
             <p-select inputId="status" formControlName="status" [options]="statusOptions" optionLabel="label"

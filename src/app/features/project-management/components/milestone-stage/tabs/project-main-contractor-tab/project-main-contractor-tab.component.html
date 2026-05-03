@@ -40,7 +40,7 @@
         <th class="text-right">{{ 'projectTabs.projectMainContractor.columnAmount' | translate }}</th>
         <th>{{ 'projectTabs.projectMainContractor.columnStartDate' | translate }}</th>
         <th>{{ 'projectTabs.projectMainContractor.columnEndDate' | translate }}</th>
-        <th class="text-center" style="width: 10rem">{{ 'common.actions' | translate }}</th>
+        <th class="text-center" style="width: 12rem">{{ 'common.actions' | translate }}</th>
       </tr>
     </ng-template>
 
@@ -57,6 +57,16 @@
         <td>{{ item.endDate | date:'yyyy-MM-dd' }}</td>
         <td class="text-center">
           <div class="contractor-actions">
+            <p-button
+              icon="pi pi-briefcase"
+              [rounded]="true"
+              severity="secondary"
+              [text]="true"
+              size="small"
+              [pTooltip]="'wizard.step4.contractorDuties' | translate"
+              tooltipPosition="top"
+              (onClick)="openContractorDutiesDialog(item)">
+            </p-button>
             <p-button
               icon="pi pi-pencil"
               [rounded]="true"
@@ -107,3 +117,15 @@
     (saved)="onDialogSaved($event)">
   </app-add-contractor-dialog>
 }
+
+<ng-container *ngIf="showContractorDutiesDialog()">
+  <app-contractor-duties-dialog
+    [visible]="showContractorDutiesDialog()"
+    [agreementId]="0"
+    [mainContractId]="selectedMainContractId()"
+    [existingContractorDuties]="selectedContractorDuties()"
+    [isViewMode]="false"
+    (closeDialog)="onContractorDutiesDialogClose()"
+    (contractorDutyData)="onContractorDutyDataReceived($event)">
+  </app-contractor-duties-dialog>
+</ng-container>

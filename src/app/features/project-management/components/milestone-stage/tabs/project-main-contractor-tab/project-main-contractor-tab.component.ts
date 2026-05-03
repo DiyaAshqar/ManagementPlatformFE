@@ -13,12 +13,14 @@ import { BadgeModule } from 'primeng/badge';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
 import {
+  ContractorDutyDto,
   ConstructorClient,
   CreateProjectMainContractorCommand,
   IGetProjectMainContractorDto,
   ProjectMainContractorClient
 } from '../../../../../../../nswag/api-client';
 import { AddContractorDialogComponent } from '../../../dialog/add-contractor-dialog/add-contractor-dialog.component';
+import { ContractorDutiesDialogComponent } from '../../../../../agreement-wizard/components/steps/step4/contractor-duties-dialog/contractor-duties-dialog.component';
 
 @Component({
   selector: 'app-project-main-contractor-tab',
@@ -32,7 +34,8 @@ import { AddContractorDialogComponent } from '../../../dialog/add-contractor-dia
     ToastModule,
     TooltipModule,
     BadgeModule,
-    AddContractorDialogComponent
+    AddContractorDialogComponent,
+    ContractorDutiesDialogComponent
   ],
   providers: [MessageService, ProjectMainContractorClient, ConstructorClient],
   templateUrl: './project-main-contractor-tab.component.html',
@@ -46,6 +49,9 @@ export class ProjectMainContractorTabComponent implements OnInit {
 
   showContractorDialog = signal(false);
   editContractorItem = signal<IGetProjectMainContractorDto | null>(null);
+  showContractorDutiesDialog = signal(false);
+  selectedMainContractId = signal<number>(0);
+  selectedContractorDuties = signal<ContractorDutyDto[]>([]);
 
   // ─── Lookup maps (for table display) ───────────────────────────────────────
   contractorMap: Record<number, string> = {};
@@ -122,6 +128,33 @@ export class ProjectMainContractorTabComponent implements OnInit {
     this.showContractorDialog.set(true);
   }
 
+  openContractorDutiesDialog(item: IGetProjectMainContractorDto): void {
+    if (!item.id) {
+      return;
+    }
+
+    this.isLoading.set(true);
+
+    this.contractorClient.getById(item.id).subscribe({
+      next: (res) => {
+        const duties = (res.data as any)?.contractorDutyDto ?? (item as any)?.contractorDutyDto ?? [];
+        this.selectedContractorDuties.set(this.mapContractorDuties(duties));
+        this.selectedMainContractId.set(item.id!);
+        this.showContractorDutiesDialog.set(true);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading contractor duties:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to load Contractor Duties.'
+        });
+        this.isLoading.set(false);
+      }
+    });
+  }
+
   onDialogSaved(command: CreateProjectMainContractorCommand): void {
     this.contractorClient.createOrUpdate(command).subscribe({
       next: (res) => {
@@ -150,6 +183,88 @@ export class ProjectMainContractorTabComponent implements OnInit {
         });
       }
     });
+  }
+
+  onContractorDutiesDialogClose(): void {
+    this.showContractorDutiesDialog.set(false);
+    this.selectedMainContractId.set(0);
+    this.selectedContractorDuties.set([]);
+  }
+
+  onContractorDutyDataReceived(contractorDuties: ContractorDutyDto[]): void {
+    const contractId = this.selectedMainContractId();
+    const contractor = this.contractorItems().find(item => item.id === contractId);
+
+    if (!contractor || !contractId) {
+      this.onContractorDutiesDialogClose();
+      return;
+    }
+
+    const payload: any = {
+      id: contractor.id,
+      projectStageId: contractor.projectStageId ?? this.projectStageId,
+      constructorId: contractor.constructorId,
+      amount: contractor.amount,
+      startDate: contractor.startDate,
+      endDate: contractor.endDate,
+      contractorDutyDto: contractorDuties.map(duty => ({
+        id: duty.id,
+        subTotal: duty.subTotal,
+        quantity: duty.quantity,
+        price: duty.price,
+        unitId: duty.unitId,
+        dutyTypeId: duty.dutyTypeId,
+        dutyResponsibilityId: duty.dutyResponsibilityId,
+        mainContractId: contractId,
+        isDeleted: duty.isDeleted ?? false
+      }))
+    };
+
+    this.contractorClient.createOrUpdate(payload).subscribe({
+      next: (res) => {
+        if (res.succeeded) {
+          this.loadContractorData();
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: 'Contractor Duties saved successfully.'
+          });
+          this.onContractorDutiesDialogClose();
+        } else {
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: res.message || 'Failed to save Contractor Duties.'
+          });
+        }
+      },
+      error: (err) => {
+        console.error('Error saving contractor duties:', err);
+        this.messageService.add({
+          severity: 'error',
+          summary: 'Error',
+          detail: 'Failed to save Contractor Duties.'
+        });
+      }
+    });
+  }
+
+  private mapContractorDuties(duties: any[]): ContractorDutyDto[] {
+    if (!Array.isArray(duties)) {
+      return [];
+    }
+
+    return duties.map((duty) => new ContractorDutyDto({
+      id: duty.id,
+      subTotal: duty.subTotal,
+      quantity: duty.quantity,
+      price: duty.price,
+      unitId: duty.unitId,
+      dutyTypeId: duty.dutyTypeId,
+      dutyResponsibilityId: duty.dutyResponsibilityId,
+      mainContractId: duty.mainContractId,
+      isDeleted: duty.isDeleted ?? false
+    }));
   }
 
   confirmDelete(item: IGetProjectMainContractorDto): void {
