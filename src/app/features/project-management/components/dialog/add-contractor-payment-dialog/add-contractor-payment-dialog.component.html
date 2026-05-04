@@ -1,0 +1,150 @@
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [header]="dialogHeader"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '42rem' }"
+  [breakpoints]="{ '960px': '75vw', '640px': '95vw' }">
+
+  <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+    <div class="grid">
+
+      <!-- Payment Date -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-calendar
+              inputId="paymentDate"
+              formControlName="paymentDate"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              iconDisplay="input"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('paymentDate')">
+            </p-calendar>
+            <label for="paymentDate">{{ 'dialogs.contractorPayment.paymentDate' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('paymentDate')" class="p-error">{{ 'dialogs.contractorPayment.paymentDateRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <!-- Paid Amount -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-inputnumber
+              inputId="paidAmount"
+              formControlName="paidAmount"
+              mode="decimal"
+              locale="en-US"
+              [minFractionDigits]="2"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('paidAmount')">
+            </p-inputnumber>
+            <label for="paidAmount">{{ 'dialogs.contractorPayment.paidAmount' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('paidAmount')" class="p-error">{{ 'dialogs.contractorPayment.paidAmountRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="col-12">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="paymentMethod"
+              formControlName="paymentMethod"
+              [options]="paymentMethodOptions"
+              optionLabel="label"
+              optionValue="value"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('paymentMethod')">
+            </p-select>
+            <label for="paymentMethod">{{ 'dialogs.contractorPayment.paymentMethod' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('paymentMethod')" class="p-error">{{ 'dialogs.contractorPayment.paymentMethodRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <!-- Receipt No -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <input
+              pInputText
+              id="receiptNo"
+              formControlName="receiptNo"
+              class="w-full" />
+            <label for="receiptNo">{{ 'dialogs.contractorPayment.receiptNo' | translate }}</label>
+          </p-floatlabel>
+        </div>
+      </div>
+
+      <!-- Cheque No -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <input
+              pInputText
+              id="chequeNo"
+              formControlName="chequeNo"
+              class="w-full" />
+            <label for="chequeNo">{{ 'dialogs.contractorPayment.chequeNo' | translate }}</label>
+          </p-floatlabel>
+        </div>
+      </div>
+
+      <!-- Transfer Reference -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <input
+              pInputText
+              id="transferReferenceNumber"
+              formControlName="transferReferenceNumber"
+              class="w-full" />
+            <label for="transferReferenceNumber">{{ 'dialogs.contractorPayment.transferRef' | translate }}</label>
+          </p-floatlabel>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div class="col-12">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <textarea
+              pTextarea
+              id="notes"
+              formControlName="notes"
+              rows="3"
+              class="w-full"
+              style="resize: vertical;">
+            </textarea>
+            <label for="notes">{{ 'dialogs.contractorPayment.notes' | translate }}</label>
+          </p-floatlabel>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      [label]="'common.cancel' | translate"
+      severity="secondary"
+      [text]="true"
+      (onClick)="onHide()">
+    </p-button>
+    <p-button
+      [label]="isEditMode ? ('dialogs.contractorPayment.update' | translate) : ('dialogs.contractorPayment.add' | translate)"
+      icon="pi pi-check"
+      [loading]="isSubmitting()"
+      (onClick)="onSubmit()">
+    </p-button>
+  </ng-template>
+
+</p-dialog>

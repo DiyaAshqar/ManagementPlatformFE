@@ -5,6 +5,7 @@ import { TranslateService, TranslateModule } from '@ngx-translate/core';
 
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
+import { DialogModule } from 'primeng/dialog';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { ToastModule } from 'primeng/toast';
@@ -21,6 +22,7 @@ import {
 } from '../../../../../../../nswag/api-client';
 import { AddContractorDialogComponent } from '../../../dialog/add-contractor-dialog/add-contractor-dialog.component';
 import { ContractorDutiesDialogComponent } from '../../../../../agreement-wizard/components/steps/step4/contractor-duties-dialog/contractor-duties-dialog.component';
+import { ProjectMainContractorPaymentsComponent } from '../../../../components/project-main-contractor/project-main-contractor-payments/project-main-contractor-payments.component';
 
 @Component({
   selector: 'app-project-main-contractor-tab',
@@ -29,13 +31,15 @@ import { ContractorDutiesDialogComponent } from '../../../../../agreement-wizard
     CommonModule,
     TranslateModule,
     ButtonModule,
+    DialogModule,
     SkeletonModule,
     TableModule,
     ToastModule,
     TooltipModule,
     BadgeModule,
     AddContractorDialogComponent,
-    ContractorDutiesDialogComponent
+    ContractorDutiesDialogComponent,
+    ProjectMainContractorPaymentsComponent
   ],
   providers: [MessageService, ProjectMainContractorClient, ConstructorClient],
   templateUrl: './project-main-contractor-tab.component.html',
@@ -52,6 +56,9 @@ export class ProjectMainContractorTabComponent implements OnInit {
   showContractorDutiesDialog = signal(false);
   selectedMainContractId = signal<number>(0);
   selectedContractorDuties = signal<ContractorDutyDto[]>([]);
+
+  // Master-detail: selected contractor for payments view
+  selectedContractor = signal<IGetProjectMainContractorDto | null>(null);
 
   // ─── Lookup maps (for table display) ───────────────────────────────────────
   contractorMap: Record<number, string> = {};
@@ -121,6 +128,18 @@ export class ProjectMainContractorTabComponent implements OnInit {
   openAddDialog(): void {
     this.editContractorItem.set(null);
     this.showContractorDialog.set(true);
+  }
+
+  selectContractorForPayments(item: IGetProjectMainContractorDto): void {
+    this.selectedContractor.set(item);
+  }
+
+  closePaymentsDialog(): void {
+    this.selectedContractor.set(null);
+  }
+
+  getContractorName(item: IGetProjectMainContractorDto): string {
+    return this.contractorMap[item.constructorId ?? 0] || '—';
   }
 
   openEditDialog(item: IGetProjectMainContractorDto): void {

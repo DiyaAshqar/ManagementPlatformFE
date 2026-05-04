@@ -32,7 +32,8 @@
     "info": "Info",
     "view": "View",
     "status": "Status",
-    "clearFilters": "Clear Filters"
+    "clearFilters": "Clear Filters",
+    "attachments": "Attachments"
   },
   "breadcrumb": {
     "home": "Home",
@@ -654,6 +655,28 @@
       "emptyMessage": "No contractors found for this stage",
       "emptySubMessage": "Click \"Add Contractor\" to get started"
     },
+    "contractorPayment": {
+      "cardTitle": "Contractor Payments",
+      "cardSubtitle": "Manage payment records for this contractor",
+      "totalPayments": "Total Payments",
+      "totalPaid": "Total Paid",
+      "addPayment": "Add Payment",
+      "columnId": "ID",
+      "columnDate": "Payment Date",
+      "columnAmount": "Paid Amount",
+      "columnMethod": "Payment Method",
+      "columnReceiptNo": "Receipt No",
+      "columnNotes": "Notes",
+      "emptyMessage": "No payments recorded for this contractor",
+      "emptySubMessage": "Click \"Add Payment\" to record the first payment",
+      "methodCash": "Cash",
+      "methodCheque": "Cheque",
+      "methodBankTransfer": "Bank Transfer",
+      "confirmDelete": {
+        "header": "Delete Payment",
+        "message": "Are you sure you want to delete this payment record?"
+      }
+    },
     "vo": {
       "confirmDelete": {
         "header": "Delete Voucher Order",
@@ -863,6 +886,22 @@
       "subtotal": "Subtotal",
       "statusRequired": "Status is required.",
       "createOrder": "Create Order"
+    },
+    "contractorPayment": {
+      "addTitle": "Record Payment",
+      "editTitle": "Edit Payment",
+      "paymentDate": "Payment Date",
+      "paymentDateRequired": "Payment date is required.",
+      "paidAmount": "Paid Amount",
+      "paidAmountRequired": "Paid amount is required and must be positive.",
+      "paymentMethod": "Payment Method",
+      "paymentMethodRequired": "Payment method is required.",
+      "receiptNo": "Receipt No",
+      "chequeNo": "Cheque No",
+      "transferRef": "Transfer Reference No",
+      "notes": "Notes",
+      "add": "Record Payment",
+      "update": "Update"
     },
     "contractor": {
       "addTitle": "Add Main Contractor",

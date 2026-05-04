@@ -1,0 +1,99 @@
+.payments-card {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  overflow: hidden;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+
+  .payments-card-header {
+    margin-bottom: 1rem;
+
+    .payments-header-info {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .payments-back-indicator {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+
+    .payments-icon {
+      font-size: 1.5rem;
+      color: var(--primary-color);
+      margin-top: 0.15rem;
+    }
+
+    .payments-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text-color);
+    }
+
+    .payments-card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-color-secondary);
+      margin: 0.2rem 0 0;
+    }
+  }
+
+  .payments-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+
+    .payments-stats {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .payments-total-label {
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+    }
+
+    .payments-value-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      background: var(--primary-50);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+    }
+  }
+
+  .payment-amount {
+    font-weight: 600;
+    color: var(--text-color);
+  }
+
+  .payment-notes {
+    max-width: 200px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    color: var(--text-color-secondary);
+    font-size: 0.875rem;
+  }
+
+  .payment-actions {
+    display: flex;
+    gap: 0.25rem;
+    justify-content: center;
+  }
+
+  .empty-state {
+    padding: 3rem;
+
+    p {
+      color: var(--text-color-secondary);
+      margin: 0.5rem 0;
+    }
+  }
+}

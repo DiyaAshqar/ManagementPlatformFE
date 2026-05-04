@@ -58,6 +58,16 @@
         <td class="text-center">
           <div class="contractor-actions">
             <p-button
+              icon="pi pi-credit-card"
+              [rounded]="true"
+              severity="secondary"
+              [text]="true"
+              size="small"
+              [pTooltip]="'projectTabs.contractorPayment.cardTitle' | translate"
+              tooltipPosition="top"
+              (onClick)="selectContractorForPayments(item)">
+            </p-button>
+            <p-button
               icon="pi pi-briefcase"
               [rounded]="true"
               severity="secondary"
@@ -129,3 +139,25 @@
     (contractorDutyData)="onContractorDutyDataReceived($event)">
   </app-contractor-duties-dialog>
 </ng-container>
+
+<!-- ── Payments Dialog (Master-Detail) ───────────────────────────── -->
+<p-dialog
+  [visible]="!!selectedContractor()"
+  (visibleChange)="!$event && closePaymentsDialog()"
+  [header]="'projectTabs.contractorPayment.cardTitle' | translate"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '98vw', 'max-width': '1600px', height: '90vh' }"
+  [breakpoints]="{ '960px': '98vw' }"
+  [contentStyle]="{ overflow: 'auto', height: 'calc(90vh - 60px)' }"
+  [maximizable]="true">
+
+  @if (selectedContractor()) {
+    <app-project-main-contractor-payments
+      [contractor]="selectedContractor()!"
+      [contractorName]="getContractorName(selectedContractor()!)">
+    </app-project-main-contractor-payments>
+  }
+
+</p-dialog>

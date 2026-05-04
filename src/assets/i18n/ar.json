@@ -32,7 +32,8 @@
     "info": "معلومة",
     "view": "عرض",
     "status": "الحالة",
-    "clearFilters": "مسح الفلاتر"
+    "clearFilters": "مسح الفلاتر",
+    "attachments": "المرفقات"
   },
   "breadcrumb": {
     "home": "الرئيسية",
@@ -651,6 +652,28 @@
       "emptyMessage": "لم يتم العثور على مقاولين لهذه المرحلة",
       "emptySubMessage": "اضغط على \"إضافة مقاول\" للبدء"
     },
+    "contractorPayment": {
+      "cardTitle": "مدفوعات المقاول",
+      "cardSubtitle": "إدارة سجلات الدفع لهذا المقاول",
+      "totalPayments": "إجمالي المدفوعات",
+      "totalPaid": "إجمالي المدفوع",
+      "addPayment": "إضافة دفعة",
+      "columnId": "المعرف",
+      "columnDate": "تاريخ الدفع",
+      "columnAmount": "المبلغ المدفوع",
+      "columnMethod": "طريقة الدفع",
+      "columnReceiptNo": "رقم الإيصال",
+      "columnNotes": "ملاحظات",
+      "emptyMessage": "لا توجد مدفوعات مسجلة لهذا المقاول",
+      "emptySubMessage": "اضغط على \"إضافة دفعة\" لتسجيل أول دفعة",
+      "methodCash": "نقداً",
+      "methodCheque": "شيك",
+      "methodBankTransfer": "تحويل بنكي",
+      "confirmDelete": {
+        "header": "حذف الدفعة",
+        "message": "هل أنت متأكد من حذف سجل الدفع هذا؟"
+      }
+    },
     "vo": {
       "confirmDelete": {
         "header": "حذف أمر التعديل",
@@ -860,8 +883,22 @@
       "subtotal": "المجموع الفرعي",
       "statusRequired": "الحالة مطلوبة.",
       "createOrder": "إنشاء أمر"
-    },
-    "contractor": {
+    },    "contractorPayment": {
+      "addTitle": "تسجيل دفعة",
+      "editTitle": "تعديل الدفعة",
+      "paymentDate": "تاريخ الدفع",
+      "paymentDateRequired": "تاريخ الدفع مطلوب.",
+      "paidAmount": "المبلغ المدفوع",
+      "paidAmountRequired": "المبلغ المدفوع مطلوب ويجب أن يكون موجباً.",
+      "paymentMethod": "طريقة الدفع",
+      "paymentMethodRequired": "طريقة الدفع مطلوبة.",
+      "receiptNo": "رقم الإيصال",
+      "chequeNo": "رقم الشيك",
+      "transferRef": "رقم مرجع التحويل",
+      "notes": "ملاحظات",
+      "add": "تسجيل دفعة",
+      "update": "تحديث"
+    },    "contractor": {
       "addTitle": "إضافة مقاول الرئيسي",
       "editTitle": "تعديل المقاول الرئيسي",
       "contractor": "المقاول",
