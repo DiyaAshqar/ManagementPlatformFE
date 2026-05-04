@@ -9,11 +9,11 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
-import { Subject } from 'rxjs';
+import { forkJoin, of, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 import { AgreementWizardService } from '../../../services/agreement-wizard.service';
-import { LookupDto, QuantityBillDto, SixthStepDto, FullAgreementDto } from '../../../../../../nswag/api-client';
+import { LookupDto, MileStonesDto, QuantityBillDto, SixthStepDto, FullAgreementDto } from '../../../../../../nswag/api-client';
 
 @Component({
   selector: 'app-step6',
@@ -43,7 +43,7 @@ export class Step6Component implements OnInit, OnDestroy {
   quantityBills = signal<QuantityBillDto[]>([]);
   materials = signal<LookupDto[]>([]);
   units = signal<LookupDto[]>([]);
-  milestones = signal<LookupDto[]>([]);
+  milestones = signal<MileStonesDto[]>([]);
   constructors = signal<LookupDto[]>([]);
   isLoading = signal(false);
 
@@ -92,14 +92,21 @@ export class Step6Component implements OnInit, OnDestroy {
   private loadLookups(): void {
     this.isLoading.set(true);
 
-    this.agreementWizardService.getStep6Lookups()
+    const milestonesObs = this.agreementId() > 0
+      ? this.agreementWizardService.getMilestonesFromStep3(this.agreementId(), 3)
+      : of([]);
+
+    forkJoin({
+      lookups: this.agreementWizardService.getStep6Lookups(),
+      milestones: milestonesObs
+    })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
-          this.materials.set(response.materials || []);
-          this.units.set(response.units || []);
-          this.milestones.set(response.milestones || []);
-          this.constructors.set(response.constructors || []);
+        next: ({ lookups, milestones }) => {
+          this.materials.set(lookups.materials || []);
+          this.units.set(lookups.units || []);
+          this.milestones.set(milestones);
+          this.constructors.set(lookups.constructors || []);
           this.isLoading.set(false);
         },
         error: (error) => {

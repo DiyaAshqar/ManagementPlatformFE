@@ -5,15 +5,18 @@ import {
   AgreementClient,
   AttachmentClient,
   BooleanResponse,
+  ConstructorClient,
   FourthStepDto,
   FullAgreementDto,
   FullAgreementDtoResponse,
   GetAllAgreementDtoListPagedResponseResponse,
   GetAttachmentMetaDataListResponse,
   GetAttachmentMetaDataResponse,
+  GetConstructorDto,
   Int32Response,
   LookupClient,
   LookupDto,
+  MileStonesDto,
   StringLookupDtoListDictionaryResponse
 } from '../../../../nswag/api-client';
 
@@ -25,7 +28,8 @@ export class AgreementWizardService {
   constructor(
     private agreementClient: AgreementClient,
     private attachmentClient: AttachmentClient,
-    private lookupClient: LookupClient
+    private lookupClient: LookupClient,
+    private constructorClient: ConstructorClient
   ) { }
 
   // Agreement methods
@@ -219,5 +223,29 @@ export class AgreementWizardService {
     fourthStepDto.fourthStepDto = fourthStep;
     
     return this.agreementClient.createAgreement(fourthStepDto);
+  }
+
+  // Get contractors filtered by main contract type
+  getConstructorsByTypeId(typeId: number): Observable<GetConstructorDto[]> {
+    return this.constructorClient.getByTypeId(typeId, undefined, undefined, undefined).pipe(
+      map(response => {
+        if (response.succeeded && response.data?.data) {
+          return response.data.data;
+        }
+        return [];
+      })
+    );
+  }
+
+  // Get milestones from a specific step of an agreement (defaults to step 3)
+  getMilestonesFromStep3(agreementId: number, step: number = 3): Observable<MileStonesDto[]> {
+    return this.agreementClient.getAgreementById(agreementId, step).pipe(
+      map(response => {
+        if (response.succeeded && response.data?.mileStonesStepDto?.mileStonesDto) {
+          return response.data.mileStonesStepDto.mileStonesDto.filter(m => !m.isDeleted);
+        }
+        return [];
+      })
+    );
   }
 }

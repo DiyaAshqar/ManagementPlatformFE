@@ -1,9 +1,11 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccordionModule } from 'primeng/accordion';
+import { SkeletonModule } from 'primeng/skeleton';
 import { TabsModule } from 'primeng/tabs';
-import { ProjectStageDto } from '../../../../../nswag/api-client';
+import { MileStonesDto, ProjectStageDto } from '../../../../../nswag/api-client';
+import { AgreementWizardService } from '../../../agreement-wizard/services/agreement-wizard.service';
 import { BoqTabComponent } from './tabs/boq-tab/boq-tab.component';
 import { PurchaseOrdersTabComponent } from './tabs/purchase-orders-tab/purchase-orders-tab.component';
 import { SurveyingVisitsTabComponent } from './tabs/surveying-visits-tab/surveying-visits-tab.component';
@@ -19,6 +21,7 @@ import { ProjectExpenseManagementComponent } from '../project-expense-management
     CommonModule,
     TranslateModule,
     AccordionModule,
+    SkeletonModule,
     TabsModule,
     BoqTabComponent,
     PurchaseOrdersTabComponent,
@@ -34,11 +37,17 @@ import { ProjectExpenseManagementComponent } from '../project-expense-management
 export class MilestoneStageComponent implements OnInit {
   @Input() projectId!: string;
   @Input() milestoneStages: ProjectStageDto[] = [];
+  @Input() agreementId: number = 0;
+
+  private agreementWizardService = inject(AgreementWizardService);
+
+  apiMilestones = signal<MileStonesDto[]>([]);
+  isLoadingMilestones = signal(false);
 
   // Track active tab for each accordion panel
-  activeTabs: { [stageId: number]: string } = {};
+  activeTabs: { [panelId: number]: string } = {};
   
-  // Track which tabs have been opened (format: "stageId-tabIndex")
+  // Track which tabs have been opened (format: "panelId-tabIndex")
   openedTabs = new Set<string>();
   
   // Track which accordion panels have been opened
@@ -48,12 +57,45 @@ export class MilestoneStageComponent implements OnInit {
   activeAccordionPanels: number[] = [];
 
   ngOnInit(): void {
-    // Initialize active tab for each stage to first tab
-    this.milestoneStages.forEach(stage => {
-      if (stage.id) {
-        this.activeTabs[stage.id] = '0';
+    if (this.agreementId > 0) {
+      this.loadApiMilestones();
+    } else {
+      // Fallback: initialize active tab for each project stage
+      this.milestoneStages.forEach(stage => {
+        if (stage.id) {
+          this.activeTabs[stage.id] = '0';
+        }
+      });
+    }
+  }
+
+  private loadApiMilestones(): void {
+    this.isLoadingMilestones.set(true);
+    this.agreementWizardService.getMilestonesFromStep3(this.agreementId).subscribe({
+      next: (milestones) => {
+        this.apiMilestones.set(milestones);
+        milestones.forEach(m => {
+          if (m.id) {
+            this.activeTabs[m.id] = '0';
+          }
+        });
+        this.isLoadingMilestones.set(false);
+      },
+      error: () => {
+        // Fallback to project stages on error
+        this.milestoneStages.forEach(stage => {
+          if (stage.id) {
+            this.activeTabs[stage.id] = '0';
+          }
+        });
+        this.isLoadingMilestones.set(false);
       }
     });
+  }
+
+  /** Returns the projectStageId for a given index in the API milestones array */
+  getProjectStageIdForIndex(index: number): number {
+    return this.milestoneStages[index]?.id || 0;
   }
   
   onAccordionChange(event: any): void {

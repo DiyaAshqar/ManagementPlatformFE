@@ -193,7 +193,8 @@
               <div class="py-4">
                 <app-milestone-stage 
                   [projectId]="project()!.id"
-                  [milestoneStages]="milestoneStages()">
+                  [milestoneStages]="milestoneStages()"
+                  [agreementId]="project()!.agreementId || 0">
                 </app-milestone-stage>
               </div>
             </p-tabpanel>

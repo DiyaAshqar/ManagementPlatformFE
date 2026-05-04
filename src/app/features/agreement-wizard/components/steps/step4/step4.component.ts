@@ -17,9 +17,11 @@ import { AgreementWizardService } from '../../../services/agreement-wizard.servi
 import {
   FullAgreementDto,
   FourthStepDto,
+  GetConstructorDto,
   MainContractDto,
   ContractorDutyDto,
-  LookupDto
+  LookupDto,
+  MileStonesDto
 } from '../../../../../../nswag/api-client';
 import { ContractorDutiesDialogComponent } from './contractor-duties-dialog/contractor-duties-dialog.component';
 
@@ -51,8 +53,8 @@ export class Step4Component implements OnInit, OnDestroy {
 
   mainContractForm!: FormGroup;
   mainContractTypes = signal<LookupDto[]>([]);
-  constructors = signal<LookupDto[]>([]);
-  milestones = signal<LookupDto[]>([]);
+  constructors = signal<GetConstructorDto[]>([]);
+  milestones = signal<MileStonesDto[]>([]);
   mainContracts = signal<MainContractDto[]>([]);
   isLoading = signal(false);
   isFormValid = signal(false);
@@ -79,7 +81,9 @@ export class Step4Component implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookups();
+    this.loadMilestonesFromStep3();
     this.loadAgreementData();
+    this.watchTypeIdChanges();
 
     // Disable all fields if in view mode
     if (this.isViewMode()) {
@@ -127,13 +131,50 @@ export class Step4Component implements OnInit, OnDestroy {
       .subscribe({
         next: (lookups) => {
           this.mainContractTypes.set(lookups.mainContractTypes);
-          this.constructors.set(lookups.constructors);
-          this.milestones.set(lookups.milestones);
           this.isLoading.set(false);
         },
         error: (error) => {
           console.error('Error loading lookups:', error);
           this.isLoading.set(false);
+        }
+      });
+  }
+
+  private loadMilestonesFromStep3(): void {
+    if (this.agreementId() > 0) {
+      this.agreementWizardService.getMilestonesFromStep3(this.agreementId())
+        .pipe(takeUntil(this.destroy$))
+        .subscribe({
+          next: (milestones) => {
+            this.milestones.set(milestones);
+          },
+          error: (error) => {
+            console.error('Error loading milestones:', error);
+          }
+        });
+    }
+  }
+
+  private watchTypeIdChanges(): void {
+    this.mainContractForm.get('typeId')!.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((typeId: number) => {
+        // Only reset constructorId when NOT in edit mode (i.e., user changed type manually)
+        if (this.editingIndex() === null) {
+          this.constructors.set([]);
+          this.mainContractForm.patchValue({ constructorId: 0 }, { emitEvent: false });
+        }
+        if (typeId && typeId > 0) {
+          this.agreementWizardService.getConstructorsByTypeId(typeId)
+            .pipe(takeUntil(this.destroy$))
+            .subscribe({
+              next: (constructors) => {
+                this.constructors.set(constructors);
+              },
+              error: (error) => {
+                console.error('Error loading constructors by type:', error);
+              }
+            });
         }
       });
   }

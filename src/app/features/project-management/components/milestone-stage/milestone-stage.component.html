@@ -6,85 +6,168 @@
     <p class="ms-subtitle">{{ 'projectDetail.milestoneStages.subtitle' | translate }}</p>
   </div>
 
-  <!-- ── Accordion for Multiple Milestone Stages ──────────────────────── -->
-  <p-accordion [multiple]="true" [(value)]="activeAccordionPanels" (valueChange)="onAccordionChange({value: $event})">
-    @for (stage of milestoneStages; track stage.id; let i = $index) {
-      <p-accordion-panel [value]="stage.id!">
-        <p-accordion-header>
-          <span class="font-semibold">{{ getMilestoneTitle(i, stage) }}</span>
-        </p-accordion-header>
-
-        <p-accordion-content>
-          @if (isPanelLoaded(stage.id!)) {
-            <!-- ── Tabs for this Milestone Stage ─────────────────────────── -->
-            <p-tabs [(value)]="activeTabs[stage.id!]" (valueChange)="onTabChange(stage.id!, $event)">
-              <p-tablist>
-                <p-tab value="0">{{ 'projectTabs.boq.title' | translate }}</p-tab>
-                <p-tab value="1">{{ 'projectTabs.projectMainContractor.title' | translate }}</p-tab>
-                <p-tab value="2">{{ 'projectTabs.purchaseOrders.title' | translate }}</p-tab>
-                <p-tab value="3">{{ 'projectTabs.surveyingVisits.title' | translate }}</p-tab>
-                <p-tab value="4">{{ 'projectTabs.voucherOrders.title' | translate }}</p-tab>
-                <p-tab value="5">{{ 'projectTabs.milestoneDocuments.title' | translate }}</p-tab>
-                <p-tab value="6">{{ 'projectDetail.tabs.expenses' | translate }}</p-tab>
-              </p-tablist>
-
-              <p-tabpanels>
-                <p-tabpanel value="0">
-                  @if (shouldLoadTab(stage.id!, '0')) {
-                    <app-boq-tab [projectStageId]="stage.id!" class="block mt-3"></app-boq-tab>
-                  }
-                </p-tabpanel>
-
-                <p-tabpanel value="1">
-                  @if (shouldLoadTab(stage.id!, '1')) {
-                    <app-project-main-contractor-tab [projectStageId]="stage.id!"></app-project-main-contractor-tab>
-                  }
-                </p-tabpanel>
-
-                <p-tabpanel value="2">
-                  @if (shouldLoadTab(stage.id!, '2')) {
-                    <app-purchase-orders-tab [projectStageId]="stage.id!"></app-purchase-orders-tab>
-                  }
-                </p-tabpanel>
-
-                <p-tabpanel value="3">
-                  @if (shouldLoadTab(stage.id!, '3')) {
-                    <app-surveying-visits-tab [projectStageId]="stage.id!"></app-surveying-visits-tab>
-                  }
-                </p-tabpanel>
-
-                <p-tabpanel value="4">
-                  @if (shouldLoadTab(stage.id!, '4')) {
-                    <app-voucher-orders-tab [projectStageId]="stage.id!"></app-voucher-orders-tab>
-                  }
-                </p-tabpanel>
-
-                <p-tabpanel value="5">
-                  @if (shouldLoadTab(stage.id!, '5')) {
-                    <app-milestone-documents-tab [projectStageId]="stage.id!"></app-milestone-documents-tab>
-                  }
-                </p-tabpanel>
-
-                <p-tabpanel value="6">
-                  @if (shouldLoadTab(stage.id!, '6')) {
-                    <app-project-expense-management [projectId]="projectId" class="block mt-3"></app-project-expense-management>
-                  }
-                </p-tabpanel>
-              </p-tabpanels>
-            </p-tabs>
-          }
-        </p-accordion-content>
-      </p-accordion-panel>
-    }
-  </p-accordion>
-
-  @if (milestoneStages.length === 0) {
-    <div class="text-center py-6 text-muted-color">
-      <i class="pi pi-inbox" style="font-size: 3rem"></i>
-      <p class="mt-3">{{ 'projectDetail.milestoneStages.noStages' | translate }}</p>
+  <!-- Loading state -->
+  @if (isLoadingMilestones()) {
+    <div class="flex flex-column gap-2">
+      <p-skeleton height="3rem"></p-skeleton>
+      <p-skeleton height="3rem"></p-skeleton>
     </div>
   }
 
-</div>
+  <!-- ── Accordion driven by API milestones ───────────────────────────── -->
+  @if (!isLoadingMilestones() && apiMilestones().length > 0) {
+    <p-accordion [multiple]="true" [(value)]="activeAccordionPanels" (valueChange)="onAccordionChange({value: $event})">
+      @for (milestone of apiMilestones(); track milestone.id; let i = $index) {
+        <p-accordion-panel [value]="milestone.id!">
+          <p-accordion-header>
+            <span class="font-semibold">{{ milestone.name }}</span>
+          </p-accordion-header>
 
+          <p-accordion-content>
+            @if (isPanelLoaded(milestone.id!)) {
+              <!-- ── Tabs for this Milestone Stage ─────────────────────────── -->
+              <p-tabs [(value)]="activeTabs[milestone.id!]" (valueChange)="onTabChange(milestone.id!, $event)">
+                <p-tablist>
+                  <p-tab value="0">{{ 'projectTabs.boq.title' | translate }}</p-tab>
+                  <p-tab value="1">{{ 'projectTabs.projectMainContractor.title' | translate }}</p-tab>
+                  <p-tab value="2">{{ 'projectTabs.purchaseOrders.title' | translate }}</p-tab>
+                  <p-tab value="3">{{ 'projectTabs.surveyingVisits.title' | translate }}</p-tab>
+                  <p-tab value="4">{{ 'projectTabs.voucherOrders.title' | translate }}</p-tab>
+                  <p-tab value="5">{{ 'projectTabs.milestoneDocuments.title' | translate }}</p-tab>
+                  <p-tab value="6">{{ 'projectDetail.tabs.expenses' | translate }}</p-tab>
+                </p-tablist>
+
+                <p-tabpanels>
+                  <p-tabpanel value="0">
+                    @if (shouldLoadTab(milestone.id!, '0')) {
+                      <app-boq-tab [projectStageId]="getProjectStageIdForIndex(i)" class="block mt-3"></app-boq-tab>
+                    }
+                  </p-tabpanel>
+
+                  <p-tabpanel value="1">
+                    @if (shouldLoadTab(milestone.id!, '1')) {
+                      <app-project-main-contractor-tab [projectStageId]="getProjectStageIdForIndex(i)"></app-project-main-contractor-tab>
+                    }
+                  </p-tabpanel>
+
+                  <p-tabpanel value="2">
+                    @if (shouldLoadTab(milestone.id!, '2')) {
+                      <app-purchase-orders-tab [projectStageId]="getProjectStageIdForIndex(i)"></app-purchase-orders-tab>
+                    }
+                  </p-tabpanel>
+
+                  <p-tabpanel value="3">
+                    @if (shouldLoadTab(milestone.id!, '3')) {
+                      <app-surveying-visits-tab [projectStageId]="getProjectStageIdForIndex(i)"></app-surveying-visits-tab>
+                    }
+                  </p-tabpanel>
+
+                  <p-tabpanel value="4">
+                    @if (shouldLoadTab(milestone.id!, '4')) {
+                      <app-voucher-orders-tab [projectStageId]="getProjectStageIdForIndex(i)"></app-voucher-orders-tab>
+                    }
+                  </p-tabpanel>
+
+                  <p-tabpanel value="5">
+                    @if (shouldLoadTab(milestone.id!, '5')) {
+                      <app-milestone-documents-tab [projectStageId]="getProjectStageIdForIndex(i)"></app-milestone-documents-tab>
+                    }
+                  </p-tabpanel>
+
+                  <p-tabpanel value="6">
+                    @if (shouldLoadTab(milestone.id!, '6')) {
+                      <app-project-expense-management [projectId]="projectId" class="block mt-3"></app-project-expense-management>
+                    }
+                  </p-tabpanel>
+                </p-tabpanels>
+              </p-tabs>
+            }
+          </p-accordion-content>
+        </p-accordion-panel>
+      }
+    </p-accordion>
+  }
+
+  <!-- ── Fallback: Accordion driven by project stages ─────────────────── -->
+  @if (!isLoadingMilestones() && apiMilestones().length === 0) {
+    <p-accordion [multiple]="true" [(value)]="activeAccordionPanels" (valueChange)="onAccordionChange({value: $event})">
+      @for (stage of milestoneStages; track stage.id; let i = $index) {
+        <p-accordion-panel [value]="stage.id!">
+          <p-accordion-header>
+            <span class="font-semibold">{{ getMilestoneTitle(i, stage) }}</span>
+          </p-accordion-header>
+
+          <p-accordion-content>
+            @if (isPanelLoaded(stage.id!)) {
+              <!-- ── Tabs for this Milestone Stage ─────────────────────────── -->
+              <p-tabs [(value)]="activeTabs[stage.id!]" (valueChange)="onTabChange(stage.id!, $event)">
+                <p-tablist>
+                  <p-tab value="0">{{ 'projectTabs.boq.title' | translate }}</p-tab>
+                  <p-tab value="1">{{ 'projectTabs.projectMainContractor.title' | translate }}</p-tab>
+                  <p-tab value="2">{{ 'projectTabs.purchaseOrders.title' | translate }}</p-tab>
+                  <p-tab value="3">{{ 'projectTabs.surveyingVisits.title' | translate }}</p-tab>
+                  <p-tab value="4">{{ 'projectTabs.voucherOrders.title' | translate }}</p-tab>
+                  <p-tab value="5">{{ 'projectTabs.milestoneDocuments.title' | translate }}</p-tab>
+                  <p-tab value="6">{{ 'projectDetail.tabs.expenses' | translate }}</p-tab>
+                </p-tablist>
+
+                <p-tabpanels>
+                  <p-tabpanel value="0">
+                    @if (shouldLoadTab(stage.id!, '0')) {
+                      <app-boq-tab [projectStageId]="stage.id!" class="block mt-3"></app-boq-tab>
+                    }
+                  </p-tabpanel>
+
+                  <p-tabpanel value="1">
+                    @if (shouldLoadTab(stage.id!, '1')) {
+                      <app-project-main-contractor-tab [projectStageId]="stage.id!"></app-project-main-contractor-tab>
+                    }
+                  </p-tabpanel>
+
+                  <p-tabpanel value="2">
+                    @if (shouldLoadTab(stage.id!, '2')) {
+                      <app-purchase-orders-tab [projectStageId]="stage.id!"></app-purchase-orders-tab>
+                    }
+                  </p-tabpanel>
+
+                  <p-tabpanel value="3">
+                    @if (shouldLoadTab(stage.id!, '3')) {
+                      <app-surveying-visits-tab [projectStageId]="stage.id!"></app-surveying-visits-tab>
+                    }
+                  </p-tabpanel>
+
+                  <p-tabpanel value="4">
+                    @if (shouldLoadTab(stage.id!, '4')) {
+                      <app-voucher-orders-tab [projectStageId]="stage.id!"></app-voucher-orders-tab>
+                    }
+                  </p-tabpanel>
+
+                  <p-tabpanel value="5">
+                    @if (shouldLoadTab(stage.id!, '5')) {
+                      <app-milestone-documents-tab [projectStageId]="stage.id!"></app-milestone-documents-tab>
+                    }
+                  </p-tabpanel>
+
+                  <p-tabpanel value="6">
+                    @if (shouldLoadTab(stage.id!, '6')) {
+                      <app-project-expense-management [projectId]="projectId" class="block mt-3"></app-project-expense-management>
+                    }
+                  </p-tabpanel>
+                </p-tabpanels>
+              </p-tabs>
+            }
+          </p-accordion-content>
+        </p-accordion-panel>
+      }
+    </p-accordion>
+
+    @if (milestoneStages.length === 0) {
+      <div class="text-center py-6 text-muted-color">
+        <i class="pi pi-inbox" style="font-size: 3rem"></i>
+        <p class="mt-3">{{ 'projectDetail.milestoneStages.noStages' | translate }}</p>
+      </div>
+    }
+  }
+
+</div>
 
