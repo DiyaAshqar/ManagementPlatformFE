@@ -73,7 +73,7 @@ export class StepMilestonesComponent implements OnInit, OnDestroy {
     this.milestoneForm = this.fb.group({
       id: [0],
       name: ['', [Validators.required, Validators.maxLength(200)]],
-      order: [null, [Validators.required, Validators.min(1)]],
+      order: [{ value: 1, disabled: true }, [Validators.required, Validators.min(1)]],
       description: ['', [Validators.required, Validators.maxLength(500)]]
     });
   }
@@ -88,6 +88,7 @@ export class StepMilestonesComponent implements OnInit, OnDestroy {
             if (response.succeeded && response.data?.mileStonesStepDto?.mileStonesDto) {
               this.milestones.set([...response.data.mileStonesStepDto.mileStonesDto]);
             }
+            this.setNextOrder();
             this.isLoading.set(false);
           },
           error: (error) => {
@@ -125,7 +126,7 @@ export class StepMilestonesComponent implements OnInit, OnDestroy {
       return;
     }
 
-    const formValue = this.milestoneForm.value;
+    const formValue = this.milestoneForm.getRawValue();
     const currentEntries = [...this.milestones()];
     const currentEditingIndex = this.editingIndex();
 
@@ -180,15 +181,26 @@ export class StepMilestonesComponent implements OnInit, OnDestroy {
       allEntries.splice(allIndex, 1);
     }
     this.milestones.set(allEntries);
+    this.setNextOrder();
   }
 
   clearForm(): void {
-    this.milestoneForm.reset({ id: 0, name: '', order: null, description: '' });
+    this.milestoneForm.reset({ id: 0, name: '', order: this.getNextOrder(), description: '' });
     this.editingIndex.set(null);
   }
 
   getActiveEntries(): MileStonesDto[] {
     return this.milestones().filter(e => !e.isDeleted);
+  }
+
+  private setNextOrder(): void {
+    if (this.editingIndex() !== null) return;
+    this.milestoneForm.patchValue({ order: this.getNextOrder() });
+  }
+
+  private getNextOrder(): number {
+    const maxOrder = this.getActiveEntries().reduce((max, entry) => Math.max(max, entry.order || 0), 0);
+    return maxOrder + 1;
   }
 
   onSubmit(): void {

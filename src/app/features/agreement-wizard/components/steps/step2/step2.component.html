@@ -27,28 +27,9 @@
                         <p-floatlabel variant="in">
                             <p-select inputId="contractModelId" formControlName="contractModelId"
                                 [options]="contractModels()" optionLabel="name" optionValue="id" styleClass="w-full"
+                                (onChange)="onContractModelChange()"
                                 [class]="isFieldInvalid('contractModelId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'"></p-select>
                             <label for="contractModelId">{{ 'wizard.step2.contractModel' | translate }}</label>
-                        </p-floatlabel>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Payment Details -->
-        <div class="col-12">
-            <h3 class="text-xl font-semibold mb-2">{{ 'wizard.step2.paymentDetails' | translate }}</h3>
-
-            <div class="grid">
-                <div class="col-12 md:col-6 mb-3">
-                    <div class="field">
-                        <p-floatlabel variant="in">
-                            <p-select inputId="paymentMethodId" formControlName="paymentMethodId"
-                                [options]="paymentMethods()" optionLabel="name" optionValue="id" styleClass="w-full"
-                                (onChange)="onPaymentMethodChange()"
-                                 [class]="isFieldInvalid('paymentMethodId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'">
-                            </p-select>
-                            <label for="paymentMethodId">{{ 'wizard.step2.paymentMethod' | translate }}</label>
                         </p-floatlabel>
                     </div>
                 </div>
@@ -57,12 +38,13 @@
                     <div class="field">
                         <p-floatlabel variant="in">
                             <p-inputNumber inputId="amount" formControlName="amount" [min]="0" [showButtons]="false"
+                                [suffix]="isCostPlusSelected() ? '%' : ''"
+                                [max]="isCostPlusSelected() ? 100 : null"
                                 mode="decimal" locale="en-US"
                                 [ngClass]="{'ng-invalid': isFieldInvalid('amount')}"
                                 inputStyleClass="w-full"></p-inputNumber>
-                            <label for="amount">{{ 'wizard.step2.monthlyPayment' | translate }}</label>
+                            <label for="amount">{{ getContractModelValueLabel() | translate }}</label>
                         </p-floatlabel>
-                        <small class="text-color-secondary">{{ 'wizard.step2.monthlyPaymentHint' | translate }}</small>
                     </div>
                 </div>
             </div>

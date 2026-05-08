@@ -45,7 +45,6 @@ export class Step2Component implements OnInit, OnDestroy {
   step2Form!: FormGroup;
   contractTypes = signal<LookupDto[]>([]);
   contractModels = signal<LookupDto[]>([]);
-  paymentMethods = signal<LookupDto[]>([]);
   services = signal<LookupDto[]>([]);
   isLoading = signal(false);
   isFormValid = signal(false);
@@ -82,7 +81,6 @@ export class Step2Component implements OnInit, OnDestroy {
     this.step2Form = this.fb.group({
       contractTypeId: [null, Validators.required],
       contractModelId: [null, Validators.required],
-      paymentMethodId: [null, Validators.required],
       amount: [{ value: null, disabled: true }],
       selectedServices: this.fb.array([], Validators.required)
     });
@@ -107,8 +105,8 @@ export class Step2Component implements OnInit, OnDestroy {
         next: (lookups) => {
           this.contractTypes.set(lookups.contractTypes);
           this.contractModels.set(lookups.contractModels);
-          this.paymentMethods.set(lookups.paymentMethods);
           this.services.set(lookups.services);
+          this.updateAmountControlState(false);
           this.isLoading.set(false);
         },
         error: (error) => {
@@ -147,14 +145,13 @@ export class Step2Component implements OnInit, OnDestroy {
       this.step2Form.patchValue({
         contractTypeId: data.agreementPaymentDto.contractTypeId,
         contractModelId: data.agreementPaymentDto.contractModelId,
-        paymentMethodId: (data.agreementPaymentDto as any).paymentMethodId,
-        amount: data.agreementPaymentDto.monthlyPaymentDto?.amount
+        amount: this.getAmountValueByContractModel(
+          data.agreementPaymentDto.contractModelId,
+          data.agreementPaymentDto.monthlyPaymentDto
+        )
       });
 
-      // Enable/disable amount field based on payment method
-      if ((data.agreementPaymentDto as any).paymentMethodId === 1) {
-        this.step2Form.get('amount')?.enable();
-      }
+      this.updateAmountControlState(false);
     }
 
     if (data.agreementServiceDto && Array.isArray(data.agreementServiceDto)) {
@@ -240,7 +237,6 @@ export class Step2Component implements OnInit, OnDestroy {
     agreementPaymentDto.id = this.agreementPaymentId;
     agreementPaymentDto.contractTypeId = formValue.contractTypeId || 0;
     agreementPaymentDto.contractModelId = formValue.contractModelId || 0;
-    (agreementPaymentDto as any).paymentMethodId = formValue.paymentMethodId || 0;
     // Use stored monthly payment ID if in edit mode
     agreementPaymentDto.monthlyPaymentId = this.monthlyPaymentId;
     agreementPaymentDto.agreementId = this.agreementId() || 0;
@@ -249,7 +245,7 @@ export class Step2Component implements OnInit, OnDestroy {
     const monthlyPaymentDto = new MonthlyPaymentDto();
     // Use stored ID if in edit mode, otherwise 0 for create
     monthlyPaymentDto.id = this.monthlyPaymentId;
-    monthlyPaymentDto.amount = formValue.amount ? parseFloat(formValue.amount) : 0;
+    this.setMonthlyPaymentValue(monthlyPaymentDto, formValue.contractModelId, formValue.amount);
     agreementPaymentDto.monthlyPaymentDto = monthlyPaymentDto;
 
     // Map AgreementServiceDto array
@@ -280,12 +276,11 @@ export class Step2Component implements OnInit, OnDestroy {
         id: 0,
         contractTypeId: formData.contractTypeId || 0,
         contractModelId: formData.contractModelId || 0,
-        paymentMethodId: formData.paymentMethodId || 0,
         monthlyPaymentId: 0,
         agreementId: this.agreementId(),
         monthlyPaymentDto: {
           id: 0,
-          amount: formData.amount ? parseFloat(formData.amount) : 0
+          ...this.buildMonthlyPaymentValue(formData.contractModelId, formData.amount)
         }
       },
       agreementServiceDto: this.selectedServicesArray.value.map((serviceId: number) => ({
@@ -296,19 +291,96 @@ export class Step2Component implements OnInit, OnDestroy {
     };
   }
 
-  onPaymentMethodChange(): void {
-    const method = this.step2Form.get('paymentMethodId')?.value;
+  onContractModelChange(): void {
+    this.updateAmountControlState(true);
+  }
+
+  isCostPlusSelected(): boolean {
+    return this.getSelectedContractModelKey() === 'costplus';
+  }
+
+  getContractModelValueLabel(): string {
+    const modelKey = this.getSelectedContractModelKey();
+
+    if (modelKey === 'costplus') {
+      return 'wizard.step2.percentageValue';
+    }
+
+    if (modelKey === 'cutcost') {
+      return 'wizard.step2.amountValue';
+    }
+
+    if (modelKey === 'monthlyfees') {
+      return 'wizard.step2.monthlyPayment';
+    }
+
+    return 'wizard.step2.contractingValue';
+  }
+
+  private updateAmountControlState(resetValue: boolean): void {
+    const modelKey = this.getSelectedContractModelKey();
     const amountControl = this.step2Form.get('amount');
 
-    if (method === 1) { // Monthly Fees
+    if (modelKey) {
       amountControl?.enable();
       amountControl?.setValidators([Validators.required, Validators.min(0)]);
+      if (modelKey === 'costplus') {
+        amountControl?.addValidators(Validators.max(100));
+      }
     } else {
       amountControl?.disable();
       amountControl?.clearValidators();
+    }
+
+    if (resetValue) {
       amountControl?.reset();
     }
+
     amountControl?.updateValueAndValidity();
+  }
+
+  private getSelectedContractModelKey(): string {
+    const selectedModelId = this.step2Form.get('contractModelId')?.value;
+    const selectedModel = this.contractModels().find(model => model.id === selectedModelId);
+    return this.normalizeContractModelName(selectedModel?.name);
+  }
+
+  private getAmountValueByContractModel(contractModelId?: number, monthlyPayment?: MonthlyPaymentDto): number | undefined {
+    const selectedModel = this.contractModels().find(model => model.id === contractModelId);
+    const modelKey = this.normalizeContractModelName(selectedModel?.name);
+
+    if (modelKey === 'costplus') {
+      return monthlyPayment?.percentageFees;
+    }
+
+    if (modelKey === 'monthlyfees') {
+      return monthlyPayment?.monthlyFees;
+    }
+
+    return monthlyPayment?.amount ?? monthlyPayment?.monthlyFees ?? monthlyPayment?.percentageFees;
+  }
+
+  private setMonthlyPaymentValue(monthlyPaymentDto: MonthlyPaymentDto, contractModelId: number, value: number): void {
+    const mappedValue = this.buildMonthlyPaymentValue(contractModelId, value);
+    monthlyPaymentDto.amount = mappedValue.amount;
+    monthlyPaymentDto.monthlyFees = mappedValue.monthlyFees;
+    monthlyPaymentDto.percentageFees = mappedValue.percentageFees;
+  }
+
+  private buildMonthlyPaymentValue(contractModelId: number, value: number): Pick<MonthlyPaymentDto, 'amount' | 'monthlyFees' | 'percentageFees'> {
+    const selectedModel = this.contractModels().find(model => model.id === contractModelId);
+    const modelKey = this.normalizeContractModelName(selectedModel?.name);
+    const numericValue = Number(value) || 0;
+
+    return {
+      amount: modelKey === 'cutcost' ? numericValue : 0,
+      monthlyFees: modelKey === 'monthlyfees' ? numericValue : 0,
+      percentageFees: modelKey === 'costplus' ? numericValue : 0
+    };
+  }
+
+  private normalizeContractModelName(name?: string): string {
+    return (name || '').toLowerCase().replace(/[^a-z]/g, '');
   }
 
   isFieldInvalid(fieldName: string): boolean {
