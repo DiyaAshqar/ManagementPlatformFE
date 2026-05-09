@@ -13,6 +13,7 @@ import { VoucherOrdersTabComponent } from './tabs/voucher-orders-tab/voucher-ord
 import { MilestoneDocumentsTabComponent } from './tabs/documents-tab/documents-tab.component';
 import { ProjectMainContractorTabComponent } from './tabs/project-main-contractor-tab/project-main-contractor-tab.component';
 import { ProjectExpenseManagementComponent } from '../project-expense-management/project-expense-management.component';
+import { PaymentClaimTabComponent } from './tabs/payment-claim-tab/payment-claim-tab.component';
 
 @Component({
   selector: 'app-milestone-stage',
@@ -29,7 +30,8 @@ import { ProjectExpenseManagementComponent } from '../project-expense-management
     VoucherOrdersTabComponent,
     MilestoneDocumentsTabComponent,
     ProjectMainContractorTabComponent,
-    ProjectExpenseManagementComponent
+    ProjectExpenseManagementComponent,
+    PaymentClaimTabComponent
   ],
   templateUrl: './milestone-stage.component.html',
   styleUrls: ['./milestone-stage.component.scss']

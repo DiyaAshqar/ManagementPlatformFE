@@ -35,6 +35,12 @@
                   <p-tab value="4">{{ 'projectTabs.voucherOrders.title' | translate }}</p-tab>
                   <p-tab value="5">{{ 'projectTabs.milestoneDocuments.title' | translate }}</p-tab>
                   <p-tab value="6">{{ 'projectDetail.tabs.expenses' | translate }}</p-tab>
+                  <p-tab value="7">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-file-check"></i>
+                      <span>{{ 'ownerPayment.tabTitle' | translate }}</span>
+                    </div>
+                  </p-tab>
                 </p-tablist>
 
                 <p-tabpanels>
@@ -79,6 +85,15 @@
                       <app-project-expense-management [projectId]="projectId" class="block mt-3"></app-project-expense-management>
                     }
                   </p-tabpanel>
+
+                  <p-tabpanel value="7">
+                    @if (shouldLoadTab(milestone.id!, '7')) {
+                      <app-payment-claim-tab
+                        [projectStageId]="getProjectStageIdForIndex(i)"
+                        [projectId]="projectId">
+                      </app-payment-claim-tab>
+                    }
+                  </p-tabpanel>
                 </p-tabpanels>
               </p-tabs>
             }
@@ -109,6 +124,12 @@
                   <p-tab value="4">{{ 'projectTabs.voucherOrders.title' | translate }}</p-tab>
                   <p-tab value="5">{{ 'projectTabs.milestoneDocuments.title' | translate }}</p-tab>
                   <p-tab value="6">{{ 'projectDetail.tabs.expenses' | translate }}</p-tab>
+                  <p-tab value="7">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-file-check"></i>
+                      <span>{{ 'ownerPayment.tabTitle' | translate }}</span>
+                    </div>
+                  </p-tab>
                 </p-tablist>
 
                 <p-tabpanels>
@@ -151,6 +172,15 @@
                   <p-tabpanel value="6">
                     @if (shouldLoadTab(stage.id!, '6')) {
                       <app-project-expense-management [projectId]="projectId" class="block mt-3"></app-project-expense-management>
+                    }
+                  </p-tabpanel>
+
+                  <p-tabpanel value="7">
+                    @if (shouldLoadTab(stage.id!, '7')) {
+                      <app-payment-claim-tab
+                        [projectStageId]="stage.id!"
+                        [projectId]="projectId">
+                      </app-payment-claim-tab>
                     }
                   </p-tabpanel>
                 </p-tabpanels>

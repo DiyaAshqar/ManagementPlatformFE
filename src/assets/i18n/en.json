@@ -524,6 +524,74 @@
       "milestone": "Milestone"
     }
   },
+  "ownerPayment": {
+    "tabTitle": "Payment Claim",
+    "title": "Payment Claim",
+    "subtitle": "Generate a comprehensive financial claim report for the owner",
+    "selectInstruction": "Select the data types to include in this financial claim:",
+    "generateBtn": "Generate Claim",
+    "previewTitle": "Payment Claim Preview",
+    "printHeader": "Payment Claim Report",
+    "printDate": "Date",
+    "confirmed": "Confirmed & Locked",
+    "back": "Back",
+    "confirmBtn": "Confirm & Lock",
+    "printBtn": "Print Report",
+    "total": "Total",
+    "grandTotal": "Grand Total",
+    "items": "items",
+    "noData": "No data available",
+    "types": {
+      "boq": {
+        "label": "Bill of Quantities",
+        "desc": "Materials & quantities"
+      },
+      "pmc": {
+        "label": "Main Contractor",
+        "desc": "Project main contracts"
+      },
+      "sv": {
+        "label": "Surveying Visits",
+        "desc": "Site visit records"
+      },
+      "vo": {
+        "label": "Voucher Orders",
+        "desc": "Variation orders"
+      },
+      "exp": {
+        "label": "Expenses",
+        "desc": "Project expenses"
+      }
+    },
+    "cols": {
+      "description": "Description",
+      "qty": "Quantity",
+      "unitPrice": "Unit Price",
+      "subtotal": "Subtotal",
+      "amount": "Amount",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "visitDate": "Visit Date",
+      "surveyor": "Surveyor",
+      "purpose": "Purpose",
+      "voNumber": "VO No.",
+      "expenseNo": "Expense No.",
+      "supplier": "Supplier",
+      "date": "Date",
+      "notes": "Notes"
+    },
+    "confirm": {
+      "header": "Confirm Payment Claim",
+      "message": "Are you sure you want to confirm and lock this payment claim? This action cannot be undone.",
+      "accept": "Yes, Confirm",
+      "reject": "Cancel",
+      "successTitle": "Claim Confirmed",
+      "successMsg": "The financial claim has been confirmed and locked successfully."
+    },
+    "errors": {
+      "loadFailed": "Failed to load claim data. Please try again."
+    }
+  },
   "projectTabs": {
     "boq": {
       "title": "Bill of Quantities",
