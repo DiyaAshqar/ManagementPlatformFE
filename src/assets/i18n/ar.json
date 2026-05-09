@@ -33,7 +33,8 @@
     "view": "عرض",
     "status": "الحالة",
     "clearFilters": "مسح الفلاتر",
-    "attachments": "المرفقات"
+    "attachments": "المرفقات",
+    "total": "الإجمالي"
   },
   "breadcrumb": {
     "home": "الرئيسية",
@@ -321,7 +322,7 @@
       "showingEntries": "عرض {first} إلى {last} من {totalRecords} إدخالات"
     },
     "step3": {
-      "title": "مواصفات المواد والجودة",
+      "title": "مساحات المشروع",
       "projectAreaUnits": "وحدات مساحة المشروع",
       "annexName": "اسم الطابق / الملحق",
       "selectAnnex": "اختر ملحقاً",
@@ -493,7 +494,7 @@
       "overview": "نظرة عامة",
       "preparing": "التحضير",
       "excavation": "الحفر",
-      "milestones": "المعالم",
+      "milestones": "المراحل",
       "documents": "المستندات",
       "expenses": "المصروفات"
     },
@@ -660,6 +661,10 @@
       "cardSubtitle": "إدارة سجلات الدفع لهذا المقاول",
       "totalPayments": "إجمالي المدفوعات",
       "totalPaid": "إجمالي المدفوع",
+      "remainingBalance": "الرصيد المتبقي",
+      "contractAmount": "مبلغ العقد",
+      "startDate": "تاريخ البداية",
+      "endDate": "تاريخ الانتهاء",
       "addPayment": "إضافة دفعة",
       "columnId": "المعرف",
       "columnDate": "تاريخ الدفع",

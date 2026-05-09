@@ -1,4 +1,4 @@
-# Step 3: Material & Quality Specifications Implementation
+# Step 3: Project areas Implementation
 
 ## Overview
 Step 3 of the Agreement Wizard handles material specifications, equipment details, and quality control information. It follows the same pattern as Step 1 and Step 2, using Angular 19 signals, reactive forms, and PrimeNG components.
@@ -223,7 +223,7 @@ Each section follows this structure:
 {
   "wizard": {
     "step3": {
-      "title": "Material & Quality Specifications",
+      "title": "Project areas",
       "materialSpecifications": "Material Specifications",
       "equipmentDetails": "Equipment Details",
       "qualityControl": "Quality Control",
@@ -252,7 +252,7 @@ Each section follows this structure:
 {
   "wizard": {
     "step3": {
-      "title": "مواصفات المواد والجودة",
+      "title": "مساحات المشروع",
       "materialSpecifications": "مواصفات المواد",
       "equipmentDetails": "تفاصيل المعدات",
       "qualityControl": "مراقبة الجودة",

@@ -33,7 +33,8 @@
     "view": "View",
     "status": "Status",
     "clearFilters": "Clear Filters",
-    "attachments": "Attachments"
+    "attachments": "Attachments",
+    "total": "Total"
   },
   "breadcrumb": {
     "home": "Home",
@@ -259,7 +260,7 @@
       "createNew": "Create New Agreement"
     },
     "step1": {
-      "title": "Agreement Details",
+      "title": "Main info",
       "agreementDetails": "Agreement Information",
       "clientInfo": "Client Information",
       "landInfo": "Land Information",
@@ -291,7 +292,7 @@
       "floorNumber": "Floor Number"
     },
     "step2": {
-      "title": "Contract & Payment Details",
+      "title": "Payment Details",
       "contractDetails": "Contract Information",
       "paymentDetails": "Payment Information",
       "services": "Services",
@@ -324,7 +325,7 @@
       "showingEntries": "Showing {first} to {last} of {totalRecords} entries"
     },
     "step3": {
-      "title": "Material & Quality Specifications",
+      "title": "Project areas",
       "projectAreaUnits": "Project Area Units",
       "annexName": "Floor/Annex Name",
       "selectAnnex": "Select an annex",
@@ -366,19 +367,19 @@
       "milestone": "Milestone"
     },
     "step5": {
-      "title": "Supplier Services",
+      "title": "Supplier",
       "material": "Material",
       "selectMaterial": "Select a material",
       "supplier": "Supplier",
       "selectSupplier": "Select a supplier",
       "representativeName": "Representative Name",
       "enterRepresentativeName": "Enter representative name",
-      "entriesList": "Supplier Services List",
-      "noData": "No supplier services added yet. Add your first entry above.",
+      "entriesList": "Supplier List",
+      "noData": "No Supplier added yet. Add your first entry above.",
       "showingEntries": "Showing {first} to {last} of {totalRecords} entries"
     },
     "step6": {
-      "title": "Quantity Bill of Materials",
+      "title": "BOQ",
       "material": "Material",
       "selectMaterial": "Select a material",
       "quantity": "Quantity",
@@ -663,6 +664,10 @@
       "cardSubtitle": "Manage payment records for this contractor",
       "totalPayments": "Total Payments",
       "totalPaid": "Total Paid",
+      "remainingBalance": "Remaining Balance",
+      "contractAmount": "Contract Amount",
+      "startDate": "Start Date",
+      "endDate": "End Date",
       "addPayment": "Add Payment",
       "columnId": "ID",
       "columnDate": "Payment Date",

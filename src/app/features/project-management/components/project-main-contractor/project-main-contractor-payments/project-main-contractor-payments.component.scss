@@ -66,6 +66,43 @@
       padding: 0.35rem 0.75rem;
       border-radius: 6px;
     }
+
+    .payments-remaining-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      background: var(--surface-50);
+    }
+  }
+
+  .payments-master-details {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    padding: 0.75rem 1rem;
+    background: var(--surface-50);
+    border-radius: 8px;
+    margin-bottom: 1rem;
+    border: 1px solid var(--surface-border);
+
+    .master-detail-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .master-detail-label {
+      font-size: 0.75rem;
+      color: var(--text-color-secondary);
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+
+    .master-detail-value {
+      font-size: 0.9rem;
+      color: var(--text-color);
+    }
   }
 
   .payment-amount {

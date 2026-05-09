@@ -19,6 +19,15 @@
   box-sizing: border-box;
 }
 
+/* Phone country code select inside p-inputgroup */
+.phone-code-select {
+  width: 9rem !important;
+  flex-shrink: 0;
+  .p-select-label {
+    padding-inline-end: 0.25rem;
+  }
+}
+
 html,
 body {
   height: 100%;

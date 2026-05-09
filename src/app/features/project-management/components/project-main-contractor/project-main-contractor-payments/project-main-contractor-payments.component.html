@@ -18,6 +18,24 @@
     </div>
   </div>
 
+  <!-- Master Details -->
+  @if (contractor) {
+    <div class="payments-master-details">
+      <div class="master-detail-item">
+        <span class="master-detail-label">{{ 'projectTabs.contractorPayment.contractAmount' | translate }}</span>
+        <span class="master-detail-value font-semibold">{{ contractor.amount | number:'1.0-0' }}</span>
+      </div>
+      <div class="master-detail-item">
+        <span class="master-detail-label">{{ 'projectTabs.contractorPayment.startDate' | translate }}</span>
+        <span class="master-detail-value">{{ contractor.startDate | date:'yyyy-MM-dd' }}</span>
+      </div>
+      <div class="master-detail-item">
+        <span class="master-detail-label">{{ 'projectTabs.contractorPayment.endDate' | translate }}</span>
+        <span class="master-detail-value">{{ contractor.endDate | date:'yyyy-MM-dd' }}</span>
+      </div>
+    </div>
+  }
+
   <!-- Toolbar -->
   <div class="payments-toolbar">
     <div class="payments-stats">
@@ -26,6 +44,9 @@
       </span>
       <span class="payments-value-label">
         {{ 'projectTabs.contractorPayment.totalPaid' | translate }}: {{ totalPaid | number:'1.0-0' }}
+      </span>
+      <span [class]="remainingBalance < 0 ? 'payments-remaining-label text-red-500' : 'payments-remaining-label text-green-600'">
+        {{ 'projectTabs.contractorPayment.remainingBalance' | translate }}: {{ remainingBalance | number:'1.0-0' }}
       </span>
     </div>
     <p-button
@@ -50,7 +71,6 @@
 
     <ng-template pTemplate="header">
       <tr>
-        <th style="width: 5rem">{{ 'projectTabs.contractorPayment.columnId' | translate }}</th>
         <th style="min-width: 11rem">{{ 'projectTabs.contractorPayment.columnDate' | translate }}</th>
         <th class="text-right" style="min-width: 10rem">{{ 'projectTabs.contractorPayment.columnAmount' | translate }}</th>
         <th style="min-width: 11rem">{{ 'projectTabs.contractorPayment.columnMethod' | translate }}</th>
@@ -62,12 +82,6 @@
 
     <ng-template pTemplate="body" let-item let-editing="editing" let-ri="rowIndex">
       <tr [pEditableRow]="item" [class.new-row]="(item.id ?? 0) <= 0">
-
-        <!-- ID -->
-        <td>
-          <span *ngIf="(item.id ?? 0) > 0">{{ item.id }}</span>
-          <span *ngIf="(item.id ?? 0) <= 0" class="new-badge">New</span>
-        </td>
 
         <!-- Payment Date -->
         <td pEditableColumn>
@@ -141,7 +155,7 @@
         <td pEditableColumn>
           <p-cellEditor>
             <ng-template pTemplate="input">
-              <input pInputText [(ngModel)]="item.notes" class="w-full" />
+              <textarea pTextarea [(ngModel)]="item.notes" class="w-full" rows="2" style="resize: vertical;"></textarea>
             </ng-template>
             <ng-template pTemplate="output">
               <span class="payment-notes">{{ item.notes || '—' }}</span>

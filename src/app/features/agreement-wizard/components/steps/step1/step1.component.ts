@@ -6,6 +6,7 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { InputGroupModule } from 'primeng/inputgroup';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
@@ -29,7 +30,8 @@ import { LookupDto, FullAgreementDto, FirstStepDto, AgreementDto, ClientDto, Lan
     TextareaModule,
     ButtonModule,
     TranslateModule,
-    FloatLabelModule
+    FloatLabelModule,
+    InputGroupModule
   ],
   templateUrl: './step1.component.html'
 })
@@ -47,6 +49,32 @@ export class Step1Component implements OnInit, OnDestroy {
   agreementTypes = signal<LookupDto[]>([]);
   isLoading = signal(false);
   isFormValid = signal(false);
+
+  phoneCodes = [
+    { name: 'Jordan', iso: 'jo', dialCode: '+962' },
+    { name: 'Saudi Arabia', iso: 'sa', dialCode: '+966' },
+    { name: 'UAE', iso: 'ae', dialCode: '+971' },
+    { name: 'Egypt', iso: 'eg', dialCode: '+20' },
+    { name: 'Palestine', iso: 'ps', dialCode: '+970' },
+    { name: 'Kuwait', iso: 'kw', dialCode: '+965' },
+    { name: 'Qatar', iso: 'qa', dialCode: '+974' },
+    { name: 'Bahrain', iso: 'bh', dialCode: '+973' },
+    { name: 'Oman', iso: 'om', dialCode: '+968' },
+    { name: 'Lebanon', iso: 'lb', dialCode: '+961' },
+    { name: 'Syria', iso: 'sy', dialCode: '+963' },
+    { name: 'Iraq', iso: 'iq', dialCode: '+964' },
+    { name: 'Libya', iso: 'ly', dialCode: '+218' },
+    { name: 'Tunisia', iso: 'tn', dialCode: '+216' },
+    { name: 'Algeria', iso: 'dz', dialCode: '+213' },
+    { name: 'Morocco', iso: 'ma', dialCode: '+212' },
+    { name: 'Turkey', iso: 'tr', dialCode: '+90' },
+    { name: 'USA', iso: 'us', dialCode: '+1' },
+    { name: 'UK', iso: 'gb', dialCode: '+44' },
+  ];
+
+  getFlagUrl(iso: string): string {
+    return `https://flagcdn.com/w20/${iso}.png`;
+  }
   
   minEndDate = signal<Date | null>(null);
   maxStartDate = signal<Date | null>(null);
@@ -99,8 +127,10 @@ export class Step1Component implements OnInit, OnDestroy {
       clientDto: this.fb.group({
         id: [0],
         contactPerson: ['', [Validators.required, Validators.maxLength(100)]],
+        contactPersonCountryCode: ['+962'],
         contactPersonNumber: ['', [Validators.required]],
         representerName: ['', [Validators.required, Validators.maxLength(100)]],
+        representerNameCountryCode: ['+962'],
         representerNameNumber: ['', [Validators.required]]
       }),
       landInformationDto: this.fb.group({

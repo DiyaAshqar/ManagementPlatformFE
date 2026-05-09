@@ -8,6 +8,7 @@ import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
 import { SkeletonModule } from 'primeng/skeleton';
 import { Table, TableModule } from 'primeng/table';
@@ -45,6 +46,7 @@ import { DocumentsTableComponent } from '../../../../../shared/components/docume
     TooltipModule,
     TagModule,
     DialogModule,
+    TextareaModule,
     DocumentsTableComponent
   ],
   providers: [MessageService, ProjectMainContractorPaymentClient, LookupClient],
@@ -77,6 +79,10 @@ export class ProjectMainContractorPaymentsComponent implements OnInit, OnChanges
 
   get totalPaid(): number {
     return this.rows.reduce((sum, p) => sum + (p.paidAmount ?? 0), 0);
+  }
+
+  get remainingBalance(): number {
+    return (this.contractor?.amount ?? 0) - this.totalPaid;
   }
 
   ngOnInit(): void {
@@ -134,7 +140,8 @@ export class ProjectMainContractorPaymentsComponent implements OnInit, OnChanges
   addNewRow(): void {
     const newRow = new GetProjectMainContractorPaymentDto({
       id: this.tempIdSeq--,
-      projectMainContractorId: this.contractor.id
+      projectMainContractorId: this.contractor.id,
+      paymentDate: new Date()
     });
     this.rows = [newRow, ...this.rows];
     setTimeout(() => this.dt?.initRowEdit(newRow));

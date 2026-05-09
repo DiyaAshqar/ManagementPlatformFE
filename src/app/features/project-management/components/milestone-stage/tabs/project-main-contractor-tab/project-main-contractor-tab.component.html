@@ -112,6 +112,14 @@
       </tr>
     </ng-template>
 
+    <ng-template pTemplate="footer">
+      <tr>
+        <td colspan="2" class="font-semibold text-right">{{ 'common.total' | translate }}</td>
+        <td class="text-right font-bold contractor-amount">{{ totalContractValue | number:'1.0-0' }}</td>
+        <td colspan="3"></td>
+      </tr>
+    </ng-template>
+
   </p-table>
 
 </div>

@@ -28,7 +28,7 @@ features/agreement-wizard/
 ├── agreement-wizard.component.ts    # Main wizard container
 ├── agreement-wizard.component.html  # Stepper layout
 └── steps/
-    ├── step1/                       # Agreement Details (✅ Implemented)
+    ├── step1/                       # Main info (✅ Implemented)
     │   ├── step1.component.ts
     │   └── step1.component.html
     ├── step2/                       # Contract & Payment (✅ Implemented)
@@ -48,7 +48,7 @@ features/agreement-wizard/
         └── step7.component.ts
 ```
 
-## Step 1: Agreement Details
+## Step 1: Main info
 
 The first step collects comprehensive information about the agreement:
 
@@ -83,7 +83,7 @@ The first step collects comprehensive information about the agreement:
 - Number format validation for phone numbers and IDs
 - Min/Max length validation
 
-## Step 2: Contract & Payment Details
+## Step 2: Payment Details
 
 The second step handles contract configuration and payment setup:
 
@@ -105,7 +105,7 @@ The second step handles contract configuration and payment setup:
 - Services array must not be empty
 - Monthly payment amount required only when Monthly Fees method is selected
 
-## Step 3: Material & Quality Specifications
+## Step 3: Project areas
 
 The third step collects material, equipment, and quality control information:
 
