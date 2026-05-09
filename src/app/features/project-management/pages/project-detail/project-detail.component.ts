@@ -20,6 +20,7 @@ import { GetProjectDto, ProjectStageDto, ProjectStageType } from '../../../../..
 import { DocumentsStageComponent } from '../../components/documents-stage/documents-stage.component';
 import { ExcavationStageComponent } from '../../components/excavation-stage/excavation-stage.component';
 import { MilestoneStageComponent } from '../../components/milestone-stage/milestone-stage.component';
+import { OwnerPaymentTabComponent } from '../../components/owner-payment-tab/owner-payment-tab.component';
 import { PreparingStageComponent } from '../../components/preparing-stage/preparing-stage.component';
 import { StageKanbanComponent } from '../../components/stage-kanban/stage-kanban.component';
 import { Project, ProjectStatus, Stage, TaskStatus } from '../../models';
@@ -51,6 +52,7 @@ interface ReportType {
     PreparingStageComponent,
     ExcavationStageComponent,
     MilestoneStageComponent,
+    OwnerPaymentTabComponent,
     StageKanbanComponent,
     DocumentsStageComponent,
     // StagingBoardComponent

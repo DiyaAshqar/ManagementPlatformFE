@@ -499,7 +499,8 @@
       "excavation": "Excavation",
       "milestones": "Milestones",
       "documents": "Documents",
-      "expenses": "Expenses"
+      "expenses": "Expenses",
+      "ownerPayment": "Owner Payment"
     },
     "printDialog": {
       "header": "Print Project Report",
@@ -590,6 +591,34 @@
     },
     "errors": {
       "loadFailed": "Failed to load claim data. Please try again."
+    }
+  },
+  "ownerPaymentEntry": {
+    "title": "Owner Payment",
+    "subtitle": "Record owner payments for this project",
+    "formTitle": "Payment Details",
+    "createdAt": "Created Date",
+    "amount": "Amount",
+    "amountPlaceholder": "Enter amount",
+    "amountRequired": "Amount is required and must be positive.",
+    "currency": "Currency",
+    "paymentType": "Payment Type",
+    "referenceNumber": "Reference Number",
+    "referencePlaceholder": "Cheque or transfer number",
+    "notes": "Notes",
+    "notesPlaceholder": "Notes",
+    "savePayment": "Save Payment",
+    "totalPaid": "Total Paid",
+    "records": "Records",
+    "recordsTitle": "Owner Payment Records",
+    "emptyRecords": "No owner payments recorded yet.",
+    "paymentTypes": {
+      "cash": "Cash",
+      "cheque": "Cheque",
+      "transfer": "Bank Transfer"
+    },
+    "messages": {
+      "saved": "Owner payment saved successfully."
     }
   },
   "projectTabs": {

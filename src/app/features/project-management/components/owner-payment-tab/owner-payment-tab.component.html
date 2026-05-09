@@ -1,0 +1,177 @@
+<p-toast></p-toast>
+
+<div class="owner-payment-entry">
+  <div class="entry-header">
+    <div class="header-icon">
+      <i class="pi pi-credit-card"></i>
+    </div>
+    <div>
+      <h2>{{ 'ownerPaymentEntry.title' | translate }}</h2>
+      <p>{{ 'ownerPaymentEntry.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <div class="entry-grid">
+    <section class="entry-form">
+      <div class="form-section-title">
+        <h3>{{ 'ownerPaymentEntry.formTitle' | translate }}</h3>
+        <span>{{ project?.name }}</span>
+      </div>
+
+      <div class="form-grid">
+        <div class="field-block">
+          <label for="ownerPaymentCreatedAt">{{ 'ownerPaymentEntry.createdAt' | translate }} <span>*</span></label>
+          <p-datepicker
+            inputId="ownerPaymentCreatedAt"
+            [ngModel]="createdAt()"
+            (ngModelChange)="createdAt.set($event)"
+            dateFormat="yy-mm-dd"
+            [showIcon]="true"
+            styleClass="w-full"
+            appendTo="body">
+          </p-datepicker>
+        </div>
+
+        <div class="field-block">
+          <label for="ownerPaymentAmount">{{ 'ownerPaymentEntry.amount' | translate }} <span>*</span></label>
+          <p-inputNumber
+            inputId="ownerPaymentAmount"
+            [ngModel]="amount()"
+            (ngModelChange)="amount.set($event)"
+            [min]="0"
+            [minFractionDigits]="2"
+            [maxFractionDigits]="2"
+            [placeholder]="'ownerPaymentEntry.amountPlaceholder' | translate"
+            inputStyleClass="w-full"
+            styleClass="w-full"
+            [class.ng-invalid]="submitted() && (!amount() || amount()! <= 0)">
+          </p-inputNumber>
+          @if (submitted() && (!amount() || amount()! <= 0)) {
+            <small class="p-error">{{ 'ownerPaymentEntry.amountRequired' | translate }}</small>
+          }
+        </div>
+
+        <div class="field-block">
+          <label for="ownerPaymentCurrency">{{ 'ownerPaymentEntry.currency' | translate }} <span>*</span></label>
+          <p-select
+            inputId="ownerPaymentCurrency"
+            [ngModel]="currency()"
+            (ngModelChange)="currency.set($event)"
+            [options]="currencies"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="w-full"
+            appendTo="body">
+          </p-select>
+        </div>
+
+        <div class="field-block">
+          <label for="ownerPaymentType">{{ 'ownerPaymentEntry.paymentType' | translate }} <span>*</span></label>
+          <p-select
+            inputId="ownerPaymentType"
+            [ngModel]="paymentType()"
+            (ngModelChange)="onPaymentTypeChange($event)"
+            [options]="paymentTypes"
+            optionLabel="label"
+            optionValue="value"
+            styleClass="w-full"
+            appendTo="body">
+          </p-select>
+        </div>
+
+        <div class="field-block">
+          <label for="ownerPaymentReference">{{ 'ownerPaymentEntry.referenceNumber' | translate }}</label>
+          <input
+            pInputText
+            id="ownerPaymentReference"
+            type="text"
+            [ngModel]="referenceNumber()"
+            (ngModelChange)="referenceNumber.set($event)"
+            [disabled]="isReferenceDisabled()"
+            [placeholder]="'ownerPaymentEntry.referencePlaceholder' | translate"
+            class="w-full" />
+        </div>
+
+        <div class="field-block field-wide">
+          <label for="ownerPaymentNotes">{{ 'ownerPaymentEntry.notes' | translate }}</label>
+          <textarea
+            pTextarea
+            id="ownerPaymentNotes"
+            rows="3"
+            [ngModel]="notes()"
+            (ngModelChange)="notes.set($event)"
+            [placeholder]="'ownerPaymentEntry.notesPlaceholder' | translate"
+            class="w-full">
+          </textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <p-button
+          [label]="'common.cancel' | translate"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="resetForm()">
+        </p-button>
+        <p-button
+          [label]="'ownerPaymentEntry.savePayment' | translate"
+          icon="pi pi-save"
+          (onClick)="savePayment()">
+        </p-button>
+      </div>
+    </section>
+
+    <aside class="entry-summary">
+      <div class="summary-card">
+        <span>{{ 'ownerPaymentEntry.totalPaid' | translate }}</span>
+        <strong>{{ formatAmount(totalPaid()) }}</strong>
+      </div>
+      <div class="summary-card muted">
+        <span>{{ 'ownerPaymentEntry.records' | translate }}</span>
+        <strong>{{ records().length }}</strong>
+      </div>
+    </aside>
+  </div>
+
+  <section class="records-section">
+    <div class="records-title">
+      <h3>{{ 'ownerPaymentEntry.recordsTitle' | translate }}</h3>
+      <span>{{ records().length }}</span>
+    </div>
+
+    <p-table
+      [value]="records()"
+      [tableStyle]="{ 'min-width': '52rem' }"
+      styleClass="p-datatable-sm p-datatable-striped"
+      responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'ownerPaymentEntry.createdAt' | translate }}</th>
+          <th>{{ 'ownerPaymentEntry.paymentType' | translate }}</th>
+          <th>{{ 'ownerPaymentEntry.referenceNumber' | translate }}</th>
+          <th class="text-right">{{ 'ownerPaymentEntry.amount' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-record>
+        <tr>
+          <td>{{ record.createdAt | date: 'yyyy-MM-dd' }}</td>
+          <td>{{ getPaymentTypeLabel(record.paymentType) }}</td>
+          <td>{{ record.referenceNumber || '-' }}</td>
+          <td class="text-right font-semibold text-primary">{{ formatAmount(record.amount, record.currency) }}</td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4">
+            <div class="empty-state">
+              <i class="pi pi-wallet"></i>
+              <p>{{ 'ownerPaymentEntry.emptyRecords' | translate }}</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </section>
+</div>

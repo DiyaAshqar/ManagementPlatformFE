@@ -136,12 +136,6 @@
               <td class="text-right font-semibold">{{ item.subTotal | number:'1.2-2' }}</td>
             </tr>
           </ng-template>
-          <ng-template pTemplate="footer">
-            <tr class="op-footer-row">
-              <td colspan="4" class="text-right font-bold">{{ 'ownerPayment.total' | translate }}</td>
-              <td class="text-right font-bold text-primary">{{ formatCurrency(boqTotal) }}</td>
-            </tr>
-          </ng-template>
         </p-table>
       </div>
     }
@@ -180,12 +174,6 @@
               <td>{{ formatDate(item.startDate) }}</td>
               <td>{{ formatDate(item.endDate) }}</td>
               <td class="text-right font-semibold">{{ item.amount | number:'1.2-2' }}</td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="footer">
-            <tr class="op-footer-row">
-              <td colspan="3" class="text-right font-bold">{{ 'ownerPayment.total' | translate }}</td>
-              <td class="text-right font-bold text-primary">{{ formatCurrency(pmcTotal) }}</td>
             </tr>
           </ng-template>
         </p-table>
@@ -234,12 +222,6 @@
               <td class="text-right font-semibold">{{ item.subTotal | number:'1.2-2' }}</td>
             </tr>
           </ng-template>
-          <ng-template pTemplate="footer">
-            <tr class="op-footer-row">
-              <td colspan="6" class="text-right font-bold">{{ 'ownerPayment.total' | translate }}</td>
-              <td class="text-right font-bold text-primary">{{ formatCurrency(svTotal) }}</td>
-            </tr>
-          </ng-template>
         </p-table>
       </div>
     }
@@ -284,12 +266,6 @@
               <td class="text-right font-semibold">{{ item.subTotal | number:'1.2-2' }}</td>
             </tr>
           </ng-template>
-          <ng-template pTemplate="footer">
-            <tr class="op-footer-row">
-              <td colspan="5" class="text-right font-bold">{{ 'ownerPayment.total' | translate }}</td>
-              <td class="text-right font-bold text-primary">{{ formatCurrency(voTotal) }}</td>
-            </tr>
-          </ng-template>
         </p-table>
       </div>
     }
@@ -332,12 +308,6 @@
               <td>{{ formatDate(item.expenseDate) }}</td>
               <td class="text-muted-color">{{ item.notes || '—' }}</td>
               <td class="text-right font-semibold">{{ item.totalAmount | number:'1.2-2' }}</td>
-            </tr>
-          </ng-template>
-          <ng-template pTemplate="footer">
-            <tr class="op-footer-row">
-              <td colspan="5" class="text-right font-bold">{{ 'ownerPayment.total' | translate }}</td>
-              <td class="text-right font-bold text-primary">{{ formatCurrency(expTotal) }}</td>
             </tr>
           </ng-template>
         </p-table>

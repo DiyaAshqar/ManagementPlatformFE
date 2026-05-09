@@ -496,7 +496,8 @@
       "excavation": "الحفر",
       "milestones": "المراحل",
       "documents": "المستندات",
-      "expenses": "المصروفات"
+      "expenses": "المصروفات",
+      "ownerPayment": "دفعات المالك"
     },
     "printDialog": {
       "header": "طباعة تقرير المشروع",
@@ -587,6 +588,34 @@
     },
     "errors": {
       "loadFailed": "فشل تحميل بيانات المطالبة. الرجاء المحاولة مرة أخرى."
+    }
+  },
+  "ownerPaymentEntry": {
+    "title": "دفعات المالك",
+    "subtitle": "تسجيل دفعات المالك لهذا المشروع",
+    "formTitle": "تفاصيل الدفعة",
+    "createdAt": "تاريخ الإنشاء",
+    "amount": "المبلغ",
+    "amountPlaceholder": "أدخل المبلغ",
+    "amountRequired": "المبلغ مطلوب ويجب أن يكون موجباً.",
+    "currency": "العملة",
+    "paymentType": "نوع الدفع",
+    "referenceNumber": "رقم المرجع",
+    "referencePlaceholder": "رقم الشيك أو التحويل",
+    "notes": "ملاحظات",
+    "notesPlaceholder": "ملاحظات",
+    "savePayment": "حفظ الدفعة",
+    "totalPaid": "إجمالي المدفوع",
+    "records": "السجلات",
+    "recordsTitle": "سجلات دفعات المالك",
+    "emptyRecords": "لا توجد دفعات مالك مسجلة بعد.",
+    "paymentTypes": {
+      "cash": "نقداً",
+      "cheque": "شيك",
+      "transfer": "تحويل بنكي"
+    },
+    "messages": {
+      "saved": "تم حفظ دفعة المالك بنجاح."
     }
   },
   "projectTabs": {

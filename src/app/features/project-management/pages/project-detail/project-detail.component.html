@@ -154,6 +154,12 @@
                 <span>{{ 'projectDetail.tabs.documents' | translate }}</span>
               </div>
             </p-tab>
+            <p-tab value="6">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-credit-card"></i>
+                <span>{{ 'projectDetail.tabs.ownerPayment' | translate }}</span>
+              </div>
+            </p-tab>
           </p-tablist>
           
           <p-tabpanels>
@@ -201,6 +207,13 @@
             <p-tabpanel value="5">
               <div class="py-4">
                 <app-documents-stage [projectId]="project()!.id"></app-documents-stage>
+              </div>
+            </p-tabpanel>
+            <p-tabpanel value="6">
+              <div class="py-4">
+                @if (activeTabIndex === '6') {
+                  <app-owner-payment-tab [project]="project()"></app-owner-payment-tab>
+                }
               </div>
             </p-tabpanel>
           </p-tabpanels>
