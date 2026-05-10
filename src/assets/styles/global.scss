@@ -214,27 +214,28 @@ small.p-error {
 }
 
 // ── Global PrimeNG DataTable Header ──────────────────────────────────────────
-// Prominent, branded header for every p-table in the app
+// Prominent, branded header for every p-table in the app with light colors
 .p-datatable .p-datatable-thead > tr > th {
-  background: var(--primary-gradient) !important;
-  color: #ffffff !important;
+  background: #E3EFFD !important;
+  color: #0052CC !important;
   font-weight: 700 !important;
   letter-spacing: 0.03em;
   padding: 0.875rem 1rem;
-  border-color: rgba(255, 255, 255, 0.15) !important;
+  border-bottom: 2px solid #0A84FF !important;
 }
 
-// Sort icon visibility on gradient background
+// Sort icon visibility on light background
 .p-datatable .p-datatable-thead > tr > th .p-sortable-column-icon,
 .p-datatable .p-datatable-thead > tr > th .p-icon {
-  color: rgba(255, 255, 255, 0.8) !important;
+  color: #0052CC !important;
 }
 
 .p-datatable .p-datatable-thead > tr > th.p-highlight {
-  background: linear-gradient(90deg, #0040A8, #0070E0) !important;
+  background: #D9E8F7 !important;
+  color: #0052CC !important;
 }
 
 .p-datatable .p-datatable-thead > tr > th:hover {
-  background: linear-gradient(90deg, #0040A8, #0070E0) !important;
-  color: #ffffff !important;
+  background: #D9E8F7 !important;
+  color: #0040A8 !important;
 }

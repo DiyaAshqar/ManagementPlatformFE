@@ -55,8 +55,8 @@ export class MilestoneStageComponent implements OnInit {
   // Track which accordion panels have been opened
   openedPanels = new Set<number>();
   
-  // Track current active accordion panels
-  activeAccordionPanels: number[] = [];
+  // Track current active accordion panel (single selection)
+  activeAccordionValue: any = undefined;
 
   ngOnInit(): void {
     if (this.agreementId > 0) {
@@ -101,16 +101,11 @@ export class MilestoneStageComponent implements OnInit {
   }
   
   onAccordionChange(event: any): void {
-    // Track opened panels
-    if (event.value) {
-      const openPanels = Array.isArray(event.value) ? event.value : [event.value];
-      openPanels.forEach((panelId: number) => {
-        if (!this.openedPanels.has(panelId)) {
-          this.openedPanels.add(panelId);
-          // Mark first tab as opened when panel opens
-          this.openedTabs.add(`${panelId}-0`);
-        }
-      });
+    const panelId: number | undefined = event.value ?? undefined;
+    if (panelId !== undefined && !this.openedPanels.has(panelId)) {
+      this.openedPanels.add(panelId);
+      // Mark first tab as opened when panel opens
+      this.openedTabs.add(`${panelId}-0`);
     }
   }
   

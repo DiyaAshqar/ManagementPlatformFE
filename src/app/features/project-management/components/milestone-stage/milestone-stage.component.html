@@ -16,7 +16,7 @@
 
   <!-- ── Accordion driven by API milestones ───────────────────────────── -->
   @if (!isLoadingMilestones() && apiMilestones().length > 0) {
-    <p-accordion [multiple]="true" [(value)]="activeAccordionPanels" (valueChange)="onAccordionChange({value: $event})">
+    <p-accordion [(value)]="activeAccordionValue" (valueChange)="onAccordionChange({value: $event})">
       @for (milestone of apiMilestones(); track milestone.id; let i = $index) {
         <p-accordion-panel [value]="milestone.id!">
           <p-accordion-header>
@@ -105,7 +105,7 @@
 
   <!-- ── Fallback: Accordion driven by project stages ─────────────────── -->
   @if (!isLoadingMilestones() && apiMilestones().length === 0) {
-    <p-accordion [multiple]="true" [(value)]="activeAccordionPanels" (valueChange)="onAccordionChange({value: $event})">
+    <p-accordion [(value)]="activeAccordionValue" (valueChange)="onAccordionChange({value: $event})">
       @for (stage of milestoneStages; track stage.id; let i = $index) {
         <p-accordion-panel [value]="stage.id!">
           <p-accordion-header>

@@ -14,3 +14,41 @@
   }
 }
 
+// ── Accordion active state ───────────────────────────────────────────────────
+:host ::ng-deep {
+  .p-accordionpanel {
+    margin-bottom: 0.5rem;
+    border-radius: var(--border-radius, 6px);
+    overflow: hidden;
+    border: 1px solid var(--surface-border);
+    transition: box-shadow 0.2s ease;
+
+    &.p-accordionpanel-active {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 1px var(--primary-color), 0 4px 16px rgba(0, 0, 0, 0.08);
+
+      > .p-accordionheader {
+        background: var(--primary-color);
+        color: #ffffff;
+
+        .p-accordionheader-toggle-icon {
+          color: #ffffff;
+        }
+
+        span {
+          color: #ffffff;
+        }
+      }
+    }
+
+    &:not(.p-accordionpanel-active) > .p-accordionheader {
+      background: var(--surface-card);
+      color: var(--text-color);
+
+      &:hover {
+        background: var(--surface-hover);
+      }
+    }
+  }
+}
+
