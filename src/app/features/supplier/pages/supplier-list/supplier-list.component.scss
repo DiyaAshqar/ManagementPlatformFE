@@ -11,13 +11,6 @@
 
   :host ::ng-deep {
     .p-datatable {
-      .p-datatable-thead > tr > th {
-        background-color: var(--surface-section);
-        color: var(--text-color);
-        font-weight: 600;
-        border-bottom: 1px solid var(--surface-border);
-      }
-
       .p-datatable-tbody > tr {
         &:hover {
           background-color: var(--surface-hover);

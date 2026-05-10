@@ -39,11 +39,7 @@
     ::ng-deep {
       .p-datatable {
         .p-datatable-thead > tr > th {
-          background: var(--surface-section);
-          color: var(--text-color);
-          font-weight: 600;
           padding: 1rem;
-          border-bottom: 2px solid var(--surface-border);
 
           input {
             margin-top: 0.5rem;

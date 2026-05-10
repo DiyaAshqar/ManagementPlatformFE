@@ -212,3 +212,29 @@ small.p-error {
     inset-inline-start: 2.75rem;
   }
 }
+
+// ── Global PrimeNG DataTable Header ──────────────────────────────────────────
+// Prominent, branded header for every p-table in the app
+.p-datatable .p-datatable-thead > tr > th {
+  background: var(--primary-gradient) !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.03em;
+  padding: 0.875rem 1rem;
+  border-color: rgba(255, 255, 255, 0.15) !important;
+}
+
+// Sort icon visibility on gradient background
+.p-datatable .p-datatable-thead > tr > th .p-sortable-column-icon,
+.p-datatable .p-datatable-thead > tr > th .p-icon {
+  color: rgba(255, 255, 255, 0.8) !important;
+}
+
+.p-datatable .p-datatable-thead > tr > th.p-highlight {
+  background: linear-gradient(90deg, #0040A8, #0070E0) !important;
+}
+
+.p-datatable .p-datatable-thead > tr > th:hover {
+  background: linear-gradient(90deg, #0040A8, #0070E0) !important;
+  color: #ffffff !important;
+}
