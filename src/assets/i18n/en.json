@@ -623,7 +623,7 @@
   },
   "projectTabs": {
     "boq": {
-      "title": "Bill of Quantities",
+      "title": "BOQ",
       "titleAbbr": "Bill of Quantities (BoQ)",
       "subtitle": "Manage construction materials and quantities",
       "totalItems": "Total Items",
@@ -673,11 +673,11 @@
       }
     },
     "milestoneDocuments": {
-      "title": "Project Documents",
+      "title": "Documents",
       "subtitle": "Manage project documents and attachments"
     },
     "voucherOrders": {
-      "title": "Voucher Orders",
+      "title": "V.O s",
       "subtitle": "Manage voucher orders and approvals",
       "totalLabel": "Total Voucher Orders",
       "createButton": "Create Voucher Order",
@@ -701,7 +701,7 @@
       "totalVOValue": "Total VO Value"
     },
     "surveyingVisits": {
-      "title": "Surveying Visits",
+      "title": "Surveying",
       "subtitle": "Schedule and track site surveys",
       "totalLabel": "Total Surveying Visits",
       "scheduleButton": "Schedule Visit",
@@ -741,7 +741,7 @@
       "statusRejected": "Rejected"
     },
     "projectMainContractor": {
-      "title": "Project Main Contractor",
+      "title": "Main Contractors",
       "subtitle": "Manage main contractor information and contracts",
       "cardTitle": "Project Main Contractor",
       "cardSubtitle": "Manage main contractor information for this stage",
