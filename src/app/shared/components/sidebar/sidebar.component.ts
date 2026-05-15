@@ -54,6 +54,7 @@ export class SidebarComponent implements OnInit {
         { label: 'sidebar.items.projectManagement', icon: 'pi pi-th-large', route: '/projects' },
         { label: 'sidebar.items.constructors', icon: 'pi pi-users', route: '/constructor' },
         { label: 'sidebar.items.suppliers', icon: 'pi pi-building', route: '/supplier' },
+        { label: 'sidebar.items.materials', icon: 'pi pi-box', route: '/materials' },
       ]
     }
   ];

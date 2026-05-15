@@ -52,7 +52,8 @@
     "editConstructor": "Edit Constructor",
     "supplier": "Suppliers",
     "newSupplier": "New Supplier",
-    "editSupplier": "Edit Supplier"
+    "editSupplier": "Edit Supplier",
+    "materials": "Materials"
   },
   "agreements": {
     "title": "Agreements",
@@ -241,6 +242,7 @@
       "agreementWizard": "Agreement Wizard",
       "constructors": "Constructors",
       "suppliers": "Suppliers",
+      "materials": "Materials",
       "feature1": "Feature 1",
       "feature2": "Feature 2"
     },
@@ -1048,5 +1050,38 @@
     "cancel": "Cancel",
     "upload": "Upload",
     "uploading": "Uploading..."
+  },
+  "material": {
+    "title": "Material Management",
+    "subtitle": "Manage material categories, subcategories, and items in a tree structure",
+    "category": {
+      "title": "Categories",
+      "add": "Add Category",
+      "addTitle": "Add Category",
+      "editTitle": "Edit Category",
+      "name": "Category Name",
+      "namePlaceholder": "Enter category name",
+      "noData": "No categories found"
+    },
+    "subCategory": {
+      "title": "Subcategories",
+      "add": "Add Subcategory",
+      "addTitle": "Add Subcategory",
+      "editTitle": "Edit Subcategory",
+      "name": "Subcategory Name",
+      "namePlaceholder": "Enter subcategory name",
+      "noData": "No subcategories found",
+      "selectCategory": "Select a category first"
+    },
+    "item": {
+      "title": "Materials",
+      "add": "Add Material",
+      "addTitle": "Add Material",
+      "editTitle": "Edit Material",
+      "name": "Material Name",
+      "namePlaceholder": "Enter material name",
+      "noData": "No materials found",
+      "selectSubCategory": "Select a subcategory first"
+    }
   }
 }

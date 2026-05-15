@@ -238,6 +238,7 @@
       "agreementWizard": "إدارة الاتفاقيات",
       "constructors": "المقاولون",
       "suppliers": "الموردون",
+      "materials": "المواد",
       "feature1": "ميزة 1",
       "feature2": "ميزة 2"
     },
@@ -1043,5 +1044,38 @@
     "cancel": "إلغاء",
     "upload": "رفع",
     "uploading": "جاري الرفع..."
+  },
+  "material": {
+    "title": "إدارة المواد",
+    "subtitle": "إدارة فئات المواد والفئات الفرعية والعناصر في هيكل شجري",
+    "category": {
+      "title": "الفئات",
+      "add": "إضافة فئة",
+      "addTitle": "إضافة فئة",
+      "editTitle": "تعديل الفئة",
+      "name": "اسم الفئة",
+      "namePlaceholder": "أدخل اسم الفئة",
+      "noData": "لا توجد فئات"
+    },
+    "subCategory": {
+      "title": "الفئات الفرعية",
+      "add": "إضافة فئة فرعية",
+      "addTitle": "إضافة فئة فرعية",
+      "editTitle": "تعديل الفئة الفرعية",
+      "name": "اسم الفئة الفرعية",
+      "namePlaceholder": "أدخل اسم الفئة الفرعية",
+      "noData": "لا توجد فئات فرعية",
+      "selectCategory": "اختر فئة أولاً"
+    },
+    "item": {
+      "title": "المواد",
+      "add": "إضافة مادة",
+      "addTitle": "إضافة مادة",
+      "editTitle": "تعديل المادة",
+      "name": "اسم المادة",
+      "namePlaceholder": "أدخل اسم المادة",
+      "noData": "لا توجد مواد",
+      "selectSubCategory": "اختر فئة فرعية أولاً"
+    }
   }
 }

@@ -134,6 +134,11 @@ export const routes: Routes = [
               .then(m => m.SupplierFormComponent)
           }
         ]
+      },
+      {
+        path: 'materials',
+        loadComponent: () => import('./features/material/pages/material-management/material-management.component')
+          .then(m => m.MaterialManagementComponent)
       }
     ]
   },

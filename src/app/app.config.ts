@@ -12,7 +12,7 @@ import { providePrimeNG } from 'primeng/config';
 import { DialogService } from 'primeng/dynamicdialog';
 
 import { environment } from '../environments/environment';
-import { AgreementClient, AttachmentClient, LookupClient, ProjectClient, TaskClient, SubTaskClient, ConstructorClient, SupplierClient, ExpenseClient, CurrencyClient, API_BASE_URL } from '../nswag/api-client';
+import { AgreementClient, AttachmentClient, LookupClient, ProjectClient, TaskClient, SubTaskClient, ConstructorClient, SupplierClient, ExpenseClient, CurrencyClient, MaterialClient, MaterialCategoryClient, MaterialSubCategoryClient, API_BASE_URL } from '../nswag/api-client';
 import { routes } from './app.routes';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { ErrorInterceptor } from './core/interceptors/error.interceptor';
@@ -79,6 +79,9 @@ export const appConfig: ApplicationConfig = {
     SupplierClient,
     ExpenseClient,
     CurrencyClient,
+    MaterialClient,
+    MaterialCategoryClient,
+    MaterialSubCategoryClient,
     {
       provide: API_BASE_URL, useValue: environment.nSwagUrl
     },
