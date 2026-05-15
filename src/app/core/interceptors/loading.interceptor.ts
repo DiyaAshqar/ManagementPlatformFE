@@ -10,13 +10,13 @@ export const LoadingInterceptor: HttpInterceptorFn = (req, next) => {
   const skipLoading = req.headers.has('X-Skip-Loading');
 
   if (!skipLoading) {
-    loadingService.show();
+    // loadingService.show();
   }
 
   return next(req).pipe(
     finalize(() => {
       if (!skipLoading) {
-        loadingService.hide();
+        // loadingService.hide();
       }
     })
   );

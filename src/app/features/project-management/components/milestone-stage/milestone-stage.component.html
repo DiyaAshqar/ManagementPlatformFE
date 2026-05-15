@@ -28,16 +28,51 @@
               <!-- ── Tabs for this Milestone Stage ─────────────────────────── -->
               <p-tabs [(value)]="activeTabs[milestone.id!]" (valueChange)="onTabChange(milestone.id!, $event)">
                 <p-tablist>
-                  <p-tab value="0">{{ 'projectTabs.boq.title' | translate }}</p-tab>
-                  <p-tab value="1">{{ 'projectTabs.projectMainContractor.title' | translate }}</p-tab>
-                  <p-tab value="2">{{ 'projectTabs.purchaseOrders.title' | translate }}</p-tab>
-                  <p-tab value="3">{{ 'projectTabs.surveyingVisits.title' | translate }}</p-tab>
-                  <p-tab value="4">{{ 'projectTabs.voucherOrders.title' | translate }}</p-tab>
-                  <p-tab value="5">{{ 'projectTabs.milestoneDocuments.title' | translate }}</p-tab>
-                  <p-tab value="6">{{ 'projectDetail.tabs.expenses' | translate }}</p-tab>
+                  <p-tab value="0">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-table" style="color: #3B82F6"></i>
+                      <span>{{ 'projectTabs.boq.title' | translate }}</span>
+                    </div>
+                  </p-tab>
+                  <p-tab value="1">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-building" style="color: #10B981"></i>
+                      <span>{{ 'projectTabs.projectMainContractor.title' | translate }}</span>
+                    </div>
+                  </p-tab>
+                  <p-tab value="2">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-shopping-cart" style="color: #F59E0B"></i>
+                      <span>{{ 'projectTabs.purchaseOrders.title' | translate }}</span>
+                    </div>
+                  </p-tab>
+                  <p-tab value="3">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-map-marker" style="color: #EF4444"></i>
+                      <span>{{ 'projectTabs.surveyingVisits.title' | translate }}</span>
+                    </div>
+                  </p-tab>
+                  <p-tab value="4">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-file-edit" style="color: #8B5CF6"></i>
+                      <span>{{ 'projectTabs.voucherOrders.title' | translate }}</span>
+                    </div>
+                  </p-tab>
+                  <p-tab value="5">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-folder-open" style="color: #F97316"></i>
+                      <span>{{ 'projectTabs.milestoneDocuments.title' | translate }}</span>
+                    </div>
+                  </p-tab>
+                  <p-tab value="6">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-wallet" style="color: #06B6D4"></i>
+                      <span>{{ 'projectDetail.tabs.expenses' | translate }}</span>
+                    </div>
+                  </p-tab>
                   <p-tab value="7">
                     <div class="flex align-items-center gap-2">
-                      <i class="pi pi-file-check"></i>
+                      <i class="pi pi-file-check" style="color: #84CC16"></i>
                       <span>{{ 'ownerPayment.tabTitle' | translate }}</span>
                     </div>
                   </p-tab>
@@ -117,16 +152,51 @@
               <!-- ── Tabs for this Milestone Stage ─────────────────────────── -->
               <p-tabs [(value)]="activeTabs[stage.id!]" (valueChange)="onTabChange(stage.id!, $event)">
                 <p-tablist>
-                  <p-tab value="0">{{ 'projectTabs.boq.title' | translate }}</p-tab>
-                  <p-tab value="1">{{ 'projectTabs.projectMainContractor.title' | translate }}</p-tab>
-                  <p-tab value="2">{{ 'projectTabs.purchaseOrders.title' | translate }}</p-tab>
-                  <p-tab value="3">{{ 'projectTabs.surveyingVisits.title' | translate }}</p-tab>
-                  <p-tab value="4">{{ 'projectTabs.voucherOrders.title' | translate }}</p-tab>
-                  <p-tab value="5">{{ 'projectTabs.milestoneDocuments.title' | translate }}</p-tab>
-                  <p-tab value="6">{{ 'projectDetail.tabs.expenses' | translate }}</p-tab>
+                  <p-tab value="0">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-table" style="color: #3B82F6"></i>
+                      <span>{{ 'projectTabs.boq.title' | translate }}</span>
+                    </div>
+                  </p-tab>
+                  <p-tab value="1">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-building" style="color: #10B981"></i>
+                      <span>{{ 'projectTabs.projectMainContractor.title' | translate }}</span>
+                    </div>
+                  </p-tab>
+                  <p-tab value="2">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-shopping-cart" style="color: #F59E0B"></i>
+                      <span>{{ 'projectTabs.purchaseOrders.title' | translate }}</span>
+                    </div>
+                  </p-tab>
+                  <p-tab value="3">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-map-marker" style="color: #EF4444"></i>
+                      <span>{{ 'projectTabs.surveyingVisits.title' | translate }}</span>
+                    </div>
+                  </p-tab>
+                  <p-tab value="4">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-file-edit" style="color: #8B5CF6"></i>
+                      <span>{{ 'projectTabs.voucherOrders.title' | translate }}</span>
+                    </div>
+                  </p-tab>
+                  <p-tab value="5">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-folder-open" style="color: #F97316"></i>
+                      <span>{{ 'projectTabs.milestoneDocuments.title' | translate }}</span>
+                    </div>
+                  </p-tab>
+                  <p-tab value="6">
+                    <div class="flex align-items-center gap-2">
+                      <i class="pi pi-wallet" style="color: #06B6D4"></i>
+                      <span>{{ 'projectDetail.tabs.expenses' | translate }}</span>
+                    </div>
+                  </p-tab>
                   <p-tab value="7">
                     <div class="flex align-items-center gap-2">
-                      <i class="pi pi-file-check"></i>
+                      <i class="pi pi-file-check" style="color: #84CC16"></i>
                       <span>{{ 'ownerPayment.tabTitle' | translate }}</span>
                     </div>
                   </p-tab>

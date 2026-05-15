@@ -27,16 +27,21 @@
       border-color: var(--primary-color);
       box-shadow: 0 0 0 1px var(--primary-color), 0 4px 16px rgba(0, 0, 0, 0.08);
 
-      > .p-accordionheader {
-        background: var(--primary-color);
-        color: #ffffff;
+      > .p-accordionheader,
+      > .p-accordionheader[data-p-active="true"] {
+        background: var(--primary-color) !important;
+        color: #ffffff !important;
+        border-radius: 0 !important;
 
-        .p-accordionheader-toggle-icon {
-          color: #ffffff;
+        .p-accordionheader-toggle-icon,
+        .p-accordion-header-action,
+        [data-pc-section="toggleicon"],
+        [data-pc-section="headeraction"] {
+          color: #ffffff !important;
         }
 
-        span {
-          color: #ffffff;
+        span, a, button {
+          color: #ffffff !important;
         }
       }
     }
@@ -47,6 +52,17 @@
 
       &:hover {
         background: var(--surface-hover);
+      }
+    }
+
+    // Ensure tabs inside accordion content always use correct text color
+    .p-accordioncontent {
+      .p-tab {
+        color: var(--p-tabs-tab-color, var(--text-color-secondary));
+
+        &.p-tab-active {
+          color: var(--p-tabs-tab-active-color, var(--primary-color));
+        }
       }
     }
   }

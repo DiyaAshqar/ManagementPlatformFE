@@ -1678,11 +1678,11 @@ export class MaterialClient {
      * @param filter (optional) 
      * @return OK
      */
-    getByCategoryId(categoryId: number, pageNumber: number | undefined, pageSize: number | undefined, filter: string | undefined): Observable<GetMaterialDtoListPagedResponseResponse> {
-        let url_ = this.baseUrl + "/api/Material/Category/{categoryId}?";
-        if (categoryId === undefined || categoryId === null)
-            throw new globalThis.Error("The parameter 'categoryId' must be defined.");
-        url_ = url_.replace("{categoryId}", encodeURIComponent("" + categoryId));
+    getByCategoryId(subCategoryId: number, pageNumber: number | undefined, pageSize: number | undefined, filter: string | undefined): Observable<GetMaterialDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/Material/Category/{subCategoryId}?";
+        if (subCategoryId === undefined || subCategoryId === null)
+            throw new globalThis.Error("The parameter 'subCategoryId' must be defined.");
+        url_ = url_.replace("{subCategoryId}", encodeURIComponent("" + subCategoryId));
         if (pageNumber === null)
             throw new globalThis.Error("The parameter 'pageNumber' cannot be null.");
         else if (pageNumber !== undefined)
@@ -2311,6 +2311,62 @@ export class MilestoneClient {
     }
 
     /**
+     * @param body (optional) 
+     * @return OK
+     */
+    create(body: CreateMilestoneCommand | undefined): Observable<MileStonesDtoResponse> {
+        let url_ = this.baseUrl + "/api/Milestone";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<MileStonesDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<MileStonesDtoResponse>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<MileStonesDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = MileStonesDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @param projectStageId (optional) 
      * @return OK
      */
@@ -2356,6 +2412,321 @@ export class MilestoneClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = MilestoneDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class PaymentFlowClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createOrUpdate(body: CreatePaymentFlowCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/PaymentFlow";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return OK
+     */
+    delete(id: number | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/PaymentFlow?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getAll(requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetPaymentFlowDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/PaymentFlow?";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetPaymentFlowDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetPaymentFlowDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<GetPaymentFlowDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetPaymentFlowDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getById(id: number): Observable<GetPaymentFlowDtoResponse> {
+        let url_ = this.baseUrl + "/api/PaymentFlow/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetPaymentFlowDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetPaymentFlowDtoResponse>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<GetPaymentFlowDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetPaymentFlowDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param projectId (optional) 
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getByProjectId(projectId: number | undefined, requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetPaymentFlowDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/PaymentFlow/by-project?";
+        if (projectId === null)
+            throw new globalThis.Error("The parameter 'projectId' cannot be null.");
+        else if (projectId !== undefined)
+            url_ += "ProjectId=" + encodeURIComponent("" + projectId) + "&";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByProjectId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByProjectId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetPaymentFlowDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetPaymentFlowDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetByProjectId(response: HttpResponseBase): Observable<GetPaymentFlowDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetPaymentFlowDtoListPagedResponseResponse.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -5985,10 +6356,14 @@ export interface ICity {
 export class Client implements IClient {
     id?: number;
     isDeleted?: boolean;
-    contactPerson!: string | undefined;
-    contactPersonNumber!: number;
-    representerName!: string | undefined;
-    representerNameNumber!: number;
+    contactPerson?: string | undefined;
+    contactPersonNumber?: number;
+    contactPersonCountryCodeId?: number | undefined;
+    contactPersonCountryCode?: CountryCode;
+    representerName?: string | undefined;
+    representerNameNumber?: number;
+    representerCountryCodeId?: number | undefined;
+    representerCountryCode?: CountryCode;
     agreement?: Agreement[] | undefined;
 
     constructor(data?: IClient) {
@@ -6006,8 +6381,12 @@ export class Client implements IClient {
             this.isDeleted = _data["isDeleted"];
             this.contactPerson = _data["contactPerson"];
             this.contactPersonNumber = _data["contactPersonNumber"];
+            this.contactPersonCountryCodeId = _data["contactPersonCountryCodeId"];
+            this.contactPersonCountryCode = _data["contactPersonCountryCode"] ? CountryCode.fromJS(_data["contactPersonCountryCode"]) : undefined as any;
             this.representerName = _data["representerName"];
             this.representerNameNumber = _data["representerNameNumber"];
+            this.representerCountryCodeId = _data["representerCountryCodeId"];
+            this.representerCountryCode = _data["representerCountryCode"] ? CountryCode.fromJS(_data["representerCountryCode"]) : undefined as any;
             if (Array.isArray(_data["agreement"])) {
                 this.agreement = [] as any;
                 for (let item of _data["agreement"])
@@ -6029,8 +6408,12 @@ export class Client implements IClient {
         data["isDeleted"] = this.isDeleted;
         data["contactPerson"] = this.contactPerson;
         data["contactPersonNumber"] = this.contactPersonNumber;
+        data["contactPersonCountryCodeId"] = this.contactPersonCountryCodeId;
+        data["contactPersonCountryCode"] = this.contactPersonCountryCode ? this.contactPersonCountryCode.toJSON() : undefined as any;
         data["representerName"] = this.representerName;
         data["representerNameNumber"] = this.representerNameNumber;
+        data["representerCountryCodeId"] = this.representerCountryCodeId;
+        data["representerCountryCode"] = this.representerCountryCode ? this.representerCountryCode.toJSON() : undefined as any;
         if (Array.isArray(this.agreement)) {
             data["agreement"] = [];
             for (let item of this.agreement)
@@ -6043,10 +6426,14 @@ export class Client implements IClient {
 export interface IClient {
     id?: number;
     isDeleted?: boolean;
-    contactPerson: string | undefined;
-    contactPersonNumber: number;
-    representerName: string | undefined;
-    representerNameNumber: number;
+    contactPerson?: string | undefined;
+    contactPersonNumber?: number;
+    contactPersonCountryCodeId?: number | undefined;
+    contactPersonCountryCode?: CountryCode;
+    representerName?: string | undefined;
+    representerNameNumber?: number;
+    representerCountryCodeId?: number | undefined;
+    representerCountryCode?: CountryCode;
     agreement?: Agreement[] | undefined;
 }
 
@@ -6054,8 +6441,12 @@ export class ClientDto implements IClientDto {
     id?: number | undefined;
     contactPerson?: string | undefined;
     contactPersonNumber?: number;
+    contactPersonCountryCodeId?: number | undefined;
+    contactPersonCountryCodeName?: string | undefined;
     representerName?: string | undefined;
     representerNameNumber?: number;
+    representerCountryCodeId?: number | undefined;
+    representerCountryCodeName?: string | undefined;
 
     constructor(data?: IClientDto) {
         if (data) {
@@ -6071,8 +6462,12 @@ export class ClientDto implements IClientDto {
             this.id = _data["id"];
             this.contactPerson = _data["contactPerson"];
             this.contactPersonNumber = _data["contactPersonNumber"];
+            this.contactPersonCountryCodeId = _data["contactPersonCountryCodeId"];
+            this.contactPersonCountryCodeName = _data["contactPersonCountryCodeName"];
             this.representerName = _data["representerName"];
             this.representerNameNumber = _data["representerNameNumber"];
+            this.representerCountryCodeId = _data["representerCountryCodeId"];
+            this.representerCountryCodeName = _data["representerCountryCodeName"];
         }
     }
 
@@ -6088,8 +6483,12 @@ export class ClientDto implements IClientDto {
         data["id"] = this.id;
         data["contactPerson"] = this.contactPerson;
         data["contactPersonNumber"] = this.contactPersonNumber;
+        data["contactPersonCountryCodeId"] = this.contactPersonCountryCodeId;
+        data["contactPersonCountryCodeName"] = this.contactPersonCountryCodeName;
         data["representerName"] = this.representerName;
         data["representerNameNumber"] = this.representerNameNumber;
+        data["representerCountryCodeId"] = this.representerCountryCodeId;
+        data["representerCountryCodeName"] = this.representerCountryCodeName;
         return data;
     }
 }
@@ -6098,8 +6497,12 @@ export interface IClientDto {
     id?: number | undefined;
     contactPerson?: string | undefined;
     contactPersonNumber?: number;
+    contactPersonCountryCodeId?: number | undefined;
+    contactPersonCountryCodeName?: string | undefined;
     representerName?: string | undefined;
     representerNameNumber?: number;
+    representerCountryCodeId?: number | undefined;
+    representerCountryCodeName?: string | undefined;
 }
 
 export class Constructor implements IConstructor {
@@ -6446,6 +6849,74 @@ export interface ICountry {
     city?: City[] | undefined;
 }
 
+export class CountryCode implements ICountryCode {
+    id?: number;
+    name!: string | undefined;
+    code?: string | undefined;
+    contactPersonClients?: Client[] | undefined;
+    representerClients?: Client[] | undefined;
+
+    constructor(data?: ICountryCode) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.code = _data["code"];
+            if (Array.isArray(_data["contactPersonClients"])) {
+                this.contactPersonClients = [] as any;
+                for (let item of _data["contactPersonClients"])
+                    this.contactPersonClients!.push(Client.fromJS(item));
+            }
+            if (Array.isArray(_data["representerClients"])) {
+                this.representerClients = [] as any;
+                for (let item of _data["representerClients"])
+                    this.representerClients!.push(Client.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CountryCode {
+        data = typeof data === 'object' ? data : {};
+        let result = new CountryCode();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["code"] = this.code;
+        if (Array.isArray(this.contactPersonClients)) {
+            data["contactPersonClients"] = [];
+            for (let item of this.contactPersonClients)
+                data["contactPersonClients"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.representerClients)) {
+            data["representerClients"] = [];
+            for (let item of this.representerClients)
+                data["representerClients"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface ICountryCode {
+    id?: number;
+    name: string | undefined;
+    code?: string | undefined;
+    contactPersonClients?: Client[] | undefined;
+    representerClients?: Client[] | undefined;
+}
+
 export class CreateConstructorCommand implements ICreateConstructorCommand {
     id?: number | undefined;
     name?: string | undefined;
@@ -6545,7 +7016,7 @@ export class CreateExpenseCommand implements ICreateExpenseCommand {
     totalAmount?: number;
     notes?: string | undefined;
     autoPost?: boolean;
-    projectStageId?: number;
+    mileStoneId?: number;
     supplierId?: number;
     expenseDetails?: CreateExpenseDetailModel[] | undefined;
 
@@ -6566,7 +7037,7 @@ export class CreateExpenseCommand implements ICreateExpenseCommand {
             this.totalAmount = _data["totalAmount"];
             this.notes = _data["notes"];
             this.autoPost = _data["autoPost"];
-            this.projectStageId = _data["projectStageId"];
+            this.mileStoneId = _data["mileStoneId"];
             this.supplierId = _data["supplierId"];
             if (Array.isArray(_data["expenseDetails"])) {
                 this.expenseDetails = [] as any;
@@ -6591,7 +7062,7 @@ export class CreateExpenseCommand implements ICreateExpenseCommand {
         data["totalAmount"] = this.totalAmount;
         data["notes"] = this.notes;
         data["autoPost"] = this.autoPost;
-        data["projectStageId"] = this.projectStageId;
+        data["mileStoneId"] = this.mileStoneId;
         data["supplierId"] = this.supplierId;
         if (Array.isArray(this.expenseDetails)) {
             data["expenseDetails"] = [];
@@ -6609,7 +7080,7 @@ export interface ICreateExpenseCommand {
     totalAmount?: number;
     notes?: string | undefined;
     autoPost?: boolean;
-    projectStageId?: number;
+    mileStoneId?: number;
     supplierId?: number;
     expenseDetails?: CreateExpenseDetailModel[] | undefined;
 }
@@ -6717,7 +7188,7 @@ export interface ICreateMaterialCategoryCommand {
 export class CreateMaterialCommand implements ICreateMaterialCommand {
     id?: number | undefined;
     name?: string | undefined;
-    categoryId?: number;
+    subCategoryId?: number;
 
     constructor(data?: ICreateMaterialCommand) {
         if (data) {
@@ -6732,7 +7203,7 @@ export class CreateMaterialCommand implements ICreateMaterialCommand {
         if (_data) {
             this.id = _data["id"];
             this.name = _data["name"];
-            this.categoryId = _data["categoryId"];
+            this.subCategoryId = _data["subCategoryId"];
         }
     }
 
@@ -6747,7 +7218,7 @@ export class CreateMaterialCommand implements ICreateMaterialCommand {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
-        data["categoryId"] = this.categoryId;
+        data["subCategoryId"] = this.subCategoryId;
         return data;
     }
 }
@@ -6755,7 +7226,7 @@ export class CreateMaterialCommand implements ICreateMaterialCommand {
 export interface ICreateMaterialCommand {
     id?: number | undefined;
     name?: string | undefined;
-    categoryId?: number;
+    subCategoryId?: number;
 }
 
 export class CreateMaterialSubCategoryCommand implements ICreateMaterialSubCategoryCommand {
@@ -6800,6 +7271,114 @@ export interface ICreateMaterialSubCategoryCommand {
     id?: number | undefined;
     name?: string | undefined;
     categoryId?: number;
+}
+
+export class CreateMilestoneCommand implements ICreateMilestoneCommand {
+    projectStageId?: number;
+    agreementId?: number;
+    name?: string | undefined;
+    description?: string | undefined;
+
+    constructor(data?: ICreateMilestoneCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.projectStageId = _data["projectStageId"];
+            this.agreementId = _data["agreementId"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+        }
+    }
+
+    static fromJS(data: any): CreateMilestoneCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateMilestoneCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["projectStageId"] = this.projectStageId;
+        data["agreementId"] = this.agreementId;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        return data;
+    }
+}
+
+export interface ICreateMilestoneCommand {
+    projectStageId?: number;
+    agreementId?: number;
+    name?: string | undefined;
+    description?: string | undefined;
+}
+
+export class CreatePaymentFlowCommand implements ICreatePaymentFlowCommand {
+    id?: number | undefined;
+    cash?: number;
+    projectId?: number;
+    paymentMethodId?: number;
+    currencyId?: number;
+    notes?: string | undefined;
+    createdAt?: Date;
+
+    constructor(data?: ICreatePaymentFlowCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.cash = _data["cash"];
+            this.projectId = _data["projectId"];
+            this.paymentMethodId = _data["paymentMethodId"];
+            this.currencyId = _data["currencyId"];
+            this.notes = _data["notes"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): CreatePaymentFlowCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreatePaymentFlowCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["cash"] = this.cash;
+        data["projectId"] = this.projectId;
+        data["paymentMethodId"] = this.paymentMethodId;
+        data["currencyId"] = this.currencyId;
+        data["notes"] = this.notes;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        return data;
+    }
+}
+
+export interface ICreatePaymentFlowCommand {
+    id?: number | undefined;
+    cash?: number;
+    projectId?: number;
+    paymentMethodId?: number;
+    currencyId?: number;
+    notes?: string | undefined;
+    createdAt?: Date;
 }
 
 export class CreateProjectBOQCommand implements ICreateProjectBOQCommand {
@@ -6935,6 +7514,7 @@ export class CreateProjectMainContractorCommand implements ICreateProjectMainCon
     projectStageId?: number;
     constructorId?: number;
     amount?: number;
+    totalPayments?: number;
     startDate?: Date;
     endDate?: Date;
 
@@ -6953,6 +7533,7 @@ export class CreateProjectMainContractorCommand implements ICreateProjectMainCon
             this.projectStageId = _data["projectStageId"];
             this.constructorId = _data["constructorId"];
             this.amount = _data["amount"];
+            this.totalPayments = _data["totalPayments"];
             this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
             this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
         }
@@ -6971,6 +7552,7 @@ export class CreateProjectMainContractorCommand implements ICreateProjectMainCon
         data["projectStageId"] = this.projectStageId;
         data["constructorId"] = this.constructorId;
         data["amount"] = this.amount;
+        data["totalPayments"] = this.totalPayments;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
         data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
         return data;
@@ -6982,6 +7564,7 @@ export interface ICreateProjectMainContractorCommand {
     projectStageId?: number;
     constructorId?: number;
     amount?: number;
+    totalPayments?: number;
     startDate?: Date;
     endDate?: Date;
 }
@@ -7497,6 +8080,7 @@ export class Currency implements ICurrency {
     abb?: string | undefined;
     rate?: number;
     expenseDetails?: ExpenseDetail[] | undefined;
+    paymentFlows?: PaymentFlow[] | undefined;
 
     constructor(data?: ICurrency) {
         if (data) {
@@ -7518,6 +8102,11 @@ export class Currency implements ICurrency {
                 this.expenseDetails = [] as any;
                 for (let item of _data["expenseDetails"])
                     this.expenseDetails!.push(ExpenseDetail.fromJS(item));
+            }
+            if (Array.isArray(_data["paymentFlows"])) {
+                this.paymentFlows = [] as any;
+                for (let item of _data["paymentFlows"])
+                    this.paymentFlows!.push(PaymentFlow.fromJS(item));
             }
         }
     }
@@ -7541,6 +8130,11 @@ export class Currency implements ICurrency {
             for (let item of this.expenseDetails)
                 data["expenseDetails"].push(item ? item.toJSON() : undefined as any);
         }
+        if (Array.isArray(this.paymentFlows)) {
+            data["paymentFlows"] = [];
+            for (let item of this.paymentFlows)
+                data["paymentFlows"].push(item ? item.toJSON() : undefined as any);
+        }
         return data;
     }
 }
@@ -7552,6 +8146,7 @@ export interface ICurrency {
     abb?: string | undefined;
     rate?: number;
     expenseDetails?: ExpenseDetail[] | undefined;
+    paymentFlows?: PaymentFlow[] | undefined;
 }
 
 export class CurrencyDto implements ICurrencyDto {
@@ -8022,8 +8617,10 @@ export class Expense implements IExpense {
     totalAmount?: number;
     notes?: string | undefined;
     autoPost?: boolean;
-    projectStageId?: number;
+    projectStageId?: number | undefined;
     projectStage?: ProjectStage;
+    mileStonesId?: number;
+    mileStones?: MileStones;
     supplierId?: number;
     supplier?: Supplier;
     expenseDetails?: ExpenseDetail[] | undefined;
@@ -8049,6 +8646,8 @@ export class Expense implements IExpense {
             this.autoPost = _data["autoPost"];
             this.projectStageId = _data["projectStageId"];
             this.projectStage = _data["projectStage"] ? ProjectStage.fromJS(_data["projectStage"]) : undefined as any;
+            this.mileStonesId = _data["mileStonesId"];
+            this.mileStones = _data["mileStones"] ? MileStones.fromJS(_data["mileStones"]) : undefined as any;
             this.supplierId = _data["supplierId"];
             this.supplier = _data["supplier"] ? Supplier.fromJS(_data["supplier"]) : undefined as any;
             if (Array.isArray(_data["expenseDetails"])) {
@@ -8082,6 +8681,8 @@ export class Expense implements IExpense {
         data["autoPost"] = this.autoPost;
         data["projectStageId"] = this.projectStageId;
         data["projectStage"] = this.projectStage ? this.projectStage.toJSON() : undefined as any;
+        data["mileStonesId"] = this.mileStonesId;
+        data["mileStones"] = this.mileStones ? this.mileStones.toJSON() : undefined as any;
         data["supplierId"] = this.supplierId;
         data["supplier"] = this.supplier ? this.supplier.toJSON() : undefined as any;
         if (Array.isArray(this.expenseDetails)) {
@@ -8106,8 +8707,10 @@ export interface IExpense {
     totalAmount?: number;
     notes?: string | undefined;
     autoPost?: boolean;
-    projectStageId?: number;
+    projectStageId?: number | undefined;
     projectStage?: ProjectStage;
+    mileStonesId?: number;
+    mileStones?: MileStones;
     supplierId?: number;
     supplier?: Supplier;
     expenseDetails?: ExpenseDetail[] | undefined;
@@ -9141,7 +9744,7 @@ export class GetExpenseDto implements IGetExpenseDto {
     totalAmount?: number;
     notes?: string | undefined;
     autoPost?: boolean;
-    projectStageId?: number;
+    projectStageId?: number | undefined;
     supplierId?: number;
     supplierName?: string | undefined;
     expenseDetails?: ExpenseDetailDto[] | undefined;
@@ -9208,7 +9811,7 @@ export interface IGetExpenseDto {
     totalAmount?: number;
     notes?: string | undefined;
     autoPost?: boolean;
-    projectStageId?: number;
+    projectStageId?: number | undefined;
     supplierId?: number;
     supplierName?: string | undefined;
     expenseDetails?: ExpenseDetailDto[] | undefined;
@@ -10150,6 +10753,286 @@ export interface IGetMaterialSubCategoryDtoResponse {
     data?: GetMaterialSubCategoryDto;
 }
 
+export class GetPaymentFlowDto implements IGetPaymentFlowDto {
+    id?: number;
+    cash?: number;
+    projectId?: number;
+    projectName?: string | undefined;
+    paymentMethodId?: number;
+    paymentMethodName?: string | undefined;
+    currencyId?: number;
+    currencyName?: string | undefined;
+    currencyAbb?: string | undefined;
+    currencyRate?: number;
+    notes?: string | undefined;
+    createdAt?: Date;
+
+    constructor(data?: IGetPaymentFlowDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.cash = _data["cash"];
+            this.projectId = _data["projectId"];
+            this.projectName = _data["projectName"];
+            this.paymentMethodId = _data["paymentMethodId"];
+            this.paymentMethodName = _data["paymentMethodName"];
+            this.currencyId = _data["currencyId"];
+            this.currencyName = _data["currencyName"];
+            this.currencyAbb = _data["currencyAbb"];
+            this.currencyRate = _data["currencyRate"];
+            this.notes = _data["notes"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetPaymentFlowDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetPaymentFlowDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["cash"] = this.cash;
+        data["projectId"] = this.projectId;
+        data["projectName"] = this.projectName;
+        data["paymentMethodId"] = this.paymentMethodId;
+        data["paymentMethodName"] = this.paymentMethodName;
+        data["currencyId"] = this.currencyId;
+        data["currencyName"] = this.currencyName;
+        data["currencyAbb"] = this.currencyAbb;
+        data["currencyRate"] = this.currencyRate;
+        data["notes"] = this.notes;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetPaymentFlowDto {
+    id?: number;
+    cash?: number;
+    projectId?: number;
+    projectName?: string | undefined;
+    paymentMethodId?: number;
+    paymentMethodName?: string | undefined;
+    currencyId?: number;
+    currencyName?: string | undefined;
+    currencyAbb?: string | undefined;
+    currencyRate?: number;
+    notes?: string | undefined;
+    createdAt?: Date;
+}
+
+export class GetPaymentFlowDtoListPagedResponse implements IGetPaymentFlowDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetPaymentFlowDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IGetPaymentFlowDtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetPaymentFlowDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): GetPaymentFlowDtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetPaymentFlowDtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IGetPaymentFlowDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetPaymentFlowDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class GetPaymentFlowDtoListPagedResponseResponse implements IGetPaymentFlowDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetPaymentFlowDtoListPagedResponse;
+
+    constructor(data?: IGetPaymentFlowDtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetPaymentFlowDtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetPaymentFlowDtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetPaymentFlowDtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetPaymentFlowDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetPaymentFlowDtoListPagedResponse;
+}
+
+export class GetPaymentFlowDtoResponse implements IGetPaymentFlowDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetPaymentFlowDto;
+
+    constructor(data?: IGetPaymentFlowDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetPaymentFlowDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetPaymentFlowDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetPaymentFlowDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetPaymentFlowDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetPaymentFlowDto;
+}
+
 export class GetProjectBOQDto implements IGetProjectBOQDto {
     id?: number;
     projectStageId?: number;
@@ -10731,6 +11614,7 @@ export class GetProjectMainContractorDto implements IGetProjectMainContractorDto
     projectStageId?: number;
     constructorId?: number;
     amount?: number;
+    totalPayments?: number;
     startDate?: Date;
     endDate?: Date;
 
@@ -10749,6 +11633,7 @@ export class GetProjectMainContractorDto implements IGetProjectMainContractorDto
             this.projectStageId = _data["projectStageId"];
             this.constructorId = _data["constructorId"];
             this.amount = _data["amount"];
+            this.totalPayments = _data["totalPayments"];
             this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
             this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
         }
@@ -10767,6 +11652,7 @@ export class GetProjectMainContractorDto implements IGetProjectMainContractorDto
         data["projectStageId"] = this.projectStageId;
         data["constructorId"] = this.constructorId;
         data["amount"] = this.amount;
+        data["totalPayments"] = this.totalPayments;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
         data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
         return data;
@@ -10778,6 +11664,7 @@ export interface IGetProjectMainContractorDto {
     projectStageId?: number;
     constructorId?: number;
     amount?: number;
+    totalPayments?: number;
     startDate?: Date;
     endDate?: Date;
 }
@@ -12717,7 +13604,6 @@ export class MainContractDto implements IMainContractDto {
     endDate?: Date;
     agreementId?: number;
     typeId?: number;
-    typeName?: string | undefined;
     constructorId?: number;
     isDeleted?: boolean;
     contractorDutyDto?: ContractorDutyDto[] | undefined;
@@ -12739,7 +13625,6 @@ export class MainContractDto implements IMainContractDto {
             this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
             this.agreementId = _data["agreementId"];
             this.typeId = _data["typeId"];
-            this.typeName = _data["typeName"];
             this.constructorId = _data["constructorId"];
             this.isDeleted = _data["isDeleted"];
             if (Array.isArray(_data["contractorDutyDto"])) {
@@ -12765,7 +13650,6 @@ export class MainContractDto implements IMainContractDto {
         data["endDate"] = this.endDate ? formatDate(this.endDate) : undefined as any;
         data["agreementId"] = this.agreementId;
         data["typeId"] = this.typeId;
-        data["typeName"] = this.typeName;
         data["constructorId"] = this.constructorId;
         data["isDeleted"] = this.isDeleted;
         if (Array.isArray(this.contractorDutyDto)) {
@@ -12784,7 +13668,6 @@ export interface IMainContractDto {
     endDate?: Date;
     agreementId?: number;
     typeId?: number;
-    typeName?: string | undefined;
     constructorId?: number;
     isDeleted?: boolean;
     contractorDutyDto?: ContractorDutyDto[] | undefined;
@@ -12845,8 +13728,8 @@ export interface IMainContractorType {
 export class Material implements IMaterial {
     id?: number;
     name!: string | undefined;
-    categoryId?: number | undefined;
-    category?: MaterialCategory;
+    subCategoryId?: number | undefined;
+    subCategory?: MaterialSubCategory;
 
     constructor(data?: IMaterial) {
         if (data) {
@@ -12861,8 +13744,8 @@ export class Material implements IMaterial {
         if (_data) {
             this.id = _data["id"];
             this.name = _data["name"];
-            this.categoryId = _data["categoryId"];
-            this.category = _data["category"] ? MaterialCategory.fromJS(_data["category"]) : undefined as any;
+            this.subCategoryId = _data["subCategoryId"];
+            this.subCategory = _data["subCategory"] ? MaterialSubCategory.fromJS(_data["subCategory"]) : undefined as any;
         }
     }
 
@@ -12877,8 +13760,8 @@ export class Material implements IMaterial {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
         data["name"] = this.name;
-        data["categoryId"] = this.categoryId;
-        data["category"] = this.category ? this.category.toJSON() : undefined as any;
+        data["subCategoryId"] = this.subCategoryId;
+        data["subCategory"] = this.subCategory ? this.subCategory.toJSON() : undefined as any;
         return data;
     }
 }
@@ -12886,8 +13769,8 @@ export class Material implements IMaterial {
 export interface IMaterial {
     id?: number;
     name: string | undefined;
-    categoryId?: number | undefined;
-    category?: MaterialCategory;
+    subCategoryId?: number | undefined;
+    subCategory?: MaterialSubCategory;
 }
 
 export class MaterialCategory implements IMaterialCategory {
@@ -13112,6 +13995,62 @@ export interface IMileStonesDto {
     description?: string | undefined;
     order?: number;
     isDeleted?: boolean;
+}
+
+export class MileStonesDtoResponse implements IMileStonesDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: MileStonesDto;
+
+    constructor(data?: IMileStonesDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? MileStonesDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): MileStonesDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new MileStonesDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IMileStonesDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: MileStonesDto;
 }
 
 export class MileStonesStepDto implements IMileStonesStepDto {
@@ -13354,6 +14293,134 @@ export interface IMonthlyPaymentDto {
     percentageFees?: number | undefined;
 }
 
+export class PaymentFlow implements IPaymentFlow {
+    id?: number;
+    isDeleted?: boolean;
+    cash?: number;
+    notes?: string | undefined;
+    createdAt?: Date;
+    projectId?: number;
+    project?: Project;
+    paymentMethodId?: number;
+    paymentMethod?: PaymentMethod;
+    currencyId?: number;
+    currency?: Currency;
+
+    constructor(data?: IPaymentFlow) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.cash = _data["cash"];
+            this.notes = _data["notes"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.projectId = _data["projectId"];
+            this.project = _data["project"] ? Project.fromJS(_data["project"]) : undefined as any;
+            this.paymentMethodId = _data["paymentMethodId"];
+            this.paymentMethod = _data["paymentMethod"] ? PaymentMethod.fromJS(_data["paymentMethod"]) : undefined as any;
+            this.currencyId = _data["currencyId"];
+            this.currency = _data["currency"] ? Currency.fromJS(_data["currency"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): PaymentFlow {
+        data = typeof data === 'object' ? data : {};
+        let result = new PaymentFlow();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["cash"] = this.cash;
+        data["notes"] = this.notes;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["projectId"] = this.projectId;
+        data["project"] = this.project ? this.project.toJSON() : undefined as any;
+        data["paymentMethodId"] = this.paymentMethodId;
+        data["paymentMethod"] = this.paymentMethod ? this.paymentMethod.toJSON() : undefined as any;
+        data["currencyId"] = this.currencyId;
+        data["currency"] = this.currency ? this.currency.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IPaymentFlow {
+    id?: number;
+    isDeleted?: boolean;
+    cash?: number;
+    notes?: string | undefined;
+    createdAt?: Date;
+    projectId?: number;
+    project?: Project;
+    paymentMethodId?: number;
+    paymentMethod?: PaymentMethod;
+    currencyId?: number;
+    currency?: Currency;
+}
+
+export class PaymentMethod implements IPaymentMethod {
+    id?: number;
+    name!: string | undefined;
+    paymentFlows?: PaymentFlow[] | undefined;
+
+    constructor(data?: IPaymentMethod) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            if (Array.isArray(_data["paymentFlows"])) {
+                this.paymentFlows = [] as any;
+                for (let item of _data["paymentFlows"])
+                    this.paymentFlows!.push(PaymentFlow.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): PaymentMethod {
+        data = typeof data === 'object' ? data : {};
+        let result = new PaymentMethod();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        if (Array.isArray(this.paymentFlows)) {
+            data["paymentFlows"] = [];
+            for (let item of this.paymentFlows)
+                data["paymentFlows"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IPaymentMethod {
+    id?: number;
+    name: string | undefined;
+    paymentFlows?: PaymentFlow[] | undefined;
+}
+
 export class Project implements IProject {
     id?: number;
     createdById?: number | undefined;
@@ -13373,6 +14440,7 @@ export class Project implements IProject {
     agreementId?: number;
     projectStages?: ProjectStage[] | undefined;
     expenses?: Expense[] | undefined;
+    paymentFlows?: PaymentFlow[] | undefined;
 
     constructor(data?: IProject) {
         if (data) {
@@ -13410,6 +14478,11 @@ export class Project implements IProject {
                 this.expenses = [] as any;
                 for (let item of _data["expenses"])
                     this.expenses!.push(Expense.fromJS(item));
+            }
+            if (Array.isArray(_data["paymentFlows"])) {
+                this.paymentFlows = [] as any;
+                for (let item of _data["paymentFlows"])
+                    this.paymentFlows!.push(PaymentFlow.fromJS(item));
             }
         }
     }
@@ -13449,6 +14522,11 @@ export class Project implements IProject {
             for (let item of this.expenses)
                 data["expenses"].push(item ? item.toJSON() : undefined as any);
         }
+        if (Array.isArray(this.paymentFlows)) {
+            data["paymentFlows"] = [];
+            for (let item of this.paymentFlows)
+                data["paymentFlows"].push(item ? item.toJSON() : undefined as any);
+        }
         return data;
     }
 }
@@ -13472,6 +14550,7 @@ export interface IProject {
     agreementId?: number;
     projectStages?: ProjectStage[] | undefined;
     expenses?: Expense[] | undefined;
+    paymentFlows?: PaymentFlow[] | undefined;
 }
 
 export class ProjectAreaUnit implements IProjectAreaUnit {
@@ -13714,6 +14793,7 @@ export class ProjectMainContractor implements IProjectMainContractor {
     constructor_?: Constructor;
     constructorId?: number;
     amount?: number;
+    totalPayments?: number;
     startDate?: Date;
     endDate?: Date;
     attachments?: Attachment[] | undefined;
@@ -13737,6 +14817,7 @@ export class ProjectMainContractor implements IProjectMainContractor {
             this.constructor_ = _data["constructor"] ? Constructor.fromJS(_data["constructor"]) : undefined as any;
             this.constructorId = _data["constructorId"];
             this.amount = _data["amount"];
+            this.totalPayments = _data["totalPayments"];
             this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
             this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
             if (Array.isArray(_data["attachments"])) {
@@ -13768,6 +14849,7 @@ export class ProjectMainContractor implements IProjectMainContractor {
         data["constructor"] = this.constructor_ ? this.constructor_.toJSON() : undefined as any;
         data["constructorId"] = this.constructorId;
         data["amount"] = this.amount;
+        data["totalPayments"] = this.totalPayments;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
         data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
         if (Array.isArray(this.attachments)) {
@@ -13792,6 +14874,7 @@ export interface IProjectMainContractor {
     constructor_?: Constructor;
     constructorId?: number;
     amount?: number;
+    totalPayments?: number;
     startDate?: Date;
     endDate?: Date;
     attachments?: Attachment[] | undefined;

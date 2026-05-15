@@ -140,8 +140,12 @@ export class Step3Component implements OnInit, OnDestroy {
 
   private populateForm(data: ThirdStepDto): void {
     if (data.projectAreaUnitDto && Array.isArray(data.projectAreaUnitDto)) {
-      // Map the existing DTO objects directly since they already have the correct structure
-      this.projectAreaUnits.set([...data.projectAreaUnitDto]);
+      const sorted = [...data.projectAreaUnitDto].sort((a, b) => {
+        const aOrder = (a as any).orderNo ?? 0;
+        const bOrder = (b as any).orderNo ?? 0;
+        return aOrder - bOrder;
+      });
+      this.projectAreaUnits.set(sorted);
     }
   }
 
