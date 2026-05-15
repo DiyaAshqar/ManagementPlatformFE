@@ -1,0 +1,26 @@
+:host ::ng-deep {
+  // ── Top-level project tabs: scroll horizontally on small screens ────────
+  .p-tablist {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--surface-border) transparent;
+    flex-wrap: nowrap !important;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--surface-border);
+      border-radius: 2px;
+    }
+  }
+
+  .p-tabs {
+    min-width: 0;
+    overflow: hidden;
+  }
+}

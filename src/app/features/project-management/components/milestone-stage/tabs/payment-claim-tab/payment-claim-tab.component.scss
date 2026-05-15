@@ -215,7 +215,9 @@
 .op-section {
   border: 1px solid var(--surface-border);
   border-radius: 10px;
-  overflow: hidden;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
   margin-bottom: 1.25rem;
   background: var(--surface-card);
 }

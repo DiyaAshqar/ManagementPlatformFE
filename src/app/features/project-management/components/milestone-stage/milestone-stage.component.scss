@@ -66,5 +66,31 @@
       }
     }
   }
+
+  // ── Responsive tablist: scroll horizontally instead of overflowing ──────
+  .p-tablist {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--surface-border) transparent;
+    flex-wrap: nowrap !important;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--surface-border);
+      border-radius: 2px;
+    }
+  }
+
+  // Prevent the tabs component from pushing the page wider
+  .p-tabs {
+    min-width: 0;
+    overflow: hidden;
+  }
 }
 
