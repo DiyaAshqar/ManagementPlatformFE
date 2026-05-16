@@ -629,6 +629,7 @@
     "records": "Records",
     "recordsTitle": "Owner Payment Records",
     "emptyRecords": "No owner payments recorded yet.",
+    "printReceipt": "Print Payment Receipt",
     "paymentTypes": {
       "cash": "Cash",
       "cheque": "Cheque",

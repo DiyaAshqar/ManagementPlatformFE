@@ -4,6 +4,8 @@ import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
+import { buildClaimReport, ClaimReportSection } from './payment-claim-report.builder';
+
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
@@ -239,7 +241,152 @@ export class PaymentClaimTabComponent implements OnInit {
   }
 
   printClaim(): void {
-    window.print();
+    const t    = (key: string) => this.translate.instant(key);
+    const lang = this.translate.currentLang || 'en';
+    const isRtl = lang === 'ar';
+    const data = this.claimData();
+    const sel  = this.selectedTypes();
+
+    const fmtN = (v: number | null | undefined, dec = 2): string =>
+      (v ?? 0).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+
+    const row = (i: number, cells: string): string =>
+      `<tr class="${i % 2 === 0 ? 'even' : 'odd'}">${cells}</tr>`;
+
+    const sections: ClaimReportSection[] = [];
+
+    if (sel.has('BOQ') && data.boq.length > 0) {
+      sections.push({
+        key: 'BOQ', title: t('ownerPayment.types.boq.label'),
+        itemCount: data.boq.length, total: this.boqTotal, badgeColor: '#3b82f6',
+        headers: [
+          { text: '#', align: 'center' },
+          { text: t('ownerPayment.cols.description'), align: 'left' },
+          { text: t('ownerPayment.cols.qty'),          align: 'right' },
+          { text: t('ownerPayment.cols.unitPrice'),    align: 'right' },
+          { text: t('ownerPayment.cols.subtotal'),     align: 'right' },
+        ],
+        rows: data.boq.map((item, i) => row(i,
+          `<td class="center">${i + 1}</td>
+           <td dir="auto">${item.description || '—'}</td>
+           <td class="right">${fmtN(item.actualQuantity, 0)}</td>
+           <td class="right">${fmtN(item.price)}</td>
+           <td class="right bold">${fmtN(item.subTotal)}</td>`
+        )).join(''),
+      });
+    }
+
+    if (sel.has('PMC') && data.pmc.length > 0) {
+      sections.push({
+        key: 'PMC', title: t('ownerPayment.types.pmc.label'),
+        itemCount: data.pmc.length, total: this.pmcTotal, badgeColor: '#22c55e',
+        headers: [
+          { text: '#', align: 'center' },
+          { text: t('ownerPayment.cols.startDate'), align: 'left' },
+          { text: t('ownerPayment.cols.endDate'),   align: 'left' },
+          { text: t('ownerPayment.cols.amount'),    align: 'right' },
+        ],
+        rows: data.pmc.map((item, i) => row(i,
+          `<td class="center">${i + 1}</td>
+           <td>${this.formatDate(item.startDate)}</td>
+           <td>${this.formatDate(item.endDate)}</td>
+           <td class="right bold">${fmtN(item.amount)}</td>`
+        )).join(''),
+      });
+    }
+
+    if (sel.has('SV') && data.sv.length > 0) {
+      sections.push({
+        key: 'SV', title: t('ownerPayment.types.sv.label'),
+        itemCount: data.sv.length, total: this.svTotal, badgeColor: '#f97316',
+        headers: [
+          { text: '#', align: 'center' },
+          { text: t('ownerPayment.cols.visitDate'),  align: 'left' },
+          { text: t('ownerPayment.cols.surveyor'),   align: 'left' },
+          { text: t('ownerPayment.cols.purpose'),    align: 'left' },
+          { text: t('ownerPayment.cols.qty'),        align: 'right' },
+          { text: t('ownerPayment.cols.unitPrice'),  align: 'right' },
+          { text: t('ownerPayment.cols.subtotal'),   align: 'right' },
+        ],
+        rows: data.sv.map((item, i) => row(i,
+          `<td class="center">${i + 1}</td>
+           <td>${this.formatDate(item.visitDate)}</td>
+           <td dir="auto">${item.surveyor || '—'}</td>
+           <td dir="auto">${item.purpose  || '—'}</td>
+           <td class="right">${fmtN(item.quantity, 0)}</td>
+           <td class="right">${fmtN(item.price)}</td>
+           <td class="right bold">${fmtN(item.subTotal)}</td>`
+        )).join(''),
+      });
+    }
+
+    if (sel.has('VO') && data.vo.length > 0) {
+      sections.push({
+        key: 'VO', title: t('ownerPayment.types.vo.label'),
+        itemCount: data.vo.length, total: this.voTotal, badgeColor: '#a855f7',
+        headers: [
+          { text: '#', align: 'center' },
+          { text: t('ownerPayment.cols.voNumber'),   align: 'left' },
+          { text: t('ownerPayment.cols.description'), align: 'left' },
+          { text: t('ownerPayment.cols.qty'),         align: 'right' },
+          { text: t('ownerPayment.cols.unitPrice'),   align: 'right' },
+          { text: t('ownerPayment.cols.subtotal'),    align: 'right' },
+        ],
+        rows: data.vo.map((item, i) => row(i,
+          `<td class="center">${i + 1}</td>
+           <td><span class="badge">${item.voNumber || '—'}</span></td>
+           <td dir="auto">${item.description || '—'}</td>
+           <td class="right">${fmtN(item.quantity, 0)}</td>
+           <td class="right">${fmtN(item.price)}</td>
+           <td class="right bold">${fmtN(item.subTotal)}</td>`
+        )).join(''),
+      });
+    }
+
+    if (sel.has('EXP') && data.exp.length > 0) {
+      sections.push({
+        key: 'EXP', title: t('ownerPayment.types.exp.label'),
+        itemCount: data.exp.length, total: this.expTotal, badgeColor: '#ef4444',
+        headers: [
+          { text: '#', align: 'center' },
+          { text: t('ownerPayment.cols.expenseNo'), align: 'left' },
+          { text: t('ownerPayment.cols.supplier'),  align: 'left' },
+          { text: t('ownerPayment.cols.date'),      align: 'left' },
+          { text: t('ownerPayment.cols.notes'),     align: 'left' },
+          { text: t('ownerPayment.cols.amount'),    align: 'right' },
+        ],
+        rows: data.exp.map((item, i) => row(i,
+          `<td class="center">${i + 1}</td>
+           <td><span class="badge">${item.expenseNo || '—'}</span></td>
+           <td dir="auto">${item.supplierName || '—'}</td>
+           <td>${this.formatDate(item.expenseDate)}</td>
+           <td class="muted" dir="auto">${item.notes || '—'}</td>
+           <td class="right bold">${fmtN(item.totalAmount)}</td>`
+        )).join(''),
+      });
+    }
+
+    const html = buildClaimReport({
+      lang, isRtl,
+      isConfirmed: this.isConfirmed(),
+      date: this.formatDate(this.claimDate),
+      grandTotal: this.grandTotal,
+      sections,
+      labels: {
+        reportTitle:      t('ownerPayment.printHeader'),
+        dateLabel:        t('ownerPayment.printDate'),
+        confirmedLabel:   t('ownerPayment.confirmed'),
+        grandTotalLabel:  t('ownerPayment.grandTotal'),
+        itemsLabel:       t('ownerPayment.items'),
+        footerText:       `Construction Management Platform \u2014 ${new Date().toLocaleString(lang)}`,
+      },
+    });
+
+    const win = window.open('', '_blank', 'width=1024,height=800');
+    if (!win) { window.print(); return; }
+    win.document.write(html);
+    win.document.close();
+    win.addEventListener('load', () => setTimeout(() => win.print(), 400));
   }
 
   // ── Totals ──────────────────────────────────────────────────────────────────

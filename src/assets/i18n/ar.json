@@ -625,6 +625,7 @@
     "records": "السجلات",
     "recordsTitle": "سجلات دفعات المالك",
     "emptyRecords": "لا توجد دفعات مالك مسجلة بعد.",
+    "printReceipt": "طباعة سند قبض",
     "paymentTypes": {
       "cash": "نقداً",
       "cheque": "شيك",

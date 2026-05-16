@@ -165,6 +165,16 @@
           <td class="text-right font-semibold text-primary">{{ formatAmount(record.cash, record.currencyAbb || getCurrencyLabel(record.currencyId)) }}</td>
           <td class="text-center">
             <p-button
+              icon="pi pi-print"
+              severity="info"
+              [text]="true"
+              [rounded]="true"
+              [ariaLabel]="'ownerPaymentEntry.printReceipt' | translate"
+              [pTooltip]="'ownerPaymentEntry.printReceipt' | translate"
+              tooltipPosition="top"
+              (onClick)="printReceipt(record)">
+            </p-button>
+            <p-button
               icon="pi pi-trash"
               severity="danger"
               [text]="true"
