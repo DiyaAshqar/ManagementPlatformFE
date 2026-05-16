@@ -22,12 +22,12 @@ export class ExpenseApiService {
     return this.expenseClient.delete(id);
   }
 
-  getByProjectId(
-    projectId: number,
+  getByProjectStageId(
+    projectStageId: number,
     pageNumber: number = 1,
     pageSize: number = 100
   ): Observable<GetExpenseDtoListPagedResponseResponse> {
-    return this.expenseClient.getByProjectId(projectId, pageNumber, pageSize, undefined);
+    return this.expenseClient.getByProjectId(projectStageId, pageNumber, pageSize, undefined);
   }
 
   getById(id: number): Observable<GetExpenseDtoResponse> {

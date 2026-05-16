@@ -70,6 +70,7 @@ const emptyDetails = (): IExpenseDetailDto[] => [createEmptyDetail()];
 })
 export class ProjectExpenseManagementComponent implements OnInit {
   @Input() projectId!: string;
+  @Input() projectStageId: number = 0;
 
   // -- View state --------------------------------------------------------------
   currentView = signal<'list' | 'form'>('list');
@@ -129,7 +130,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
 
   loadExpenses(): void {
     this.isLoadingList.set(true);
-    this.expenseService.getByProjectId(+this.projectId).subscribe({
+    this.expenseService.getByProjectStageId(this.projectStageId).subscribe({
       next: (response) => {
         if (response.succeeded && response.data?.data) {
           this.expenses.set(response.data.data);
@@ -258,6 +259,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
       totalAmount: this.calculateFormTotal(),
       notes: this.formNotes(),
       supplierId: this.formSupplierId() ?? undefined,
+      projectStageId: this.projectStageId,
       expenseDetails: details,
     });
 

@@ -117,7 +117,7 @@
 
                   <p-tabpanel value="6">
                     @if (shouldLoadTab(milestone.id!, '6')) {
-                      <app-project-expense-management [projectId]="projectId" class="block mt-3"></app-project-expense-management>
+                      <app-project-expense-management [projectId]="projectId" [projectStageId]="getProjectStageIdForIndex(i)" class="block mt-3"></app-project-expense-management>
                     }
                   </p-tabpanel>
 
@@ -241,7 +241,7 @@
 
                   <p-tabpanel value="6">
                     @if (shouldLoadTab(stage.id!, '6')) {
-                      <app-project-expense-management [projectId]="projectId" class="block mt-3"></app-project-expense-management>
+                      <app-project-expense-management [projectId]="projectId" [projectStageId]="stage.id!" class="block mt-3"></app-project-expense-management>
                     }
                   </p-tabpanel>
 

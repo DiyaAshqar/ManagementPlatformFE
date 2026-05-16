@@ -7016,7 +7016,7 @@ export class CreateExpenseCommand implements ICreateExpenseCommand {
     totalAmount?: number;
     notes?: string | undefined;
     autoPost?: boolean;
-    mileStoneId?: number;
+    projectStageId?: number;
     supplierId?: number;
     expenseDetails?: CreateExpenseDetailModel[] | undefined;
 
@@ -7037,7 +7037,7 @@ export class CreateExpenseCommand implements ICreateExpenseCommand {
             this.totalAmount = _data["totalAmount"];
             this.notes = _data["notes"];
             this.autoPost = _data["autoPost"];
-            this.mileStoneId = _data["mileStoneId"];
+            this.projectStageId = _data["projectStageId"];
             this.supplierId = _data["supplierId"];
             if (Array.isArray(_data["expenseDetails"])) {
                 this.expenseDetails = [] as any;
@@ -7062,7 +7062,7 @@ export class CreateExpenseCommand implements ICreateExpenseCommand {
         data["totalAmount"] = this.totalAmount;
         data["notes"] = this.notes;
         data["autoPost"] = this.autoPost;
-        data["mileStoneId"] = this.mileStoneId;
+        data["projectStageId"] = this.projectStageId;
         data["supplierId"] = this.supplierId;
         if (Array.isArray(this.expenseDetails)) {
             data["expenseDetails"] = [];
@@ -7080,7 +7080,7 @@ export interface ICreateExpenseCommand {
     totalAmount?: number;
     notes?: string | undefined;
     autoPost?: boolean;
-    mileStoneId?: number;
+    projectStageId?: number;
     supplierId?: number;
     expenseDetails?: CreateExpenseDetailModel[] | undefined;
 }
@@ -7274,10 +7274,12 @@ export interface ICreateMaterialSubCategoryCommand {
 }
 
 export class CreateMilestoneCommand implements ICreateMilestoneCommand {
+    id?: number;
     projectStageId?: number;
     agreementId?: number;
     name?: string | undefined;
     description?: string | undefined;
+    order?: number;
 
     constructor(data?: ICreateMilestoneCommand) {
         if (data) {
@@ -7290,10 +7292,12 @@ export class CreateMilestoneCommand implements ICreateMilestoneCommand {
 
     init(_data?: any) {
         if (_data) {
+            this.id = _data["id"];
             this.projectStageId = _data["projectStageId"];
             this.agreementId = _data["agreementId"];
             this.name = _data["name"];
             this.description = _data["description"];
+            this.order = _data["order"];
         }
     }
 
@@ -7306,19 +7310,23 @@ export class CreateMilestoneCommand implements ICreateMilestoneCommand {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
         data["projectStageId"] = this.projectStageId;
         data["agreementId"] = this.agreementId;
         data["name"] = this.name;
         data["description"] = this.description;
+        data["order"] = this.order;
         return data;
     }
 }
 
 export interface ICreateMilestoneCommand {
+    id?: number;
     projectStageId?: number;
     agreementId?: number;
     name?: string | undefined;
     description?: string | undefined;
+    order?: number;
 }
 
 export class CreatePaymentFlowCommand implements ICreatePaymentFlowCommand {
@@ -8619,8 +8627,6 @@ export class Expense implements IExpense {
     autoPost?: boolean;
     projectStageId?: number | undefined;
     projectStage?: ProjectStage;
-    mileStonesId?: number;
-    mileStones?: MileStones;
     supplierId?: number;
     supplier?: Supplier;
     expenseDetails?: ExpenseDetail[] | undefined;
@@ -8646,8 +8652,6 @@ export class Expense implements IExpense {
             this.autoPost = _data["autoPost"];
             this.projectStageId = _data["projectStageId"];
             this.projectStage = _data["projectStage"] ? ProjectStage.fromJS(_data["projectStage"]) : undefined as any;
-            this.mileStonesId = _data["mileStonesId"];
-            this.mileStones = _data["mileStones"] ? MileStones.fromJS(_data["mileStones"]) : undefined as any;
             this.supplierId = _data["supplierId"];
             this.supplier = _data["supplier"] ? Supplier.fromJS(_data["supplier"]) : undefined as any;
             if (Array.isArray(_data["expenseDetails"])) {
@@ -8681,8 +8685,6 @@ export class Expense implements IExpense {
         data["autoPost"] = this.autoPost;
         data["projectStageId"] = this.projectStageId;
         data["projectStage"] = this.projectStage ? this.projectStage.toJSON() : undefined as any;
-        data["mileStonesId"] = this.mileStonesId;
-        data["mileStones"] = this.mileStones ? this.mileStones.toJSON() : undefined as any;
         data["supplierId"] = this.supplierId;
         data["supplier"] = this.supplier ? this.supplier.toJSON() : undefined as any;
         if (Array.isArray(this.expenseDetails)) {
@@ -8709,8 +8711,6 @@ export interface IExpense {
     autoPost?: boolean;
     projectStageId?: number | undefined;
     projectStage?: ProjectStage;
-    mileStonesId?: number;
-    mileStones?: MileStones;
     supplierId?: number;
     supplier?: Supplier;
     expenseDetails?: ExpenseDetail[] | undefined;
@@ -13513,6 +13513,8 @@ export class MainContract implements IMainContract {
     endDate?: Date;
     agreementId?: number;
     agreement?: Agreement;
+    milestoneId?: number;
+    milestone?: MileStones;
     constructorId?: number;
     constructor_?: Constructor;
     contractorDuty?: ContractorDuty[] | undefined;
@@ -13539,6 +13541,8 @@ export class MainContract implements IMainContract {
             this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
             this.agreementId = _data["agreementId"];
             this.agreement = _data["agreement"] ? Agreement.fromJS(_data["agreement"]) : undefined as any;
+            this.milestoneId = _data["milestoneId"];
+            this.milestone = _data["milestone"] ? MileStones.fromJS(_data["milestone"]) : undefined as any;
             this.constructorId = _data["constructorId"];
             this.constructor_ = _data["constructor"] ? Constructor.fromJS(_data["constructor"]) : undefined as any;
             if (Array.isArray(_data["contractorDuty"])) {
@@ -13569,6 +13573,8 @@ export class MainContract implements IMainContract {
         data["endDate"] = this.endDate ? formatDate(this.endDate) : undefined as any;
         data["agreementId"] = this.agreementId;
         data["agreement"] = this.agreement ? this.agreement.toJSON() : undefined as any;
+        data["milestoneId"] = this.milestoneId;
+        data["milestone"] = this.milestone ? this.milestone.toJSON() : undefined as any;
         data["constructorId"] = this.constructorId;
         data["constructor"] = this.constructor_ ? this.constructor_.toJSON() : undefined as any;
         if (Array.isArray(this.contractorDuty)) {
@@ -13592,6 +13598,8 @@ export interface IMainContract {
     endDate?: Date;
     agreementId?: number;
     agreement?: Agreement;
+    milestoneId?: number;
+    milestone?: MileStones;
     constructorId?: number;
     constructor_?: Constructor;
     contractorDuty?: ContractorDuty[] | undefined;
@@ -13604,9 +13612,14 @@ export class MainContractDto implements IMainContractDto {
     endDate?: Date;
     agreementId?: number;
     typeId?: number;
+    contractType?: string | undefined;
     constructorId?: number;
+    constructorName?: string | undefined;
+    milestoneId?: number;
+    milestoneName?: string | undefined;
     isDeleted?: boolean;
     contractorDutyDto?: ContractorDutyDto[] | undefined;
+    milestoneDto?: MileStonesDto;
 
     constructor(data?: IMainContractDto) {
         if (data) {
@@ -13625,13 +13638,18 @@ export class MainContractDto implements IMainContractDto {
             this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
             this.agreementId = _data["agreementId"];
             this.typeId = _data["typeId"];
+            this.contractType = _data["contractType"];
             this.constructorId = _data["constructorId"];
+            this.constructorName = _data["constructorName"];
+            this.milestoneId = _data["milestoneId"];
+            this.milestoneName = _data["milestoneName"];
             this.isDeleted = _data["isDeleted"];
             if (Array.isArray(_data["contractorDutyDto"])) {
                 this.contractorDutyDto = [] as any;
                 for (let item of _data["contractorDutyDto"])
                     this.contractorDutyDto!.push(ContractorDutyDto.fromJS(item));
             }
+            this.milestoneDto = _data["milestoneDto"] ? MileStonesDto.fromJS(_data["milestoneDto"]) : undefined as any;
         }
     }
 
@@ -13650,13 +13668,18 @@ export class MainContractDto implements IMainContractDto {
         data["endDate"] = this.endDate ? formatDate(this.endDate) : undefined as any;
         data["agreementId"] = this.agreementId;
         data["typeId"] = this.typeId;
+        data["contractType"] = this.contractType;
         data["constructorId"] = this.constructorId;
+        data["constructorName"] = this.constructorName;
+        data["milestoneId"] = this.milestoneId;
+        data["milestoneName"] = this.milestoneName;
         data["isDeleted"] = this.isDeleted;
         if (Array.isArray(this.contractorDutyDto)) {
             data["contractorDutyDto"] = [];
             for (let item of this.contractorDutyDto)
                 data["contractorDutyDto"].push(item ? item.toJSON() : undefined as any);
         }
+        data["milestoneDto"] = this.milestoneDto ? this.milestoneDto.toJSON() : undefined as any;
         return data;
     }
 }
@@ -13668,9 +13691,14 @@ export interface IMainContractDto {
     endDate?: Date;
     agreementId?: number;
     typeId?: number;
+    contractType?: string | undefined;
     constructorId?: number;
+    constructorName?: string | undefined;
+    milestoneId?: number;
+    milestoneName?: string | undefined;
     isDeleted?: boolean;
     contractorDutyDto?: ContractorDutyDto[] | undefined;
+    milestoneDto?: MileStonesDto;
 }
 
 export class MainContractorType implements IMainContractorType {
@@ -13893,6 +13921,7 @@ export class MileStones implements IMileStones {
     order?: number;
     agreementId?: number | undefined;
     agreement?: Agreement;
+    mainContracts?: MainContract[] | undefined;
 
     constructor(data?: IMileStones) {
         if (data) {
@@ -13912,6 +13941,11 @@ export class MileStones implements IMileStones {
             this.order = _data["order"];
             this.agreementId = _data["agreementId"];
             this.agreement = _data["agreement"] ? Agreement.fromJS(_data["agreement"]) : undefined as any;
+            if (Array.isArray(_data["mainContracts"])) {
+                this.mainContracts = [] as any;
+                for (let item of _data["mainContracts"])
+                    this.mainContracts!.push(MainContract.fromJS(item));
+            }
         }
     }
 
@@ -13931,6 +13965,11 @@ export class MileStones implements IMileStones {
         data["order"] = this.order;
         data["agreementId"] = this.agreementId;
         data["agreement"] = this.agreement ? this.agreement.toJSON() : undefined as any;
+        if (Array.isArray(this.mainContracts)) {
+            data["mainContracts"] = [];
+            for (let item of this.mainContracts)
+                data["mainContracts"].push(item ? item.toJSON() : undefined as any);
+        }
         return data;
     }
 }
@@ -13943,6 +13982,7 @@ export interface IMileStones {
     order?: number;
     agreementId?: number | undefined;
     agreement?: Agreement;
+    mainContracts?: MainContract[] | undefined;
 }
 
 export class MileStonesDto implements IMileStonesDto {
