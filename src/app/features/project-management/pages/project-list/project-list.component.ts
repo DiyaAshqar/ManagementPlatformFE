@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -83,7 +83,8 @@ export class ProjectListComponent implements OnInit {
 
   constructor(
     private projectService: ProjectService,
-    private router: Router
+    private router: Router,
+    private translate: TranslateService
   ) {}
 
   // Stats
@@ -175,12 +176,12 @@ export class ProjectListComponent implements OnInit {
   getProjectMenuItems(project: Project): MenuItem[] {
     return [
       {
-        label: 'View Details',
+        label: this.translate.instant('projects.menu.viewDetails'),
         icon: 'pi pi-eye',
         command: () => this.viewProject(project)
       },
       {
-        label: 'Edit Project',
+        label: this.translate.instant('projects.menu.editProject'),
         icon: 'pi pi-pencil',
         command: () => this.editProject(project)
       }

@@ -91,15 +91,26 @@
     "pagination": "Showing {first} to {last} of {totalRecords} projects",
     "stats": {
       "total": "Total Projects",
+      "totalSub": "All projects",
       "active": "Active Projects",
+      "activeSub": "In progress",
       "completed": "Completed Projects",
+      "completedSub": "Finished",
+      "upcoming": "Upcoming",
+      "upcomingSub": "Planning phase",
       "budget": "Total Budget"
     },
+    "overallProgress": "Overall Progress",
+    "createFirst": "Create your first project to get started",
     "filters": {
       "status": "Status",
       "priority": "Priority",
       "selectStatus": "Select Status",
-      "selectPriority": "Select Priority"
+      "selectPriority": "Select Priority",
+      "all": "All",
+      "active": "Active",
+      "done": "Done",
+      "planning": "Planning"
     },
     "columns": {
       "name": "Project Name",
@@ -122,6 +133,10 @@
       "medium": "Medium",
       "high": "High",
       "urgent": "Urgent"
+    },
+    "menu": {
+      "viewDetails": "View Details",
+      "editProject": "Edit Project"
     },
     "form": {
       "name": "Project Name",

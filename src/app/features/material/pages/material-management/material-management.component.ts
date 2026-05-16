@@ -384,16 +384,12 @@ export class MaterialManagementComponent implements OnInit {
     this.materialService.saveMaterial(command).subscribe({
       next: (res) => {
         if (res.succeeded) {
-          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Material saved' });
           this.materialDialogVisible = false;
           this.loadMaterials();
-        } else {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: res.message || 'Save failed' });
         }
         this.materialSaving = false;
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Save failed' });
         this.materialSaving = false;
       }
     });
@@ -408,11 +404,8 @@ export class MaterialManagementComponent implements OnInit {
         this.materialService.deleteMaterial(mat.id!).subscribe({
           next: (res) => {
             if (res.succeeded) {
-              this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Material deleted' });
               this.loadMaterials();
-            } else {
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: res.message || 'Delete failed' });
-            }
+            } 
           },
           error: () => this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Delete failed' })
         });

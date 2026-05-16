@@ -90,15 +90,26 @@
     "pagination": "عرض {first} إلى {last} من {totalRecords} مشروع",
     "stats": {
       "total": "إجمالي المشاريع",
+      "totalSub": "جميع المشاريع",
       "active": "المشاريع النشطة",
+      "activeSub": "قيد التنفيذ",
       "completed": "المشاريع المكتملة",
+      "completedSub": "منتهية",
+      "upcoming": "القادمة",
+      "upcomingSub": "مرحلة التخطيط",
       "budget": "الميزانية الإجمالية"
     },
+    "overallProgress": "التقدم الكلي",
+    "createFirst": "أنشئ مشروعك الأول للبدء",
     "filters": {
       "status": "الحالة",
       "priority": "الأولوية",
       "selectStatus": "اختر الحالة",
-      "selectPriority": "اختر الأولوية"
+      "selectPriority": "اختر الأولوية",
+      "all": "الكل",
+      "active": "نشطة",
+      "done": "منتهية",
+      "planning": "تخطيط"
     },
     "columns": {
       "name": "اسم المشروع",
@@ -121,6 +132,10 @@
       "medium": "متوسط",
       "high": "عالي",
       "urgent": "عاجل"
+    },
+    "menu": {
+      "viewDetails": "عرض التفاصيل",
+      "editProject": "تعديل المشروع"
     },
     "form": {
       "name": "اسم المشروع",
