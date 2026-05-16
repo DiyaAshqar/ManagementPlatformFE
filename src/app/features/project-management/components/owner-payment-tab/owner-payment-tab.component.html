@@ -114,7 +114,7 @@
           (onClick)="resetForm()">
         </p-button>
         <p-button
-          [label]="'ownerPaymentEntry.savePayment' | translate"
+          [label]="editingPaymentId() ? ('common.update' | translate) : ('ownerPaymentEntry.savePayment' | translate)"
           icon="pi pi-save"
           [loading]="isSaving()"
           [disabled]="isSaving()"
@@ -175,12 +175,23 @@
               (onClick)="printReceipt(record)">
             </p-button>
             <p-button
+              icon="pi pi-pencil"
+              severity="secondary"
+              [text]="true"
+              [rounded]="true"
+              [disabled]="isSaving()"
+              [ariaLabel]="'common.edit' | translate"
+              [pTooltip]="'common.edit' | translate"
+              tooltipPosition="top"
+              (onClick)="editPayment(record)">
+            </p-button>
+            <p-button
               icon="pi pi-trash"
               severity="danger"
               [text]="true"
               [rounded]="true"
               [loading]="isDeleting(record)"
-              [disabled]="isDeleting(record)"
+              [disabled]="isDeleting(record) || isEditing(record)"
               [ariaLabel]="'common.delete' | translate"
               (onClick)="deletePayment(record)">
             </p-button>

@@ -16,12 +16,14 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { ConfirmationService } from 'primeng/api';
 import {
+  ConstructorClient,
   ExpenseClient,
   GetExpenseDto,
   GetProjectSurveyingVisitDto,
   IGetProjectBOQDto,
   IGetProjectMainContractorDto,
   IGetProjectVODto,
+  LookupClient,
   ProjectBOQClient,
   ProjectMainContractorClient,
   ProjectSurveyingVisitClient,
@@ -61,10 +63,12 @@ export interface ClaimData {
   ],
   providers: [
     ConfirmationService,
+    ConstructorClient,
     ProjectBOQClient,
     ProjectMainContractorClient,
     ProjectSurveyingVisitClient,
     ProjectVOClient,
+    LookupClient,
     ExpenseClient,
   ],
   templateUrl: './payment-claim-tab.component.html',
@@ -81,6 +85,9 @@ export class PaymentClaimTabComponent implements OnInit {
   claimDate = new Date();
 
   claimData = signal<ClaimData>({ boq: [], pmc: [], sv: [], vo: [], exp: [] });
+  materialMap: Record<number, string> = {};
+  unitMap: Record<number, string> = {};
+  contractorMap: Record<number, string> = {};
 
   typeCards: ClaimTypeCard[] = [
     {
@@ -126,6 +133,8 @@ export class PaymentClaimTabComponent implements OnInit {
     private svClient: ProjectSurveyingVisitClient,
     private voClient: ProjectVOClient,
     private expClient: ExpenseClient,
+    private lookupClient: LookupClient,
+    private constructorClient: ConstructorClient,
     private confirmationService: ConfirmationService,
     private translate: TranslateService
   ) {}
@@ -194,9 +203,36 @@ export class PaymentClaimTabComponent implements OnInit {
         )
       : of([]);
 
-    forkJoin({ boq: boq$, pmc: pmc$, sv: sv$, vo: vo$, exp: exp$ }).subscribe({
+    const lookups$ = selected.has('BOQ') || selected.has('SV')
+      ? this.lookupClient.getAllLookups(['material', 'unit']).pipe(
+          map((r) => r.data as Record<string, { id: number; name: string }[]> | undefined),
+          catchError(() => of(undefined))
+        )
+      : of(undefined);
+
+    const constructors$ = selected.has('BOQ') || selected.has('PMC')
+      ? this.constructorClient.getAll(1, 500, undefined).pipe(
+          map((r) => r.data?.data ?? []),
+          catchError(() => of([]))
+        )
+      : of([]);
+
+    forkJoin({ boq: boq$, pmc: pmc$, sv: sv$, vo: vo$, exp: exp$, lookups: lookups$, constructors: constructors$ }).subscribe({
       next: (data) => {
-        this.claimData.set(data as ClaimData);
+        this.materialMap = this.buildLookupMap(data.lookups?.['material']);
+        this.unitMap = this.buildLookupMap(data.lookups?.['unit']);
+        this.contractorMap = Object.fromEntries(
+          data.constructors
+            .filter((contractor) => contractor.id != null && contractor.name)
+            .map((contractor) => [contractor.id!, contractor.name!])
+        );
+        this.claimData.set({
+          boq: data.boq,
+          pmc: data.pmc,
+          sv: data.sv,
+          vo: data.vo,
+          exp: data.exp,
+        } as ClaimData);
         this.claimDate = new Date();
         this.step.set('preview');
         this.isLoading.set(false);
@@ -250,14 +286,18 @@ export class PaymentClaimTabComponent implements OnInit {
         itemCount: data.boq.length, total: this.boqTotal, badgeColor: '#3b82f6',
         headers: [
           { text: '#', align: 'center' },
+          { text: t('ownerPayment.cols.material'), align: 'left' },
           { text: t('ownerPayment.cols.description'), align: 'left' },
+          { text: t('ownerPayment.cols.unit'), align: 'left' },
           { text: t('ownerPayment.cols.qty'),          align: 'right' },
           { text: t('ownerPayment.cols.unitPrice'),    align: 'right' },
           { text: t('ownerPayment.cols.subtotal'),     align: 'right' },
         ],
         rows: data.boq.map((item, i) => row(i,
           `<td class="center">${i + 1}</td>
+           <td dir="auto">${this.getMaterialName(item)}</td>
            <td dir="auto">${item.description || '—'}</td>
+           <td dir="auto">${this.getUnitName(item)}</td>
            <td class="right">${fmtN(item.actualQuantity, 0)}</td>
            <td class="right">${fmtN(item.price)}</td>
            <td class="right bold">${fmtN(item.subTotal)}</td>`
@@ -271,12 +311,14 @@ export class PaymentClaimTabComponent implements OnInit {
         itemCount: data.pmc.length, total: this.pmcTotal, badgeColor: '#22c55e',
         headers: [
           { text: '#', align: 'center' },
+          { text: t('ownerPayment.cols.contractor'), align: 'left' },
           { text: t('ownerPayment.cols.startDate'), align: 'left' },
           { text: t('ownerPayment.cols.endDate'),   align: 'left' },
           { text: t('ownerPayment.cols.amount'),    align: 'right' },
         ],
         rows: data.pmc.map((item, i) => row(i,
           `<td class="center">${i + 1}</td>
+           <td dir="auto">${this.getContractorName(item)}</td>
            <td>${this.formatDate(item.startDate)}</td>
            <td>${this.formatDate(item.endDate)}</td>
            <td class="right bold">${fmtN(item.amount)}</td>`
@@ -424,5 +466,26 @@ export class PaymentClaimTabComponent implements OnInit {
 
   selectedTypesList(): ClaimType[] {
     return this.typeCards.filter((c) => this.selectedTypes().has(c.key)).map((c) => c.key);
+  }
+
+  getMaterialName(item: IGetProjectBOQDto): string {
+    return this.materialMap[item.materialId ?? 0] || this.readStringProp(item, 'materialName') || '-';
+  }
+
+  getUnitName(item: IGetProjectBOQDto | GetProjectSurveyingVisitDto): string {
+    return this.unitMap[item.unitId ?? 0] || this.readStringProp(item, 'unitName') || '-';
+  }
+
+  getContractorName(item: IGetProjectMainContractorDto | IGetProjectBOQDto): string {
+    return this.contractorMap[item.constructorId ?? 0] || this.readStringProp(item, 'constructorName') || this.readStringProp(item, 'contractorName') || '-';
+  }
+
+  private buildLookupMap(items?: { id: number; name: string }[]): Record<number, string> {
+    return Object.fromEntries((items ?? []).filter((item) => item.id != null && item.name).map((item) => [item.id, item.name]));
+  }
+
+  private readStringProp(item: unknown, prop: string): string {
+    const value = (item as Record<string, unknown>)?.[prop];
+    return typeof value === 'string' && value.trim() ? value : '';
   }
 }

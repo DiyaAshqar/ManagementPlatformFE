@@ -578,7 +578,10 @@
       }
     },
     "cols": {
+      "material": "المادة",
       "description": "الوصف",
+      "unit": "الوحدة",
+      "contractor": "المقاول",
       "qty": "الكمية",
       "unitPrice": "سعر الوحدة",
       "subtotal": "المجموع الفرعي",

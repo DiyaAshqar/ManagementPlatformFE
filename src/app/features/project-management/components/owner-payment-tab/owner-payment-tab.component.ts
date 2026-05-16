@@ -65,6 +65,7 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
   submitted = signal<boolean>(false);
   isLoadingRecords = signal<boolean>(false);
   isSaving = signal<boolean>(false);
+  editingPaymentId = signal<number | null>(null);
   deletingPaymentId = signal<number | null>(null);
   records = signal<GetPaymentFlowDto[]>([]);
 
@@ -135,6 +136,7 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
     }
 
     const command = new CreatePaymentFlowCommand({
+      id: this.editingPaymentId() ?? undefined,
       cash: this.amount()!,
       projectId,
       paymentMethodId: this.paymentMethodId()!,
@@ -191,8 +193,24 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
     });
   }
 
+  editPayment(record: GetPaymentFlowDto): void {
+    if (!record.id) {
+      return;
+    }
+
+    this.editingPaymentId.set(record.id);
+    this.submitted.set(false);
+    this.createdAt.set(record.createdAt ? new Date(record.createdAt) : new Date());
+    this.amount.set(record.cash ?? null);
+    this.currencyId.set(record.currencyId ?? null);
+    this.paymentMethodId.set(record.paymentMethodId ?? null);
+    this.referenceNumber.set(this.getReferenceNumber(record) !== '-' ? this.getReferenceNumber(record) : '');
+    this.notes.set(this.getNotesText(record));
+  }
+
   resetForm(): void {
     this.submitted.set(false);
+    this.editingPaymentId.set(null);
     this.createdAt.set(new Date());
     this.amount.set(null);
     this.currencyId.set(null);
@@ -226,9 +244,13 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
     return record.id != null && this.deletingPaymentId() === record.id;
   }
 
+  isEditing(record: GetPaymentFlowDto): boolean {
+    return record.id != null && this.editingPaymentId() === record.id;
+  }
+
   printReceipt(record: GetPaymentFlowDto): void {
     const referenceNumber = this.getReferenceNumber(record);
-    const notes = record.notes?.replace(/(?:^|\n)Reference Number:\s*.+(?:\n|$)/gi, '').trim() || '';
+    const notes = this.getNotesText(record);
     const currency = record.currencyAbb || record.currencyName || this.getCurrencyLabel(record.currencyId);
     const paymentMethod = record.paymentMethodName || this.getPaymentTypeLabel(record.paymentMethodId);
     const clientName = this.project?.clientName || this.project?.name || '';
@@ -268,6 +290,10 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
     notes: string;
   }): string {
     const { receiptNo, clientName, amount, currency, date, dateEn, paymentMethod, referenceNumber, projectName, notes } = opts;
+    const companyLogoUrl = '/assets/logo/LOGO%20Iconic%201.png';
+    const companyPhone = '0790809555';
+    const companyEmail = 'Info@iconic-co.com';
+    const formattedReceiptNo = String(receiptNo).padStart(3, '0');
 
     const refRow = referenceNumber ? `
         <tr>
@@ -287,7 +313,7 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
 <html lang="ar" dir="rtl">
 <head>
   <meta charset="UTF-8">
-  <title>سند قبض #${receiptNo}</title>
+  <title>سند قبض ${formattedReceiptNo}</title>
   <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -301,8 +327,22 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
       print-color-adjust: exact;
       -webkit-print-color-adjust: exact;
     }
-    @page { margin: 1cm; }
-    @media print { body { background: white; padding: 0; } }
+    @page { size: A4 portrait; margin: 0; }
+    @media print {
+      html, body {
+        background: white;
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        min-height: 100%;
+      }
+      .receipt {
+        width: 100%;
+        min-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+      }
+    }
     .receipt {
       background: white;
       width: 680px;
@@ -310,9 +350,49 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
       box-shadow: 0 4px 24px rgba(0,0,0,0.12);
       overflow: hidden;
     }
+    .brand-header {
+      padding: 1.2rem 2rem 1rem;
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      border-bottom: 1px solid #e2e8f0;
+      direction: ltr;
+    }
+    .brand-logo {
+      width: 230px;
+      max-width: 45%;
+      height: auto;
+      object-fit: contain;
+      display: block;
+    }
+    .footer-contact {
+      border-top: 1px solid #e2e8f0;
+      margin-top: 1.25rem;
+      padding-top: 0.85rem;
+      min-width: 230px;
+      color: #0f172a;
+      font-family: 'Inter', 'Tajawal', sans-serif;
+      direction: ltr;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
+      white-space: nowrap;
+    }
+    .contact-label {
+      color: #64748b;
+      font-weight: 600;
+    }
     .receipt-header {
-      background: linear-gradient(135deg, #1a56db 0%, #1e40af 100%);
-      color: white;
+      background: linear-gradient(135deg, #eaf2ff 0%, #d7e7ff 100%);
+      color: #0f172a;
       padding: 1.5rem 2rem;
       display: flex;
       justify-content: space-between;
@@ -328,11 +408,12 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
     }
     .receipt-no {
       text-align: left;
-      background: rgba(255,255,255,0.15);
+      background: rgba(255,255,255,0.62);
       border-radius: 8px;
+      border: 1px solid rgba(15,23,42,0.12);
       padding: 0.6rem 1rem;
     }
-    .receipt-no .no-label { font-size: 0.7rem; opacity: 0.8; display: block; }
+    .receipt-no .no-label { font-size: 0.7rem; color: #334155; display: block; }
     .receipt-no strong { font-size: 1.25rem; font-family: 'Inter', sans-serif; }
     .receipt-body { padding: 2rem; }
     .received-from {
@@ -385,6 +466,8 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
     .receipt-footer {
       border-top: 2px dashed #e2e8f0;
       padding: 1.5rem 2rem;
+    }
+    .signature-row {
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
@@ -399,25 +482,14 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
       margin-bottom: 2.5rem;
     }
     .signature .sig-line { border-bottom: 1.5px solid #94a3b8; }
-    .stamp-area { text-align: center; color: #cbd5e1; padding-bottom: 0.5rem; }
-    .stamp-circle {
-      width: 80px;
-      height: 80px;
-      border: 2px dashed #cbd5e1;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 0.4rem;
-      font-size: 0.65rem;
-      color: #94a3b8;
-      text-align: center;
-      line-height: 1.3;
-    }
   </style>
 </head>
 <body>
   <div class="receipt">
+    <div class="brand-header">
+      <img class="brand-logo" src="${companyLogoUrl}" alt="ICONIC for Engineering Consultants" />
+    </div>
+
     <div class="receipt-header">
       <div class="header-title">
         <h1>سند قبض</h1>
@@ -425,7 +497,7 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
       </div>
       <div class="receipt-no">
         <span class="no-label">رقم السند | Receipt No.</span>
-        <strong>#${receiptNo}</strong>
+        <strong>${formattedReceiptNo}</strong>
       </div>
     </div>
 
@@ -460,18 +532,21 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
     </div>
 
     <div class="receipt-footer">
-      <div class="signature">
-        <div class="sig-ar">توقيع المستلم</div>
-        <div class="sig-en">Receiver's Signature</div>
-        <div class="sig-line"></div>
+      <div class="signature-row">
+        <div class="signature">
+          <div class="sig-ar">توقيع المستلم</div>
+          <div class="sig-en">Receiver's Signature</div>
+          <div class="sig-line"></div>
+        </div>
+        <div class="signature">
+          <div class="sig-ar">توقيع المُسدِّد</div>
+          <div class="sig-en">Payer's Signature</div>
+          <div class="sig-line"></div>
+        </div>
       </div>
-      <div class="stamp-area">
-        <div class="stamp-circle">ختم<br/>المنشأة<br/>Stamp</div>
-      </div>
-      <div class="signature">
-        <div class="sig-ar">توقيع المُسدِّد</div>
-        <div class="sig-en">Payer's Signature</div>
-        <div class="sig-line"></div>
+      <div class="footer-contact">
+        <div class="contact-row"><span class="contact-label">Phone:</span><strong>${companyPhone}</strong></div>
+        <div class="contact-row"><span class="contact-label">Email:</span><strong>${companyEmail}</strong></div>
       </div>
     </div>
   </div>
@@ -524,6 +599,10 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
     ].filter(Boolean);
 
     return noteParts.length ? noteParts.join('\n') : undefined;
+  }
+
+  private getNotesText(record: GetPaymentFlowDto): string {
+    return record.notes?.replace(/(?:^|\n)Reference Number:\s*.+(?:\n|$)/gi, '').trim() || '';
   }
 
   private setDefaultPaymentMethod(): void {

@@ -582,7 +582,10 @@
       }
     },
     "cols": {
+      "material": "Material",
       "description": "Description",
+      "unit": "Unit",
+      "contractor": "Contractor",
       "qty": "Quantity",
       "unitPrice": "Unit Price",
       "subtotal": "Subtotal",
