@@ -10,7 +10,7 @@ import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { BadgeModule } from 'primeng/badge';
 
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import {
   CreateProjectVOCommand,
   IGetProjectVODto,
@@ -68,7 +68,6 @@ export class VoucherOrdersTabComponent implements OnInit {
   constructor(
     private voClient: ProjectVOClient,
     private lookupClient: LookupClient,
-    private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private translate: TranslateService
   ) { }
@@ -110,11 +109,6 @@ export class VoucherOrdersTabComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading VO items:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load Voucher Orders.'
-        });
         this.isLoading.set(false);
       }
     });
@@ -138,26 +132,10 @@ export class VoucherOrdersTabComponent implements OnInit {
         if (res.succeeded) {
           this.loadVOItems();
           this.showVoDialog.set(false);
-          this.messageService.add({
-            severity: 'success',
-            summary: command.id ? 'Updated' : 'Added',
-            detail: command.id ? 'Voucher Order updated successfully.' : 'Voucher Order added successfully.'
-          });
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: res.message || 'Failed to save Voucher Order.'
-          });
         }
       },
       error: (err) => {
         console.error('Error saving VO item:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to save Voucher Order.'
-        });
       }
     });
   }
@@ -172,26 +150,10 @@ export class VoucherOrdersTabComponent implements OnInit {
           next: (res) => {
             if (res.succeeded) {
               this.loadVOItems();
-              this.messageService.add({
-                severity: 'success',
-                summary: this.translate.instant('common.success'),
-                detail: 'Voucher Order removed successfully.'
-              });
-            } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: this.translate.instant('common.error'),
-                detail: res.message || 'Failed to delete Voucher Order.'
-              });
             }
           },
           error: (err) => {
             console.error('Error deleting VO item:', err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to delete Voucher Order.'
-            });
           }
         });
       }

@@ -10,7 +10,7 @@ import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { BadgeModule } from 'primeng/badge';
 
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import {
   CreateProjectPOCommand,
   IGetProjectPODto,
@@ -76,7 +76,6 @@ export class PurchaseOrdersTabComponent implements OnInit {
     private poClient: ProjectPOClient,
     private lookupClient: LookupClient,
     private supplierClient: SupplierClient,
-    private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private translate: TranslateService
   ) { }
@@ -127,11 +126,6 @@ export class PurchaseOrdersTabComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading PO items:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load Purchase Orders.'
-        });
         this.isLoading.set(false);
       }
     });
@@ -155,26 +149,10 @@ export class PurchaseOrdersTabComponent implements OnInit {
         if (res.succeeded) {
           this.loadPOItems();
           this.showPoDialog.set(false);
-          this.messageService.add({
-            severity: 'success',
-            summary: command.id ? 'Updated' : 'Added',
-            detail: command.id ? 'Purchase Order updated successfully.' : 'Purchase Order added successfully.'
-          });
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: res.message || 'Failed to save Purchase Order.'
-          });
         }
       },
       error: (err) => {
         console.error('Error saving PO item:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to save Purchase Order.'
-        });
       }
     });
   }
@@ -189,26 +167,10 @@ export class PurchaseOrdersTabComponent implements OnInit {
           next: (res) => {
             if (res.succeeded) {
               this.loadPOItems();
-              this.messageService.add({
-                severity: 'success',
-                summary: this.translate.instant('common.success'),
-                detail: 'Purchase Order removed successfully.'
-              });
-            } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: this.translate.instant('common.error'),
-                detail: res.message || 'Failed to delete Purchase Order.'
-              });
             }
           },
           error: (err) => {
             console.error('Error deleting PO item:', err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to delete Purchase Order.'
-            });
           }
         });
       }

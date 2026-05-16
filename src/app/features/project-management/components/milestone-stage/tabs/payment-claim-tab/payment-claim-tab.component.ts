@@ -14,7 +14,7 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import {
   ExpenseClient,
   GetExpenseDto,
@@ -126,7 +126,6 @@ export class PaymentClaimTabComponent implements OnInit {
     private svClient: ProjectSurveyingVisitClient,
     private voClient: ProjectVOClient,
     private expClient: ExpenseClient,
-    private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private translate: TranslateService
   ) {}
@@ -203,11 +202,6 @@ export class PaymentClaimTabComponent implements OnInit {
         this.isLoading.set(false);
       },
       error: () => {
-        this.messageService.add({
-          severity: 'error',
-          summary: this.translate.instant('common.error'),
-          detail: this.translate.instant('ownerPayment.errors.loadFailed'),
-        });
         this.isLoading.set(false);
       },
     });
@@ -225,11 +219,6 @@ export class PaymentClaimTabComponent implements OnInit {
       accept: () => {
         this.isConfirmed.set(true);
         this.step.set('confirmed');
-        this.messageService.add({
-          severity: 'success',
-          summary: this.translate.instant('ownerPayment.confirm.successTitle'),
-          detail: this.translate.instant('ownerPayment.confirm.successMsg'),
-        });
       },
     });
   }

@@ -13,7 +13,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 
-import { MessageService } from 'primeng/api';
 import { CreateProjectCommand, GetAllAgreementDto, ProjectStatus } from '../../../../../../nswag/api-client';
 import { AgreementWizardService } from '../../../../agreement-wizard/services/agreement-wizard.service';
 import { Project } from '../../../models';
@@ -62,7 +61,6 @@ export class CreateProjectDialogComponent implements OnInit {
     private fb: FormBuilder,
     private projectApiService: ProjectApiService,
     private agreementWizardService: AgreementWizardService,
-    private messageService: MessageService,
     private translate: TranslateService
   ) {}
 
@@ -139,11 +137,6 @@ export class CreateProjectDialogComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading agreements:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load agreements. Please try again.'
-        });
         this.isLoadingAgreements.set(false);
       }
     });

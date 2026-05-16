@@ -13,7 +13,7 @@ import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 
 import { Project } from '../../models';
 import {
@@ -79,7 +79,6 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
 
   constructor(
     private confirmationService: ConfirmationService,
-    private messageService: MessageService,
     private translate: TranslateService,
     private paymentFlowClient: PaymentFlowClient,
     private lookupClient: LookupClient,
@@ -123,11 +122,6 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
       error: () => {
         this.records.set([]);
         this.isLoadingRecords.set(false);
-        this.messageService.add({
-          severity: 'error',
-          summary: this.translate.instant('common.error') || 'Error',
-          detail: 'Failed to load owner payments.',
-        });
       },
     });
   }
@@ -154,28 +148,12 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
       next: (response) => {
         this.isSaving.set(false);
         if (response.succeeded) {
-          this.messageService.add({
-            severity: 'success',
-            summary: this.translate.instant('common.success'),
-            detail: this.translate.instant('ownerPaymentEntry.messages.saved'),
-          });
           this.resetForm();
           this.loadPayments();
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: this.translate.instant('common.error') || 'Error',
-            detail: response.message || 'Failed to save owner payment.',
-          });
         }
       },
       error: () => {
         this.isSaving.set(false);
-        this.messageService.add({
-          severity: 'error',
-          summary: this.translate.instant('common.error') || 'Error',
-          detail: 'Failed to save owner payment.',
-        });
       },
     });
   }
@@ -197,27 +175,11 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
           next: (response) => {
             this.deletingPaymentId.set(null);
             if (response.succeeded) {
-              this.messageService.add({
-                severity: 'success',
-                summary: this.translate.instant('common.success'),
-                detail: this.t('ownerPaymentEntry.messages.deleted', 'Owner payment deleted successfully.'),
-              });
               this.loadPayments();
-            } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: this.translate.instant('common.error') || 'Error',
-                detail: response.message || 'Failed to delete owner payment.',
-              });
             }
           },
           error: () => {
             this.deletingPaymentId.set(null);
-            this.messageService.add({
-              severity: 'error',
-              summary: this.translate.instant('common.error') || 'Error',
-              detail: 'Failed to delete owner payment.',
-            });
           },
         });
       },

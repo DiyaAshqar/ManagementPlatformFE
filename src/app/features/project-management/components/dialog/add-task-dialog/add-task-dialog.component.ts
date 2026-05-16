@@ -1,7 +1,6 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject, signal } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -52,7 +51,6 @@ export class AddTaskDialogComponent implements OnInit {
   private config = inject(DynamicDialogConfig);
   private projectService = inject(ProjectService);
   private taskService = inject(TaskService);
-  private messageService = inject(MessageService);
   private fb = inject(FormBuilder);
 
   isLoading = signal(false);
@@ -125,11 +123,6 @@ export class AddTaskDialogComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading task types:', error);
-        this.messageService.add({
-          severity: 'warn',
-          summary: 'Warning',
-          detail: 'Failed to load task types from API'
-        });
         // Fallback to default options
         this.taskTypeOptions = [
           { label: 'Task', value: 1 },
@@ -143,20 +136,10 @@ export class AddTaskDialogComponent implements OnInit {
 
   save(): void {
     if (!this.formData.title) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Please enter a task title'
-      });
       return;
     }
 
     if (!this.formData.projectStageId) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Please select a project stage'
-      });
       return;
     }
 

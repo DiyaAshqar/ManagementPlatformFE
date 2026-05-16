@@ -11,7 +11,7 @@ import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { BadgeModule } from 'primeng/badge';
 
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import {
   ContractorDutyDto,
   ConstructorClient,
@@ -71,7 +71,6 @@ export class ProjectMainContractorTabComponent implements OnInit {
   constructor(
     private contractorClient: ProjectMainContractorClient,
     private constructorClient: ConstructorClient,
-    private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private translate: TranslateService
   ) { }
@@ -111,11 +110,6 @@ export class ProjectMainContractorTabComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading contractor items:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load Main Contractors.'
-        });
         this.isLoading.set(false);
       }
     });
@@ -162,11 +156,6 @@ export class ProjectMainContractorTabComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading contractor duties:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load Contractor Duties.'
-        });
         this.isLoading.set(false);
       }
     });
@@ -178,26 +167,10 @@ export class ProjectMainContractorTabComponent implements OnInit {
         if (res.succeeded) {
           this.loadContractorData();
           this.showContractorDialog.set(false);
-          this.messageService.add({
-            severity: 'success',
-            summary: command.id ? 'Updated' : 'Added',
-            detail: command.id ? 'Main Contractor updated successfully.' : 'Main Contractor added successfully.'
-          });
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: res.message || 'Failed to save Main Contractor.'
-          });
         }
       },
       error: (err) => {
         console.error('Error saving contractor item:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to save Main Contractor.'
-        });
       }
     });
   }
@@ -241,27 +214,11 @@ export class ProjectMainContractorTabComponent implements OnInit {
       next: (res) => {
         if (res.succeeded) {
           this.loadContractorData();
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: 'Contractor Duties saved successfully.'
-          });
           this.onContractorDutiesDialogClose();
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: res.message || 'Failed to save Contractor Duties.'
-          });
         }
       },
       error: (err) => {
         console.error('Error saving contractor duties:', err);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to save Contractor Duties.'
-        });
       }
     });
   }
@@ -295,26 +252,10 @@ export class ProjectMainContractorTabComponent implements OnInit {
           next: (res) => {
             if (res.succeeded) {
               this.loadContractorData();
-              this.messageService.add({
-                severity: 'success',
-                summary: this.translate.instant('common.success'),
-                detail: 'Main Contractor removed successfully.'
-              });
-            } else {
-              this.messageService.add({
-                severity: 'error',
-                summary: this.translate.instant('common.error'),
-                detail: res.message || 'Failed to delete Main Contractor.'
-              });
             }
           },
           error: (err) => {
             console.error('Error deleting contractor item:', err);
-            this.messageService.add({
-              severity: 'error',
-              summary: 'Error',
-              detail: 'Failed to delete Main Contractor.'
-            });
           }
         });
       }

@@ -10,7 +10,7 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import {
   ConstructorClient,
   CreateProjectBOQCommand,
@@ -67,7 +67,6 @@ export class BoqTabComponent implements OnInit {
     private boqClient: ProjectBOQClient,
     private lookupClient: LookupClient,
     private constructorClient: ConstructorClient,
-    private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private translate: TranslateService
   ) { }
@@ -124,11 +123,6 @@ export class BoqTabComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading BOQ items:', err);
-        this.messageService.add({ 
-          severity: 'error', 
-          summary: 'Error', 
-          detail: 'Failed to load Bill of Quantities items.' 
-        });
         this.isLoading.set(false);
       }
     });
@@ -152,26 +146,10 @@ export class BoqTabComponent implements OnInit {
         if (res.succeeded) {
           this.loadBoqItems();
           this.showBoqDialog.set(false);
-          this.messageService.add({ 
-            severity: 'success', 
-            summary: command.id ? 'Updated' : 'Added', 
-            detail: command.id ? 'BoQ item updated successfully.' : 'BoQ item added successfully.' 
-          });
-        } else {
-          this.messageService.add({ 
-            severity: 'error', 
-            summary: 'Error', 
-            detail: res.message || 'Failed to save BoQ item.' 
-          });
         }
       },
       error: (err) => {
         console.error('Error saving BOQ item:', err);
-        this.messageService.add({ 
-          severity: 'error', 
-          summary: 'Error', 
-          detail: 'Failed to save BoQ item.' 
-        });
       }
     });
   }
@@ -186,26 +164,10 @@ export class BoqTabComponent implements OnInit {
           next: (res) => {
             if (res.succeeded) {
               this.loadBoqItems();
-              this.messageService.add({ 
-                severity: 'success', 
-                summary: this.translate.instant('common.success'), 
-                detail: 'BoQ item removed successfully.' 
-              });
-            } else {
-              this.messageService.add({ 
-                severity: 'error', 
-                summary: this.translate.instant('common.error'), 
-                detail: res.message || 'Failed to delete BoQ item.' 
-              });
             }
           },
           error: (err) => {
             console.error('Error deleting BOQ item:', err);
-            this.messageService.add({ 
-              severity: 'error', 
-              summary: 'Error', 
-              detail: 'Failed to delete BoQ item.' 
-            });
           }
         });
       }

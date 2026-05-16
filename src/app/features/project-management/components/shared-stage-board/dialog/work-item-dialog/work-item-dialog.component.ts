@@ -3,7 +3,6 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { format } from 'date-fns';
-import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DialogService, DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -43,7 +42,6 @@ export class WorkItemDialogComponent implements OnInit {
   private dialogService = inject(DialogService);
   private taskService = inject(TaskService);
   private subtaskApiService = inject(SubtaskApiService);
-  private messageService = inject(MessageService);
 
   subtasks = signal<ProjectSubTaskDto[]>([]);
   isLoadingTaskTypes = signal(false);
@@ -151,11 +149,6 @@ export class WorkItemDialogComponent implements OnInit {
         this.isLoadingSubtasks.set(false);
       },
       error: (error) => {
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load subtasks'
-        });
         this.isLoadingSubtasks.set(false);
       }
     });

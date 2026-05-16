@@ -7,7 +7,6 @@ import { SelectModule } from 'primeng/select';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { TooltipModule } from 'primeng/tooltip';
-import { MessageService } from 'primeng/api';
 import { SubtaskApiService } from '../../../../services/subtask-api.service';
 import { SubtaskService } from '../../../../services/subtask.service';
 
@@ -41,7 +40,6 @@ export class SubtaskDialogComponent implements OnInit {
   private dialogRef = inject(DynamicDialogRef);
   private config = inject(DynamicDialogConfig);
   private subtaskApiService = inject(SubtaskApiService);
-  private messageService = inject(MessageService);
   private subtaskService = inject(SubtaskService);
 
   formData = signal<SubTaskFormData>({
@@ -93,11 +91,6 @@ export class SubtaskDialogComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading subtask:', error);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: 'Failed to load subtask data'
-        });
         this.isLoading.set(false);
       }
     });
@@ -108,20 +101,10 @@ export class SubtaskDialogComponent implements OnInit {
     
     // Validation
     if (!data.title?.trim()) {
-      this.messageService.add({
-        severity: 'warn',
-        summary: 'Validation Error',
-        detail: 'Title is required'
-      });
       return;
     }
 
     if (!this.projectStageTaskId && !data.id) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'Project stage task ID is missing'
-      });
       return;
     }
 
@@ -138,28 +121,12 @@ export class SubtaskDialogComponent implements OnInit {
       next: (success) => {
         this.isLoading.set(false);
         if (success) {
-          this.messageService.add({
-            severity: 'success',
-            summary: 'Success',
-            detail: data.id ? 'Subtask updated successfully' : 'Subtask created successfully'
-          });
           this.dialogRef.close({ success: true, data });
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to save subtask'
-          });
         }
       },
       error: (error) => {
         console.error('Error saving subtask:', error);
         this.isLoading.set(false);
-        this.messageService.add({
-          severity: 'error',
-          summary: 'Error',
-          detail: error.message || 'Failed to save subtask'
-        });
       }
     });
   }

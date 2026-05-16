@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 // PrimeNG Imports
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
@@ -116,7 +116,6 @@ export class ProjectExpenseManagementComponent implements OnInit {
     private lookupClient: LookupClient,
     private currencyClient: CurrencyClient,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService,
     private translate: TranslateService
   ) {}
 
@@ -267,19 +266,8 @@ export class ProjectExpenseManagementComponent implements OnInit {
       next: (response) => {
         this.isSaving.set(false);
         if (response.succeeded) {
-          this.messageService.add({
-            severity: 'success',
-            summary: this.translate.instant('common.success'),
-            detail: this.translate.instant('projectTabs.expenses.messages.saved'),
-          });
           this.backToList();
           this.loadExpenses();
-        } else {
-          this.messageService.add({
-            severity: 'error',
-            summary: this.translate.instant('common.error'),
-            detail: response.message ?? this.translate.instant('common.errorOccurred'),
-          });
         }
       },
       error: () => this.isSaving.set(false),
@@ -300,11 +288,6 @@ export class ProjectExpenseManagementComponent implements OnInit {
           next: (response) => {
             if (response.succeeded) {
               this.expenses.update((prev) => prev.filter((e) => e.id !== expense.id));
-              this.messageService.add({
-                severity: 'success',
-                summary: this.translate.instant('common.success'),
-                detail: this.translate.instant('projectTabs.expenses.messages.deleted'),
-              });
             }
           },
         });

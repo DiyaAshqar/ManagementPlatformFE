@@ -16,7 +16,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 
 import { DialogModule } from 'primeng/dialog';
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import {
   AttachmentType,
   CreateProjectMainContractorPaymentCommand,
@@ -59,7 +59,6 @@ export class ProjectMainContractorPaymentsComponent implements OnInit, OnChanges
 
   private paymentClient = inject(ProjectMainContractorPaymentClient);
   private lookupClient = inject(LookupClient);
-  private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   private translate = inject(TranslateService);
 
@@ -117,7 +116,6 @@ export class ProjectMainContractorPaymentsComponent implements OnInit, OnChanges
         this.isLoading.set(false);
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load payments.' });
         this.isLoading.set(false);
       }
     });
@@ -170,17 +168,9 @@ export class ProjectMainContractorPaymentsComponent implements OnInit, OnChanges
         if (res.succeeded) {
           if (item.id) delete this.clonedRows[item.id];
           this.loadPayments();
-          this.messageService.add({
-            severity: 'success',
-            summary: isNew ? 'Added' : 'Updated',
-            detail: isNew ? 'Payment recorded successfully.' : 'Payment updated successfully.'
-          });
-        } else {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: res.message || 'Failed to save payment.' });
         }
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to save payment.' });
       }
     });
   }
@@ -205,13 +195,9 @@ export class ProjectMainContractorPaymentsComponent implements OnInit, OnChanges
           next: (res) => {
             if (res.succeeded) {
               this.loadPayments();
-              this.messageService.add({ severity: 'success', summary: 'Deleted', detail: 'Payment deleted successfully.' });
-            } else {
-              this.messageService.add({ severity: 'error', summary: 'Error', detail: res.message || 'Failed to delete payment.' });
             }
           },
           error: () => {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete payment.' });
           }
         });
       }

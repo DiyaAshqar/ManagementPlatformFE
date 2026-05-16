@@ -9,7 +9,7 @@ import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { BadgeModule } from 'primeng/badge';
 
-import { ConfirmationService, MessageService } from 'primeng/api';
+import { ConfirmationService } from 'primeng/api';
 import {
   CreateProjectSurveyingVisitCommand,
   GetProjectSurveyingVisitDto,
@@ -69,7 +69,6 @@ export class SurveyingVisitsTabComponent implements OnInit {
   constructor(
     private svClient: ProjectSurveyingVisitClient,
     private lookupClient: LookupClient,
-    private messageService: MessageService,
     private confirmationService: ConfirmationService,
     private translate: TranslateService
   ) {}
@@ -109,7 +108,6 @@ export class SurveyingVisitsTabComponent implements OnInit {
       },
       error: (err) => {
         console.error('Error loading surveying visits:', err);
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load Surveying Visits.' });
         this.isLoading.set(false);
       }
     });
@@ -133,17 +131,9 @@ export class SurveyingVisitsTabComponent implements OnInit {
         if (res.succeeded) {
           this.loadItems();
           this.showDialog.set(false);
-          this.messageService.add({
-            severity: 'success',
-            summary: command.id ? 'Updated' : 'Scheduled',
-            detail:  command.id ? 'Visit updated successfully.' : 'Visit scheduled successfully.'
-          });
-        } else {
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: res.message || 'Failed to save.' });
         }
       },
       error: () => {
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to save Surveying Visit.' });
       }
     });
   }
@@ -159,21 +149,9 @@ export class SurveyingVisitsTabComponent implements OnInit {
           next: (res) => {
             if (res.succeeded) {
               this.loadItems();
-              this.messageService.add({ 
-                severity: 'success', 
-                summary: this.translate.instant('common.success'), 
-                detail: 'Visit removed successfully.' 
-              });
-            } else {
-              this.messageService.add({ 
-                severity: 'error', 
-                summary: this.translate.instant('common.error'), 
-                detail: res.message || 'Failed to delete.' 
-              });
             }
           },
           error: () => {
-            this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete Surveying Visit.' });
           }
         });
       }
