@@ -83,7 +83,7 @@ export class ProjectMainContractorTabComponent implements OnInit {
   // ── Lookups ───────────────────────────────────────────────────────────────
 
   loadLookups(): void {
-    this.constructorClient.getAll(1, 10, undefined).subscribe({
+    this.constructorClient.getAll(1, 1000, undefined).subscribe({
       next: (res) => {
         const data = res.data?.data ?? [];
         this.contractorOptions = data
