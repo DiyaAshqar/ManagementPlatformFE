@@ -200,6 +200,12 @@ export class Step2Component implements OnInit, OnDestroy {
       return;
     }
 
+    // Edit mode with no changes — skip API and go to next step
+    if (this.agreementId() > 0 && this.step2Form.pristine) {
+      this.stepData.emit(this.step2Form.getRawValue());
+      return;
+    }
+
     this.isLoading.set(true);
 
     // Prepare the FullAgreementDto payload

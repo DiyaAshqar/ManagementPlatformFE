@@ -48,6 +48,7 @@ export class Step5Component implements OnInit, OnDestroy {
   // Editing state
   editingIndex = signal<number | null>(null);
 
+  private pristineSnapshot: string = '';
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -127,6 +128,7 @@ export class Step5Component implements OnInit, OnDestroy {
     if (data.supplierServiceDto && Array.isArray(data.supplierServiceDto)) {
       // Map the existing DTO objects directly since they already have the correct structure
       this.supplierServices.set([...data.supplierServiceDto]);
+      this.pristineSnapshot = JSON.stringify(data.supplierServiceDto);
     }
   }
 
@@ -135,6 +137,12 @@ export class Step5Component implements OnInit, OnDestroy {
     
     if (activeEntries.length === 0) {
       // No entries to submit
+      return;
+    }
+
+    // Edit mode with no changes — skip API and go to next step
+    if (this.agreementId() > 0 && this.pristineSnapshot && JSON.stringify(this.supplierServices()) === this.pristineSnapshot) {
+      this.stepData.emit(this.buildFormData());
       return;
     }
 

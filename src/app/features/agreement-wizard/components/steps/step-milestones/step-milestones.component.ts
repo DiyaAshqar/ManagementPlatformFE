@@ -47,6 +47,7 @@ export class StepMilestonesComponent implements OnInit, OnDestroy {
   isLoading = signal(false);
   editingIndex = signal<number | null>(null);
 
+  private pristineSnapshot: string = '';
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -87,6 +88,7 @@ export class StepMilestonesComponent implements OnInit, OnDestroy {
           next: (response) => {
             if (response.succeeded && response.data?.mileStonesStepDto?.mileStonesDto) {
               this.milestones.set([...response.data.mileStonesStepDto.mileStonesDto]);
+              this.pristineSnapshot = JSON.stringify(response.data.mileStonesStepDto.mileStonesDto);
             }
             this.setNextOrder();
             this.isLoading.set(false);
@@ -214,6 +216,12 @@ export class StepMilestonesComponent implements OnInit, OnDestroy {
         detail: 'Please add at least one milestone',
         life: 5000
       });
+      return;
+    }
+
+    // Edit mode with no changes — skip API and go to next step
+    if (this.agreementId() > 0 && this.pristineSnapshot && JSON.stringify(entries) === this.pristineSnapshot) {
+      this.stepData.emit({ mileStonesDto: entries });
       return;
     }
 

@@ -752,6 +752,7 @@
       "columnId": "المعرف",
       "columnName": "اسم المقاول",
       "columnAmount": "قيمة العقد",
+      "columnTotalPayments": "إجمالي المدفوعات",
       "columnStartDate": "تاريخ البداية",
       "columnEndDate": "تاريخ النهاية",
       "emptyMessage": "لم يتم العثور على مقاولين لهذه المرحلة",

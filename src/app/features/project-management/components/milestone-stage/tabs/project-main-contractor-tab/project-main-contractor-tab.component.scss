@@ -64,6 +64,11 @@
   color: var(--green-600, #16a34a);
 }
 
+.contractor-total-payments {
+  font-weight: 600;
+  color: var(--blue-600, #2563eb);
+}
+
 .contractor-actions {
   display: flex;
   gap: 0.25rem;

@@ -54,6 +54,7 @@ export class Step3Component implements OnInit, OnDestroy {
   isFormValid = signal(false);
   editingIndex = signal<number | null>(null);
 
+  private pristineSnapshot: string = '';
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -146,6 +147,7 @@ export class Step3Component implements OnInit, OnDestroy {
         return aOrder - bOrder;
       });
       this.projectAreaUnits.set(sorted);
+      this.pristineSnapshot = JSON.stringify(sorted);
     }
   }
 
@@ -155,6 +157,12 @@ export class Step3Component implements OnInit, OnDestroy {
     if (!entries.length) {
       this.step3Form.markAllAsTouched();
       this.showError('Please add at least one entry to submit');
+      return;
+    }
+
+    // Edit mode with no changes — skip API and go to next step
+    if (this.agreementId() > 0 && this.pristineSnapshot && JSON.stringify(entries) === this.pristineSnapshot) {
+      this.stepData.emit(this.step3Form.getRawValue());
       return;
     }
 

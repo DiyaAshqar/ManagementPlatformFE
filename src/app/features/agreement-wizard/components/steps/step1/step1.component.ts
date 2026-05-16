@@ -256,6 +256,13 @@ export class Step1Component implements OnInit, OnDestroy {
       return;
     }
 
+    // Edit mode with no changes — skip API and go to next step
+    if (this.agreementId() > 0 && this.step1Form.pristine) {
+      const formValue = this.convertDatesToStrings(this.step1Form.value);
+      this.stepData.emit(formValue);
+      return;
+    }
+
     this.isLoading.set(true);
     
     // Prepare the FullAgreementDto payload

@@ -756,6 +756,7 @@
       "columnId": "ID",
       "columnName": "Contractor Name",
       "columnAmount": "Contract Amount",
+      "columnTotalPayments": "Total Payments",
       "columnStartDate": "Start Date",
       "columnEndDate": "End Date",
       "emptyMessage": "No contractors found for this stage",

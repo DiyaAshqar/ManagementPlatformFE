@@ -251,6 +251,14 @@ export class Step7Component implements OnInit, OnDestroy {
       return;
     }
 
+    // Edit mode with no new attachments — skip API and proceed
+    const newAttachments = this.attachments().filter(att => !att.isFromServer);
+    if (this.agreementId() > 0 && newAttachments.length === 0) {
+      this.stepData.emit({ attachments: this.attachments() });
+      this.router.navigate(['/agreement-wizard/success']);
+      return;
+    }
+
     this.submitStep();
   }
 

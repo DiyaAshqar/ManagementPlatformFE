@@ -50,6 +50,7 @@ export class Step6Component implements OnInit, OnDestroy {
   // Editing state
   editingIndex = signal<number | null>(null);
 
+  private pristineSnapshot: string = '';
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -141,6 +142,7 @@ export class Step6Component implements OnInit, OnDestroy {
     if (data.quantityBillDto && Array.isArray(data.quantityBillDto)) {
       // Map the existing DTO objects directly since they already have the correct structure
       this.quantityBills.set([...data.quantityBillDto]);
+      this.pristineSnapshot = JSON.stringify(data.quantityBillDto);
     }
   }
 
@@ -149,6 +151,12 @@ export class Step6Component implements OnInit, OnDestroy {
 
     if (activeEntries.length === 0) {
       // No entries to submit
+      return;
+    }
+
+    // Edit mode with no changes — skip API and go to next step
+    if (this.agreementId() > 0 && this.pristineSnapshot && JSON.stringify(this.quantityBills()) === this.pristineSnapshot) {
+      this.stepData.emit(this.buildFormData());
       return;
     }
 
