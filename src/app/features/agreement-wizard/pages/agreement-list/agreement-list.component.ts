@@ -9,7 +9,6 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
-import { ToastModule } from 'primeng/toast';
 
 // Services
 import { AgreementWizardService } from '../../services/agreement-wizard.service';
@@ -27,9 +26,7 @@ import { ConfirmationService, MessageService } from 'primeng/api';
         CardModule,
         InputTextModule,
         TooltipModule,
-        ToastModule
     ],
-    providers: [MessageService],
     templateUrl: './agreement-list.component.html',
     styleUrls: ['./agreement-list.component.scss']
 })

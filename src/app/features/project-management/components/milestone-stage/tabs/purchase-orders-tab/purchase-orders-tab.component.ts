@@ -7,7 +7,6 @@ import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
-import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { BadgeModule } from 'primeng/badge';
 
@@ -38,11 +37,10 @@ export enum POStatus {
     ButtonModule,
     TooltipModule,
     SkeletonModule,
-    ToastModule,
     BadgeModule,
     AddPoDialogComponent
   ],
-  providers: [MessageService, ProjectPOClient, LookupClient, SupplierClient],
+  providers: [ProjectPOClient, LookupClient, SupplierClient],
   templateUrl: './purchase-orders-tab.component.html',
   styleUrls: ['./purchase-orders-tab.component.scss']
 })

@@ -9,7 +9,6 @@ import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
 import { CardModule } from 'primeng/card';
-import { ToastModule } from 'primeng/toast';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService } from 'primeng/api';
 
@@ -32,10 +31,8 @@ interface MainContractorType {
     InputTextModule,
     DropdownModule,
     CardModule,
-    ToastModule,
     SkeletonModule
   ],
-  providers: [MessageService],
   templateUrl: './constructor-form.component.html',
   styleUrls: ['./constructor-form.component.scss']
 })

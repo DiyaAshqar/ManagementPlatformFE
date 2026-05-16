@@ -8,7 +8,6 @@ import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
-import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { BadgeModule } from 'primeng/badge';
 
@@ -34,14 +33,13 @@ import { ProjectMainContractorPaymentsComponent } from '../../../../components/p
     DialogModule,
     SkeletonModule,
     TableModule,
-    ToastModule,
     TooltipModule,
     BadgeModule,
     AddContractorDialogComponent,
     ContractorDutiesDialogComponent,
     ProjectMainContractorPaymentsComponent
   ],
-  providers: [MessageService, ProjectMainContractorClient, ConstructorClient],
+  providers: [ProjectMainContractorClient, ConstructorClient],
   templateUrl: './project-main-contractor-tab.component.html',
   styleUrl: './project-main-contractor-tab.component.scss'
 })

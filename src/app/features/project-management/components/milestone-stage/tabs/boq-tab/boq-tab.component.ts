@@ -8,7 +8,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
-import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { ConfirmationService, MessageService } from 'primeng/api';
@@ -31,10 +30,9 @@ import { AddBoqDialogComponent } from '../../../dialog/add-boq-dialog/add-boq-di
     ButtonModule,
     TooltipModule,
     SkeletonModule,
-    ToastModule,
     AddBoqDialogComponent
   ],
-  providers: [MessageService, ProjectBOQClient, LookupClient, ConstructorClient],
+  providers: [ProjectBOQClient, LookupClient, ConstructorClient],
   templateUrl: './boq-tab.component.html',
   styleUrls: ['./boq-tab.component.scss']
 })

@@ -12,7 +12,6 @@ import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TextareaModule } from 'primeng/textarea';
-import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { Project } from '../../models';
@@ -46,9 +45,8 @@ interface SelectOption<T = number> {
     SelectModule,
     TableModule,
     TextareaModule,
-    ToastModule,
   ],
-  providers: [ConfirmationService, MessageService, PaymentFlowClient, LookupClient, CurrencyClient],
+  providers: [ConfirmationService, PaymentFlowClient, LookupClient, CurrencyClient],
   templateUrl: './owner-payment-tab.component.html',
   styleUrls: ['./owner-payment-tab.component.scss'],
 })

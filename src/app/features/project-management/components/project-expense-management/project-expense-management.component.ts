@@ -16,7 +16,6 @@ import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
-import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 
 import {
@@ -62,11 +61,10 @@ const emptyDetails = (): IExpenseDetailDto[] => [createEmptyDetail()];
     TextareaModule,
     TagModule,
     SkeletonModule,
-    ToastModule,
     ConfirmDialogModule,
     DocumentsTableComponent,
   ],
-  providers: [ConfirmationService, MessageService, LookupClient],
+  providers: [ConfirmationService, LookupClient],
   templateUrl: './project-expense-management.component.html',
   styleUrls: ['./project-expense-management.component.scss'],
 })

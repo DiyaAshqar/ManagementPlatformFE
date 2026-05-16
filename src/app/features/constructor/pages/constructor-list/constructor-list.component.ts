@@ -12,7 +12,6 @@ import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
-import { ToastModule } from 'primeng/toast';
 import { ConfirmationService, MessageService } from 'primeng/api';
 
 import { ConstructorService } from '../../services/constructor.service';
@@ -32,9 +31,7 @@ import { GetConstructorDto } from '../../../../../nswag/api-client';
     InputIconModule,
     SkeletonModule,
     TooltipModule,
-    ToastModule
   ],
-  providers: [MessageService],
   templateUrl: './constructor-list.component.html',
   styleUrls: ['./constructor-list.component.scss']
 })

@@ -12,7 +12,6 @@ import { InputIconModule } from 'primeng/inputicon';
 import { DialogModule } from 'primeng/dialog';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TooltipModule } from 'primeng/tooltip';
-import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { TagModule } from 'primeng/tag';
 import { CardModule } from 'primeng/card';
@@ -45,13 +44,12 @@ import {
     DialogModule,
     SkeletonModule,
     TooltipModule,
-    ToastModule,
     ConfirmDialogModule,
     TagModule,
     CardModule,
     DividerModule
   ],
-  providers: [MessageService, ConfirmationService],
+  providers: [ConfirmationService],
   templateUrl: './material-management.component.html',
   styleUrls: ['./material-management.component.scss']
 })

@@ -12,7 +12,6 @@ import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
 import { SkeletonModule } from 'primeng/skeleton';
 import { Table, TableModule } from 'primeng/table';
-import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { TagModule } from 'primeng/tag';
 
@@ -42,14 +41,13 @@ import { DocumentsTableComponent } from '../../../../../shared/components/docume
     SelectModule,
     SkeletonModule,
     TableModule,
-    ToastModule,
     TooltipModule,
     TagModule,
     DialogModule,
     TextareaModule,
     DocumentsTableComponent
   ],
-  providers: [MessageService, ProjectMainContractorPaymentClient, LookupClient],
+  providers: [ProjectMainContractorPaymentClient, LookupClient],
   templateUrl: './project-main-contractor-payments.component.html',
   styleUrl: './project-main-contractor-payments.component.scss'
 })

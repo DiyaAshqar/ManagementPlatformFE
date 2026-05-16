@@ -8,7 +8,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { InputTextModule } from 'primeng/inputtext';
 import { CardModule } from 'primeng/card';
-import { ToastModule } from 'primeng/toast';
 import { SkeletonModule } from 'primeng/skeleton';
 import { MessageService } from 'primeng/api';
 
@@ -25,10 +24,8 @@ import { CreateSupplierCommand } from '../../../../../nswag/api-client';
     ButtonModule,
     InputTextModule,
     CardModule,
-    ToastModule,
     SkeletonModule
   ],
-  providers: [MessageService],
   templateUrl: './supplier-form.component.html',
   styleUrls: ['./supplier-form.component.scss']
 })

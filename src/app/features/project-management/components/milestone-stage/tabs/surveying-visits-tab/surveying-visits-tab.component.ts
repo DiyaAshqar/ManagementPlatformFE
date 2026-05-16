@@ -6,7 +6,6 @@ import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
-import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { BadgeModule } from 'primeng/badge';
 
@@ -35,11 +34,10 @@ export enum VisitStatus {
     ButtonModule,
     TooltipModule,
     SkeletonModule,
-    ToastModule,
     BadgeModule,
     AddSurveyingVisitDialogComponent
   ],
-  providers: [MessageService, ProjectSurveyingVisitClient, LookupClient],
+  providers: [ProjectSurveyingVisitClient, LookupClient],
   templateUrl: './surveying-visits-tab.component.html',
   styleUrls: ['./surveying-visits-tab.component.scss']
 })

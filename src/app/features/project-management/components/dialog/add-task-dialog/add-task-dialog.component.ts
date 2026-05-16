@@ -9,7 +9,6 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
-import { ToastModule } from 'primeng/toast';
 import { CreateTaskCommand } from '../../../../../../nswag/api-client';
 import { ProjectService } from '../../../services/project.service';
 import { TaskService } from '../../../services/task.service';
@@ -44,9 +43,7 @@ export interface AddTaskFormData {
     ButtonModule,
     InputNumberModule,
     CalendarModule,
-    ToastModule
   ],
-  providers: [MessageService],
   templateUrl: './add-task-dialog.component.html',
   styleUrls: ['./add-task-dialog.component.scss']
 })

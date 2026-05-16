@@ -9,7 +9,6 @@ import { ButtonModule } from 'primeng/button';
 import { DividerModule } from 'primeng/divider';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
-import { ToastModule } from 'primeng/toast';
 import { TooltipModule } from 'primeng/tooltip';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
@@ -55,12 +54,10 @@ export interface ClaimData {
     DividerModule,
     TableModule,
     TagModule,
-    ToastModule,
     TooltipModule,
     ConfirmDialogModule,
   ],
   providers: [
-    MessageService,
     ConfirmationService,
     ProjectBOQClient,
     ProjectMainContractorClient,
