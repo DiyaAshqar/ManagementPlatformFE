@@ -105,7 +105,6 @@
         >
           <ng-template pTemplate="header">
             <tr>
-              <th style="width: 80px">#</th>
               <th>{{ 'wizard.stepMilestones.name' | translate }}</th>
               <th>{{ 'wizard.stepMilestones.orderNo' | translate }}</th>
               <th>{{ 'wizard.stepMilestones.description' | translate }}</th>
@@ -117,7 +116,6 @@
 
           <ng-template pTemplate="body" let-entry let-rowIndex="rowIndex">
             <tr>
-              <td>{{ entry.id || '-' }}</td>
               <td>{{ entry.name }}</td>
               <td>{{ entry.order }}</td>
               <td>{{ entry.description }}</td>
@@ -138,7 +136,7 @@
 
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td [attr.colspan]="isViewMode() ? 4 : 5" class="text-center p-6">
+              <td [attr.colspan]="isViewMode() ? 3 : 4" class="text-center p-6">
                 <i class="pi pi-inbox text-4xl mb-3 block text-gray-400"></i>
                 <p class="text-gray-500">{{ 'wizard.stepMilestones.noData' | translate }}</p>
               </td>

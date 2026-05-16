@@ -1,4 +1,5 @@
 <p-toast></p-toast>
+<p-confirmDialog></p-confirmDialog>
 
 <div class="owner-payment-entry">
   <div class="entry-header">
@@ -55,8 +56,8 @@
           <label for="ownerPaymentCurrency">{{ 'ownerPaymentEntry.currency' | translate }} <span>*</span></label>
           <p-select
             inputId="ownerPaymentCurrency"
-            [ngModel]="currency()"
-            (ngModelChange)="currency.set($event)"
+            [ngModel]="currencyId()"
+            (ngModelChange)="currencyId.set($event)"
             [options]="currencies"
             optionLabel="label"
             optionValue="value"
@@ -69,7 +70,7 @@
           <label for="ownerPaymentType">{{ 'ownerPaymentEntry.paymentType' | translate }} <span>*</span></label>
           <p-select
             inputId="ownerPaymentType"
-            [ngModel]="paymentType()"
+            [ngModel]="paymentMethodId()"
             (ngModelChange)="onPaymentTypeChange($event)"
             [options]="paymentTypes"
             optionLabel="label"
@@ -116,6 +117,8 @@
         <p-button
           [label]="'ownerPaymentEntry.savePayment' | translate"
           icon="pi pi-save"
+          [loading]="isSaving()"
+          [disabled]="isSaving()"
           (onClick)="savePayment()">
         </p-button>
       </div>
@@ -141,6 +144,7 @@
 
     <p-table
       [value]="records()"
+      [loading]="isLoadingRecords()"
       [tableStyle]="{ 'min-width': '52rem' }"
       styleClass="p-datatable-sm p-datatable-striped"
       responsiveLayout="scroll">
@@ -150,21 +154,34 @@
           <th>{{ 'ownerPaymentEntry.paymentType' | translate }}</th>
           <th>{{ 'ownerPaymentEntry.referenceNumber' | translate }}</th>
           <th class="text-right">{{ 'ownerPaymentEntry.amount' | translate }}</th>
+          <th class="text-center">{{ 'common.actions' | translate }}</th>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="body" let-record>
         <tr>
           <td>{{ record.createdAt | date: 'yyyy-MM-dd' }}</td>
-          <td>{{ getPaymentTypeLabel(record.paymentType) }}</td>
-          <td>{{ record.referenceNumber || '-' }}</td>
-          <td class="text-right font-semibold text-primary">{{ formatAmount(record.amount, record.currency) }}</td>
+          <td>{{ record.paymentMethodName || getPaymentTypeLabel(record.paymentMethodId) }}</td>
+          <td>{{ getReferenceNumber(record) }}</td>
+          <td class="text-right font-semibold text-primary">{{ formatAmount(record.cash, record.currencyAbb || getCurrencyLabel(record.currencyId)) }}</td>
+          <td class="text-center">
+            <p-button
+              icon="pi pi-trash"
+              severity="danger"
+              [text]="true"
+              [rounded]="true"
+              [loading]="isDeleting(record)"
+              [disabled]="isDeleting(record)"
+              [ariaLabel]="'common.delete' | translate"
+              (onClick)="deletePayment(record)">
+            </p-button>
+          </td>
         </tr>
       </ng-template>
 
       <ng-template pTemplate="emptymessage">
         <tr>
-          <td colspan="4">
+          <td colspan="5">
             <div class="empty-state">
               <i class="pi pi-wallet"></i>
               <p>{{ 'ownerPaymentEntry.emptyRecords' | translate }}</p>

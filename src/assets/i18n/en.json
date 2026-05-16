@@ -620,7 +620,10 @@
       "transfer": "Bank Transfer"
     },
     "messages": {
-      "saved": "Owner payment saved successfully."
+      "saved": "Owner payment saved successfully.",
+      "deleted": "Owner payment deleted successfully.",
+      "confirmDelete": "Are you sure you want to delete this owner payment?",
+      "confirmDeleteHeader": "Delete Owner Payment"
     }
   },
   "projectTabs": {
