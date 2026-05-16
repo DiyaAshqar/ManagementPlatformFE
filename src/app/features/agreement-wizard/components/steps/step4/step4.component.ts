@@ -239,7 +239,7 @@ export class Step4Component implements OnInit, OnDestroy {
       dto.agreementId = this.agreementId() || 0;
       dto.typeId = contract.typeId || 0;
       dto.constructorId = contract.constructorId || 0;
-      (dto as any).mileStoneId = (contract as any).mileStoneId || undefined;
+      dto.milestoneId = contract.milestoneId || undefined;
       dto.isDeleted = contract.isDeleted || false;
       return dto;
     });
@@ -265,7 +265,7 @@ export class Step4Component implements OnInit, OnDestroy {
         agreementId: this.agreementId(),
         typeId: contract.typeId,
         constructorId: contract.constructorId,
-        mileStoneId: (contract as any).mileStoneId,
+        milestoneId: contract.milestoneId,
         isDeleted: contract.isDeleted
       }))
     };
@@ -294,8 +294,12 @@ export class Step4Component implements OnInit, OnDestroy {
     contractData.endDate = formValue.endDate;
     contractData.agreementId = this.agreementId();
     contractData.typeId = formValue.typeId;
+    contractData.contractType = this.getMainContractTypeName(formValue.typeId);
     contractData.constructorId = formValue.constructorId;
-    (contractData as any).mileStoneId = formValue.mileStoneId;
+    contractData.constructorName = this.getConstructorName(formValue.constructorId);
+    contractData.milestoneId = formValue.mileStoneId;
+    contractData.milestoneName = this.getMilestoneName(formValue.mileStoneId);
+    contractData.milestoneDto = this.milestones().find(m => m.id === formValue.mileStoneId);
     contractData.contractorDutyDto = []; // Initialize as empty array
     contractData.isDeleted = false;
 
@@ -316,12 +320,6 @@ export class Step4Component implements OnInit, OnDestroy {
               this.mainContracts.set(contracts);
               this.editingIndex.set(null);
 
-              this.messageService.add({
-                severity: 'success',
-                summary: 'Success',
-                detail: 'Contract updated successfully',
-                life: 3000
-              });
             } else {
               // Add new contract
               this.mainContracts.set([...this.mainContracts(), contractData]);
@@ -365,7 +363,7 @@ export class Step4Component implements OnInit, OnDestroy {
       agreementId: contract.agreementId,
       typeId: contract.typeId,
       constructorId: contract.constructorId,
-      mileStoneId: (contract as any).mileStoneId || null
+      mileStoneId: contract.milestoneId || null
     });
   }
 
@@ -398,15 +396,27 @@ export class Step4Component implements OnInit, OnDestroy {
     return type?.name || 'Unknown';
   }
 
+  getMainContractTypeDisplayName(contract: MainContractDto): string {
+    return contract.contractType || this.getMainContractTypeName(contract.typeId || 0);
+  }
+
   getConstructorName(constructorId: number): string {
     const constructor = this.constructors().find(c => c.id === constructorId);
     return constructor?.name || 'Unknown';
+  }
+
+  getConstructorDisplayName(contract: MainContractDto): string {
+    return contract.constructorName || this.getConstructorName(contract.constructorId || 0);
   }
 
   getMilestoneName(mileStoneId: number | undefined): string {
     if (!mileStoneId) return '-';
     const milestone = this.milestones().find(m => m.id === mileStoneId);
     return milestone?.name || 'Unknown';
+  }
+
+  getMilestoneDisplayName(contract: MainContractDto): string {
+    return contract.milestoneName || contract.milestoneDto?.name || this.getMilestoneName(contract.milestoneId);
   }
 
   formatDate(date: Date | string | undefined): string {

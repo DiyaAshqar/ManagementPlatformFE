@@ -151,12 +151,12 @@
                 
                 <ng-template pTemplate="body" let-contract let-rowIndex="rowIndex">
                     <tr>
-                        <td>{{ getMainContractTypeName(contract.typeId) }}</td>
-                        <td>{{ getConstructorName(contract.constructorId) }}</td>
+                        <td>{{ getMainContractTypeDisplayName(contract) }}</td>
+                        <td>{{ getConstructorDisplayName(contract) }}</td>
                         <td>{{ contract.total | number:'1.2-2' }}</td>
                         <td>{{ formatDate(contract.startDate) }}</td>
                         <td>{{ formatDate(contract.endDate) }}</td>
-                        <td>{{ getMilestoneName(contract.mileStoneId) }}</td>
+                        <td>{{ getMilestoneDisplayName(contract) }}</td>
                         <td class="text-center">
                             <button 
                                 type="button"
