@@ -1,4 +1,4 @@
-<div class="p-4">
+<div class="p-2">
   <form [formGroup]="milestoneForm" (ngSubmit)="onSubmit()">
     @if (isLoading()) {
     <div class="flex justify-center align-items-center p-6">
@@ -13,7 +13,7 @@
 
       <div class="grid">
         <!-- Name field -->
-        <div class="col-12 md:col-6 lg:col-3 mb-3">
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="field">
             <p-floatlabel variant="in">
               <input
@@ -31,7 +31,7 @@
         </div>
 
         <!-- OrderNo field -->
-        <div class="col-12 md:col-6 lg:col-3 mb-3">
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="field">
             <p-floatlabel variant="in">
               <p-inputNumber
@@ -51,7 +51,7 @@
         </div>
 
         <!-- Description field -->
-        <div class="col-12 md:col-6 lg:col-3 mb-3">
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="field">
             <p-floatlabel variant="in">
               <input
@@ -69,7 +69,7 @@
         </div>
 
         <!-- Action buttons -->
-        <div class="col-12 md:col-6 lg:col-3 mb-3">
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="flex gap-2 justify-end mt-2">
             <button type="button" class="p-button p-button-secondary" (click)="clearForm()" pButton
               [label]="'wizard.stepMilestones.cancel' | translate">
@@ -137,7 +137,7 @@
           <ng-template pTemplate="emptymessage">
             <tr>
               <td [attr.colspan]="isViewMode() ? 3 : 4" class="text-center p-6">
-                <i class="pi pi-inbox text-4xl mb-3 block text-gray-400"></i>
+                <i class="pi pi-inbox text-4xl mb-1 block text-gray-400"></i>
                 <p class="text-gray-500">{{ 'wizard.stepMilestones.noData' | translate }}</p>
               </td>
             </tr>

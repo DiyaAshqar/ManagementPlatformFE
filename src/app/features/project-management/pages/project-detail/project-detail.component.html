@@ -1,14 +1,14 @@
 <div class="min-h-screen bg-surface-ground">
   @if (isLoading()) {
     <!-- Loading Skeleton -->
-    <div class="p-4">
-      <p-skeleton width="300px" height="2.5rem" class="mb-3"></p-skeleton>
+    <div class="p-2">
+      <p-skeleton width="300px" height="2.5rem" class="mb-2"></p-skeleton>
       <p-skeleton width="100%" height="200px"></p-skeleton>
     </div>
   } @else if (project()) {
     <!-- Header Section -->
     <header class="surface-card border-bottom-1 surface-border">
-      <div class="p-4">
+      <div class="p-2">
         <div class="flex align-items-center justify-content-between">
           <div class="flex align-items-center gap-3">
             <p-button 
@@ -43,8 +43,7 @@
       </div>
     </header>
 
-    <div class="p-4">
-      <!-- Overview Cards -->
+    <div class="p-2">
       <div class="grid mb-2">
         <div class="col-12 md:col-6 lg:col-3">
           <p-card styleClass="h-full">

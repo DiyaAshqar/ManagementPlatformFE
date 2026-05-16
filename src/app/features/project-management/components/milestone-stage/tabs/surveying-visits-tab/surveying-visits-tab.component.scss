@@ -5,10 +5,10 @@
   overflow-x: auto;
   overflow-y: visible;
   -webkit-overflow-scrolling: touch;
-  padding: 1.5rem;
+  padding: 0.75rem;
 
   .sv-card-header {
-    margin-bottom: 1rem;
+    margin-bottom: 0.5rem;
 
     .sv-card-title {
       font-size: 1.1rem;
@@ -29,8 +29,8 @@
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: 0.5rem;
-    margin-bottom: 1rem;
+    gap: 0.25rem;
+    margin-bottom: 0.5rem;
 
     .sv-total-label {
       font-size: 0.875rem;

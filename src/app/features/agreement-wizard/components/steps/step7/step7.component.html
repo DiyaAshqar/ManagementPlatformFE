@@ -1,4 +1,4 @@
-﻿<div class="p-4">
+<div class="p-2">
     @if (isLoading()) {
     <div class="flex justify-center align-items-center p-6">
         <p-progressSpinner></p-progressSpinner>
@@ -14,7 +14,7 @@
         <form [formGroup]="attachmentForm">
             <div class="grid">
                 <!-- File Upload Field -->
-                <div class="col-12 md:col-6 mb-3">
+                <div class="col-12 md:col-6 mb-1">
                     <div class="field">
                         <label for="fileInput" class="block mb-2 font-semibold">{{ 'wizard.step7.file' | translate }} <span class="required-asterisk">*</span></label>
                         <div class="file-upload-wrapper">
@@ -68,7 +68,7 @@
                 </div>
 
                 <!-- Attachment Name Field -->
-                <div class="col-12 md:col-6 mb-3">
+                <div class="col-12 md:col-6 mb-1">
                     <div class="field">
                         <label for="attachmentName" class="block mb-2 font-semibold">{{ 'wizard.step7.attachmentName' | translate }} <span class="required-asterisk">*</span></label>
                         <input
@@ -170,7 +170,7 @@
             </div>
             } @else {
             <div class="text-center p-6">
-                <i class="pi pi-inbox text-6xl mb-3 block text-gray-400"></i>
+                <i class="pi pi-inbox text-6xl mb-1 block text-gray-400"></i>
                 <p class="text-gray-500 text-lg">{{ 'wizard.step7.noAttachments' | translate }}</p>
                 <p class="text-gray-400 text-sm mt-2">{{ 'wizard.step7.addFirstAttachment' | translate }}</p>
             </div>

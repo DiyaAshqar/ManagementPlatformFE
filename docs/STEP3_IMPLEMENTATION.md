@@ -156,7 +156,7 @@ Each section follows this structure:
   
   <div formGroupName="sectionDto">
     <div class="grid">
-      <div class="col-12 md:col-6 mb-3">
+      <div class="col-12 md:col-6 mb-1">
         <div class="field">
           <p-floatlabel variant="in">
             <!-- Input component -->

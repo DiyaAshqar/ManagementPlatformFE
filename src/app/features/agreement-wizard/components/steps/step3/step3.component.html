@@ -1,4 +1,4 @@
-﻿<div class="p-4">
+<div class="p-2">
     <form [formGroup]="step3Form" (ngSubmit)="onSubmit()">
         @if (isLoading()) {
         <div class="flex justify-center align-items-center p-6">
@@ -14,7 +14,7 @@
             <div formGroupName="projectAreaUnitDto">
                 <div class="grid">
                     <!-- Annex field -->
-                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
                                 <p-select inputId="annexId" formControlName="annexId" [options]="annexes()"
@@ -30,7 +30,7 @@
                     </div>
 
                     <!-- Amount field -->
-                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
                                 <p-inputNumber inputId="amount" formControlName="amount" [min]="0" [showButtons]="true"
@@ -45,7 +45,7 @@
                     </div>
 
                     <!-- Unit field -->
-                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
                                 <p-select inputId="unitId" formControlName="unitId" [options]="units()"
@@ -59,7 +59,7 @@
                             }
                         </div>
                     </div>
-                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <!-- Action buttons -->
                         <div class="flex gap-2 justify-end mt-2">
                             <button type="button" class="p-button p-button-secondary" (click)="clearForm()" pButton
@@ -127,7 +127,7 @@
                     <ng-template pTemplate="emptymessage">
                         <tr>
                             <td colspan="4" class="text-center p-6">
-                                <i class="pi pi-inbox text-4xl mb-3 block text-gray-400"></i>
+                                <i class="pi pi-inbox text-4xl mb-1 block text-gray-400"></i>
                                 <p class="text-gray-500">{{ 'wizard.step3.noData' | translate }}</p>
                             </td>
                         </tr>

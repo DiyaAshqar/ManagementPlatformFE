@@ -1,4 +1,4 @@
-<div class="p-4">
+<div class="p-2">
     @if (isLoading()) {
     <div class="flex justify-center align-items-center p-6">
         <p-progressSpinner></p-progressSpinner>
@@ -14,7 +14,7 @@
             <div formGroupName="supplierServiceDto">
                 <div class="grid">
                     <!-- Material field -->
-                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
                                 <p-select inputId="materialId" formControlName="materialId" [options]="materials()"
@@ -30,7 +30,7 @@
                     </div>
 
                     <!-- Supplier field -->
-                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
                                 <p-select inputId="supplierId" formControlName="supplierId" [options]="suppliers()"
@@ -46,7 +46,7 @@
                     </div>
 
                     <!-- Representative Name field -->
-                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
                                 <input pInputText inputId="representativeName" formControlName="representativeName"
@@ -60,7 +60,7 @@
                         </div>
                     </div>
                     <!-- Action Buttons -->
-                    <div class="col-12 md:col-6 lg:col-3 mb-3 flex justify-end gap-2">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1 flex justify-end gap-2">
                         <p-button [label]="'common.cancel' | translate" severity="secondary" icon="pi pi-times"
                             (onClick)="clearForm()">
                         </p-button>
@@ -125,7 +125,7 @@
                 <ng-template pTemplate="emptymessage">
                     <tr>
                         <td colspan="4" class="text-center p-6">
-                            <i class="pi pi-inbox text-4xl mb-3 block text-gray-400"></i>
+                            <i class="pi pi-inbox text-4xl mb-1 block text-gray-400"></i>
                             <p class="text-gray-500">{{ 'wizard.step5.noData' | translate }}</p>
                         </td>
                     </tr>

@@ -24,7 +24,7 @@
     border-radius: 8px;
 
     .p-card-body {
-      padding: 1rem;
+      padding: 0.5rem;
     }
   }
 }
@@ -51,7 +51,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
+  padding: 0.375rem 0.5rem;
   border-bottom: 1px solid var(--surface-200);
 }
 

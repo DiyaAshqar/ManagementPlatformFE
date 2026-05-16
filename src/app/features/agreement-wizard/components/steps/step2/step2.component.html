@@ -1,4 +1,4 @@
-<div class="p-4">
+<div class="p-2">
     <form [formGroup]="step2Form" (ngSubmit)="onSubmit()">
         @if (isLoading()) {
         <div class="flex justify-center align-items-center p-6">
@@ -11,7 +11,7 @@
             <h3 class="text-xl font-semibold mb-2">{{ 'wizard.step2.contractDetails' | translate }}</h3>
 
             <div class="grid">
-                <div class="col-12 md:col-6 mb-3">
+                <div class="col-12 md:col-6 mb-1">
                     <div class="field">
                         <p-floatlabel variant="in">
                             <p-select inputId="contractTypeId" formControlName="contractTypeId"
@@ -22,7 +22,7 @@
                     </div>
                 </div>
 
-                <div class="col-12 md:col-6 mb-3">
+                <div class="col-12 md:col-6 mb-1">
                     <div class="field">
                         <p-floatlabel variant="in">
                             <p-select inputId="contractModelId" formControlName="contractModelId"
@@ -34,7 +34,7 @@
                     </div>
                 </div>
 
-                <div class="col-12 md:col-6 mb-3">
+                <div class="col-12 md:col-6 mb-1">
                     <div class="field">
                         <p-floatlabel variant="in">
                             <p-inputNumber inputId="amount" formControlName="amount" [min]="0" [showButtons]="false"
