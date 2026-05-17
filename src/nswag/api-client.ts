@@ -13805,7 +13805,6 @@ export class MaterialCategory implements IMaterialCategory {
     id?: number;
     name!: string | undefined;
     materialSubCategories?: MaterialSubCategory[] | undefined;
-    materials?: Material[] | undefined;
 
     constructor(data?: IMaterialCategory) {
         if (data) {
@@ -13824,11 +13823,6 @@ export class MaterialCategory implements IMaterialCategory {
                 this.materialSubCategories = [] as any;
                 for (let item of _data["materialSubCategories"])
                     this.materialSubCategories!.push(MaterialSubCategory.fromJS(item));
-            }
-            if (Array.isArray(_data["materials"])) {
-                this.materials = [] as any;
-                for (let item of _data["materials"])
-                    this.materials!.push(Material.fromJS(item));
             }
         }
     }
@@ -13849,11 +13843,6 @@ export class MaterialCategory implements IMaterialCategory {
             for (let item of this.materialSubCategories)
                 data["materialSubCategories"].push(item ? item.toJSON() : undefined as any);
         }
-        if (Array.isArray(this.materials)) {
-            data["materials"] = [];
-            for (let item of this.materials)
-                data["materials"].push(item ? item.toJSON() : undefined as any);
-        }
         return data;
     }
 }
@@ -13862,7 +13851,6 @@ export interface IMaterialCategory {
     id?: number;
     name: string | undefined;
     materialSubCategories?: MaterialSubCategory[] | undefined;
-    materials?: Material[] | undefined;
 }
 
 export class MaterialSubCategory implements IMaterialSubCategory {
@@ -13911,6 +13899,54 @@ export interface IMaterialSubCategory {
     name: string | undefined;
     categoryId?: number;
     category?: MaterialCategory;
+}
+
+export class MileStoneDto implements IMileStoneDto {
+    id?: number;
+    name?: string | undefined;
+    description?: string | undefined;
+    order?: number;
+
+    constructor(data?: IMileStoneDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.order = _data["order"];
+        }
+    }
+
+    static fromJS(data: any): MileStoneDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new MileStoneDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["order"] = this.order;
+        return data;
+    }
+}
+
+export interface IMileStoneDto {
+    id?: number;
+    name?: string | undefined;
+    description?: string | undefined;
+    order?: number;
 }
 
 export class MileStones implements IMileStones {
@@ -15186,6 +15222,7 @@ export class ProjectStageDto implements IProjectStageDto {
     projectId?: number;
     status?: number | undefined;
     stageType?: ProjectStageType;
+    mileStone?: MileStoneDto;
 
     constructor(data?: IProjectStageDto) {
         if (data) {
@@ -15202,6 +15239,7 @@ export class ProjectStageDto implements IProjectStageDto {
             this.projectId = _data["projectId"];
             this.status = _data["status"];
             this.stageType = _data["stageType"];
+            this.mileStone = _data["mileStone"] ? MileStoneDto.fromJS(_data["mileStone"]) : undefined as any;
         }
     }
 
@@ -15218,6 +15256,7 @@ export class ProjectStageDto implements IProjectStageDto {
         data["projectId"] = this.projectId;
         data["status"] = this.status;
         data["stageType"] = this.stageType;
+        data["mileStone"] = this.mileStone ? this.mileStone.toJSON() : undefined as any;
         return data;
     }
 }
@@ -15227,6 +15266,7 @@ export interface IProjectStageDto {
     projectId?: number;
     status?: number | undefined;
     stageType?: ProjectStageType;
+    mileStone?: MileStoneDto;
 }
 
 export class ProjectStageTask implements IProjectStageTask {

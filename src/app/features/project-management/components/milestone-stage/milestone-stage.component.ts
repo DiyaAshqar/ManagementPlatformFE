@@ -1,11 +1,10 @@
-import { Component, inject, Input, OnInit, signal } from '@angular/core';
+import { Component, Input, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
 import { AccordionModule } from 'primeng/accordion';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TabsModule } from 'primeng/tabs';
-import { MileStonesDto, ProjectStageDto } from '../../../../../nswag/api-client';
-import { AgreementWizardService } from '../../../agreement-wizard/services/agreement-wizard.service';
+import { ProjectStageDto } from '../../../../../nswag/api-client';
 import { BoqTabComponent } from './tabs/boq-tab/boq-tab.component';
 import { PurchaseOrdersTabComponent } from './tabs/purchase-orders-tab/purchase-orders-tab.component';
 import { SurveyingVisitsTabComponent } from './tabs/surveying-visits-tab/surveying-visits-tab.component';
@@ -41,9 +40,6 @@ export class MilestoneStageComponent implements OnInit {
   @Input() milestoneStages: ProjectStageDto[] = [];
   @Input() agreementId: number = 0;
 
-  private agreementWizardService = inject(AgreementWizardService);
-
-  apiMilestones = signal<MileStonesDto[]>([]);
   isLoadingMilestones = signal(false);
 
   // Track active tab for each accordion panel
@@ -59,47 +55,13 @@ export class MilestoneStageComponent implements OnInit {
   activeAccordionValue: any = undefined;
 
   ngOnInit(): void {
-    if (this.agreementId > 0) {
-      this.loadApiMilestones();
-    } else {
-      // Fallback: initialize active tab for each project stage
-      this.milestoneStages.forEach(stage => {
-        if (stage.id) {
-          this.activeTabs[stage.id] = '0';
-        }
-      });
-    }
-  }
-
-  private loadApiMilestones(): void {
-    this.isLoadingMilestones.set(true);
-    this.agreementWizardService.getMilestonesFromStep3(this.agreementId).subscribe({
-      next: (milestones) => {
-        this.apiMilestones.set(milestones);
-        milestones.forEach(m => {
-          if (m.id) {
-            this.activeTabs[m.id] = '0';
-          }
-        });
-        this.isLoadingMilestones.set(false);
-      },
-      error: () => {
-        // Fallback to project stages on error
-        this.milestoneStages.forEach(stage => {
-          if (stage.id) {
-            this.activeTabs[stage.id] = '0';
-          }
-        });
-        this.isLoadingMilestones.set(false);
+    this.milestoneStages.forEach(stage => {
+      if (stage.id) {
+        this.activeTabs[stage.id] = '0';
       }
     });
   }
 
-  /** Returns the projectStageId for a given index in the API milestones array */
-  getProjectStageIdForIndex(index: number): number {
-    return this.milestoneStages[index]?.id || 0;
-  }
-  
   onAccordionChange(event: any): void {
     const panelId: number | undefined = event.value ?? undefined;
     if (panelId !== undefined && !this.openedPanels.has(panelId)) {
@@ -127,7 +89,7 @@ export class MilestoneStageComponent implements OnInit {
   }
 
   getMilestoneTitle(index: number, stage: ProjectStageDto): string {
-    return `Milestone ${index + 1}`;
+    return stage.mileStone?.name || `Milestone ${index + 1}`;
   }
 }
 

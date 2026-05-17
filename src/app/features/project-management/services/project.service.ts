@@ -43,7 +43,7 @@ export class ProjectService {
   constructor(private http: HttpClient, private taskService: TaskService) {}
 
   // Mapper: Convert API DTO to Project model
-  private mapApiProjectToProject(apiProject: GetProjectDto, index: number): Project {
+  mapApiProjectToProject(apiProject: GetProjectDto, index: number = 0): Project {
     return {
       id: (apiProject.id || 0).toString(), // Use numeric ID from API
       name: apiProject.title || '',
@@ -220,13 +220,16 @@ export class ProjectService {
   }
 
   // Get a single project by ID
-  getProjectById(id: string): Observable<Project | null> {
+  getProjectById(id: string): Observable<{ raw: GetProjectDto; project: Project } | null> {
     const numericId = parseInt(id, 10);
     return this.http.get<any>(`${this.apiUrl}/Project/${numericId}`).pipe(
       catchError(() => of(null)),
       map(response => {
         if (response && response.succeeded && response.data) {
-          return this.mapApiProjectToProject(response.data, 0);
+          return {
+            raw: response.data,
+            project: this.mapApiProjectToProject(response.data, 0)
+          };
         }
         return null;
       })

@@ -26,7 +26,6 @@ import { StageKanbanComponent } from '../../components/stage-kanban/stage-kanban
 import { Project, ProjectStatus, Stage, TaskStatus } from '../../models';
 import { GetProjectTaskDto } from '../../../../../nswag/api-client';
 import { ProjectService } from '../../services/project.service';
-import { ProjectApiService } from '../../services/project-api.service';
 
 interface ReportType {
   label: string;
@@ -102,7 +101,6 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private projectService: ProjectService,
-    private projectApiService: ProjectApiService,
     private translate: TranslateService
   ) {}
 
@@ -122,24 +120,12 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   loadProject(id: string): void {
     this.isLoading.set(true);
 
-    // Fetch raw API data to get projectStages
-    this.projectApiService.getProjectById(Number(id)).subscribe({
+    this.projectService.getProjectById(id).subscribe({
       next: (response) => {
-        if (response.succeeded && response.data) {
-          this.projectData.set(response.data);
-          
-          // Also fetch the mapped project for display
-          this.projectService.getProjectById(id).subscribe({
-            next: (project) => {
-              if (project) {
-                this.project.set(project);
-              }
-              this.isLoading.set(false);
-            },
-            error: () => {
-              this.isLoading.set(false);
-            }
-          });
+        if (response) {
+          this.projectData.set(response.raw);
+          this.project.set(response.project);
+          this.isLoading.set(false);
         } else {
           this.isLoading.set(false);
           this.router.navigate(['/projects']);
