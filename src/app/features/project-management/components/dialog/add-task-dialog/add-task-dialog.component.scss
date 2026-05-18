@@ -87,6 +87,23 @@
     }
   }
 
+  .attachment-section {
+    margin-top: 12px;
+    padding: 10px;
+    background-color: #f9f9f9;
+    border: 1px solid #e0e0e0;
+    border-radius: 4px;
+
+    h4 {
+      margin: 0 0 10px 0;
+      font-size: 14px;
+      font-weight: 600;
+      color: #555;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
   .form-actions {
     display: flex;
     gap: 8px;

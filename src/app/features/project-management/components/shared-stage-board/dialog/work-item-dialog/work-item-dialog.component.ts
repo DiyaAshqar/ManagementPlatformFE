@@ -12,7 +12,8 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
-import { ICreateTaskCommand, ProjectStatusSubTask, ProjectSubTaskDto } from '../../../../../../../nswag/api-client';
+import { AttachmentType, ICreateTaskCommand, ProjectStatusSubTask, ProjectSubTaskDto } from '../../../../../../../nswag/api-client';
+import { DocumentsTableComponent } from '../../../../../../shared/components/documents-table/documents-table.component';
 import { SubtaskApiService } from '../../../../services/subtask-api.service';
 import { TaskService } from '../../../../services/task.service';
 import { SubtaskDialogComponent } from '../subtask-dialog/subtask-dialog.component';
@@ -31,7 +32,8 @@ import { SubtaskDialogComponent } from '../subtask-dialog/subtask-dialog.compone
     TableModule,
     TagModule,
     TooltipModule,
-    DatePickerModule
+    DatePickerModule,
+    DocumentsTableComponent
   ],
   templateUrl: './work-item-dialog.component.html',
   styleUrls: ['./work-item-dialog.component.scss']
@@ -42,6 +44,8 @@ export class WorkItemDialogComponent implements OnInit {
   private dialogService = inject(DialogService);
   private taskService = inject(TaskService);
   private subtaskApiService = inject(SubtaskApiService);
+
+  readonly taskAttachmentType = AttachmentType._4;
 
   subtasks = signal<ProjectSubTaskDto[]>([]);
   isLoadingTaskTypes = signal(false);

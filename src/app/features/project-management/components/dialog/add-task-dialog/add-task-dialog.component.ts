@@ -8,7 +8,8 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
-import { CreateTaskCommand } from '../../../../../../nswag/api-client';
+import { AttachmentType, CreateTaskCommand } from '../../../../../../nswag/api-client';
+import { DocumentsTableComponent } from '../../../../../shared/components/documents-table/documents-table.component';
 import { ProjectService } from '../../../services/project.service';
 import { TaskService } from '../../../services/task.service';
 
@@ -42,6 +43,7 @@ export interface AddTaskFormData {
     ButtonModule,
     InputNumberModule,
     CalendarModule,
+    DocumentsTableComponent,
   ],
   templateUrl: './add-task-dialog.component.html',
   styleUrls: ['./add-task-dialog.component.scss']
@@ -53,8 +55,11 @@ export class AddTaskDialogComponent implements OnInit {
   private taskService = inject(TaskService);
   private fb = inject(FormBuilder);
 
+  readonly taskAttachmentType = AttachmentType._4;
+
   isLoading = signal(false);
   isLoadingTaskTypes = signal(false);
+  createdTaskId = signal<number | null>(null);
 
   formData: AddTaskFormData = {
     title: '',
@@ -135,18 +140,13 @@ export class AddTaskDialogComponent implements OnInit {
   }
 
   save(): void {
-    if (!this.formData.title) {
-      return;
-    }
-
-    if (!this.formData.projectStageId) {
+    if (!this.formData.title || !this.formData.projectStageId) {
       return;
     }
 
     this.isLoading.set(true);
 
-    // Create the task object to pass back
-    const newTask: Partial<CreateTaskCommand> = {
+    const createTaskCommand = new CreateTaskCommand({
       title: this.formData.title,
       description: this.formData.description || '',
       assignTo: this.formData.assignTo ? parseInt(this.formData.assignTo, 10) : undefined,
@@ -159,19 +159,40 @@ export class AddTaskDialogComponent implements OnInit {
       excavationVolume: this.formData.volume,
       excavationSoilType: this.formData.soilType,
       excavationEquipment: this.formData.equipment,
-      status: 0, // TODO status
-      projectStageId: this.formData.projectStageId,
-      taskTypeId: this.formData.taskTypeId
-    };
-
-    // Close dialog and pass the data
-    this.dialogRef.close({
-      task: newTask,
+      status: 0,
       projectStageId: this.formData.projectStageId,
       taskTypeId: this.formData.taskTypeId
     });
 
-    this.isLoading.set(false);
+    this.taskService.createTask(createTaskCommand).subscribe({
+      next: (response) => {
+        if (response.succeeded) {
+          // Find the newly created task to expose its ID for attachments
+          this.taskService.getTasksByStageId(this.formData.projectStageId, 1, 200).subscribe({
+            next: (tasksResponse) => {
+              if (tasksResponse.succeeded && tasksResponse.data?.data) {
+                const newest = tasksResponse.data.data
+                  .filter(t => t.projectStageId === this.formData.projectStageId)
+                  .sort((a, b) => (b.id || 0) - (a.id || 0))[0];
+                this.createdTaskId.set(newest?.id ?? null);
+              }
+              this.isLoading.set(false);
+            },
+            error: () => this.isLoading.set(false)
+          });
+        } else {
+          this.isLoading.set(false);
+        }
+      },
+      error: (error) => {
+        console.error('Error creating task:', error);
+        this.isLoading.set(false);
+      }
+    });
+  }
+
+  done(): void {
+    this.dialogRef.close({ success: true });
   }
 
   cancel(): void {

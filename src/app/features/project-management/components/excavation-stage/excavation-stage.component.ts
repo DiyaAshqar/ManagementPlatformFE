@@ -301,24 +301,8 @@ export class ExcavationStageComponent implements OnInit {
     });
 
     this.dialogRef.onClose.subscribe((result) => {
-      if (result && result.task) {
-        // Call the API to create the task
-        const numericProjectId = parseInt(this.projectId, 10);
-        this.projectService.addTask(
-          this.projectId,
-          `stage-${this.projectStageId}`,
-          result.task,
-          result.projectStageId || this.projectStageId,
-          result.taskTypeId || 1
-        ).subscribe({
-          next: () => {
-            // Reload tasks to reflect the new one
-            this.loadTasks();
-          },
-          error: (error) => {
-            console.error('Error creating task:', error);
-          }
-        });
+      if (result?.success) {
+        this.loadTasks();
       }
     });
   }

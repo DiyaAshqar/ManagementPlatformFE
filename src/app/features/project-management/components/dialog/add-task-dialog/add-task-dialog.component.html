@@ -189,26 +189,49 @@
       </div>
     </div>
 
+    <!-- Attachments Section (shown after task is created) -->
+    @if (createdTaskId()) {
+      <div class="attachment-section">
+        <h4>Attachments</h4>
+        <app-documents-table
+          [attachmentType]="taskAttachmentType"
+          [relationshipId]="createdTaskId()!"
+          contextLabel="this task">
+        </app-documents-table>
+      </div>
+    }
+
     <!-- Form Actions -->
     <div class="form-actions">
-      <button
-        pButton
-        type="button"
-        label="Cancel"
-        icon="pi pi-times"
-        (click)="cancel()"
-        class="p-button-secondary"
-      ></button>
-      <button
-        pButton
-        type="button"
-        label="Create Task"
-        icon="pi pi-check"
-        (click)="save()"
-        [disabled]="isLoading()"
-        [loading]="isLoading()"
-        class="p-button-primary"
-      ></button>
+      @if (createdTaskId()) {
+        <button
+          pButton
+          type="button"
+          label="Done"
+          icon="pi pi-check"
+          (click)="done()"
+          class="p-button-success"
+        ></button>
+      } @else {
+        <button
+          pButton
+          type="button"
+          label="Cancel"
+          icon="pi pi-times"
+          (click)="cancel()"
+          class="p-button-secondary"
+        ></button>
+        <button
+          pButton
+          type="button"
+          label="Create Task"
+          icon="pi pi-check"
+          (click)="save()"
+          [disabled]="isLoading()"
+          [loading]="isLoading()"
+          class="p-button-primary"
+        ></button>
+      }
     </div>
   </form>
 </div>
