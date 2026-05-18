@@ -172,6 +172,7 @@ export class Step2Component implements OnInit, OnDestroy {
   }
 
   toggleService(serviceId?: number): void {
+    if (this.isViewMode()) return;
     if (serviceId === undefined || serviceId === null) return;
     const selectedServices = this.selectedServicesArray;
     const index = selectedServices.value.indexOf(serviceId);
@@ -181,6 +182,11 @@ export class Step2Component implements OnInit, OnDestroy {
     } else {
       selectedServices.push(this.fb.control(serviceId));
     }
+
+    selectedServices.markAsDirty();
+    selectedServices.markAsTouched();
+    selectedServices.updateValueAndValidity();
+    this.step2Form.markAsDirty();
   }
 
   isServiceSelected(serviceId?: number): boolean {
