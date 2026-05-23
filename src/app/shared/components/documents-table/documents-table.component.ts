@@ -1,4 +1,5 @@
 import { Component, Input, OnInit, OnDestroy, signal, inject } from '@angular/core';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { CommonModule } from '@angular/common';
 import { TranslatePipe } from '@ngx-translate/core';
 import { Subject, takeUntil, finalize, forkJoin } from 'rxjs';
@@ -51,12 +52,19 @@ export class DocumentsTableComponent implements OnInit, OnDestroy {
   private attachmentService = inject(AttachmentService);
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
+  private sanitizer = inject(DomSanitizer);
 
   documents = signal<AttachmentMetaData[]>([]);
   selectedFiles = signal<UploadedFile[]>([]);
   isLoading = signal(false);
   isUploading = signal(false);
+  isPreviewing = signal(false);
   showUploadDialog = false;
+  showPreviewDialog = false;
+  previewUrl: string | null = null;
+  previewSafeUrl: SafeResourceUrl | null = null;
+  previewFileName = '';
+  previewType: 'image' | 'pdf' | 'unsupported' = 'unsupported';
   isDragging = false;
 
   private destroy$ = new Subject<void>();
@@ -183,6 +191,42 @@ export class DocumentsTableComponent implements OnInit, OnDestroy {
             life: 5000,
           }),
       });
+  }
+
+  previewDocument(doc: AttachmentMetaData): void {
+    this.previewFileName = doc.fileName;
+    this.previewType = doc.fileType === 'Image' ? 'image' : doc.fileType === 'PDF' ? 'pdf' : 'unsupported';
+    if (this.previewType === 'unsupported') {
+      this.showPreviewDialog = true;
+      return;
+    }
+    this.isPreviewing.set(true);
+    this.attachmentService
+      .getAttachmentBlobUrl(doc.id)
+      .pipe(takeUntil(this.destroy$), finalize(() => this.isPreviewing.set(false)))
+      .subscribe({
+        next: ({ url }) => {
+          this.previewUrl = url;
+          this.previewSafeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(url);
+          this.showPreviewDialog = true;
+        },
+        error: () =>
+          this.messageService.add({
+            severity: 'error',
+            summary: 'Error',
+            detail: 'Failed to load preview',
+            life: 5000,
+          }),
+      });
+  }
+
+  closePreviewDialog(): void {
+    this.showPreviewDialog = false;
+    if (this.previewUrl) {
+      URL.revokeObjectURL(this.previewUrl);
+      this.previewUrl = null;
+      this.previewSafeUrl = null;
+    }
   }
 
   downloadDocument(doc: AttachmentMetaData): void {

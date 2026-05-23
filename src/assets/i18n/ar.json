@@ -1070,6 +1070,9 @@
     "typeImages": "صور",
     "download": "تحميل",
     "delete": "حذف",
+    "preview": "معاينة",
+    "previewNotAvailable": "المعاينة غير متاحة لهذا النوع من الملفات. يرجى التحميل للعرض.",
+    "close": "إغلاق",
     "cancel": "إلغاء",
     "upload": "رفع",
     "uploading": "جاري الرفع..."

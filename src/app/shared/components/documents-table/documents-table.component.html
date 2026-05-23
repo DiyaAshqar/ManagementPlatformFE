@@ -47,6 +47,11 @@
         <td>
           <div class="flex align-items-center gap-2">
             <p-button
+              icon="pi pi-eye" [text]="true" [rounded]="true" severity="info"
+              [loading]="isPreviewing()"
+              (onClick)="previewDocument(doc)" [pTooltip]="'documentsTable.preview' | translate" tooltipPosition="bottom">
+            </p-button>
+            <p-button
               icon="pi pi-download" [text]="true" [rounded]="true" severity="secondary"
               (onClick)="downloadDocument(doc)" [pTooltip]="'documentsTable.download' | translate" tooltipPosition="bottom">
             </p-button>
@@ -155,6 +160,34 @@
         (onClick)="uploadFiles()">
       </p-button>
     </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Preview Dialog ────────────────────────────────────────────────────── -->
+<p-dialog
+  [(visible)]="showPreviewDialog"
+  [modal]="true"
+  [style]="{ width: '80vw', maxWidth: '1000px' }"
+  [header]="previewFileName"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="closePreviewDialog()">
+
+  @if (previewType === 'image' && previewUrl) {
+    <div class="flex justify-content-center">
+      <img [src]="previewUrl" [alt]="previewFileName" style="max-width: 100%; max-height: 70vh; object-fit: contain;" />
+    </div>
+  } @else if (previewType === 'pdf' && previewSafeUrl) {
+    <iframe [src]="previewSafeUrl" style="width: 100%; height: 70vh; border: none;"></iframe>
+  } @else {
+    <div class="flex flex-column align-items-center justify-content-center py-6 text-center">
+      <i class="pi pi-eye-slash text-5xl text-400 mb-3"></i>
+      <p class="text-color-secondary mb-0">{{ 'documentsTable.previewNotAvailable' | translate }}</p>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button [label]="'documentsTable.close' | translate" [outlined]="true" severity="secondary" (onClick)="closePreviewDialog()"></p-button>
   </ng-template>
 </p-dialog>
 

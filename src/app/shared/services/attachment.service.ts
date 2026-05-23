@@ -125,6 +125,21 @@ export class AttachmentService {
   }
 
   /**
+   * Fetch an attachment as a blob URL for in-browser preview.
+   * Caller is responsible for calling URL.revokeObjectURL() when done.
+   */
+  getAttachmentBlobUrl(id: number): Observable<{ url: string; mimeType: string }> {
+    const url = `${this.baseUrl}/api/Attachment/${id}/download`;
+    return this.http.get(url, { responseType: 'blob', observe: 'response' }).pipe(
+      map(response => {
+        const blob = response.body!;
+        const mimeType = blob.type || 'application/octet-stream';
+        return { url: URL.createObjectURL(blob), mimeType };
+      })
+    );
+  }
+
+  /**
    * Download an attachment — fetches the binary blob and triggers a browser download.
    * @param id - Attachment ID
    * @param fileName - Optional filename hint (falls back to id)
@@ -179,12 +194,13 @@ export class AttachmentService {
    * Map API response to our AttachmentMetaData interface
    */
   private mapToAttachmentMetaData(att: GetAttachmentMetaData): AttachmentMetaData {
+    const displayName = att.originalName || att.fileName || '';
     return {
       id: att.id || 0,
-      fileName: att.fileName || '',
+      fileName: displayName,
       filePath: att.filePath || '',
       relationshipId: att.relationshipId || 0,
-      fileType: this.determineFileType(att.fileName || '')
+      fileType: this.determineFileType(displayName)
     };
   }
 

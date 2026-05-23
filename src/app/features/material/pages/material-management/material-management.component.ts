@@ -368,7 +368,7 @@ export class MaterialManagementComponent implements OnInit {
   }
 
   openEditMaterial(mat: GetMaterialDto): void {
-    this.materialForm = { id: mat.id, name: mat.name || '', subCategoryId: mat.categoryId };
+    this.materialForm = { id: mat.id, name: mat.name || '', subCategoryId: mat.subCategoryId };
     this.materialDialogTitle = 'material.item.editTitle';
     this.materialDialogVisible = true;
   }

@@ -1076,6 +1076,9 @@
     "typeImages": "Images",
     "download": "Download",
     "delete": "Delete",
+    "preview": "Preview",
+    "previewNotAvailable": "Preview is not available for this file type. Please download to view.",
+    "close": "Close",
     "cancel": "Cancel",
     "upload": "Upload",
     "uploading": "Uploading..."
