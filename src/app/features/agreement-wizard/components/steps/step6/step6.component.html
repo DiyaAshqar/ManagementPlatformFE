@@ -19,6 +19,7 @@
                             <p-floatlabel variant="in">
                                 <p-select inputId="materialId" formControlName="materialId" [options]="materials()"
                                     optionLabel="name" optionValue="id"
+                                    [filter]="true" filterPlaceholder="{{ 'wizard.step6.searchMaterial' | translate }}"
                                     [class]="isFieldInvalid('materialId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'">
                                 </p-select>
                                 <label for="materialId">{{ 'wizard.step6.material' | translate }}</label>

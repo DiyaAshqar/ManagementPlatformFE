@@ -1,7 +1,9 @@
 import { CommonModule } from '@angular/common';
-import { Component, EventEmitter, Input, OnChanges, OnInit, Output, SimpleChanges, signal } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, OnDestroy, OnInit, Output, SimpleChanges, signal } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -11,8 +13,7 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 
-import { MessageService } from 'primeng/api';
-import { CreateProjectMainContractorCommand, IGetProjectMainContractorDto } from '../../../../../../nswag/api-client';
+import { ConstructorClient, CreateProjectMainContractorCommand, IGetProjectMainContractorDto } from '../../../../../../nswag/api-client';
 
 @Component({
   selector: 'app-add-contractor-dialog',
@@ -28,35 +29,41 @@ import { CreateProjectMainContractorCommand, IGetProjectMainContractorDto } from
     FloatLabelModule,
     CalendarModule
   ],
+  providers: [ConstructorClient],
   templateUrl: './add-contractor-dialog.component.html',
   styleUrls: ['./add-contractor-dialog.component.scss']
 })
-export class AddContractorDialogComponent implements OnInit, OnChanges {
+export class AddContractorDialogComponent implements OnInit, OnChanges, OnDestroy {
   @Input() visible = false;
   @Input() projectStageId!: number;
-  /** When provided the dialog switches to edit mode */
   @Input() editItem: IGetProjectMainContractorDto | null = null;
+  @Input() contractorTypeOptions: { label: string; value: number }[] = [];
 
   @Output() visibleChange = new EventEmitter<boolean>();
   @Output() saved = new EventEmitter<CreateProjectMainContractorCommand>();
 
   contractorForm!: FormGroup;
   isSubmitting = signal(false);
+  isLoadingContractors = signal(false);
+  contractorOptions: { label: string; value: number }[] = [];
+
+  private destroy$ = new Subject<void>();
 
   get isEditMode(): boolean {
     return !!this.editItem;
   }
 
   get dialogHeader(): string {
-    return this.isEditMode 
+    return this.isEditMode
       ? this.translate.instant('dialogs.contractor.editTitle')
       : this.translate.instant('dialogs.contractor.addTitle');
   }
 
-  /** Dynamic contractor options received from the parent */
-  @Input() contractorOptions: { label: string; value: number }[] = [];
-
-  constructor(private fb: FormBuilder, private messageService: MessageService, private translate: TranslateService) { }
+  constructor(
+    private fb: FormBuilder,
+    private constructorClient: ConstructorClient,
+    private translate: TranslateService
+  ) { }
 
   ngOnInit(): void {
     this.initForm();
@@ -68,9 +75,18 @@ export class AddContractorDialogComponent implements OnInit, OnChanges {
     }
   }
 
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
   private initForm(): void {
+    this.destroy$.next();
+    this.contractorOptions = [];
+
     if (!this.contractorForm) {
       this.contractorForm = this.fb.group({
+        mainContractorTypeId: [null, Validators.required],
         constructorId: [null, Validators.required],
         amount: [null, [Validators.required, Validators.min(0)]],
         startDate: [null, Validators.required],
@@ -78,21 +94,64 @@ export class AddContractorDialogComponent implements OnInit, OnChanges {
       });
     }
 
+    this.contractorForm.get('mainContractorTypeId')!.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(typeId => {
+        this.contractorOptions = [];
+        this.contractorForm.get('constructorId')!.reset(null);
+        if (typeId) {
+          this.loadContractorsByType(typeId);
+        }
+      });
+
     if (this.isEditMode && this.editItem) {
       this.contractorForm.patchValue({
-        constructorId: this.editItem.constructorId,
         amount: this.editItem.amount,
         startDate: this.editItem.startDate ? new Date(this.editItem.startDate) : null,
         endDate: this.editItem.endDate ? new Date(this.editItem.endDate) : null
       });
+      // Resolve the type from the constructor, then load its peers
+      if (this.editItem.constructorId) {
+        this.isLoadingContractors.set(true);
+        this.constructorClient.getById(this.editItem.constructorId).subscribe({
+          next: (res) => {
+            const typeId = res.data?.mainContractorTypeId ?? null;
+            this.contractorForm.get('mainContractorTypeId')!.setValue(typeId, { emitEvent: false });
+            if (typeId) {
+              this.loadContractorsByType(typeId, this.editItem!.constructorId);
+            } else {
+              this.isLoadingContractors.set(false);
+            }
+          },
+          error: () => this.isLoadingContractors.set(false)
+        });
+      }
     } else {
       this.contractorForm.reset();
     }
   }
 
+  private loadContractorsByType(typeId: number, preselectId?: number): void {
+    this.isLoadingContractors.set(true);
+    this.constructorClient.getByTypeId(typeId, 1, 1000, undefined).subscribe({
+      next: (res) => {
+        const data = res.data?.data ?? [];
+        this.contractorOptions = data
+          .filter(c => c.id != null && c.name)
+          .map(c => ({ label: c.name!, value: c.id! }));
+        if (preselectId) {
+          this.contractorForm.get('constructorId')!.setValue(preselectId, { emitEvent: false });
+        }
+        this.isLoadingContractors.set(false);
+      },
+      error: () => this.isLoadingContractors.set(false)
+    });
+  }
+
   onHide(): void {
     this.visibleChange.emit(false);
     this.contractorForm.reset();
+    this.contractorOptions = [];
     this.isSubmitting.set(false);
   }
 

@@ -78,6 +78,27 @@
         </div>
       </div>
 
+      <!-- Supplier -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="supplierId"
+              formControlName="supplierId"
+              [options]="supplierOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="true"
+              [filterPlaceholder]="'projectTabs.boq.dialog.searchSupplier' | translate"
+              [showClear]="true"
+              class="w-full"
+              appendTo="body">
+            </p-select>
+            <label for="supplierId">{{ 'projectTabs.boq.dialog.supplier' | translate }}</label>
+          </p-floatlabel>
+        </div>
+      </div>
+
       <!-- Description -->
       <div class="col-12">
         <div class="field">

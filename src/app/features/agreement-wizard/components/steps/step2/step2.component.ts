@@ -4,6 +4,8 @@ import { FormArray, FormBuilder, FormGroup, ReactiveFormsModule, Validators } fr
 import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { InputGroupModule } from 'primeng/inputgroup';
+import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
@@ -31,7 +33,9 @@ import {
     InputNumberModule,
     ButtonModule,
     TranslateModule,
-    FloatLabelModule
+    FloatLabelModule,
+    InputGroupModule,
+    InputGroupAddonModule
   ],
   templateUrl: './step2.component.html'
 })

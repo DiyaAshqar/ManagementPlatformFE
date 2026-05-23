@@ -17,6 +17,7 @@ import {
   ConstructorClient,
   CreateProjectMainContractorCommand,
   IGetProjectMainContractorDto,
+  LookupClient,
   ProjectMainContractorClient
 } from '../../../../../../../nswag/api-client';
 import { AddContractorDialogComponent } from '../../../dialog/add-contractor-dialog/add-contractor-dialog.component';
@@ -39,7 +40,7 @@ import { ProjectMainContractorPaymentsComponent } from '../../../../components/p
     ContractorDutiesDialogComponent,
     ProjectMainContractorPaymentsComponent
   ],
-  providers: [ProjectMainContractorClient, ConstructorClient],
+  providers: [ProjectMainContractorClient, ConstructorClient, LookupClient],
   templateUrl: './project-main-contractor-tab.component.html',
   styleUrl: './project-main-contractor-tab.component.scss'
 })
@@ -61,8 +62,8 @@ export class ProjectMainContractorTabComponent implements OnInit {
   // ─── Lookup maps (for table display) ───────────────────────────────────────
   contractorMap: Record<number, string> = {};
 
-  // ─── Option arrays (passed to dialog) ──────────────────────────────────────
-  contractorOptions: { label: string; value: number }[] = [];
+  // ─── Contractor types passed to dialog ─────────────────────────────────────
+  contractorTypeOptions: { label: string; value: number }[] = [];
 
   get totalContractValue(): number {
     return this.contractorItems().reduce((sum, item) => sum + (item.amount ?? 0), 0);
@@ -71,6 +72,7 @@ export class ProjectMainContractorTabComponent implements OnInit {
   constructor(
     private contractorClient: ProjectMainContractorClient,
     private constructorClient: ConstructorClient,
+    private lookupClient: LookupClient,
     private confirmationService: ConfirmationService,
     private translate: TranslateService
   ) { }
@@ -83,13 +85,23 @@ export class ProjectMainContractorTabComponent implements OnInit {
   // ── Lookups ───────────────────────────────────────────────────────────────
 
   loadLookups(): void {
+    // Load all constructors just to build the display map for the table
     this.constructorClient.getAll(1, 1000, undefined).subscribe({
       next: (res) => {
         const data = res.data?.data ?? [];
-        this.contractorOptions = data
-          .filter(c => c.id != null && c.name)
-          .map(c => ({ label: c.name!, value: c.id! }));
-        this.contractorMap = Object.fromEntries(this.contractorOptions.map(o => [o.value, o.label]));
+        this.contractorMap = Object.fromEntries(
+          data.filter(c => c.id != null && c.name).map(c => [c.id!, c.name!])
+        );
+      }
+    });
+
+    // Load contractor types from the lookup API
+    this.lookupClient.getAllLookups(['MainContractType']).subscribe({
+      next: (res) => {
+        const types = res.data?.['MainContractType'] ?? [];
+        this.contractorTypeOptions = types
+          .filter((t: any) => t.id != null && t.name)
+          .map((t: any) => ({ label: t.name, value: t.id }));
       }
     });
   }

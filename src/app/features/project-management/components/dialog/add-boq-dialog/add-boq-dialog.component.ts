@@ -63,6 +63,7 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
     @Input() unitOptions: { label: string; value: number }[] = [];
     @Input() materialOptions: { label: string; value: number }[] = [];
     @Input() constructorOptions: { label: string; value: number }[] = [];
+    @Input() supplierOptions: { label: string; value: number }[] = [];
 
     constructor(private fb: FormBuilder, private messageService: MessageService) { }
 
@@ -83,6 +84,7 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
                 description: ['', Validators.required],
                 unitId: [null, Validators.required],
                 constructorId: [null, Validators.required],
+                supplierId: [null],
                 actualQuantity: [null, [Validators.required, Validators.min(0.01)]],
                 price: [null, [Validators.required, Validators.min(0)]]
             });
@@ -94,6 +96,7 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
                 description: this.editItem.description,
                 unitId: this.editItem.unitId,
                 constructorId: this.editItem.constructorId,
+                supplierId: (this.editItem as any).supplierId ?? null,
                 actualQuantity: this.editItem.actualQuantity,
                 price: this.editItem.price
             });
@@ -117,7 +120,7 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
             return;
         }
 
-        const { materialId, description, unitId, constructorId, actualQuantity, price } = this.boqForm.value;
+        const { materialId, description, unitId, constructorId, supplierId, actualQuantity, price } = this.boqForm.value;
         const subTotal = actualQuantity * price;
 
         const command = new CreateProjectBOQCommand({
@@ -131,6 +134,7 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
             description,
             subTotal
         });
+        (command as any).supplierId = supplierId ?? undefined;
 
         this.isSubmitting.set(true);
         this.saved.emit(command);
