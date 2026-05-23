@@ -258,16 +258,30 @@
     </div>
 
     <!-- Attachments Section -->
-    @if (formData().backendTaskId) {
-      <div class="border-top-1 surface-border pt-3">
-        <label class="block text-sm font-semibold mb-2 text-color">Attachments</label>
-        <app-documents-table
-          [attachmentType]="taskAttachmentType"
-          [relationshipId]="formData().backendTaskId!"
-          contextLabel="this task">
-        </app-documents-table>
+    <div class="border-top-1 surface-border pt-3">
+      <div class="flex align-items-center justify-content-between mb-2">
+        <label class="block text-sm font-semibold m-0 text-color">Attachments</label>
+        @if (!formData().backendTaskId) {
+          <span class="text-xs text-400">
+            <i class="pi pi-info-circle mr-1"></i>Save the task first to manage attachments
+          </span>
+        }
       </div>
-    }
+      <div [class.pointer-events-none]="!formData().backendTaskId" [class.opacity-50]="!formData().backendTaskId">
+        @if (formData().backendTaskId) {
+          <app-documents-table
+            [attachmentType]="taskAttachmentType"
+            [relationshipId]="formData().backendTaskId!"
+            contextLabel="this task">
+          </app-documents-table>
+        } @else {
+          <div class="text-center p-3 surface-50 border-round border-1 surface-border">
+            <i class="pi pi-paperclip text-2xl text-400 mb-2"></i>
+            <p class="text-xs text-500 m-0">No attachments yet. Save the task first to upload files.</p>
+          </div>
+        }
+      </div>
+    </div>
 
     <!-- Footer -->
     <div class="flex justify-content-end gap-2 border-top-1 surface-border pt-3">

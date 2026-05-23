@@ -56,6 +56,27 @@
         </div>
       </div>
 
+      <!-- Classification -->
+      <div class="col-12">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="classification"
+              formControlName="classification"
+              [options]="classificationOptions"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('classification')">
+            </p-select>
+            <label for="classification">Classification <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('classification')" class="p-error">Classification is required</small>
+        </div>
+      </div>
+
       <!-- Amount -->
       <div class="col-12">
         <div class="field">

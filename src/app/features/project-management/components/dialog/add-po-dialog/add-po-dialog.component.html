@@ -140,6 +140,16 @@
     </div>
   </form>
 
+  @if (isEditMode && editItem?.id) {
+    <div style="margin-top: 1.5rem;">
+      <app-documents-table
+        [attachmentType]="AttachmentType._5"
+        [relationshipId]="editItem!.id!"
+        contextLabel="Purchase Order">
+      </app-documents-table>
+    </div>
+  }
+
   <ng-template pTemplate="footer">
     <p-button
       [label]="'common.cancel' | translate"

@@ -13,7 +13,8 @@ import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 
 import { MessageService } from 'primeng/api';
-import { CreateProjectPOCommand, IGetProjectPODto } from '../../../../../../nswag/api-client';
+import { AttachmentType, CreateProjectPOCommand, IGetProjectPODto } from '../../../../../../nswag/api-client';
+import { DocumentsTableComponent } from '../../../../../shared/components/documents-table/documents-table.component';
 
 @Component({
     selector: 'app-add-po-dialog',
@@ -28,7 +29,8 @@ import { CreateProjectPOCommand, IGetProjectPODto } from '../../../../../../nswa
         TextareaModule,
         InputNumberModule,
         SelectModule,
-        FloatLabelModule
+        FloatLabelModule,
+        DocumentsTableComponent
     ],
     templateUrl: './add-po-dialog.component.html',
     styleUrls: ['./add-po-dialog.component.scss']
@@ -44,6 +46,7 @@ export class AddPoDialogComponent implements OnInit, OnChanges {
 
     poForm!: FormGroup;
     isSubmitting = signal(false);
+    AttachmentType = AttachmentType;
 
     get statusOptions() {
         return [

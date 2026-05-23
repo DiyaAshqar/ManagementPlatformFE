@@ -61,7 +61,6 @@ export class PurchaseOrdersTabComponent implements OnInit {
   unitOptions: { label: string; value: number }[] = [];
   supplierOptions: { label: string; value: number }[] = [];
 
-  // Status enum for template access
   POStatus = POStatus;
 
   get totalPOValue(): number {

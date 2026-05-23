@@ -47,6 +47,11 @@ export class AddContractorDialogComponent implements OnInit, OnChanges, OnDestro
   isLoadingContractors = signal(false);
   contractorOptions: { label: string; value: number }[] = [];
 
+  classificationOptions = [
+    { label: 'Main Contractor', value: 1 },
+    { label: 'Sub Contractor', value: 2 }
+  ];
+
   private destroy$ = new Subject<void>();
 
   get isEditMode(): boolean {
@@ -88,6 +93,7 @@ export class AddContractorDialogComponent implements OnInit, OnChanges, OnDestro
       this.contractorForm = this.fb.group({
         mainContractorTypeId: [null, Validators.required],
         constructorId: [null, Validators.required],
+        classification: [null, Validators.required],
         amount: [null, [Validators.required, Validators.min(0)]],
         startDate: [null, Validators.required],
         endDate: [null, Validators.required]
@@ -107,6 +113,8 @@ export class AddContractorDialogComponent implements OnInit, OnChanges, OnDestro
     if (this.isEditMode && this.editItem) {
       this.contractorForm.patchValue({
         amount: this.editItem.amount,
+        // TODO: remove cast once BE adds classification to IGetProjectMainContractorDto
+        classification: (this.editItem as any).classification ?? null,
         startDate: this.editItem.startDate ? new Date(this.editItem.startDate) : null,
         endDate: this.editItem.endDate ? new Date(this.editItem.endDate) : null
       });
@@ -164,7 +172,7 @@ export class AddContractorDialogComponent implements OnInit, OnChanges, OnDestro
       return;
     }
 
-    const { constructorId, amount, startDate, endDate } = this.contractorForm.value;
+    const { constructorId, classification, amount, startDate, endDate } = this.contractorForm.value;
 
     const command = new CreateProjectMainContractorCommand({
       id: this.isEditMode ? this.editItem!.id : undefined,
@@ -174,6 +182,8 @@ export class AddContractorDialogComponent implements OnInit, OnChanges, OnDestro
       startDate,
       endDate
     });
+    // TODO: remove cast and move classification into CreateProjectMainContractorCommand once BE adds the field
+    (command as any).classification = classification;
 
     this.isSubmitting.set(true);
     this.saved.emit(command);

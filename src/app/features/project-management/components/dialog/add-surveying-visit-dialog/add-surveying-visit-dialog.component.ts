@@ -14,9 +14,11 @@ import { TextareaModule } from 'primeng/textarea';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import {
+  AttachmentType,
   CreateProjectSurveyingVisitCommand,
   IGetProjectSurveyingVisitDto
 } from '../../../../../../nswag/api-client';
+import { DocumentsTableComponent } from '../../../../../shared/components/documents-table/documents-table.component';
 
 export enum VisitStatus {
   InProgress = 0,
@@ -38,7 +40,8 @@ export enum VisitStatus {
     InputNumberModule,
     SelectModule,
     FloatLabelModule,
-    DatePickerModule
+    DatePickerModule,
+    DocumentsTableComponent
   ],
   templateUrl: './add-surveying-visit-dialog.component.html',
   styleUrls: ['./add-surveying-visit-dialog.component.scss']
@@ -54,6 +57,7 @@ export class AddSurveyingVisitDialogComponent implements OnInit, OnChanges {
 
   visitForm!: FormGroup;
   isSubmitting = signal(false);
+  AttachmentType = AttachmentType;
 
   get statusOptions() {
     return [
