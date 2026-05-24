@@ -518,7 +518,8 @@
       "milestones": "Milestones",
       "documents": "Documents",
       "expenses": "Expenses",
-      "ownerPayment": "Owner Payment"
+      "ownerPayment": "Owner Payment",
+      "timeframe": "Timeframe"
     },
     "printDialog": {
       "header": "Print Project Report",
@@ -1114,6 +1115,78 @@
       "namePlaceholder": "Enter material name",
       "noData": "No materials found",
       "selectSubCategory": "Select a subcategory first"
+    }
+  },
+  "timeframe": {
+    "title": "Project Timeframe",
+    "subtitle": "Phases on a timeline based on each contractor's start and end dates",
+    "today": "Today",
+    "summary": {
+      "totalPhases": "Total Phases",
+      "totalContractors": "Contractors",
+      "conflicts": "Conflicts",
+      "overallProgress": "Overall Progress",
+      "delayed": "Delayed Contractors"
+    },
+    "toolbar": {
+      "searchPlaceholder": "Search contractor or type...",
+      "filterPhase": "Filter by phase",
+      "filterContractor": "Filter by contractor",
+      "filterStatus": "Filter by status",
+      "dateRange": "Date range",
+      "clearFilters": "Clear filters",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "goToToday": "Go to today",
+      "exportExcel": "Export Excel",
+      "exportPdf": "Export PDF / Print",
+      "fullscreen": "Fullscreen"
+    },
+    "scale": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "status": {
+      "not_started": "Not Started",
+      "in_progress": "In Progress",
+      "delayed": "Delayed",
+      "completed": "Completed"
+    },
+    "board": {
+      "phaseAndContractor": "Phase / Contractor"
+    },
+    "alert": {
+      "conflictsFound": "{{count}} conflict(s) detected between contractors — click to review"
+    },
+    "conflict": {
+      "hasConflict": "Has a scheduling conflict",
+      "tooltip": "Conflict between {{a}} and {{b}}",
+      "panelTitle": "Detected Conflicts",
+      "itemsFound": "items found",
+      "noneFound": "No conflicts currently detected",
+      "reasons": {
+        "date_overlap": "Date overlap",
+        "zone_overlap": "Same-zone overlap",
+        "resource_overlap": "Resource overlap"
+      }
+    },
+    "details": {
+      "startDate": "Start date",
+      "endDate": "End date",
+      "duration": "Duration",
+      "days": "days",
+      "progress": "Progress",
+      "zone": "Zone",
+      "amount": "Contract amount",
+      "payments": "Payments",
+      "dependencies": "Depends on",
+      "detectedConflicts": "Related conflicts",
+      "notes": "Notes"
+    },
+    "empty": {
+      "title": "No timeline data to display",
+      "subtitle": "No contractors with valid dates were found for this project"
     }
   }
 }

@@ -23,6 +23,7 @@ import { MilestoneStageComponent } from '../../components/milestone-stage/milest
 import { OwnerPaymentTabComponent } from '../../components/owner-payment-tab/owner-payment-tab.component';
 import { PreparingStageComponent } from '../../components/preparing-stage/preparing-stage.component';
 import { StageKanbanComponent } from '../../components/stage-kanban/stage-kanban.component';
+import { TimeframeComponent } from '../../components/timeframe/timeframe.component';
 import { Project, ProjectStatus, Stage, TaskStatus } from '../../models';
 import { GetProjectTaskDto } from '../../../../../nswag/api-client';
 import { ProjectService } from '../../services/project.service';
@@ -53,6 +54,7 @@ interface ReportType {
     MilestoneStageComponent,
     OwnerPaymentTabComponent,
     StageKanbanComponent,
+    TimeframeComponent,
     DocumentsStageComponent,
     // StagingBoardComponent
   ],

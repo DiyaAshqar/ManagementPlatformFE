@@ -159,6 +159,12 @@
                 <span>{{ 'projectDetail.tabs.ownerPayment' | translate }}</span>
               </div>
             </p-tab>
+            <p-tab value="7">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-chart-bar"></i>
+                <span>{{ 'projectDetail.tabs.timeframe' | translate }}</span>
+              </div>
+            </p-tab>
           </p-tablist>
           
           <p-tabpanels>
@@ -212,6 +218,13 @@
               <div class="py-4">
                 @if (activeTabIndex === '6') {
                   <app-owner-payment-tab [project]="project()"></app-owner-payment-tab>
+                }
+              </div>
+            </p-tabpanel>
+            <p-tabpanel value="7">
+              <div class="py-4">
+                @if (activeTabIndex === '7') {
+                  <app-timeframe [projectId]="project()!.id"></app-timeframe>
                 }
               </div>
             </p-tabpanel>

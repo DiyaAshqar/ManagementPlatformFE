@@ -514,7 +514,8 @@
       "milestones": "المراحل",
       "documents": "المستندات",
       "expenses": "المصروفات",
-      "ownerPayment": "دفعات المالك"
+      "ownerPayment": "دفعات المالك",
+      "timeframe": "الإطار الزمني"
     },
     "printDialog": {
       "header": "طباعة تقرير المشروع",
@@ -1108,6 +1109,78 @@
       "namePlaceholder": "أدخل اسم المادة",
       "noData": "لا توجد مواد",
       "selectSubCategory": "اختر فئة فرعية أولاً"
+    }
+  },
+  "timeframe": {
+    "title": "الجدول الزمني للمشروع",
+    "subtitle": "عرض المراحل على شكل خط زمني بناءً على بداية ونهاية كل مقاول",
+    "today": "اليوم",
+    "summary": {
+      "totalPhases": "إجمالي المراحل",
+      "totalContractors": "عدد المقاولين",
+      "conflicts": "عدد التعارضات",
+      "overallProgress": "نسبة الإنجاز الكلية",
+      "delayed": "المقاولون المتأخرون"
+    },
+    "toolbar": {
+      "searchPlaceholder": "ابحث عن مقاول أو نوع...",
+      "filterPhase": "تصفية حسب المرحلة",
+      "filterContractor": "تصفية حسب المقاول",
+      "filterStatus": "تصفية حسب الحالة",
+      "dateRange": "نطاق التاريخ",
+      "clearFilters": "مسح الفلاتر",
+      "zoomIn": "تكبير",
+      "zoomOut": "تصغير",
+      "goToToday": "اذهب لليوم",
+      "exportExcel": "تصدير Excel",
+      "exportPdf": "تصدير PDF / طباعة",
+      "fullscreen": "ملء الشاشة"
+    },
+    "scale": {
+      "day": "يومي",
+      "week": "أسبوعي",
+      "month": "شهري"
+    },
+    "status": {
+      "not_started": "لم يبدأ",
+      "in_progress": "جاري التنفيذ",
+      "delayed": "متأخر",
+      "completed": "مكتمل"
+    },
+    "board": {
+      "phaseAndContractor": "المرحلة / المقاول"
+    },
+    "alert": {
+      "conflictsFound": "تم اكتشاف {{count}} تعارض زمني بين المقاولين — اضغط للعرض"
+    },
+    "conflict": {
+      "hasConflict": "يوجد تعارض زمني",
+      "tooltip": "يوجد تعارض زمني بين {{a}} و {{b}}",
+      "panelTitle": "التعارضات المكتشفة",
+      "itemsFound": "عنصر تم اكتشافه",
+      "noneFound": "لا توجد تعارضات حالياً",
+      "reasons": {
+        "date_overlap": "تداخل زمني",
+        "zone_overlap": "تداخل في نفس المنطقة",
+        "resource_overlap": "تداخل في الموارد"
+      }
+    },
+    "details": {
+      "startDate": "تاريخ المباشرة",
+      "endDate": "تاريخ الانتهاء",
+      "duration": "مدة التنفيذ",
+      "days": "يوم",
+      "progress": "نسبة الإنجاز",
+      "zone": "المنطقة",
+      "amount": "قيمة العقد",
+      "payments": "المدفوع",
+      "dependencies": "يعتمد على",
+      "detectedConflicts": "التعارضات المرتبطة",
+      "notes": "ملاحظات"
+    },
+    "empty": {
+      "title": "لا توجد بيانات لعرضها",
+      "subtitle": "لم يتم العثور على مقاولين بتواريخ صالحة لهذا المشروع"
     }
   }
 }
