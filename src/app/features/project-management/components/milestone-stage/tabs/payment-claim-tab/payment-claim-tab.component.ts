@@ -197,7 +197,7 @@ export class PaymentClaimTabComponent implements OnInit {
       : of([]);
 
     const exp$ = selected.has('EXP')
-      ? this.expClient.getByProjectId(Number(this.projectId), 1, 500, undefined).pipe(
+      ? this.expClient.getByProjectId(this.projectStageId, 1, 500, undefined).pipe(
           map((r) => r.data?.data ?? []),
           catchError(() => of([]))
         )
