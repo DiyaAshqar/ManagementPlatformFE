@@ -1,0 +1,373 @@
+<p-confirmDialog></p-confirmDialog>
+
+<div class="owner-payment-wrap">
+
+  <!-- ═══════════════════════════════════════════════════════════ STEP 1: SELECT -->
+  @if (step() === 'select') {
+    <div class="op-header">
+      <div class="op-header-icon">
+        <i class="pi pi-file-check"></i>
+      </div>
+      <div>
+        <h3 class="op-title">{{ 'ownerPayment.title' | translate }}</h3>
+        <p class="op-subtitle">{{ 'ownerPayment.subtitle' | translate }}</p>
+      </div>
+    </div>
+
+    <p-divider></p-divider>
+
+    <p class="op-instruction">{{ 'ownerPayment.selectInstruction' | translate }}</p>
+
+    <!-- Type Cards Grid -->
+    <div class="op-type-grid">
+      @for (card of typeCards; track card.key) {
+        <button
+          class="op-type-card"
+          [class.selected]="isTypeSelected(card.key)"
+          [attr.data-color]="card.color"
+          (click)="toggleType(card.key)"
+          type="button">
+          <div class="op-type-card-icon" [class]="'bg-' + card.color + '-100'">
+            <i [class]="card.icon + ' text-' + card.color + '-600'"></i>
+          </div>
+          <span class="op-type-card-key">{{ card.key }}</span>
+          <span class="op-type-card-label">{{ card.labelKey | translate }}</span>
+          <span class="op-type-card-desc">{{ card.descKey | translate }}</span>
+          @if (isTypeSelected(card.key)) {
+            <div class="op-type-check">
+              <i class="pi pi-check"></i>
+            </div>
+          }
+        </button>
+      }
+    </div>
+
+    <!-- Action -->
+    <div class="op-actions">
+      <p-button
+        [label]="'ownerPayment.generateBtn' | translate"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        [disabled]="!hasSelection || isLoading()"
+        [loading]="isLoading()"
+        (onClick)="generateClaim()"
+        severity="primary"
+        [raised]="true"
+        styleClass="op-generate-btn">
+      </p-button>
+    </div>
+  }
+
+  <!-- ═══════════════════════════════════════════════════════════ STEP 2: PREVIEW -->
+  @if (step() === 'preview' || step() === 'confirmed') {
+
+    <!-- Print Header (only visible in print) -->
+    <div class="op-print-header print-only">
+      <h1>{{ 'ownerPayment.printHeader' | translate }}</h1>
+      <p>{{ 'ownerPayment.printDate' | translate }}: {{ formatDate(claimDate) }}</p>
+    </div>
+
+    <!-- Page Header -->
+    <div class="op-preview-header no-print">
+      <div class="op-preview-header-left">
+        @if (step() === 'preview') {
+          <p-button
+            icon="pi pi-arrow-left"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            (onClick)="backToSelect()"
+            [pTooltip]="'ownerPayment.back' | translate">
+          </p-button>
+        }
+        <div>
+          <h3 class="op-title">{{ 'ownerPayment.previewTitle' | translate }}</h3>
+          <p class="op-subtitle">{{ formatDate(claimDate) }}</p>
+        </div>
+      </div>
+
+      <div class="op-preview-header-right">
+        <!-- Selected type badges -->
+        <div class="op-selected-badges">
+          @for (type of selectedTypesList(); track type) {
+            <span class="op-badge">{{ type }}</span>
+          }
+        </div>
+
+        @if (step() === 'confirmed') {
+          <span class="op-confirmed-badge">
+            <i class="pi pi-lock mr-1"></i>
+            {{ 'ownerPayment.confirmed' | translate }}
+          </span>
+        }
+      </div>
+    </div>
+
+    <!-- ── BOQ Section ── -->
+    @if (selectedTypes().has('BOQ') && claimData().boq.length > 0) {
+      <div class="op-section">
+        <div class="op-section-header">
+          <div class="op-section-icon bg-blue-100">
+            <i class="pi pi-list text-blue-600"></i>
+          </div>
+          <div class="flex-1">
+            <h4 class="op-section-title">{{ 'ownerPayment.types.boq.label' | translate }}</h4>
+            <span class="op-section-count">{{ claimData().boq.length }} {{ 'ownerPayment.items' | translate }}</span>
+          </div>
+          <span class="op-section-total">{{ formatCurrency(boqTotal) }}</span>
+        </div>
+        <p-table [value]="claimData().boq" styleClass="p-datatable-sm p-datatable-striped" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>#</th>
+              <th>{{ 'ownerPayment.cols.material' | translate }}</th>
+              <th>{{ 'ownerPayment.cols.description' | translate }}</th>
+              <th>{{ 'ownerPayment.cols.unit' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.cols.qty' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.cols.unitPrice' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.cols.subtotal' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-ri="rowIndex">
+            <tr>
+              <td>{{ ri + 1 }}</td>
+              <td>{{ getMaterialName(item) }}</td>
+              <td>{{ item.description || '—' }}</td>
+              <td>{{ getUnitName(item) }}</td>
+              <td class="text-right">{{ item.actualQuantity | number:'1.0-4' }}</td>
+              <td class="text-right">{{ item.price | number:'1.2-2' }}</td>
+              <td class="text-right font-semibold">{{ item.subTotal | number:'1.2-2' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    }
+    @if (selectedTypes().has('BOQ') && claimData().boq.length === 0) {
+      <div class="op-section op-empty-section">
+        <i class="pi pi-list op-empty-icon text-blue-300"></i>
+        <p>{{ 'ownerPayment.types.boq.label' | translate }} — {{ 'ownerPayment.noData' | translate }}</p>
+      </div>
+    }
+
+    <!-- ── PMC Section ── -->
+    @if (selectedTypes().has('PMC') && claimData().pmc.length > 0) {
+      <div class="op-section">
+        <div class="op-section-header">
+          <div class="op-section-icon bg-green-100">
+            <i class="pi pi-building text-green-600"></i>
+          </div>
+          <div class="flex-1">
+            <h4 class="op-section-title">{{ 'ownerPayment.types.pmc.label' | translate }}</h4>
+            <span class="op-section-count">{{ claimData().pmc.length }} {{ 'ownerPayment.items' | translate }}</span>
+          </div>
+          <span class="op-section-total">{{ formatCurrency(pmcTotal) }}</span>
+        </div>
+        <p-table [value]="claimData().pmc" styleClass="p-datatable-sm p-datatable-striped" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>#</th>
+              <th>{{ 'ownerPayment.cols.contractor' | translate }}</th>
+              <th>{{ 'ownerPayment.cols.startDate' | translate }}</th>
+              <th>{{ 'ownerPayment.cols.endDate' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.cols.amount' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-ri="rowIndex">
+            <tr>
+              <td>{{ ri + 1 }}</td>
+              <td>{{ getContractorName(item) }}</td>
+              <td>{{ formatDate(item.startDate) }}</td>
+              <td>{{ formatDate(item.endDate) }}</td>
+              <td class="text-right font-semibold">{{ item.amount | number:'1.2-2' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    }
+    @if (selectedTypes().has('PMC') && claimData().pmc.length === 0) {
+      <div class="op-section op-empty-section">
+        <i class="pi pi-building op-empty-icon text-green-300"></i>
+        <p>{{ 'ownerPayment.types.pmc.label' | translate }} — {{ 'ownerPayment.noData' | translate }}</p>
+      </div>
+    }
+
+    <!-- ── SV Section ── -->
+    @if (selectedTypes().has('SV') && claimData().sv.length > 0) {
+      <div class="op-section">
+        <div class="op-section-header">
+          <div class="op-section-icon bg-orange-100">
+            <i class="pi pi-map-marker text-orange-600"></i>
+          </div>
+          <div class="flex-1">
+            <h4 class="op-section-title">{{ 'ownerPayment.types.sv.label' | translate }}</h4>
+            <span class="op-section-count">{{ claimData().sv.length }} {{ 'ownerPayment.items' | translate }}</span>
+          </div>
+          <span class="op-section-total">{{ formatCurrency(svTotal) }}</span>
+        </div>
+        <p-table [value]="claimData().sv" styleClass="p-datatable-sm p-datatable-striped" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>#</th>
+              <th>{{ 'ownerPayment.cols.visitDate' | translate }}</th>
+              <th>{{ 'ownerPayment.cols.surveyor' | translate }}</th>
+              <th>{{ 'ownerPayment.cols.purpose' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.cols.qty' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.cols.unitPrice' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.cols.subtotal' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-ri="rowIndex">
+            <tr>
+              <td>{{ ri + 1 }}</td>
+              <td>{{ formatDate(item.visitDate) }}</td>
+              <td>{{ item.surveyor || '—' }}</td>
+              <td>{{ item.purpose || '—' }}</td>
+              <td class="text-right">{{ item.quantity | number:'1.0-4' }}</td>
+              <td class="text-right">{{ item.price | number:'1.2-2' }}</td>
+              <td class="text-right font-semibold">{{ item.subTotal | number:'1.2-2' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    }
+    @if (selectedTypes().has('SV') && claimData().sv.length === 0) {
+      <div class="op-section op-empty-section">
+        <i class="pi pi-map-marker op-empty-icon text-orange-300"></i>
+        <p>{{ 'ownerPayment.types.sv.label' | translate }} — {{ 'ownerPayment.noData' | translate }}</p>
+      </div>
+    }
+
+    <!-- ── VO Section ── -->
+    @if (selectedTypes().has('VO') && claimData().vo.length > 0) {
+      <div class="op-section">
+        <div class="op-section-header">
+          <div class="op-section-icon bg-purple-100">
+            <i class="pi pi-receipt text-purple-600"></i>
+          </div>
+          <div class="flex-1">
+            <h4 class="op-section-title">{{ 'ownerPayment.types.vo.label' | translate }}</h4>
+            <span class="op-section-count">{{ claimData().vo.length }} {{ 'ownerPayment.items' | translate }}</span>
+          </div>
+          <span class="op-section-total">{{ formatCurrency(voTotal) }}</span>
+        </div>
+        <p-table [value]="claimData().vo" styleClass="p-datatable-sm p-datatable-striped" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>#</th>
+              <th>{{ 'ownerPayment.cols.voNumber' | translate }}</th>
+              <th>{{ 'ownerPayment.cols.description' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.cols.qty' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.cols.unitPrice' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.cols.subtotal' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-ri="rowIndex">
+            <tr>
+              <td>{{ ri + 1 }}</td>
+              <td><span class="op-vo-number">{{ item.voNumber || '—' }}</span></td>
+              <td>{{ item.description || '—' }}</td>
+              <td class="text-right">{{ item.quantity | number:'1.0-4' }}</td>
+              <td class="text-right">{{ item.price | number:'1.2-2' }}</td>
+              <td class="text-right font-semibold">{{ item.subTotal | number:'1.2-2' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    }
+    @if (selectedTypes().has('VO') && claimData().vo.length === 0) {
+      <div class="op-section op-empty-section">
+        <i class="pi pi-receipt op-empty-icon text-purple-300"></i>
+        <p>{{ 'ownerPayment.types.vo.label' | translate }} — {{ 'ownerPayment.noData' | translate }}</p>
+      </div>
+    }
+
+    <!-- ── EXP Section ── -->
+    @if (selectedTypes().has('EXP') && claimData().exp.length > 0) {
+      <div class="op-section">
+        <div class="op-section-header">
+          <div class="op-section-icon bg-red-100">
+            <i class="pi pi-wallet text-red-600"></i>
+          </div>
+          <div class="flex-1">
+            <h4 class="op-section-title">{{ 'ownerPayment.types.exp.label' | translate }}</h4>
+            <span class="op-section-count">{{ claimData().exp.length }} {{ 'ownerPayment.items' | translate }}</span>
+          </div>
+          <span class="op-section-total">{{ formatCurrency(expTotal) }}</span>
+        </div>
+        <p-table [value]="claimData().exp" styleClass="p-datatable-sm p-datatable-striped" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>#</th>
+              <th>{{ 'ownerPayment.cols.expenseNo' | translate }}</th>
+              <th>{{ 'ownerPayment.cols.supplier' | translate }}</th>
+              <th>{{ 'ownerPayment.cols.date' | translate }}</th>
+              <th>{{ 'ownerPayment.cols.notes' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.cols.amount' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-item let-ri="rowIndex">
+            <tr>
+              <td>{{ ri + 1 }}</td>
+              <td><span class="op-exp-no">{{ item.expenseNo || '—' }}</span></td>
+              <td>{{ item.supplierName || '—' }}</td>
+              <td>{{ formatDate(item.expenseDate) }}</td>
+              <td class="text-muted-color">{{ item.notes || '—' }}</td>
+              <td class="text-right font-semibold">{{ item.totalAmount | number:'1.2-2' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    }
+    @if (selectedTypes().has('EXP') && claimData().exp.length === 0) {
+      <div class="op-section op-empty-section">
+        <i class="pi pi-wallet op-empty-icon text-red-300"></i>
+        <p>{{ 'ownerPayment.types.exp.label' | translate }} — {{ 'ownerPayment.noData' | translate }}</p>
+      </div>
+    }
+
+    <!-- ── Grand Total ── -->
+    <div class="op-grand-total">
+      <div class="op-grand-total-label">{{ 'ownerPayment.grandTotal' | translate }}</div>
+      <div class="op-grand-total-value">{{ formatCurrency(grandTotal) }}</div>
+    </div>
+
+    <!-- ── Actions ── -->
+    @if (step() === 'preview') {
+      <div class="op-actions no-print">
+        <p-button
+          [label]="'ownerPayment.back' | translate"
+          icon="pi pi-arrow-left"
+          severity="secondary"
+          [outlined]="true"
+          (onClick)="backToSelect()">
+        </p-button>
+        <p-button
+          [label]="'ownerPayment.confirmBtn' | translate"
+          icon="pi pi-check"
+          severity="success"
+          [raised]="true"
+          (onClick)="confirmClaim()">
+        </p-button>
+      </div>
+    }
+
+    @if (step() === 'confirmed') {
+      <div class="op-confirmed-banner no-print">
+        <i class="pi pi-lock-open text-2xl text-green-600"></i>
+        <div>
+          <p class="font-bold text-green-700 m-0">{{ 'ownerPayment.confirm.successTitle' | translate }}</p>
+          <p class="text-green-600 text-sm m-0">{{ 'ownerPayment.confirm.successMsg' | translate }}</p>
+        </div>
+        <p-button
+          [label]="'ownerPayment.printBtn' | translate"
+          icon="pi pi-print"
+          severity="primary"
+          [raised]="true"
+          (onClick)="printClaim()"
+          styleClass="ml-auto">
+        </p-button>
+      </div>
+    }
+  }
+
+</div>

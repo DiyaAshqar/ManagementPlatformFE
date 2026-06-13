@@ -1,0 +1,117 @@
+<div class="boq-card">
+
+  <!-- Header -->
+  <div class="boq-card-header">
+    <div>
+      <h3 class="boq-card-title">{{ 'projectTabs.boq.titleAbbr' | translate }}</h3>
+      <p class="boq-card-subtitle">{{ 'projectTabs.boq.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="boq-toolbar">
+    <span class="boq-total-label">{{ 'projectTabs.boq.totalItems' | translate }}: {{ boqItems().length }}</span>
+    <p-button
+      [label]="'projectTabs.boq.addItem' | translate"
+      icon="pi pi-plus"
+      (onClick)="openAddDialog()"
+      severity="contrast"
+      [raised]="true">
+    </p-button>
+  </div>
+
+  <!-- Table -->
+  <p-table
+    [value]="boqItems()"
+    [tableStyle]="{ 'min-width': '62rem' }"
+    styleClass="p-datatable-gridlines"
+    responsiveLayout="scroll">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>{{ 'projectTabs.boq.columns.material' | translate }}</th>
+        <th>{{ 'projectTabs.boq.columns.description' | translate }}</th>
+        <th>{{ 'projectTabs.boq.columns.unit' | translate }}</th>
+        <th>{{ 'projectTabs.boq.columns.constructor' | translate }}</th>
+        <th>{{ 'projectTabs.boq.columns.supplier' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.boq.columns.actualQty' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.boq.columns.unitPrice' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.boq.columns.amount' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.boq.columns.subtotal' | translate }}</th>
+        <th class="text-center">{{ 'projectTabs.boq.columns.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item let-rowIndex="rowIndex">
+      @if (isLoading()) {
+        <tr>
+          <td colspan="10" class="text-center p-4">
+            <i class="pi pi-spin pi-spinner mr-2"></i> {{ 'projectTabs.boq.loading' | translate }}
+          </td>
+        </tr>
+      } @else {
+        <tr>
+          <td>{{ materialMap[item.materialId ?? 0] || '—' }}</td>
+          <td>{{ item.description }}</td>
+          <td><span class="boq-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
+          <td>{{ constructorMap[item.constructorId ?? 0] || '—' }}</td>
+          <td>{{ item.supplierId ? (supplierMap[item.supplierId] || '—') : '—' }}</td>
+          <td class="text-right">{{ item.actualQuantity | number:'1.0-4' }}</td>
+          <td class="text-right">{{ item.price | number:'1.2-2' }}</td>
+          <td class="text-right">{{ getAmount(item) | number:'1.0-0' }}</td>
+          <td class="text-right boq-subtotal">{{ item.subTotal | number:'1.0-0' }}</td>
+          <td class="text-center">
+            <div class="boq-actions">
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                severity="secondary"
+                [pTooltip]="'projectTabs.boq.tooltips.edit' | translate"
+                tooltipPosition="top"
+                (onClick)="openEditDialog(item)">
+              </p-button>
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                [pTooltip]="'projectTabs.boq.tooltips.delete' | translate"
+                tooltipPosition="top"
+                (onClick)="confirmDelete(item)">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      }
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      @if (!isLoading()) {
+        <tr class="boq-grand-total-row">
+          <td colspan="8" class="text-right">
+            <span class="boq-grand-total-label">{{ 'projectTabs.boq.grandTotal' | translate }}:</span>
+          </td>
+          <td class="text-right boq-grand-total-value">
+            {{ grandTotal | number:'1.0-0' }}
+          </td>
+          <td></td>
+        </tr>
+      }
+    </ng-template>
+
+  </p-table>
+</div>
+
+<!-- Add / Edit dialog -->
+<app-add-boq-dialog
+  [visible]="showBoqDialog()"
+  (visibleChange)="showBoqDialog.set($event)"
+  [projectStageId]="projectStageId"
+  [editItem]="editBoqItem()"
+  [materialOptions]="materialOptions"
+  [unitOptions]="unitOptions"
+  [constructorOptions]="constructorOptions"
+  [supplierOptions]="supplierOptions"
+  (saved)="onDialogSaved($event)">
+</app-add-boq-dialog>

@@ -1,4 +1,4 @@
-<div class="p-4">
+<div class="p-2">
     @if (isLoading()) {
     <div class="flex justify-center align-items-center p-6">
         <p-progressSpinner></p-progressSpinner>
@@ -7,14 +7,14 @@
 
     <!-- Form Section -->
     @if (!isViewMode()) {
-    <div class="col-12 mb-4">
-        <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step5.title' | translate }}</h3>
+    <div class="col-12 mb-2">
+        <h3 class="text-xl font-semibold mb-2">{{ 'wizard.step5.title' | translate }}</h3>
 
         <form [formGroup]="step5Form">
             <div formGroupName="supplierServiceDto">
                 <div class="grid">
                     <!-- Material field -->
-                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
                                 <p-select inputId="materialId" formControlName="materialId" [options]="materials()"
@@ -30,7 +30,7 @@
                     </div>
 
                     <!-- Supplier field -->
-                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
                                 <p-select inputId="supplierId" formControlName="supplierId" [options]="suppliers()"
@@ -46,7 +46,7 @@
                     </div>
 
                     <!-- Representative Name field -->
-                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
                                 <input pInputText inputId="representativeName" formControlName="representativeName"
@@ -60,7 +60,7 @@
                         </div>
                     </div>
                     <!-- Action Buttons -->
-                    <div class="col-12 md:col-6 lg:col-3 mb-3 flex justify-end gap-2">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1 flex justify-end gap-2">
                         <p-button [label]="'common.cancel' | translate" severity="secondary" icon="pi pi-times"
                             (onClick)="clearForm()">
                         </p-button>
@@ -81,7 +81,7 @@
     <!-- Table Section -->
     <div class="col-12">
         <div class="card">
-            <div class="card-header border-b border-gray-200 pb-3 mb-3">
+            <div class="card-header border-b border-gray-200 pb-3 mb-1">
                 <h4 class="text-lg font-semibold">{{ 'wizard.step5.entriesList' | translate }}</h4>
             </div>
 
@@ -125,7 +125,7 @@
                 <ng-template pTemplate="emptymessage">
                     <tr>
                         <td colspan="4" class="text-center p-6">
-                            <i class="pi pi-inbox text-4xl mb-3 block text-gray-400"></i>
+                            <i class="pi pi-inbox text-4xl mb-1 block text-gray-400"></i>
                             <p class="text-gray-500">{{ 'wizard.step5.noData' | translate }}</p>
                         </td>
                     </tr>

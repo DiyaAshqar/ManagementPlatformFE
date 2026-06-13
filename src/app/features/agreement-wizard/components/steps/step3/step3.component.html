@@ -1,4 +1,4 @@
-<div class="p-4">
+<div class="p-2">
     <form [formGroup]="step3Form" (ngSubmit)="onSubmit()">
         @if (isLoading()) {
         <div class="flex justify-center align-items-center p-6">
@@ -8,20 +8,20 @@
 
         <!-- Input Form Section -->
         @if (!isViewMode()) {
-        <div class="col-12 mb-4">
-            <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step3.projectAreaUnits' | translate }}</h3>
+        <div class="col-12 mb-2">
+            <h3 class="text-xl font-semibold mb-2">{{ 'wizard.step3.projectAreaUnits' | translate }}</h3>
 
             <div formGroupName="projectAreaUnitDto">
                 <div class="grid">
                     <!-- Annex field -->
-                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
                                 <p-select inputId="annexId" formControlName="annexId" [options]="annexes()"
                                     optionLabel="name" optionValue="id"
                                     [class]="isFieldInvalid('annexId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
                                 </p-select>
-                                <label for="annexId">{{ 'wizard.step3.annexName' | translate }}*</label>
+                                <label for="annexId">{{ 'wizard.step3.annexName' | translate }} <span class="required-asterisk">*</span></label>
                             </p-floatlabel>
                             @if (isFieldInvalid('annexId')) {
                             <small class="text-red-500">{{ getFieldError('annexId') }}</small>
@@ -30,13 +30,13 @@
                     </div>
 
                     <!-- Amount field -->
-                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
                                 <p-inputNumber inputId="amount" formControlName="amount" [min]="0" [showButtons]="true"
                                     [ngClass]="{'ng-invalid': isFieldInvalid('amount')}" inputStyleClass="w-full">
                                 </p-inputNumber>
-                                <label for="amount">{{ 'wizard.step3.quantity' | translate }}*</label>
+                                <label for="amount">{{ 'wizard.step3.quantity' | translate }} <span class="required-asterisk">*</span></label>
                             </p-floatlabel>
                             @if (isFieldInvalid('amount')) {
                             <small class="text-red-500">{{ getFieldError('amount') }}</small>
@@ -45,21 +45,21 @@
                     </div>
 
                     <!-- Unit field -->
-                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
                                 <p-select inputId="unitId" formControlName="unitId" [options]="units()"
                                     optionLabel="name" optionValue="id"
                                     [class]="isFieldInvalid('unitId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
                                 </p-select>
-                                <label for="unitId">{{ 'wizard.step3.unit' | translate }}*</label>
+                                <label for="unitId">{{ 'wizard.step3.unit' | translate }} <span class="required-asterisk">*</span></label>
                             </p-floatlabel>
                             @if (isFieldInvalid('unitId')) {
                             <small class="text-red-500">{{ getFieldError('unitId') }}</small>
                             }
                         </div>
                     </div>
-                    <div class="col-12 md:col-6 lg:col-3 mb-3">
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <!-- Action buttons -->
                         <div class="flex gap-2 justify-end mt-2">
                             <button type="button" class="p-button p-button-secondary" (click)="clearForm()" pButton
@@ -83,7 +83,7 @@
         <!-- Data Table Section -->
         <div class="col-12">
             <div class="card">
-                <div class="card-header border-b border-gray-200 pb-3 mb-3">
+                <div class="card-header border-b border-gray-200 pb-3 mb-1">
                     <h4 class="text-lg font-semibold">{{ 'wizard.step3.entriesList' | translate }}</h4>
                 </div>
 
@@ -127,7 +127,7 @@
                     <ng-template pTemplate="emptymessage">
                         <tr>
                             <td colspan="4" class="text-center p-6">
-                                <i class="pi pi-inbox text-4xl mb-3 block text-gray-400"></i>
+                                <i class="pi pi-inbox text-4xl mb-1 block text-gray-400"></i>
                                 <p class="text-gray-500">{{ 'wizard.step3.noData' | translate }}</p>
                             </td>
                         </tr>

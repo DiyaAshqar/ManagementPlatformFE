@@ -1,4 +1,4 @@
-<div class="p-4">
+<div class="p-2">
   <form [formGroup]="step1Form" (ngSubmit)="onSubmit()">
     @if (isLoading()) {
     <div class="flex justify-center align-items-center p-6">
@@ -6,13 +6,13 @@
     </div>
     }
 
-    <!-- Agreement Details -->
+    <!-- Main info -->
     <div class="col-12">
-      <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step1.agreementDetails' | translate }}</h3>
+      <h3 class="text-xl font-semibold mb-2">{{ 'wizard.step1.agreementDetails' | translate }}</h3>
 
       <div formGroupName="agreementDto">
         <div class="grid">
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <input pInputText id="projectNumber" formControlName="projectNumber" readonly class="w-full" />
@@ -22,7 +22,7 @@
             </div>
           </div>
 
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <p-datepicker inputId="agreementDate" formControlName="agreementDate" dateFormat="mm/dd/yy"
@@ -34,7 +34,7 @@
         </div>
 
         <div class="grid">
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <input pInputText  class="ng-dirty ng-invalid" id="projectName" formControlName="projectName" class="w-full"
@@ -44,7 +44,7 @@
             </div>
           </div>
 
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <input pInputText id="businessSector" formControlName="businessSector" class="w-full"
@@ -56,7 +56,7 @@
         </div>
 
         <div class="grid">
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <p-datepicker inputId="estimatedStartDate" formControlName="estimatedStartDate" dateFormat="mm/dd/yy"
@@ -72,7 +72,7 @@
             </div>
           </div>
 
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <p-datepicker inputId="estimatedEndDate" formControlName="estimatedEndDate" dateFormat="mm/dd/yy"
@@ -90,7 +90,7 @@
         </div>
 
         <div class="grid">
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <p-select inputId="countryId" formControlName="countryId" [options]="countries()" optionLabel="name"
@@ -103,7 +103,7 @@
             </div>
           </div>
 
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <p-select inputId="cityId" formControlName="cityId" [options]="cities()" optionLabel="name" optionValue="id"
@@ -117,7 +117,7 @@
         </div>
 
         <div class="grid">
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <p-select inputId="agreementTypeId" formControlName="agreementTypeId" [options]="agreementTypes()"
@@ -130,7 +130,7 @@
             </div>
           </div>
 
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <p-inputNumber inputId="projectArea" formControlName="projectArea" [min]="0" [showButtons]="false"
@@ -143,7 +143,7 @@
         </div>
 
         <div class="grid">
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <p-inputNumber inputId="drillingQuantity" formControlName="drillingQuantity" [min]="0" [showButtons]="false"
@@ -153,17 +153,28 @@
               </p-floatlabel>
             </div>
           </div>
+
+          <div class="col-12 md:col-6 mb-1">
+            <div class="field">
+              <p-floatlabel variant="in">
+                <textarea pTextarea id="description" formControlName="description"
+                  [class.ng-invalid]="isFieldInvalid('agreementDto.description')"
+                  rows="1" style="resize: none; width: 100%;" class="w-full"></textarea>
+                <label for="description">{{ 'wizard.step1.description' | translate }}</label>
+              </p-floatlabel>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
     <!-- Client Information -->
     <div class="col-12">
-      <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step1.clientInfo' | translate }}</h3>
+      <h3 class="text-xl font-semibold mb-2">{{ 'wizard.step1.clientInfo' | translate }}</h3>
 
       <div formGroupName="clientDto">
         <div class="grid">
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <input pInputText id="contactPerson" formControlName="contactPerson" class="w-full"
@@ -173,19 +184,39 @@
             </div>
           </div>
 
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
-              <p-floatlabel variant="in">
-                <input pInputText id="contactPersonNumber" formControlName="contactPersonNumber" class="w-full"
+              <label class="block text-sm text-color-secondary mb-1">{{ 'wizard.step1.contactPersonNumber' | translate }}</label>
+              <p-inputgroup>
+                  <p-select
+                    formControlName="contactPersonCountryCode"
+                    [options]="phoneCodes"
+                    optionLabel="dialCode"
+                    optionValue="dialCode"
+                    appendTo="body"
+                    styleClass="phone-code-select">
+                    <ng-template pTemplate="selectedItem" let-opt>
+                      <span class="flex align-items-center gap-2">
+                        <img [src]="getFlagUrl(opt.iso)" [alt]="opt.name" width="20" height="13" style="border-radius: 2px; object-fit: cover;">
+                        <span>{{ opt.dialCode }}</span>
+                      </span>
+                    </ng-template>
+                    <ng-template pTemplate="item" let-opt>
+                      <span class="flex align-items-center gap-2">
+                        <img [src]="getFlagUrl(opt.iso)" [alt]="opt.name" width="20" height="13" style="border-radius: 2px; object-fit: cover;">
+                        <span>{{ opt.name }} ({{ opt.dialCode }})</span>
+                      </span>
+                    </ng-template>
+                  </p-select>
+                <input pInputText formControlName="contactPersonNumber" class="w-full"
                   [class.ng-invalid]="isFieldInvalid('clientDto.contactPersonNumber')" />
-                <label for="contactPersonNumber">{{ 'wizard.step1.contactPersonNumber' | translate }} </label>
-              </p-floatlabel>
+              </p-inputgroup>
             </div>
           </div>
         </div>
 
         <div class="grid">
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <input pInputText id="representerName" formControlName="representerName" class="w-full"
@@ -195,13 +226,33 @@
             </div>
           </div>
 
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
-              <p-floatlabel variant="in">
-                <input pInputText id="representerNameNumber" formControlName="representerNameNumber" class="w-full"
+              <label class="block text-sm text-color-secondary mb-1">{{ 'wizard.step1.representerNameNumber' | translate }}</label>
+              <p-inputgroup>
+                  <p-select
+                    formControlName="representerNameCountryCode"
+                    [options]="phoneCodes"
+                    optionLabel="dialCode"
+                    optionValue="dialCode"
+                    appendTo="body"
+                    styleClass="phone-code-select">
+                    <ng-template pTemplate="selectedItem" let-opt>
+                      <span class="flex align-items-center gap-2">
+                        <img [src]="getFlagUrl(opt.iso)" [alt]="opt.name" width="20" height="13" style="border-radius: 2px; object-fit: cover;">
+                        <span>{{ opt.dialCode }}</span>
+                      </span>
+                    </ng-template>
+                    <ng-template pTemplate="item" let-opt>
+                      <span class="flex align-items-center gap-2">
+                        <img [src]="getFlagUrl(opt.iso)" [alt]="opt.name" width="20" height="13" style="border-radius: 2px; object-fit: cover;">
+                        <span>{{ opt.name }} ({{ opt.dialCode }})</span>
+                      </span>
+                    </ng-template>
+                  </p-select>
+                <input pInputText formControlName="representerNameNumber" class="w-full"
                   [class.ng-invalid]="isFieldInvalid('clientDto.representerNameNumber')" />
-                <label for="representerNameNumber">{{ 'wizard.step1.representerNameNumber' | translate }} </label>
-              </p-floatlabel>
+              </p-inputgroup>
             </div>
           </div>
         </div>
@@ -210,11 +261,11 @@
 
     <!-- Land Information -->
     <div class="col-12">
-      <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step1.landInfo' | translate }}</h3>
+      <h3 class="text-xl font-semibold mb-2">{{ 'wizard.step1.landInfo' | translate }}</h3>
 
       <div formGroupName="landInformationDto">
         <div class="grid">
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <input pInputText id="basinName" formControlName="basinName" class="w-full"
@@ -224,7 +275,7 @@
             </div>
           </div>
 
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <input pInputText id="village" formControlName="village" class="w-full"
@@ -236,7 +287,7 @@
         </div>
 
         <div class="grid">
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <input pInputText id="directorate" formControlName="directorate" class="w-full"
@@ -246,7 +297,7 @@
             </div>
           </div>
 
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <input pInputText id="plotNumber" formControlName="plotNumber" class="w-full"
@@ -258,7 +309,7 @@
         </div>
 
         <div class="grid">
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <input pInputText id="basinNumber" formControlName="basinNumber" class="w-full"
@@ -268,7 +319,7 @@
             </div>
           </div>
 
-          <div class="col-12 md:col-6 mb-3">
+          <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
                 <input pInputText id="floorNumber" formControlName="floorNumber" class="w-full"

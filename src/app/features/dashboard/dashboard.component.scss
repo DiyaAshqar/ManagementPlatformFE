@@ -1,0 +1,328 @@
+.dashboard-container {
+  min-height: 100vh;
+  margin: 0 auto;
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+// Statistics Cards
+.stat-card {
+  background: var(--surface-card);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
+  border: 1px solid var(--surface-border);
+  height: 100%;
+
+  &:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .stat-content {
+    .stat-label {
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      color: var(--text-color);
+    }
+
+    .stat-trend {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      font-size: 0.75rem;
+      margin-top: 0.5rem;
+
+      &.positive {
+        color: #10b981;
+      }
+
+      &.negative {
+        color: #ef4444;
+      }
+
+      i {
+        font-size: 0.625rem;
+      }
+    }
+  }
+
+  .stat-icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: white;
+
+    &.stat-icon-projects {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+
+    &.stat-icon-agreements {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    }
+
+    &.stat-icon-suppliers {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+
+    &.stat-icon-constructors {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+  }
+}
+
+// Chart Cards
+.chart-card {
+  background: var(--surface-card);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--surface-border);
+  height: 100%;
+
+  .chart-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--surface-border);
+
+    .chart-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-color);
+    }
+  }
+
+  .chart-body {
+    padding: 1.5rem;
+  }
+}
+
+// Table Cards
+.table-card {
+  background: var(--surface-card);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--surface-border);
+  height: 100%;
+
+  .table-header {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--surface-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    .table-title {
+      font-size: 1.125rem;
+      font-weight: 600;
+      margin: 0;
+      color: var(--text-color);
+    }
+  }
+
+  .table-body {
+    padding: 0;
+    max-height: 400px;
+    overflow-y: auto;
+
+    ::ng-deep {
+      .p-datatable {
+        .p-datatable-thead {
+          display: none;
+        }
+
+        .p-datatable-tbody > tr {
+          transition: background-color 0.2s;
+
+          &:hover {
+            background-color: var(--surface-hover);
+          }
+
+          > td {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--surface-border);
+          }
+
+          &:last-child > td {
+            border-bottom: none;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Task List
+.task-list {
+  .task-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--surface-border);
+    gap: 1rem;
+    flex-wrap: wrap;
+
+    &:last-child {
+      border-bottom: none;
+    }
+
+    &:hover {
+      background-color: var(--surface-hover);
+    }
+
+    .task-info {
+      flex: 1;
+      min-width: 200px;
+
+      .task-title {
+        font-weight: 600;
+        color: var(--text-color);
+        margin-bottom: 0.25rem;
+      }
+
+      .task-project {
+        font-size: 0.875rem;
+        color: var(--text-color-secondary);
+      }
+    }
+
+    .task-meta {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .task-date {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.875rem;
+        color: var(--text-color-secondary);
+
+        i {
+          font-size: 0.875rem;
+        }
+      }
+    }
+  }
+}
+
+// Quick Actions
+.quick-actions {
+  .action-card {
+    background: var(--surface-card);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid var(--surface-border);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transform: translateY(-2px);
+    }
+
+    .action-icon {
+      width: 3rem;
+      height: 3rem;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.25rem;
+      color: white;
+
+      &.action-icon-projects {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      }
+
+      &.action-icon-agreements {
+        background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+      }
+
+      &.action-icon-suppliers {
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      }
+
+      &.action-icon-constructors {
+        background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      }
+    }
+
+    .action-label {
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-color);
+      text-align: center;
+    }
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 576px) {
+  .stat-card {
+    padding: 1rem;
+
+    .stat-value {
+      font-size: 1.5rem;
+    }
+
+    .stat-icon {
+      width: 2.5rem;
+      height: 2.5rem;
+      font-size: 1.25rem;
+    }
+  }
+
+  .chart-card,
+  .table-card {
+    .chart-header,
+    .table-header {
+      padding: 0.75rem 1rem;
+    }
+
+    .chart-body {
+      padding: 1rem;
+    }
+  }
+
+  .task-item {
+    flex-direction: column;
+    align-items: flex-start !important;
+
+    .task-meta {
+      width: 100%;
+      justify-content: space-between;
+    }
+  }
+}

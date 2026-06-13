@@ -1,0 +1,173 @@
+<div class="contractor-card">
+
+  <!-- Header -->
+  <div class="contractor-card-header">
+    <div>
+      <h3 class="contractor-card-title">{{ 'projectTabs.projectMainContractor.cardTitle' | translate }}</h3>
+      <p class="contractor-card-subtitle">{{ 'projectTabs.projectMainContractor.cardSubtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="contractor-toolbar">
+    <div class="contractor-stats">
+      <span class="contractor-total-label">{{ 'projectTabs.projectMainContractor.totalContractors' | translate }}: {{ contractorItems().length }}</span>
+      <span class="contractor-value-label">{{ 'projectTabs.projectMainContractor.totalValue' | translate }}: {{ totalContractValue | number:'1.0-0' }}</span>
+    </div>
+    <p-button
+      [label]="'projectTabs.projectMainContractor.addContractor' | translate"
+      icon="pi pi-plus"
+      (onClick)="openAddDialog()"
+      severity="contrast"
+      [raised]="true">
+    </p-button>
+  </div>
+
+  <!-- Table -->
+  <p-table
+    [value]="contractorItems()"
+    [tableStyle]="{ 'min-width': '62rem' }"
+    styleClass="p-datatable-gridlines"
+    responsiveLayout="scroll"
+    [loading]="isLoading()">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 5rem">{{ 'projectTabs.projectMainContractor.columnId' | translate }}</th>
+        <th>{{ 'projectTabs.projectMainContractor.columnName' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.projectMainContractor.columnAmount' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.projectMainContractor.columnTotalPayments' | translate }}</th>
+        <th>{{ 'projectTabs.projectMainContractor.columnStartDate' | translate }}</th>
+        <th>{{ 'projectTabs.projectMainContractor.columnEndDate' | translate }}</th>
+        <th class="text-center" style="width: 12rem">{{ 'common.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <td>{{ item.id }}</td>
+        <td>
+          <span class="contractor-name">{{ contractorMap[item.constructorId ?? 0] || '—' }}</span>
+        </td>
+        <td class="text-right contractor-amount">
+          {{ item.amount | number:'1.0-0' }}
+        </td>
+        <td class="text-right contractor-total-payments">
+          {{ item.totalPayments | number:'1.0-0' }}
+        </td>
+        <td>{{ item.startDate | date:'yyyy-MM-dd' }}</td>
+        <td>{{ item.endDate | date:'yyyy-MM-dd' }}</td>
+        <td class="text-center">
+          <div class="contractor-actions">
+            <p-button
+              icon="pi pi-credit-card"
+              [rounded]="true"
+              severity="secondary"
+              [text]="true"
+              size="small"
+              [pTooltip]="'projectTabs.contractorPayment.cardTitle' | translate"
+              tooltipPosition="top"
+              (onClick)="selectContractorForPayments(item)">
+            </p-button>
+            <p-button
+              icon="pi pi-briefcase"
+              [rounded]="true"
+              severity="secondary"
+              [text]="true"
+              size="small"
+              [pTooltip]="'wizard.step4.contractorDuties' | translate"
+              tooltipPosition="top"
+              (onClick)="openContractorDutiesDialog(item)">
+            </p-button>
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              severity="secondary"
+              [text]="true"
+              size="small"
+              [pTooltip]="'common.edit' | translate"
+              tooltipPosition="top"
+              (onClick)="openEditDialog(item)">
+            </p-button>
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              severity="danger"
+              [text]="true"
+              size="small"
+              [pTooltip]="'common.delete' | translate"
+              tooltipPosition="top"
+              (onClick)="confirmDelete(item)">
+            </p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" class="text-center empty-state">
+          <i class="pi pi-users" style="font-size: 3rem; color: var(--text-color-secondary);"></i>
+          <p class="mt-3">{{ 'projectTabs.projectMainContractor.emptyMessage' | translate }}</p>
+          <p class="text-sm text-muted-color">{{ 'projectTabs.projectMainContractor.emptySubMessage' | translate }}</p>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      <tr>
+        <td colspan="2" class="font-semibold text-right">{{ 'common.total' | translate }}</td>
+        <td class="text-right font-bold contractor-amount">{{ totalContractValue | number:'1.0-0' }}</td>
+        <td colspan="4"></td>
+      </tr>
+    </ng-template>
+
+  </p-table>
+
+</div>
+
+<!-- ── Dialog ─────────────────────────────────────────────────────── -->
+@if (showContractorDialog()) {
+  <app-add-contractor-dialog
+    [visible]="showContractorDialog()"
+    (visibleChange)="showContractorDialog.set($event)"
+    [projectStageId]="projectStageId"
+    [editItem]="editContractorItem()"
+    [contractorTypeOptions]="contractorTypeOptions"
+    (saved)="onDialogSaved($event)">
+  </app-add-contractor-dialog>
+}
+
+<ng-container *ngIf="showContractorDutiesDialog()">
+  <app-contractor-duties-dialog
+    [visible]="showContractorDutiesDialog()"
+    [agreementId]="0"
+    [mainContractId]="selectedMainContractId()"
+    [existingContractorDuties]="selectedContractorDuties()"
+    [isViewMode]="false"
+    (closeDialog)="onContractorDutiesDialogClose()"
+    (contractorDutyData)="onContractorDutyDataReceived($event)">
+  </app-contractor-duties-dialog>
+</ng-container>
+
+<!-- ── Payments Dialog (Master-Detail) ───────────────────────────── -->
+<p-dialog
+  [visible]="!!selectedContractor()"
+  (visibleChange)="!$event && closePaymentsDialog()"
+  [header]="'projectTabs.contractorPayment.cardTitle' | translate"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '98vw', 'max-width': '1600px', height: '90vh' }"
+  [breakpoints]="{ '960px': '98vw' }"
+  [contentStyle]="{ overflow: 'auto', height: 'calc(90vh - 60px)' }"
+  [maximizable]="true">
+
+  @if (selectedContractor()) {
+    <app-project-main-contractor-payments
+      [contractor]="selectedContractor()!"
+      [contractorName]="getContractorName(selectedContractor()!)">
+    </app-project-main-contractor-payments>
+  }
+
+</p-dialog>

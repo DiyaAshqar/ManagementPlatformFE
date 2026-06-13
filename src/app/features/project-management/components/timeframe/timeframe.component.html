@@ -1,0 +1,529 @@
+<div class="tf-shell" [class.tf-fullscreen]="isFullscreen()">
+
+  <!-- ── Summary cards ────────────────────────────────────────────── -->
+  <div class="grid tf-summary-grid">
+    <div class="col-12 md:col-6 lg:col-3 xl:col">
+      <div class="tf-stat tf-stat--phases">
+        <div class="tf-stat-icon"><i class="pi pi-flag-fill"></i></div>
+        <div class="tf-stat-body">
+          <div class="tf-stat-label">{{ 'timeframe.summary.totalPhases' | translate }}</div>
+          <div class="tf-stat-value">{{ summary().totalPhases }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 md:col-6 lg:col-3 xl:col">
+      <div class="tf-stat tf-stat--contractors">
+        <div class="tf-stat-icon"><i class="pi pi-users"></i></div>
+        <div class="tf-stat-body">
+          <div class="tf-stat-label">{{ 'timeframe.summary.totalContractors' | translate }}</div>
+          <div class="tf-stat-value">{{ summary().totalContractors }}</div>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 md:col-6 lg:col-3 xl:col">
+      <button class="tf-stat tf-stat--conflicts tf-stat-clickable"
+              [class.tf-stat--alert]="summary().totalConflicts > 0"
+              (click)="showConflictsPanel.set(true)">
+        <div class="tf-stat-icon"><i class="pi pi-exclamation-triangle"></i></div>
+        <div class="tf-stat-body">
+          <div class="tf-stat-label">{{ 'timeframe.summary.conflicts' | translate }}</div>
+          <div class="tf-stat-value">{{ summary().totalConflicts }}</div>
+        </div>
+        @if (summary().totalConflicts > 0) {
+          <span class="tf-stat-pulse"></span>
+        }
+      </button>
+    </div>
+    <div class="col-12 md:col-6 lg:col-3 xl:col">
+      <div class="tf-stat tf-stat--progress">
+        <div class="tf-stat-icon"><i class="pi pi-chart-line"></i></div>
+        <div class="tf-stat-body">
+          <div class="tf-stat-label">{{ 'timeframe.summary.overallProgress' | translate }}</div>
+          <div class="tf-stat-value">{{ summary().overallProgress }}%</div>
+          <p-progressbar [value]="summary().overallProgress" [showValue]="false"
+                         styleClass="tf-stat-progress" [style]="{ height: '4px' }"></p-progressbar>
+        </div>
+      </div>
+    </div>
+    <div class="col-12 md:col-6 lg:col-3 xl:col">
+      <div class="tf-stat tf-stat--delayed">
+        <div class="tf-stat-icon"><i class="pi pi-clock"></i></div>
+        <div class="tf-stat-body">
+          <div class="tf-stat-label">{{ 'timeframe.summary.delayed' | translate }}</div>
+          <div class="tf-stat-value">{{ summary().delayedContractors }}</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Toolbar ──────────────────────────────────────────────────── -->
+  <div class="tf-toolbar">
+    <div class="tf-toolbar-left">
+      <p-iconfield iconPosition="left" styleClass="tf-search">
+        <p-inputicon class="pi pi-search"></p-inputicon>
+        <input type="text" pInputText
+               [ngModel]="filters().search"
+               (ngModelChange)="setSearchFilter($event)"
+               [placeholder]="'timeframe.toolbar.searchPlaceholder' | translate" />
+      </p-iconfield>
+
+      <p-multiselect
+        [options]="phaseOptions()"
+        [ngModel]="filters().phaseIds"
+        (ngModelChange)="setPhaseFilter($event)"
+        optionLabel="label" optionValue="value"
+        [placeholder]="'timeframe.toolbar.filterPhase' | translate"
+        styleClass="tf-multiselect"
+        [maxSelectedLabels]="1"
+        [showHeader]="false" />
+
+      <p-multiselect
+        [options]="contractorOptions()"
+        [ngModel]="filters().contractorIds"
+        (ngModelChange)="setContractorFilter($event)"
+        optionLabel="label" optionValue="value"
+        [placeholder]="'timeframe.toolbar.filterContractor' | translate"
+        styleClass="tf-multiselect"
+        [maxSelectedLabels]="1"
+        [filter]="true" />
+
+      <p-multiselect
+        [options]="statusOptions"
+        [ngModel]="filters().statuses"
+        (ngModelChange)="setStatusFilter($event)"
+        optionLabel="label" optionValue="value"
+        [placeholder]="'timeframe.toolbar.filterStatus' | translate"
+        styleClass="tf-multiselect"
+        [maxSelectedLabels]="1"
+        [showHeader]="false" />
+
+      <p-datepicker
+        [ngModel]="filters().dateRange"
+        (ngModelChange)="setDateRangeFilter($event)"
+        selectionMode="range"
+        [readonlyInput]="true"
+        [showIcon]="true"
+        [placeholder]="'timeframe.toolbar.dateRange' | translate"
+        styleClass="tf-datepicker" />
+
+      <p-button icon="pi pi-filter-slash" [text]="true" severity="secondary"
+                [pTooltip]="'timeframe.toolbar.clearFilters' | translate"
+                tooltipPosition="bottom"
+                (onClick)="clearFilters()"></p-button>
+    </div>
+
+    <div class="tf-toolbar-right">
+      <p-selectbutton
+        [options]="scaleOptions"
+        [ngModel]="scale()"
+        (ngModelChange)="setScale($event)"
+        optionLabel="label" optionValue="value"
+        [allowEmpty]="false"
+        styleClass="tf-scale"></p-selectbutton>
+
+      <p-button icon="pi pi-minus" [text]="true" [rounded]="true" severity="secondary"
+                [pTooltip]="'timeframe.toolbar.zoomOut' | translate"
+                tooltipPosition="bottom"
+                (onClick)="zoomOut()"></p-button>
+      <p-button icon="pi pi-plus" [text]="true" [rounded]="true" severity="secondary"
+                [pTooltip]="'timeframe.toolbar.zoomIn' | translate"
+                tooltipPosition="bottom"
+                (onClick)="zoomIn()"></p-button>
+      <p-button icon="pi pi-compass" [text]="true" [rounded]="true" severity="secondary"
+                [pTooltip]="'timeframe.toolbar.goToToday' | translate"
+                tooltipPosition="bottom"
+                (onClick)="scrollToToday()"></p-button>
+      <p-button icon="pi pi-file-excel" [text]="true" [rounded]="true" severity="secondary"
+                [pTooltip]="'timeframe.toolbar.exportExcel' | translate"
+                tooltipPosition="bottom"
+                (onClick)="exportExcel()"></p-button>
+      <p-button icon="pi pi-file-pdf" [text]="true" [rounded]="true" severity="secondary"
+                [pTooltip]="'timeframe.toolbar.exportPdf' | translate"
+                tooltipPosition="bottom"
+                (onClick)="exportPdf()"></p-button>
+      <p-button icon="pi pi-window-maximize" [text]="true" [rounded]="true" severity="secondary"
+                [pTooltip]="'timeframe.toolbar.fullscreen' | translate"
+                tooltipPosition="bottom"
+                (onClick)="toggleFullscreen()"></p-button>
+    </div>
+  </div>
+
+  <!-- ── Conflict alert strip ─────────────────────────────────────── -->
+  @if (summary().totalConflicts > 0) {
+    <div class="tf-conflict-alert" (click)="showConflictsPanel.set(true)">
+      <i class="pi pi-exclamation-triangle"></i>
+      <span>{{ 'timeframe.alert.conflictsFound' | translate: { count: summary().totalConflicts } }}</span>
+      <i class="pi pi-chevron-left tf-alert-arrow"></i>
+    </div>
+  }
+
+  <!-- ── Gantt body ───────────────────────────────────────────────── -->
+  <div class="tf-board" [class.tf-empty]="filteredPhases().length === 0">
+
+    @if (range() === null) {
+      <!-- Empty State ----------------------------------------------- -->
+      <div class="tf-empty-state">
+        <i class="pi pi-inbox tf-empty-icon"></i>
+        <h3>{{ 'timeframe.empty.title' | translate }}</h3>
+        <p>{{ 'timeframe.empty.subtitle' | translate }}</p>
+      </div>
+    } @else {
+
+      <div class="tf-board-grid">
+        <!-- LEFT: Phase / Contractor sidebar -->
+        <div class="tf-side">
+          <div class="tf-side-header">
+            <span>{{ 'timeframe.board.phaseAndContractor' | translate }}</span>
+          </div>
+          <div class="tf-side-body">
+            @for (phase of filteredPhases(); track trackByPhaseId(0, phase)) {
+              <div class="tf-side-phase">
+                <button class="tf-side-phase-toggle" (click)="togglePhase(phase.id)">
+                  <i class="pi" [class.pi-chevron-down]="phase.expanded" [class.pi-chevron-left]="!phase.expanded"></i>
+                  <span class="tf-side-phase-name">{{ phase.name }}</span>
+                  <span class="tf-side-phase-meta">
+                    <span class="tf-side-phase-count">{{ phase.contractors.length }}</span>
+                  </span>
+                </button>
+              </div>
+              @if (phase.expanded) {
+                @for (c of phase.contractors; track trackByContractorId(0, c)) {
+                  <div class="tf-side-contractor" (click)="selectContractor(c, phase.id)">
+                    <span class="tf-side-status-dot" [style.background]="statusColor(c.status)"></span>
+                    <div class="tf-side-contractor-info">
+                      <div class="tf-side-contractor-name">{{ c.name }}</div>
+                      <div class="tf-side-contractor-type">{{ c.contractorType }}</div>
+                    </div>
+                    @if (contractorConflicts(c.id).length > 0) {
+                      <i class="pi pi-exclamation-triangle tf-side-conflict-icon"
+                         [pTooltip]="'timeframe.conflict.hasConflict' | translate"
+                         tooltipPosition="left"></i>
+                    }
+                  </div>
+                }
+              }
+            }
+          </div>
+        </div>
+
+        <!-- RIGHT: Timeline chart -->
+        <div class="tf-chart">
+          <!-- Sticky header -->
+          <div class="tf-chart-header" #chartHeader>
+            <div class="tf-chart-header-row">
+              @for (col of columns(); track trackByColIndex($index); let i = $index) {
+                <div class="tf-col-tick"
+                     [class.tf-col-today]="col.isToday"
+                     [class.tf-col-weekend]="col.isWeekend"
+                     [class.tf-col-month-start]="col.isMonthStart">
+                  <div class="tf-col-label">{{ col.label }}</div>
+                  @if (col.subLabel) {
+                    <div class="tf-col-sublabel">{{ col.subLabel }}</div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+
+          <!-- Scrollable area -->
+          <div class="tf-chart-scroll" #chartScroll
+               (mousedown)="onChartMouseDown($event)">
+            <div class="tf-chart-canvas">
+
+              <!-- Background grid -->
+              <div class="tf-grid">
+                @for (col of columns(); track trackByColIndex($index)) {
+                  <div class="tf-grid-col"
+                       [class.tf-grid-weekend]="col.isWeekend"
+                       [class.tf-grid-month-start]="col.isMonthStart"></div>
+                }
+              </div>
+
+              <!-- Today vertical indicator -->
+              @if (todayLeft() !== null) {
+                <div class="tf-today-line" [style.inset-inline-start.%]="todayLeft()">
+                  <div class="tf-today-flag">{{ 'timeframe.today' | translate }}</div>
+                </div>
+              }
+
+              <!-- Rows -->
+              <div class="tf-rows">
+                @for (phase of filteredPhases(); track trackByPhaseId(0, phase)) {
+                  <!-- Phase row (rollup bar) -->
+                  <div class="tf-row tf-row-phase">
+                    @if (phaseBars().get(phase.id); as pb) {
+                      <div class="tf-phase-bar"
+                           [style.inset-inline-start.%]="pb.left"
+                           [style.width.%]="pb.width"
+                           [pTooltip]="phase.name + ' • ' + phase.progress + '%'"
+                           tooltipPosition="top">
+                        <div class="tf-phase-bar-fill" [style.width.%]="phase.progress"></div>
+                        <span class="tf-phase-bar-label">{{ phase.name }}</span>
+                      </div>
+                    }
+                  </div>
+
+                  @if (phase.expanded) {
+                    @for (c of phase.contractors; track trackByContractorId(0, c)) {
+                      <div class="tf-row tf-row-contractor">
+                        @if (contractorBars().get(c.id); as cb) {
+                          <button type="button"
+                                  class="tf-bar"
+                                  [class.tf-bar-conflict]="cb.hasConflict"
+                                  [class.tf-bar-selected]="selectedContractor()?.id === c.id"
+                                  [style.inset-inline-start.%]="cb.left"
+                                  [style.width.%]="cb.width"
+                                  [style.background]="statusBg(c.status)"
+                                  (click)="selectContractor(c, phase.id)"
+                                  (mouseenter)="op.show($event); hoverContractor = c"
+                                  (mouseleave)="op.hide()">
+                            <div class="tf-bar-progress" [style.width.%]="c.progress"></div>
+                            <span class="tf-bar-label">{{ c.name }}</span>
+                            @if (cb.hasConflict) {
+                              <i class="pi pi-exclamation-triangle tf-bar-warn"></i>
+                            }
+                            <div class="tf-bar-handle tf-bar-handle-start"></div>
+                            <div class="tf-bar-handle tf-bar-handle-end"></div>
+                          </button>
+                        }
+                      </div>
+                    }
+                  }
+                }
+              </div>
+
+              <!-- Dependency arrows -->
+              <svg class="tf-dependencies" preserveAspectRatio="none">
+                <defs>
+                  <marker id="tf-arrow" markerWidth="6" markerHeight="6" refX="5" refY="3"
+                          orient="auto" markerUnits="strokeWidth">
+                    <path d="M0,0 L0,6 L6,3 z" fill="currentColor" />
+                  </marker>
+                </defs>
+                @for (line of dependencyLines(); track line.fromId + '-' + line.toId) {
+                  <path [attr.d]="line.d" class="tf-dep-line" marker-end="url(#tf-arrow)"></path>
+                }
+              </svg>
+            </div>
+          </div>
+
+          <!-- Mini-map overview -->
+          <div class="tf-minimap">
+            <div class="tf-minimap-track">
+              @for (b of miniMapBars(); track $index) {
+                <span class="tf-minimap-bar"
+                      [style.inset-inline-start.%]="b.left"
+                      [style.width.%]="b.width"
+                      [style.background]="b.color"></span>
+              }
+              @if (todayLeft() !== null) {
+                <span class="tf-minimap-today" [style.inset-inline-start.%]="todayLeft()"></span>
+              }
+            </div>
+          </div>
+
+        </div>
+      </div>
+    }
+  </div>
+</div>
+
+<!-- ── Hover popover ────────────────────────────────────────────── -->
+<p-popover #op>
+  @if (hoverContractor; as c) {
+    <div class="tf-pop">
+      <div class="tf-pop-head">
+        <span class="tf-pop-dot" [style.background]="statusColor(c.status)"></span>
+        <strong>{{ c.name }}</strong>
+      </div>
+      <div class="tf-pop-meta">{{ c.contractorType }} <span *ngIf="c.zone">• {{ c.zone }}</span></div>
+      <div class="tf-pop-row">
+        <span>{{ 'timeframe.details.startDate' | translate }}</span>
+        <strong>{{ formatDate(c.startDate) }}</strong>
+      </div>
+      <div class="tf-pop-row">
+        <span>{{ 'timeframe.details.endDate' | translate }}</span>
+        <strong>{{ formatDate(c.endDate) }}</strong>
+      </div>
+      <div class="tf-pop-row">
+        <span>{{ 'timeframe.details.duration' | translate }}</span>
+        <strong>{{ durationDays(c) }} {{ 'timeframe.details.days' | translate }}</strong>
+      </div>
+      <div class="tf-pop-row">
+        <span>{{ 'timeframe.details.progress' | translate }}</span>
+        <strong>{{ c.progress }}%</strong>
+      </div>
+      @if (contractorConflicts(c.id).length > 0) {
+        <div class="tf-pop-warn">
+          <i class="pi pi-exclamation-triangle"></i>
+          {{ 'timeframe.conflict.tooltip' | translate: {
+              a: contractorConflicts(c.id)[0].contractorAName,
+              b: contractorConflicts(c.id)[0].contractorBName
+            } }}
+        </div>
+      }
+    </div>
+  }
+</p-popover>
+
+<!-- ── Contractor details drawer ───────────────────────────────── -->
+<p-drawer
+  [visible]="showDetails()"
+  (visibleChange)="showDetails.set($event)"
+  position="right"
+  [style]="{ width: '26rem' }"
+  styleClass="tf-drawer"
+  [showCloseIcon]="true">
+
+  <ng-template pTemplate="header">
+    @if (selectedContractor(); as c) {
+      <div class="tf-drawer-header">
+        <span class="tf-pop-dot" [style.background]="statusColor(c.status)"></span>
+        <div>
+          <div class="tf-drawer-title">{{ c.name }}</div>
+          <div class="tf-drawer-sub">{{ c.contractorType }}</div>
+        </div>
+      </div>
+    }
+  </ng-template>
+
+  @if (selectedContractor(); as c) {
+    <div class="tf-drawer-body">
+      <p-tag [value]="('timeframe.status.' + c.status) | translate" [severity]="statusSeverity(c.status)"></p-tag>
+
+      <div class="tf-drawer-progress">
+        <div class="flex justify-content-between align-items-center mb-1">
+          <span>{{ 'timeframe.details.progress' | translate }}</span>
+          <strong>{{ c.progress }}%</strong>
+        </div>
+        <p-progressbar [value]="c.progress" [showValue]="false"></p-progressbar>
+      </div>
+
+      <p-divider></p-divider>
+
+      <div class="tf-grid-2">
+        <div class="tf-info-cell">
+          <span class="tf-info-label">{{ 'timeframe.details.startDate' | translate }}</span>
+          <strong>{{ formatDate(c.startDate) }}</strong>
+        </div>
+        <div class="tf-info-cell">
+          <span class="tf-info-label">{{ 'timeframe.details.endDate' | translate }}</span>
+          <strong>{{ formatDate(c.endDate) }}</strong>
+        </div>
+        <div class="tf-info-cell">
+          <span class="tf-info-label">{{ 'timeframe.details.duration' | translate }}</span>
+          <strong>{{ durationDays(c) }} {{ 'timeframe.details.days' | translate }}</strong>
+        </div>
+        <div class="tf-info-cell">
+          <span class="tf-info-label">{{ 'timeframe.details.zone' | translate }}</span>
+          <strong>{{ c.zone || '—' }}</strong>
+        </div>
+        <div class="tf-info-cell">
+          <span class="tf-info-label">{{ 'timeframe.details.amount' | translate }}</span>
+          <strong>{{ formatCurrency(c.amount) }}</strong>
+        </div>
+        <div class="tf-info-cell">
+          <span class="tf-info-label">{{ 'timeframe.details.payments' | translate }}</span>
+          <strong>{{ formatCurrency(c.totalPayments) }}</strong>
+        </div>
+      </div>
+
+      @if (c.dependsOnIds && c.dependsOnIds.length > 0) {
+        <p-divider></p-divider>
+        <div>
+          <div class="tf-info-label mb-2">{{ 'timeframe.details.dependencies' | translate }}</div>
+          <div class="flex flex-wrap gap-1">
+            @for (depId of c.dependsOnIds; track depId) {
+              @if (contractorBars().get(depId); as depBar) {
+                <p-chip [label]="depBar.contractor.name" icon="pi pi-link"></p-chip>
+              }
+            }
+          </div>
+        </div>
+      }
+
+      @if (contractorConflicts(c.id).length > 0) {
+        <p-divider></p-divider>
+        <div class="tf-drawer-conflicts">
+          <div class="tf-info-label mb-2">
+            <i class="pi pi-exclamation-triangle mr-1" style="color: var(--p-red-500);"></i>
+            {{ 'timeframe.details.detectedConflicts' | translate }}
+          </div>
+          @for (cf of contractorConflicts(c.id); track cf.id) {
+            <div class="tf-conflict-card">
+              <div class="tf-conflict-card-title">
+                {{ cf.contractorAName }} ↔ {{ cf.contractorBName }}
+              </div>
+              <div class="tf-conflict-card-meta">
+                @if (cf.zone) {
+                  <span><i class="pi pi-map-marker"></i> {{ cf.zone }}</span>
+                }
+                <span><i class="pi pi-calendar"></i> {{ cf.overlapDays }} {{ 'timeframe.details.days' | translate }}</span>
+              </div>
+              <div class="tf-conflict-card-dates">
+                {{ formatDate(cf.overlapStart) }} → {{ formatDate(cf.overlapEnd) }}
+              </div>
+            </div>
+          }
+        </div>
+      }
+
+      @if (c.notes) {
+        <p-divider></p-divider>
+        <div>
+          <div class="tf-info-label mb-2">{{ 'timeframe.details.notes' | translate }}</div>
+          <p class="tf-notes">{{ c.notes }}</p>
+        </div>
+      }
+    </div>
+  }
+</p-drawer>
+
+<!-- ── Conflicts side panel ────────────────────────────────────── -->
+<p-drawer
+  [visible]="showConflictsPanel()"
+  (visibleChange)="showConflictsPanel.set($event)"
+  position="right"
+  [style]="{ width: '24rem' }"
+  styleClass="tf-drawer tf-drawer-conflicts-panel"
+  [showCloseIcon]="true">
+
+  <ng-template pTemplate="header">
+    <div class="tf-drawer-header">
+      <i class="pi pi-exclamation-triangle" style="font-size: 1.4rem; color: var(--p-red-500);"></i>
+      <div>
+        <div class="tf-drawer-title">{{ 'timeframe.conflict.panelTitle' | translate }}</div>
+        <div class="tf-drawer-sub">{{ conflicts().length }} {{ 'timeframe.conflict.itemsFound' | translate }}</div>
+      </div>
+    </div>
+  </ng-template>
+
+  <div class="tf-drawer-body">
+    @if (conflicts().length === 0) {
+      <div class="tf-empty-state tf-empty-mini">
+        <i class="pi pi-check-circle"></i>
+        <p>{{ 'timeframe.conflict.noneFound' | translate }}</p>
+      </div>
+    } @else {
+      @for (cf of conflicts(); track trackByConflictId(0, cf)) {
+        <div class="tf-conflict-card tf-conflict-card-action" (click)="goToConflict(cf)">
+          <div class="tf-conflict-card-title">
+            {{ cf.contractorAName }} ↔ {{ cf.contractorBName }}
+          </div>
+          <div class="tf-conflict-card-meta">
+            @if (cf.zone) {
+              <span><i class="pi pi-map-marker"></i> {{ cf.zone }}</span>
+            }
+            <span><i class="pi pi-calendar"></i> {{ cf.overlapDays }} {{ 'timeframe.details.days' | translate }}</span>
+            <span class="tf-conflict-reason">
+              {{ ('timeframe.conflict.reasons.' + cf.reason) | translate }}
+            </span>
+          </div>
+          <div class="tf-conflict-card-dates">
+            {{ formatDate(cf.overlapStart) }} → {{ formatDate(cf.overlapEnd) }}
+          </div>
+        </div>
+      }
+    }
+  </div>
+</p-drawer>

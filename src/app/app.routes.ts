@@ -5,7 +5,7 @@ export const routes: Routes = [
   // Root redirect
   {
     path: '',
-    redirectTo: '/agreement-wizard',
+    redirectTo: '/dashboard',
     pathMatch: 'full'
   },
 
@@ -35,6 +35,11 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     loadComponent: () => import('./layouts/main-layout/main-layout.component').then(m => m.MainLayoutComponent),
     children: [
+      {
+        path: 'dashboard',
+        loadComponent: () => import('./features/dashboard/dashboard.component')
+          .then(m => m.DashboardComponent)
+      },
       {
         path: 'analytics',
         loadComponent: () => import('./features/analytics/analytics.component')
@@ -74,6 +79,66 @@ export const routes: Routes = [
               .then(m => m.AgreementWizardComponent)
           }
         ]
+      },
+      {
+        path: 'projects',
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/project-management/pages/project-list/project-list.component')
+              .then(m => m.ProjectListComponent)
+          },
+          {
+            path: ':id',
+            loadComponent: () => import('./features/project-management/pages/project-detail/project-detail.component')
+              .then(m => m.ProjectDetailComponent)
+          }
+        ]
+      },
+      {
+        path: 'constructor',
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/constructor/pages/constructor-list/constructor-list.component')
+              .then(m => m.ConstructorListComponent)
+          },
+          {
+            path: 'new',
+            loadComponent: () => import('./features/constructor/pages/constructor-form/constructor-form.component')
+              .then(m => m.ConstructorFormComponent)
+          },
+          {
+            path: 'edit/:id',
+            loadComponent: () => import('./features/constructor/pages/constructor-form/constructor-form.component')
+              .then(m => m.ConstructorFormComponent)
+          }
+        ]
+      },
+      {
+        path: 'supplier',
+        children: [
+          {
+            path: '',
+            loadComponent: () => import('./features/supplier/pages/supplier-list/supplier-list.component')
+              .then(m => m.SupplierListComponent)
+          },
+          {
+            path: 'new',
+            loadComponent: () => import('./features/supplier/pages/supplier-form/supplier-form.component')
+              .then(m => m.SupplierFormComponent)
+          },
+          {
+            path: 'edit/:id',
+            loadComponent: () => import('./features/supplier/pages/supplier-form/supplier-form.component')
+              .then(m => m.SupplierFormComponent)
+          }
+        ]
+      },
+      {
+        path: 'materials',
+        loadComponent: () => import('./features/material/pages/material-management/material-management.component')
+          .then(m => m.MaterialManagementComponent)
       }
     ]
   },

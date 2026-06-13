@@ -26,7 +26,7 @@ import { AuthService } from '../../../../core/auth/services/auth.service';
   template: `
     <div class="login-card">
       <p-card>
-        <div class="text-center mb-4">
+        <div class="text-center mb-2">
           <h2>{{ 'app.title' | translate }}</h2>
           <p class="text-secondary">{{ 'auth.login' | translate }}</p>
         </div>
@@ -57,7 +57,7 @@ import { AuthService } from '../../../../core/auth/services/auth.service';
             </p-password>
           </div>
 
-          <div class="field-checkbox mb-4">
+          <div class="field-checkbox mb-2">
             <p-checkbox 
               [(ngModel)]="rememberMe" 
               name="rememberMe"

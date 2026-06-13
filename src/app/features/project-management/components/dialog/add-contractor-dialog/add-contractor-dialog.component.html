@@ -1,0 +1,157 @@
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [header]="dialogHeader"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '44rem' }"
+  [breakpoints]="{ '960px': '75vw', '640px': '95vw' }">
+
+  <form [formGroup]="contractorForm" (ngSubmit)="onSubmit()">
+    <div class="grid">
+
+      <!-- Contractor Type -->
+      <div class="col-12">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="mainContractorTypeId"
+              formControlName="mainContractorTypeId"
+              [options]="contractorTypeOptions"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('mainContractorTypeId')">
+            </p-select>
+            <label for="mainContractorTypeId">{{ 'dialogs.contractor.contractorType' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('mainContractorTypeId')" class="p-error">{{ 'dialogs.contractor.contractorTypeRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <!-- Contractor -->
+      <div class="col-12">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="constructorId"
+              formControlName="constructorId"
+              [options]="contractorOptions"
+              optionLabel="label"
+              optionValue="value"
+              [filter]="true"
+              [filterPlaceholder]="'dialogs.contractor.searchContractor' | translate"
+              [showClear]="true"
+              class="w-full"
+              appendTo="body"
+              [disabled]="!contractorForm.get('mainContractorTypeId')?.value || isLoadingContractors()"
+              [class.ng-invalid]="isFieldInvalid('constructorId')">
+            </p-select>
+            <label for="constructorId">{{ 'dialogs.contractor.contractor' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('constructorId')" class="p-error">{{ 'dialogs.contractor.contractorRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <!-- Classification -->
+      <div class="col-12">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="classification"
+              formControlName="classification"
+              [options]="classificationOptions"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('classification')">
+            </p-select>
+            <label for="classification">Classification <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('classification')" class="p-error">Classification is required</small>
+        </div>
+      </div>
+
+      <!-- Amount -->
+      <div class="col-12">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-inputnumber
+              inputId="amount"
+              formControlName="amount"
+              mode="decimal"
+              locale="en-US"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('amount')">
+            </p-inputnumber>
+            <label for="amount">{{ 'dialogs.contractor.contractAmount' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('amount')" class="p-error">{{ 'dialogs.contractor.amountRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <!-- Start Date -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-calendar
+              inputId="startDate"
+              formControlName="startDate"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              iconDisplay="input"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('startDate')">
+            </p-calendar>
+            <label for="startDate">{{ 'dialogs.contractor.startDate' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('startDate')" class="p-error">{{ 'dialogs.contractor.startDateRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <!-- End Date -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-calendar
+              inputId="endDate"
+              formControlName="endDate"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              iconDisplay="input"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('endDate')">
+            </p-calendar>
+            <label for="endDate">{{ 'dialogs.contractor.endDate' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('endDate')" class="p-error">{{ 'dialogs.contractor.endDateRequired' | translate }}</small>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Actions -->
+    <div class="flex justify-end gap-3 mt-4">
+      <p-button
+        [label]="'common.cancel' | translate"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="onHide()"
+        type="button">
+      </p-button>
+      <p-button
+        [label]="isEditMode ? ('common.update' | translate) : ('dialogs.contractor.add' | translate)"
+        type="submit"
+        [loading]="isSubmitting()">
+      </p-button>
+    </div>
+  </form>
+
+</p-dialog>

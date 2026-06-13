@@ -1,0 +1,39 @@
+:host {
+  display: block;
+}
+
+.drop-zone {
+  &:hover {
+    background: var(--surface-hover);
+  }
+
+  &--active {
+    border-color: var(--primary-color) !important;
+    background-color: color-mix(in srgb, var(--primary-color) 5%, transparent);
+  }
+}
+
+.selected-files-list {
+  max-height: 15rem;
+}
+
+:deep(.p-datatable) {
+  .p-datatable-thead > tr > th {
+    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .p-datatable-tbody > tr > td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--surface-border);
+    vertical-align: middle;
+  }
+
+  .p-datatable-tbody > tr:last-child > td {
+    border-bottom: none;
+  }
+
+  .p-datatable-tbody > tr:hover {
+    background: var(--surface-hover);
+  }
+}

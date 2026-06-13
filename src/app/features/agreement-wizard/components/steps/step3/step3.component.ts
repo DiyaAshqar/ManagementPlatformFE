@@ -54,6 +54,7 @@ export class Step3Component implements OnInit, OnDestroy {
   isFormValid = signal(false);
   editingIndex = signal<number | null>(null);
 
+  private pristineSnapshot: string = '';
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -121,7 +122,7 @@ export class Step3Component implements OnInit, OnDestroy {
     // Only load data in edit mode (when agreementId > 0)
     if (this.agreementId() > 0) {
       this.isLoading.set(true);
-      this.agreementWizardService.getAgreementById(this.agreementId(), 3)
+      this.agreementWizardService.getAgreementById(this.agreementId(), 4)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
@@ -140,8 +141,13 @@ export class Step3Component implements OnInit, OnDestroy {
 
   private populateForm(data: ThirdStepDto): void {
     if (data.projectAreaUnitDto && Array.isArray(data.projectAreaUnitDto)) {
-      // Map the existing DTO objects directly since they already have the correct structure
-      this.projectAreaUnits.set([...data.projectAreaUnitDto]);
+      const sorted = [...data.projectAreaUnitDto].sort((a, b) => {
+        const aOrder = (a as any).orderNo ?? 0;
+        const bOrder = (b as any).orderNo ?? 0;
+        return aOrder - bOrder;
+      });
+      this.projectAreaUnits.set(sorted);
+      this.pristineSnapshot = JSON.stringify(sorted);
     }
   }
 
@@ -151,6 +157,12 @@ export class Step3Component implements OnInit, OnDestroy {
     if (!entries.length) {
       this.step3Form.markAllAsTouched();
       this.showError('Please add at least one entry to submit');
+      return;
+    }
+
+    // Edit mode with no changes — skip API and go to next step
+    if (this.agreementId() > 0 && this.pristineSnapshot && JSON.stringify(entries) === this.pristineSnapshot) {
+      this.stepData.emit(this.step3Form.getRawValue());
       return;
     }
 
@@ -200,7 +212,7 @@ export class Step3Component implements OnInit, OnDestroy {
     
     // Create the FullAgreementDto
     const fullAgreementDto = new FullAgreementDto();
-    fullAgreementDto.step = 3;
+    fullAgreementDto.step = 4;
     fullAgreementDto.agreementId = this.agreementId() || 0;
     fullAgreementDto.thirdStepDto = thirdStepDto;
     

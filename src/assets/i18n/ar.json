@@ -28,7 +28,31 @@
     "loading": "جاري التحميل...",
     "success": "نجح",
     "error": "خطأ",
-    "warning": "تحذير"
+    "warning": "تحذير",
+    "info": "معلومة",
+    "view": "عرض",
+    "status": "الحالة",
+    "clearFilters": "مسح الفلاتر",
+    "attachments": "المرفقات",
+    "total": "الإجمالي"
+  },
+  "breadcrumb": {
+    "home": "الرئيسية",
+    "management": "الإدارة",
+    "dashboard": "لوحة التحكم",
+    "agreementWizard": "إدارة الاتفاقيات",
+    "agreements": "الاتفاقيات",
+    "createAgreement": "إنشاء اتفاقية",
+    "editAgreement": "تعديل اتفاقية",
+    "viewAgreement": "عرض اتفاقية",
+    "projects": "المشاريع",
+    "projectDetails": "تفاصيل المشروع",
+    "constructor": "المقاولون",
+    "newConstructor": "مقاول جديد",
+    "editConstructor": "تعديل المقاول",
+    "supplier": "الموردون",
+    "newSupplier": "مورد جديد",
+    "editSupplier": "تعديل المورد"
   },
   "agreements": {
     "title": "الاتفاقيات",
@@ -49,6 +73,101 @@
       "view": "عرض الاتفاقية",
       "edit": "تعديل الاتفاقية",
       "delete": "حذف الاتفاقية"
+    },
+    "confirmDelete": {
+      "header": "تأكيد الحذف",
+      "message": "هل أنت متأكد من حذف \"{{name}}\"؟",
+      "notImplemented": "وظيفة الحذف سيتم تنفيذها قريباً"
+    }
+  },
+  "projects": {
+    "title": "إدارة المشاريع",
+    "subtitle": "إدارة جميع مشاريع البناء وتتبع التقدم",
+    "createNew": "إنشاء مشروع جديد",
+    "edit": "تعديل المشروع",
+    "noProjects": "لم يتم العثور على مشاريع",
+    "searchPlaceholder": "البحث في المشاريع...",
+    "pagination": "عرض {first} إلى {last} من {totalRecords} مشروع",
+    "stats": {
+      "total": "إجمالي المشاريع",
+      "totalSub": "جميع المشاريع",
+      "active": "المشاريع النشطة",
+      "activeSub": "قيد التنفيذ",
+      "completed": "المشاريع المكتملة",
+      "completedSub": "منتهية",
+      "upcoming": "القادمة",
+      "upcomingSub": "مرحلة التخطيط",
+      "budget": "الميزانية الإجمالية"
+    },
+    "overallProgress": "التقدم الكلي",
+    "createFirst": "أنشئ مشروعك الأول للبدء",
+    "filters": {
+      "status": "الحالة",
+      "priority": "الأولوية",
+      "selectStatus": "اختر الحالة",
+      "selectPriority": "اختر الأولوية",
+      "all": "الكل",
+      "active": "نشطة",
+      "done": "منتهية",
+      "planning": "تخطيط"
+    },
+    "columns": {
+      "name": "اسم المشروع",
+      "client": "العميل",
+      "status": "الحالة",
+      "priority": "الأولوية",
+      "progress": "التقدم",
+      "budget": "الميزانية",
+      "endDate": "تاريخ الانتهاء"
+    },
+    "status": {
+      "planning": "التخطيط",
+      "in_progress": "قيد التنفيذ",
+      "on_hold": "معلق",
+      "completed": "مكتمل",
+      "cancelled": "ملغي"
+    },
+    "priority": {
+      "low": "منخفض",
+      "medium": "متوسط",
+      "high": "عالي",
+      "urgent": "عاجل"
+    },
+    "menu": {
+      "viewDetails": "عرض التفاصيل",
+      "editProject": "تعديل المشروع"
+    },
+    "form": {
+      "name": "اسم المشروع",
+      "description": "الوصف",
+      "clientName": "اسم العميل",
+      "projectManager": "مدير المشروع",
+      "startDate": "تاريخ البداية",
+      "endDate": "تاريخ الانتهاء",
+      "budget": "الميزانية",
+      "priority": "الأولوية",
+      "milestoneCount": "عدد المراحل الرئيسية"
+    },
+    "stages": {
+      "title": "المراحل الرئيسية للمشروع",
+      "preparing": "التحضير",
+      "excavation": "الحفر",
+      "foundation": "الأساسات",
+      "structure": "الهيكل",
+      "finishing": "التشطيب",
+      "milestone": "المعلم",
+      "completed": "مكتمل"
+    },
+    "tasks": {
+      "title": "المهام",
+      "addNew": "إضافة مهمة",
+      "status": {
+        "todo": "للقيام به",
+        "in_progress": "قيد التنفيذ",
+        "review": "مراجعة",
+        "blocked": "محظور",
+        "completed": "مكتمل"
+      }
     }
   },
   "validation": {
@@ -59,6 +178,9 @@
   },
   "dashboard": {
     "title": "لوحة التحكم",
+    "subtitle": "مرحباً بعودتك! إليك نظرة عامة على منصة الإدارة.",
+    "newProject": "مشروع جديد",
+    "newAgreement": "اتفاقية جديدة",
     "multiSelectDemo": "عرض تجريبي متعدد الاختيار",
     "selectItems": "اختر العناصر",
     "selectItemsPlaceholder": "اختر العناصر",
@@ -73,12 +195,77 @@
     "salaryDeposit": "إيداع الراتب",
     "rentPayment": "دفع الإيجار",
     "groceries": "البقالة",
-    "freelanceIncome": "دخل العمل الحر"
+    "freelanceIncome": "دخل العمل الحر",
+    "stats": {
+      "totalProjects": "إجمالي المشاريع",
+      "activeAgreements": "الاتفاقيات النشطة",
+      "totalSuppliers": "إجمالي الموردين",
+      "constructors": "المقاولون",
+      "vsLastMonth": "مقارنة بالشهر الماضي",
+      "newThisMonth": "جديد هذا الشهر"
+    },
+    "charts": {
+      "projectStatus": "حالة المشاريع",
+      "monthlyProgress": "التقدم الشهري",
+      "projectsStarted": "المشاريع المبدوءة",
+      "projectsCompleted": "المشاريع المنجزة"
+    },
+    "tables": {
+      "recentProjects": "المشاريع الأخيرة",
+      "recentAgreements": "الاتفاقيات الأخيرة",
+      "viewAll": "عرض الكل",
+      "upcomingTasks": "المهام القادمة",
+      "tasks": "مهام"
+    },
+    "quickActions": {
+      "title": "الإجراءات السريعة",
+      "viewProjects": "عرض المشاريع",
+      "agreements": "الاتفاقيات",
+      "suppliers": "الموردون",
+      "constructors": "المقاولون"
+    },
+    "statusLabels": {
+      "completed": "مكتمل",
+      "approved": "موافق عليه",
+      "inProgress": "قيد التنفيذ",
+      "pending": "في الانتظار",
+      "planning": "التخطيط",
+      "draft": "مسودة",
+      "onHold": "معلق",
+      "rejected": "مرفوض"
+    },
+    "priorityLabels": {
+      "low": "منخفض",
+      "medium": "متوسط",
+      "high": "عالي",
+      "urgent": "عاجل"
+    }
+  },
+  "sidebar": {
+    "sections": {
+      "overview": "نظرة عامة",
+      "additionalFeatures": "مميزات إضافية",
+      "extendedModules": "وحدات موسعة"
+    },
+    "items": {
+      "dashboard": "لوحة التحكم",
+      "projectManagement": "إدارة المشاريع",
+      "agreementWizard": "إدارة الاتفاقيات",
+      "constructors": "المقاولون",
+      "suppliers": "الموردون",
+      "materials": "المواد",
+      "feature1": "ميزة 1",
+      "feature2": "ميزة 2"
+    },
+    "footer": {
+      "settings": "الإعدادات",
+      "help": "المساعدة"
+    }
   },
   "wizard": {
     "next": "التالي",
     "back": "رجوع",
-    "submit": "إرسال",
+    "submit": "حفظ الكل",
     "success": {
       "title": "تم إنشاء الاتفاقية بنجاح!",
       "message": "تم إرسال وحفظ اتفاقيتك بنجاح. يمكنك الآن عرضها في قائمة الاتفاقيات أو إنشاء اتفاقية جديدة.",
@@ -105,6 +292,7 @@
       "selectAgreementType": "اختر نوع الاتفاقية",
       "projectArea": "مساحة المشروع",
       "drillingQuantity": "كمية الحفر",
+      "description": "الوصف",
       "contactPerson": "شخص الاتصال",
       "contactPersonNumber": "رقم شخص الاتصال",
       "representerName": "اسم الممثل",
@@ -126,13 +314,31 @@
       "paymentMethod": "طريقة الدفع",
       "monthlyPayment": "قيمة الدفع الشهري",
       "monthlyPaymentHint": "يتم تفعيله فقط عند اختيار طريقة الدفع الشهرية",
+      "percentageValue": "قيمة النسبة",
+      "amountValue": "قيمة المبلغ",
+      "contractingValue": "قيمة التعاقد",
       "selectServices": "اختر الخدمات",
       "description": "هذه هي الخطوة 2 - سيتم تنفيذ المحتوى",
       "placeholder": "سيتم إضافة محتوى الخطوة 2 هنا",
       "validate": "التحقق من الخطوة 2"
     },
+    "stepMilestones": {
+      "title": "المراحل",
+      "name": "الاسم",
+      "orderNo": "رقم الترتيب",
+      "description": "الوصف",
+      "cancel": "إلغاء",
+      "add": "إضافة",
+      "update": "تحديث",
+      "entriesList": "قائمة المراحل",
+      "actions": "الإجراءات",
+      "edit": "تعديل",
+      "delete": "حذف",
+      "noData": "لم تتم إضافة أي مراحل بعد. أضف إدخالات باستخدام النموذج أعلاه.",
+      "showingEntries": "عرض {first} إلى {last} من {totalRecords} إدخالات"
+    },
     "step3": {
-      "title": "مواصفات المواد والجودة",
+      "title": "مساحات المشروع",
       "projectAreaUnits": "وحدات مساحة المشروع",
       "annexName": "اسم الطابق / الملحق",
       "selectAnnex": "اختر ملحقاً",
@@ -151,14 +357,14 @@
       "showingEntries": "عرض {first} إلى {last} من {totalRecords} إدخالات"
     },
     "step4": {
-      "title": "العقود الرئيسية",
-      "contractType": "نوع العقد الرئيسي",
+      "title": "المقاوليين الرئيسية",
+      "contractType": "نوع المقاول الرئيسي",
       "contractor": "المقاول",
       "totalAmount": "المبلغ الإجمالي",
       "startDate": "تاريخ البداية المتوقع",
       "endDate": "تاريخ النهاية المتوقع",
-      "contractsList": "قائمة العقود الرئيسية",
-      "noContracts": "لم تتم إضافة أي عقود بعد. أضف أول عقد رئيسي أعلاه.",
+      "contractsList": "قائمة المقاوليين الرئيسيين",
+      "noContracts": "لم تتم إضافة أي عقود مقاولات بعد. أضف أول عقد رئيسي أعلاه.",
       "showingContracts": "عرض {first} إلى {last} من {totalRecords} عقود",
       "contractorDuties": "واجبات المقاول",
       "addContractorDuty": "إضافة واجب مقاول",
@@ -170,7 +376,8 @@
       "subTotal": "المجموع الفرعي",
       "unit": "الوحدة",
       "dutyType": "نوع الواجب",
-      "dutyResponsibility": "مسؤولية الواجب"
+      "dutyResponsibility": "مسؤولية الواجب",
+      "milestone": "المرحلة"
     },
     "step5": {
       "title": "خدمات الموردين",
@@ -188,11 +395,14 @@
       "title": "كشف الكميات",
       "material": "المادة",
       "selectMaterial": "اختر مادة",
+      "searchMaterial": "ابحث عن مادة...",
       "quantity": "الكمية",
       "unit": "الوحدة",
       "selectUnit": "اختر وحدة",
       "milestone": "المرحلة",
       "selectMilestone": "اختر مرحلة",
+      "constructor": "المقاول",
+      "selectConstructor": "اختر مقاولاً",
       "price": "سعر الوحدة",
       "total": "الإجمالي",
       "entriesList": "قائمة كشف الكميات",
@@ -213,6 +423,764 @@
       "addFirstAttachment": "أضف أول مستند باستخدام النموذج أعلاه",
       "view": "عرض",
       "download": "تحميل"
+    }
+  },
+  "constructor": {
+    "title": "المقاولون",
+    "subtitle": "إدارة المقاولين الرئيسيين وشركات البناء",
+    "create": "إضافة مقاول",
+    "createFirst": "إضافة أول مقاول",
+    "searchPlaceholder": "بحث في المقاولين...",
+    "pagination": "عرض {first} إلى {last} من {totalRecords} مقاول",
+    "columns": {
+      "name": "الاسم",
+      "contractorType": "نوع المقاول",
+      "actions": "الإجراءات"
+    },
+    "noData": "لم يتم العثور على مقاولين",
+    "tooltips": {
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "form": {
+      "createTitle": "إنشاء مقاول",
+      "editTitle": "تعديل مقاول",
+      "createSubtitle": "إضافة مقاول رئيسي جديد",
+      "editSubtitle": "تحديث معلومات المقاول",
+      "name": "الاسم",
+      "contractorType": "نوع المقاول",
+      "namePlaceholder": "أدخل اسم المقاول",
+      "contractorTypePlaceholder": "اختر نوع المقاول",
+      "nameRequired": "الاسم مطلوب",
+      "nameMinLength": "يجب أن يكون الاسم على الأقل حرفين",
+      "contractorTypeRequired": "نوع المقاول مطلوب",
+      "cancel": "إلغاء",
+      "create": "إنشاء",
+      "update": "تحديث"
+    }
+  },
+  "supplier": {
+    "title": "الموردون",
+    "subtitle": "إدارة الموردين والبائعين",
+    "create": "إضافة مورد",
+    "createFirst": "إضافة أول مورد",
+    "searchPlaceholder": "بحث في الموردين...",
+    "pagination": "عرض {first} إلى {last} من {totalRecords} مورد",
+    "columns": {
+      "name": "الاسم",
+      "phoneNumber": "رقم الهاتف",
+      "email": "البريد الإلكتروني",
+      "actions": "الإجراءات"
+    },
+    "noData": "لم يتم العثور على موردين",
+    "tooltips": {
+      "edit": "تعديل",
+      "delete": "حذف"
+    },
+    "form": {
+      "createTitle": "إنشاء مورد",
+      "editTitle": "تعديل مورد",
+      "createSubtitle": "إضافة مورد جديد",
+      "editSubtitle": "تحديث معلومات المورد",
+      "name": "الاسم",
+      "phoneNumber": "رقم الهاتف",
+      "email": "البريد الإلكتروني",
+      "namePlaceholder": "أدخل اسم المورد",
+      "phoneNumberPlaceholder": "أدخل رقم الهاتف",
+      "emailPlaceholder": "أدخل البريد الإلكتروني",
+      "nameRequired": "الاسم مطلوب",
+      "nameMinLength": "يجب أن يكون الاسم على الأقل حرفين",
+      "phoneNumberRequired": "رقم الهاتف مطلوب",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "صيغة البريد الإلكتروني غير صحيحة",
+      "cancel": "إلغاء",
+      "create": "إنشاء",
+      "update": "تحديث"
+    }
+  },
+  "projectDetail": {
+    "backToProjects": "العودة للمشاريع",
+    "printReport": "طباعة التقرير",
+    "overallProgress": "التقدم الكلي",
+    "budget": "الميزانية",
+    "spent": "مُنفق",
+    "startDate": "تاريخ البداية",
+    "projectDescription": "وصف المشروع",
+    "overviewDetails": "نظرة عامة والتفاصيل الرئيسية",
+    "tabs": {
+      "overview": "نظرة عامة",
+      "preparing": "التحضير",
+      "excavation": "الحفر",
+      "milestones": "المراحل",
+      "documents": "المستندات",
+      "expenses": "المصروفات",
+      "ownerPayment": "دفعات المالك",
+      "timeframe": "الإطار الزمني"
+    },
+    "printDialog": {
+      "header": "طباعة تقرير المشروع",
+      "description": "تخصيص وطباعة تقرير شامل للمشروع",
+      "reportType": "نوع التقرير",
+      "selectReportType": "اختر نوع التقرير",
+      "cancel": "إلغاء",
+      "downloadPdf": "تحميل PDF",
+      "print": "طباعة",
+      "reportTypes": {
+        "full": "تقرير المشروع الكامل",
+        "summary": "الملخص التنفيذي",
+        "progress": "تقرير التقدم",
+        "financial": "التقرير المالي",
+        "custom": "تقرير مخصص"
+      }
+    },
+    "milestoneStages": {
+      "title": "المراحل الرئيسية",
+      "subtitle": "إدارة جميع المراحل الرئيسية وتفاصيلها",
+      "noStages": "لم يتم العثور على المراحل الرئيسية لهذا المشروع",
+      "milestone": "مرحلة رئيسية"
+    }
+  },
+  "ownerPayment": {
+    "tabTitle": "مطالبة الدفع",
+    "title": "مطالبة الدفع",
+    "subtitle": "إنشاء تقرير مطالبة مالية شامل للمالك",
+    "selectInstruction": "اختر أنواع البيانات التي سيتضمنها التقرير:",
+    "generateBtn": "توليد المطالبة",
+    "previewTitle": "معاينة مطالبة الدفع",
+    "printHeader": "تقرير مطالبة الدفع",
+    "printDate": "التاريخ",
+    "confirmed": "مؤكدة ومقفلة",
+    "back": "رجوع",
+    "confirmBtn": "تأكيد وإقفال",
+    "printBtn": "طباعة التقرير",
+    "total": "المجموع",
+    "grandTotal": "المجموع الكلي",
+    "items": "عنصر",
+    "noData": "لا توجد بيانات",
+    "types": {
+      "boq": {
+        "label": "كشف الكميات",
+        "desc": "المواد والكميات"
+      },
+      "pmc": {
+        "label": "المقاول الرئيسي",
+        "desc": "العقود الرئيسية"
+      },
+      "sv": {
+        "label": "زيارات المساحة",
+        "desc": "سجلات الزيارات الميدانية"
+      },
+      "vo": {
+        "label": "أوامر التغيير",
+        "desc": "أوامر التغيير والإضافات"
+      },
+      "exp": {
+        "label": "المصروفات",
+        "desc": "مصروفات المشروع"
+      }
+    },
+    "cols": {
+      "material": "المادة",
+      "description": "الوصف",
+      "unit": "الوحدة",
+      "contractor": "المقاول",
+      "qty": "الكمية",
+      "unitPrice": "سعر الوحدة",
+      "subtotal": "المجموع الفرعي",
+      "amount": "المبلغ",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "visitDate": "تاريخ الزيارة",
+      "surveyor": "المساح",
+      "purpose": "الغرض",
+      "voNumber": "رقم الأمر",
+      "expenseNo": "رقم المصروف",
+      "supplier": "المورد",
+      "date": "التاريخ",
+      "notes": "الملاحظات"
+    },
+    "confirm": {
+      "header": "تأكيد مطالبة الدفع",
+      "message": "هل أنت متأكد من تأكيد وإقفال مطالبة الدفع؟ لا يمكن التراجع عن هذا الإجراء.",
+      "accept": "نعم، تأكيد",
+      "reject": "إلغاء",
+      "successTitle": "تم تأكيد المطالبة",
+      "successMsg": "تم تأكيد المطالبة المالية وإقفالها بنجاح."
+    },
+    "errors": {
+      "loadFailed": "فشل تحميل بيانات المطالبة. الرجاء المحاولة مرة أخرى."
+    }
+  },
+  "ownerPaymentEntry": {
+    "title": "دفعات المالك",
+    "subtitle": "تسجيل دفعات المالك لهذا المشروع",
+    "formTitle": "تفاصيل الدفعة",
+    "createdAt": "تاريخ الإنشاء",
+    "amount": "المبلغ",
+    "amountPlaceholder": "أدخل المبلغ",
+    "amountRequired": "المبلغ مطلوب ويجب أن يكون موجباً.",
+    "currency": "العملة",
+    "paymentType": "نوع الدفع",
+    "referenceNumber": "رقم المرجع",
+    "referencePlaceholder": "رقم الشيك أو التحويل",
+    "notes": "ملاحظات",
+    "notesPlaceholder": "ملاحظات",
+    "savePayment": "حفظ الدفعة",
+    "totalPaid": "إجمالي المدفوع",
+    "records": "السجلات",
+    "recordsTitle": "سجلات دفعات المالك",
+    "emptyRecords": "لا توجد دفعات مالك مسجلة بعد.",
+    "printReceipt": "طباعة سند قبض",
+    "paymentTypes": {
+      "cash": "نقداً",
+      "cheque": "شيك",
+      "transfer": "تحويل بنكي"
+    },
+    "messages": {
+      "deleted": "تم حذف دفعة المالك بنجاح.",
+      "confirmDelete": "هل أنت متأكد من حذف دفعة المالك هذه؟",
+      "confirmDeleteHeader": "حذف دفعة المالك",
+      "saved": "تم حفظ دفعة المالك بنجاح."
+    }
+  },
+  "projectTabs": {
+    "boq": {
+      "title": "كشف الكميات",
+      "titleAbbr": "كشف الكميات (BoQ)",
+      "subtitle": "إدارة مواد البناء والكميات",
+      "totalItems": "إجمالي العناصر",
+      "addItem": "إضافة عنصر",
+      "grandTotal": "المجموع الكلي",
+      "loading": "جاري التحميل...",
+      "columns": {
+        "material": "المادة",
+        "description": "الوصف",
+        "unit": "الوحدة",
+        "constructor": "المقاول",
+        "supplier": "المورد",
+        "actualQty": "الكمية الفعلية",
+        "unitPrice": "سعر الوحدة",
+        "amount": "المبلغ",
+        "subtotal": "المجموع الفرعي",
+        "actions": "الإجراءات"
+      },
+      "tooltips": {
+        "edit": "تعديل",
+        "delete": "حذف"
+      },
+      "confirmDelete": {
+        "header": "حذف عنصر BoQ",
+        "message": "هل أنت متأكد من حذف \"{{name}}\"؟"
+      },
+      "dialog": {
+        "addTitle": "إضافة عنصر كشف كميات",
+        "editTitle": "تعديل عنصر كشف كميات",
+        "material": "المادة",
+        "unit": "الوحدة",
+        "constructor": "المقاول",
+        "description": "الوصف",
+        "actualQuantity": "الكمية الفعلية",
+        "unitPrice": "سعر الوحدة",
+        "subtotal": "المجموع الفرعي",
+        "searchMaterial": "ابحث عن مادة...",
+        "searchConstructor": "ابحث عن مقاول...",
+        "supplier": "المورد",
+        "searchSupplier": "ابحث عن مورد...",
+        "materialRequired": "المادة مطلوبة.",
+        "unitRequired": "الوحدة مطلوبة.",
+        "constructorRequired": "المقاول مطلوب.",
+        "descriptionRequired": "الوصف مطلوب.",
+        "quantityRequired": "الكمية مطلوبة.",
+        "priceRequired": "سعر الوحدة مطلوب.",
+        "cancel": "إلغاء",
+        "addItem": "إضافة عنصر",
+        "update": "تحديث"
+      }
+    },
+    "milestoneDocuments": {
+      "title": "المستندات",
+      "subtitle": "إدارة مستندات ومرفقات المشروع"
+    },
+    "voucherOrders": {
+      "title": "أوامر التعديلات",
+      "subtitle": "إدارة أوامر التعديلات والموافقات",
+      "totalLabel": "إجمالي أوامر التعديلات",
+      "createButton": "إنشاء أمر تعديل",
+      "voNumber": "رقم أمر تعديل",
+      "voItem": "عنوان أمر التعديل",
+      "description": "الوصف",
+      "quantity": "الكمية",
+      "unit": "الوحدة",
+      "amount": "المبلغ",
+      "subtotal": "المجموع الفرعي",
+      "isEffected": "مؤثر",
+      "effectedDateStart": "تاريخ بداية التأثير",
+      "effectedDateEnd": "تاريخ نهاية التأثير",
+      "approvalStatus": "حالة الموافقة",
+      "actions": "الإجراءات",
+      "yes": "نعم",
+      "no": "لا",
+      "editTooltip": "تعديل",
+      "deleteTooltip": "حذف",
+      "emptyMessage": "لم يتم العثور على أوامر التعديل. اضغط على \"إنشاء أمر تعديل\" لإضافة واحد.",
+      "totalVOValue": "إجمالي قيمة التعديلات"
+    },
+    "surveyingVisits": {
+      "title": "زيارات المساحة",
+      "subtitle": "جدولة وتتبع مسوحات الموقع",
+      "totalLabel": "إجمالي زيارات المساحة",
+      "scheduleButton": "جدولة زيارة",
+      "visitDate": "تاريخ الزيارة",
+      "surveyor": "المساحة",
+      "purpose": "الغرض",
+      "unit": "الوحدة",
+      "quantity": "الكمية",
+      "unitPrice": "سعر الوحدة",
+      "amount": "المبلغ",
+      "subtotal": "المجموع الفرعي",
+      "status": "الحالة",
+      "actions": "الإجراءات",
+      "editTooltip": "تعديل",
+      "deleteTooltip": "حذف",
+      "emptyMessage": "لم يتم العثور على زيارات المساحة. اضغط على \"جدولة زيارة\" لإضافة واحدة.",
+      "totalSurveyValue": "إجمالي قيمة المساحة"
+    },
+    "purchaseOrders": {
+      "title": "أوامر الشراء",
+      "subtitle": "إدارة طلبات شراء المواد والخدمات",
+      "cardTitle": "أوامر الشراء",
+      "cardSubtitle": "إنشاء وإدارة أوامر الشراء",
+      "totalPO": "إجمالي أوامر الشراء",
+      "createPO": "إنشاء أمر شراء",
+      "columnPoNumber": "رقم أمر الشراء",
+      "columnSupplier": "المورد",
+      "columnDescription": "الوصف",
+      "columnUnit": "الوحدة",
+      "columnUnitPrice": "سعر الوحدة",
+      "columnAmount": "المبلغ",
+      "columnSubtotal": "المجموع الفرعي",
+      "totalValue": "إجمالي قيمة أوامر الشراء",
+      "emptyMessage": "لم يتم العثور على أوامر شراء. اضغط على \"إنشاء أمر شراء\" لإضافة واحد.",
+      "statusApproved": "موافق عليه",
+      "statusPending": "قيد الانتظار",
+      "statusRejected": "مرفوض"
+    },
+    "projectMainContractor": {
+      "title": "المقاولين الرئيسيين",
+      "subtitle": "إدارة معلومات وعقود المقاول الرئيسي",
+      "cardTitle": "المقاول الرئيسي للمشروع",
+      "cardSubtitle": "إدارة معلومات المقاول الرئيسي لهذه المرحلة",
+      "totalContractors": "إجمالي المقاولين",
+      "totalValue": "القيمة الإجمالية",
+      "addContractor": "إضافة مقاول",
+      "columnId": "المعرف",
+      "columnName": "اسم المقاول",
+      "columnAmount": "قيمة العقد",
+      "columnTotalPayments": "إجمالي المدفوعات",
+      "columnStartDate": "تاريخ البداية",
+      "columnEndDate": "تاريخ النهاية",
+      "emptyMessage": "لم يتم العثور على مقاولين لهذه المرحلة",
+      "emptySubMessage": "اضغط على \"إضافة مقاول\" للبدء"
+    },
+    "contractorPayment": {
+      "cardTitle": "مدفوعات المقاول",
+      "cardSubtitle": "إدارة سجلات الدفع لهذا المقاول",
+      "totalPayments": "إجمالي المدفوعات",
+      "totalPaid": "إجمالي المدفوع",
+      "remainingBalance": "الرصيد المتبقي",
+      "contractAmount": "مبلغ العقد",
+      "startDate": "تاريخ البداية",
+      "endDate": "تاريخ الانتهاء",
+      "addPayment": "إضافة دفعة",
+      "columnId": "المعرف",
+      "columnDate": "تاريخ الدفع",
+      "columnAmount": "المبلغ المدفوع",
+      "columnMethod": "طريقة الدفع",
+      "columnReceiptNo": "رقم الإيصال",
+      "columnNotes": "ملاحظات",
+      "emptyMessage": "لا توجد مدفوعات مسجلة لهذا المقاول",
+      "emptySubMessage": "اضغط على \"إضافة دفعة\" لتسجيل أول دفعة",
+      "methodCash": "نقداً",
+      "methodCheque": "شيك",
+      "methodBankTransfer": "تحويل بنكي",
+      "confirmDelete": {
+        "header": "حذف الدفعة",
+        "message": "هل أنت متأكد من حذف سجل الدفع هذا؟"
+      }
+    },
+    "vo": {
+      "confirmDelete": {
+        "header": "حذف أمر التعديل",
+        "message": "هل أنت متأكد من حذف أمر التعديل \"{{name}}\"؟"
+      }
+    },
+    "po": {
+      "statusApproved": "موافق عليه",
+      "statusPending": "قيد الانتظار",
+      "statusRejected": "مرفوض",
+      "confirmDelete": {
+        "header": "حذف أمر شراء",
+        "message": "هل أنت متأكد من حذف أمر الشراء \"{{name}}\"؟"
+      }
+    },
+    "mainContractor": {
+      "confirmDelete": {
+        "header": "حذف المقاول الرئيسي",
+        "message": "هل أنت متأكد من حذف \"{{name}}\"؟"
+      }
+    },
+    "surveyingVisit": {
+      "confirmDelete": {
+        "header": "حذف زيارة مساحة",
+        "message": "هل أنت متأكد من حذف الزيارة \"{{name}}\"؟"
+      }
+    },
+    "expenses": {
+      "title": "إدارة المصروفات",
+      "subtitle": "إنشاء وإدارة سجلات المصروفات",
+      "columns": {
+        "expenseNo": "رقم المصروف",
+        "supplier": "المورد",
+        "date": "التاريخ",
+        "total": "الإجمالي",
+        "notes": "ملاحظات"
+      },
+      "list": {
+        "newExpense": "مصروف جديد",
+        "totalRecords": "إجمالي المصروفات",
+        "totalAmount": "المبلغ الإجمالي",
+        "empty": "لا توجد مصروفات مسجلة حتى الآن.",
+        "pagination": "عرض {first} إلى {last} من {totalRecords} مصروف"
+      },
+      "form": {
+        "newTitle": "مصروف جديد",
+        "editTitle": "تعديل المصروف",
+        "subtitle": "أدخل تفاصيل المصروف وبنوده أدناه",
+        "backToList": "عودة للقائمة",
+        "expenseNoPlaceholder": "مثال: EXP-2026-001",
+        "selectSupplier": "اختر المورد",
+        "notesPlaceholder": "ملاحظات اختيارية...",
+        "save": "حفظ المصروف"
+      },
+      "lineItems": {
+        "title": "بنود الصرف",
+        "subtitle": "أضف عناصر لهذا المصروف",
+        "addRow": "إضافة صف",
+        "total": "الإجمالي",
+        "selectItem": "اختر عنصر",
+        "selectCurrency": "اختر العملة",
+        "columns": {
+          "item": "العنصر",
+          "qty": "الكمية",
+          "unitPrice": "سعر الوحدة",
+          "subTotal": "المجموع الفرعي",
+          "currency": "العملة"
+        }
+      },
+      "confirmDelete": {
+        "header": "حذف المصروف",
+        "message": "هل أنت متأكد من حذف المصروف \"{{name}}\"؟"
+      },
+      "messages": {
+        "saved": "تم حفظ المصروف بنجاح.",
+        "deleted": "تم حذف المصروف بنجاح."
+      },
+      "attachments": {
+        "title": "المرفقات",
+        "saveFirst": "احفظ المصروف أولاً لإضافة المرفقات."
+      }
+    }
+  },
+  "workItemDialog": {
+    "title": "إضافة مهمة عمل",
+    "editTitle": "تعديل مهمة عمل",
+    "fields": {
+      "title": "العنوان",
+      "titlePlaceholder": "حفر الأساسات - المرحلة الأولى",
+      "type": "النوع",
+      "typePlaceholder": "اختر النوع",
+      "assignTo": "تعيين إلى",
+      "assignToPlaceholder": "محمد أحمد",
+      "startDate": "تاريخ البداية",
+      "endDate": "تاريخ النهاية",
+      "priority": "الأولوية",
+      "priorityPlaceholder": "اختر الأولوية",
+      "taskPoints": "نقاط المهمة",
+      "taskPointsPlaceholder": "8",
+      "location": "الموقع",
+      "locationPlaceholder": "الشبكة أ1-أ5",
+      "depth": "العمق",
+      "depthPlaceholder": "3.5 متر",
+      "volume": "الحجم",
+      "volumePlaceholder": "450 متر مكعب",
+      "soilType": "نوع التربة",
+      "soilTypePlaceholder": "طين",
+      "equipment": "المعدات",
+      "equipmentPlaceholder": "حفار كات 320",
+      "description": "الوصف",
+      "descriptionPlaceholder": "صف مهمة الحفر..."
+    },
+    "subtasks": {
+      "title": "المهام الفرعية",
+      "addSubtask": "إضافة مهمة فرعية",
+      "noSubtasks": "لا توجد مهام فرعية بعد. انقر فوق \"إضافة مهمة فرعية\" لإنشاء واحدة.",
+      "saveTaskFirst": "الرجاء حفظ المهمة الرئيسية أولاً قبل إضافة المهام الفرعية",
+      "columns": {
+        "title": "العنوان",
+        "dates": "التواريخ",
+        "type": "النوع",
+        "status": "الحالة",
+        "cost": "التكلفة",
+        "quantity": "الكمية",
+        "actions": "الإجراءات"
+      }
+    },
+    "buttons": {
+      "cancel": "إلغاء",
+      "save": "حفظ"
+    }
+  },
+  "excavationStage": {
+    "title": "مرحلة الحفر",
+    "subtitle": "تتبع أنشطة وقياسات الحفر"
+  },
+  "dialogs": {
+    "voucherOrder": {
+      "createTitle": "إنشاء أمر تعديل",
+      "editTitle": "تعديل أمر التعديل",
+      "voNumber": "رقم أمر التعديل",
+      "voNumberRequired": "رقم أمر التعديل مطلوب.",
+      "voItem": "عنوان أمر التعديل",
+      "voItemRequired": "عنوان أمر التعديل مطلوب.",
+      "description": "الوصف",
+      "descriptionRequired": "الوصف مطلوب.",
+      "quantity": "الكمية",
+      "quantityRequired": "الكمية مطلوبة.",
+      "unit": "الوحدة",
+      "unitRequired": "الوحدة مطلوبة.",
+      "amount": "المبلغ",
+      "amountRequired": "المبلغ مطلوب.",
+      "approvalStatus": "حالة الموافقة",
+      "statusRequired": "الحالة مطلوبة.",
+      "statusApproved": "موافق عليه",
+      "statusPending": "قيد الانتظار",
+      "statusRejected": "مرفوض",
+      "isEffected": "هل التعديل يؤثر على فترة المشروع؟",
+      "effectedDateStart": "تاريخ بداية التأثير",
+      "effectedDateStartRequired": "تاريخ بداية التأثير مطلوب.",
+      "effectedDateEnd": "تاريخ نهاية التأثير",
+      "effectedDateEndRequired": "تاريخ نهاية التأثير مطلوب.",
+      "subtotal": "المجموع الفرعي",
+      "cancel": "إلغاء",
+      "create": "إنشاء أمر تعديل",
+      "update": "تحديث أمر التعديل"
+    },
+    "surveyingVisit": {
+      "createTitle": "جدولة زيارة",
+      "editTitle": "تعديل زيارة المساحة",
+      "visitDate": "تاريخ الزيارة",
+      "visitDateRequired": "تاريخ الزيارة مطلوب.",
+      "surveyor": "المساح",
+      "surveyorRequired": "المساح مطلوب.",
+      "purpose": "الغرض",
+      "purposeRequired": "الغرض مطلوب.",
+      "unit": "الوحدة",
+      "unitRequired": "الوحدة مطلوبة.",
+      "quantity": "الكمية",
+      "quantityRequired": "الكمية مطلوبة.",
+      "unitPrice": "سعر الوحدة",
+      "unitPriceRequired": "سعر الوحدة مطلوب.",
+      "status": "الحالة",
+      "statusRequired": "الحالة مطلوبة.",
+      "statusInProgress": "قيد التنفيذ",
+      "statusScheduled": "مجدول",
+      "statusCompleted": "مكتمل",
+      "subtotal": "المجموع الفرعي",
+      "cancel": "إلغاء",
+      "schedule": "جدولة زيارة",
+      "update": "تحديث"
+    },
+    "purchaseOrder": {
+      "addTitle": "إنشاء أمر شراء",
+      "editTitle": "تعديل أمر الشراء",
+      "poNumber": "رقم أمر الشراء",
+      "poNumberRequired": "رقم أمر الشراء مطلوب.",
+      "supplier": "المورد",
+      "supplierRequired": "المورد مطلوب.",
+      "searchSupplier": "البحث عن مورد...",
+      "description": "الوصف",
+      "descriptionRequired": "الوصف مطلوب.",
+      "unit": "الوحدة",
+      "unitRequired": "الوحدة مطلوبة.",
+      "unitPrice": "سعر الوحدة",
+      "unitPriceRequired": "سعر الوحدة مطلوب.",
+      "subtotal": "المجموع الفرعي",
+      "statusRequired": "الحالة مطلوبة.",
+      "createOrder": "إنشاء أمر"
+    },    "contractorPayment": {
+      "addTitle": "تسجيل دفعة",
+      "editTitle": "تعديل الدفعة",
+      "paymentDate": "تاريخ الدفع",
+      "paymentDateRequired": "تاريخ الدفع مطلوب.",
+      "paidAmount": "المبلغ المدفوع",
+      "paidAmountRequired": "المبلغ المدفوع مطلوب ويجب أن يكون موجباً.",
+      "paymentMethod": "طريقة الدفع",
+      "paymentMethodRequired": "طريقة الدفع مطلوبة.",
+      "receiptNo": "رقم الإيصال",
+      "chequeNo": "رقم الشيك",
+      "transferRef": "رقم مرجع التحويل",
+      "notes": "ملاحظات",
+      "add": "تسجيل دفعة",
+      "update": "تحديث"
+    },    "contractor": {
+      "addTitle": "إضافة مقاول الرئيسي",
+      "editTitle": "تعديل المقاول الرئيسي",
+      "contractorType": "نوع المقاول",
+      "contractorTypeRequired": "نوع المقاول مطلوب.",
+      "contractor": "المقاول",
+      "contractorRequired": "المقاول مطلوب.",
+      "searchContractor": "البحث عن مقاول...",
+      "contractAmount": "قيمة العقد",
+      "amountRequired": "المبلغ مطلوب وجب أن يكون موجباً.",
+      "startDate": "تاريخ البداية",
+      "startDateRequired": "تاريخ البداية مطلوب.",
+      "endDate": "تاريخ النهاية",
+      "endDateRequired": "تاريخ النهاية مطلوب.",
+      "add": "إضافة"
+    }
+  },
+  "documentsTable": {
+    "totalDocuments": "إجمالي المستندات",
+    "uploadDocument": "رفع مستند",
+    "noDocuments": "لا توجد مستندات بعد",
+    "uploadFilesHint": "ارفع الملفات والمستندات",
+    "columnName": "اسم المستند",
+    "columnType": "النوع",
+    "columnUploadDate": "تاريخ الرفع",
+    "columnSize": "الحجم",
+    "columnUploadedBy": "رُفع بواسطة",
+    "columnActions": "الإجراءات",
+    "uploadDialogHeader": "رفع المستندات",
+    "uploadDialogHint": "ارفع المستندات والصور والملفات لـ",
+    "dropZoneTitle": "انقر للرفع أو اسحب وأفلت",
+    "dropZoneHint": "PDF, DOC, JPG, PNG, XLS حتى 50 ميجابايت لكل ملف",
+    "selectedFiles": "الملفات المحددة",
+    "noDocumentsFound": "لم يتم العثور على مستندات",
+    "typePdf": "PDF",
+    "typeExcel": "Excel",
+    "typeImages": "صور",
+    "download": "تحميل",
+    "delete": "حذف",
+    "preview": "معاينة",
+    "previewNotAvailable": "المعاينة غير متاحة لهذا النوع من الملفات. يرجى التحميل للعرض.",
+    "close": "إغلاق",
+    "cancel": "إلغاء",
+    "upload": "رفع",
+    "uploading": "جاري الرفع..."
+  },
+  "material": {
+    "title": "إدارة المواد",
+    "subtitle": "إدارة فئات المواد والفئات الفرعية والعناصر في هيكل شجري",
+    "category": {
+      "title": "الفئات",
+      "add": "إضافة فئة",
+      "addTitle": "إضافة فئة",
+      "editTitle": "تعديل الفئة",
+      "name": "اسم الفئة",
+      "namePlaceholder": "أدخل اسم الفئة",
+      "noData": "لا توجد فئات"
+    },
+    "subCategory": {
+      "title": "الفئات الفرعية",
+      "add": "إضافة فئة فرعية",
+      "addTitle": "إضافة فئة فرعية",
+      "editTitle": "تعديل الفئة الفرعية",
+      "name": "اسم الفئة الفرعية",
+      "namePlaceholder": "أدخل اسم الفئة الفرعية",
+      "noData": "لا توجد فئات فرعية",
+      "selectCategory": "اختر فئة أولاً"
+    },
+    "item": {
+      "title": "المواد",
+      "add": "إضافة مادة",
+      "addTitle": "إضافة مادة",
+      "editTitle": "تعديل المادة",
+      "name": "اسم المادة",
+      "namePlaceholder": "أدخل اسم المادة",
+      "noData": "لا توجد مواد",
+      "selectSubCategory": "اختر فئة فرعية أولاً"
+    }
+  },
+  "timeframe": {
+    "title": "الجدول الزمني للمشروع",
+    "subtitle": "عرض المراحل على شكل خط زمني بناءً على بداية ونهاية كل مقاول",
+    "today": "اليوم",
+    "summary": {
+      "totalPhases": "إجمالي المراحل",
+      "totalContractors": "عدد المقاولين",
+      "conflicts": "عدد التعارضات",
+      "overallProgress": "نسبة الإنجاز الكلية",
+      "delayed": "المقاولون المتأخرون"
+    },
+    "toolbar": {
+      "searchPlaceholder": "ابحث عن مقاول أو نوع...",
+      "filterPhase": "تصفية حسب المرحلة",
+      "filterContractor": "تصفية حسب المقاول",
+      "filterStatus": "تصفية حسب الحالة",
+      "dateRange": "نطاق التاريخ",
+      "clearFilters": "مسح الفلاتر",
+      "zoomIn": "تكبير",
+      "zoomOut": "تصغير",
+      "goToToday": "اذهب لليوم",
+      "exportExcel": "تصدير Excel",
+      "exportPdf": "تصدير PDF / طباعة",
+      "fullscreen": "ملء الشاشة"
+    },
+    "scale": {
+      "day": "يومي",
+      "week": "أسبوعي",
+      "month": "شهري"
+    },
+    "status": {
+      "not_started": "لم يبدأ",
+      "in_progress": "جاري التنفيذ",
+      "delayed": "متأخر",
+      "completed": "مكتمل"
+    },
+    "board": {
+      "phaseAndContractor": "المرحلة / المقاول"
+    },
+    "alert": {
+      "conflictsFound": "تم اكتشاف {{count}} تعارض زمني بين المقاولين — اضغط للعرض"
+    },
+    "conflict": {
+      "hasConflict": "يوجد تعارض زمني",
+      "tooltip": "يوجد تعارض زمني بين {{a}} و {{b}}",
+      "panelTitle": "التعارضات المكتشفة",
+      "itemsFound": "عنصر تم اكتشافه",
+      "noneFound": "لا توجد تعارضات حالياً",
+      "reasons": {
+        "date_overlap": "تداخل زمني",
+        "zone_overlap": "تداخل في نفس المنطقة",
+        "resource_overlap": "تداخل في الموارد"
+      }
+    },
+    "details": {
+      "startDate": "تاريخ المباشرة",
+      "endDate": "تاريخ الانتهاء",
+      "duration": "مدة التنفيذ",
+      "days": "يوم",
+      "progress": "نسبة الإنجاز",
+      "zone": "المنطقة",
+      "amount": "قيمة العقد",
+      "payments": "المدفوع",
+      "dependencies": "يعتمد على",
+      "detectedConflicts": "التعارضات المرتبطة",
+      "notes": "ملاحظات"
+    },
+    "empty": {
+      "title": "لا توجد بيانات لعرضها",
+      "subtitle": "لم يتم العثور على مقاولين بتواريخ صالحة لهذا المشروع"
     }
   }
 }

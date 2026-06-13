@@ -1,12 +1,14 @@
-<p-dialog 
-  [header]="'wizard.step4.contractorDuties' | translate" 
-  [visible]="visible()" 
-  (onHide)="onDialogHide()"
+<p-dialog
+  #dutiesDialog
+  [header]="'wizard.step4.contractorDuties' | translate"
+  [visible]="visible()"
+  (visibleChange)="onVisibleChange($event)"
   [modal]="true"
   [style]="{ width: '90vw', maxWidth: '1200px' }"
   [dismissableMask]="false"
-  [closeOnEscape]="true">
-  
+  [closeOnEscape]="true"
+  [showHeader]="true">
+
   @if (isLoading()) {
     <div class="flex justify-center align-items-center p-6">
       <p-progressSpinner></p-progressSpinner>
@@ -15,21 +17,22 @@
 
   <!-- Form Section -->
   @if (!isViewMode()) {
-  <div class="mb-4">
-    <h4 class="text-lg font-semibold mb-4">{{ 'wizard.step4.addContractorDuty' | translate }}</h4>
+  <div class="mb-2">
+    <h4 class="text-lg font-semibold mb-2">{{ 'wizard.step4.addContractorDuty' | translate }}</h4>
 
     <form [formGroup]="contractorDutyForm">
       <div class="grid">
+
         <!-- Quantity -->
-        <div class="col-12 md:col-6 lg:col-3 mb-3">
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="field">
             <p-floatlabel variant="in">
-              <p-inputNumber 
-                inputId="quantity" 
-                formControlName="quantity" 
-                [min]="0.01" 
+              <p-inputNumber
+                inputId="quantity"
+                formControlName="quantity"
+                [min]="0.01"
                 [showButtons]="false"
-                mode="decimal" 
+                mode="decimal"
                 [minFractionDigits]="2"
                 [ngClass]="{'ng-invalid': isFieldInvalid('quantity')}"
                 inputStyleClass="w-full">
@@ -43,16 +46,15 @@
         </div>
 
         <!-- Price -->
-        <div class="col-12 md:col-6 lg:col-3 mb-3">
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="field">
             <p-floatlabel variant="in">
-              <p-inputNumber 
-                inputId="price" 
-                formControlName="price" 
-                [min]="0.01" 
+              <p-inputNumber
+                inputId="price"
+                formControlName="price"
+                [min]="0.01"
                 [showButtons]="false"
-                mode="currency" 
-                currency="USD" 
+                mode="decimal"
                 locale="en-US"
                 [ngClass]="{'ng-invalid': isFieldInvalid('price')}"
                 inputStyleClass="w-full">
@@ -66,15 +68,14 @@
         </div>
 
         <!-- Sub Total (readonly) -->
-        <div class="col-12 md:col-6 lg:col-3 mb-3">
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="field">
             <p-floatlabel variant="in">
-              <p-inputNumber 
-                inputId="subTotal" 
-                formControlName="subTotal" 
+              <p-inputNumber
+                inputId="subTotal"
+                formControlName="subTotal"
                 [readonly]="true"
-                mode="currency" 
-                currency="USD" 
+                mode="decimal"
                 locale="en-US"
                 inputStyleClass="w-full">
               </p-inputNumber>
@@ -84,14 +85,14 @@
         </div>
 
         <!-- Unit -->
-        <div class="col-12 md:col-6 lg:col-3 mb-3">
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="field">
             <p-floatlabel variant="in">
-              <p-select 
-                inputId="unitId" 
-                formControlName="unitId" 
+              <p-select
+                inputId="unitId"
+                formControlName="unitId"
                 [options]="units()"
-                optionLabel="name" 
+                optionLabel="name"
                 optionValue="id"
                 [class]="isFieldInvalid('unitId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
               </p-select>
@@ -104,14 +105,14 @@
         </div>
 
         <!-- Duty Type -->
-        <div class="col-12 md:col-6 lg:col-3 mb-3">
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="field">
             <p-floatlabel variant="in">
-              <p-select 
-                inputId="dutyTypeId" 
-                formControlName="dutyTypeId" 
+              <p-select
+                inputId="dutyTypeId"
+                formControlName="dutyTypeId"
                 [options]="dutyTypes()"
-                optionLabel="name" 
+                optionLabel="name"
                 optionValue="id"
                 [class]="isFieldInvalid('dutyTypeId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
               </p-select>
@@ -124,14 +125,14 @@
         </div>
 
         <!-- Duty Responsibility -->
-        <div class="col-12 md:col-6 lg:col-3 mb-3">
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="field">
             <p-floatlabel variant="in">
-              <p-select 
-                inputId="dutyResponsibilityId" 
-                formControlName="dutyResponsibilityId" 
+              <p-select
+                inputId="dutyResponsibilityId"
+                formControlName="dutyResponsibilityId"
                 [options]="dutyResponsibilities()"
-                optionLabel="name" 
+                optionLabel="name"
                 optionValue="id"
                 [class]="isFieldInvalid('dutyResponsibilityId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
               </p-select>
@@ -143,44 +144,137 @@
           </div>
         </div>
 
+        <!-- Materials -->
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
+          <div class="field">
+            <p-floatlabel variant="in">
+              <p-select
+                inputId="materialId"
+                formControlName="materialId"
+                [options]="materialGroups"
+                optionGroupLabel="label"
+                optionGroupChildren="items"
+                optionLabel="label"
+                optionValue="value"
+                [showClear]="true"
+                [filter]="true"
+                filterPlaceholder="Search materials..."
+                class="w-full">
+                <ng-template pTemplate="group" let-group>
+                  <div class="flex align-items-center gap-2">
+                    <span class="font-semibold">{{ group.label }}</span>
+                  </div>
+                </ng-template>
+              </p-select>
+              <!-- TODO: add required asterisk once BE is ready -->
+              <label for="materialId">Materials</label>
+            </p-floatlabel>
+          </div>
+        </div>
+
+        <!-- Generate Expense checkbox (full row) -->
+        <div class="col-12 mb-1">
+          <div class="flex align-items-center gap-2">
+            <p-checkbox
+              inputId="generateExpense"
+              formControlName="generateExpense"
+              [binary]="true">
+            </p-checkbox>
+            <label for="generateExpense" class="cursor-pointer select-none font-medium">
+              Generate Expense
+            </label>
+          </div>
+        </div>
+
+        <!-- Supplier (required when generateExpense is checked) -->
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
+          <div class="field">
+            <p-floatlabel variant="in">
+              <p-select
+                inputId="supplierId"
+                formControlName="supplierId"
+                [options]="suppliers()"
+                optionLabel="label"
+                optionValue="value"
+                [showClear]="true"
+                [filter]="true"
+                filterPlaceholder="Search suppliers..."
+                [loading]="isLoadingSuppliers()"
+                [disabled]="!generateExpenseChecked"
+                [class]="isFieldInvalid('supplierId') ? 'ng-dirty ng-invalid w-full' : 'w-full'">
+              </p-select>
+              <label for="supplierId">
+                Supplier
+                @if (generateExpenseChecked) { <span class="required-asterisk">*</span> }
+              </label>
+            </p-floatlabel>
+            @if (isFieldInvalid('supplierId')) {
+              <small class="text-red-500 block mt-1">{{ getFieldError('supplierId') }}</small>
+            }
+          </div>
+        </div>
+
+        <!-- Expense No (required when generateExpense is checked) -->
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
+          <div class="field">
+            <p-floatlabel variant="in">
+              <input
+                id="expenseNo"
+                type="text"
+                pInputText
+                formControlName="expenseNo"
+                [disabled]="!generateExpenseChecked"
+                [class]="isFieldInvalid('expenseNo') ? 'ng-dirty ng-invalid w-full' : 'w-full'"
+                placeholder=" ">
+              <label for="expenseNo">
+                Expense No
+                @if (generateExpenseChecked) { <span class="required-asterisk">*</span> }
+              </label>
+            </p-floatlabel>
+            @if (isFieldInvalid('expenseNo')) {
+              <small class="text-red-500 block mt-1">{{ getFieldError('expenseNo') }}</small>
+            }
+          </div>
+        </div>
+
         <!-- Action Buttons -->
-        <div class="col-12 md:col-6 lg:col-3 mb-3 flex justify-end gap-2 mt-3">
-          <p-button 
-            [label]="'common.cancel' | translate" 
-            severity="secondary" 
+        <div class="col-12 flex justify-end gap-2 mt-2">
+          <p-button
+            [label]="'common.cancel' | translate"
+            severity="secondary"
             icon="pi pi-times"
             (onClick)="clearForm()">
           </p-button>
-          <p-button 
+          <p-button
             [label]="editingIndex() !== null ? ('common.edit' | translate) : ('common.add' | translate)"
-            icon="pi pi-check" 
+            icon="pi pi-check"
             (onClick)="addContractorDuty()"
             [disabled]="contractorDutyForm.invalid">
           </p-button>
         </div>
+
       </div>
     </form>
   </div>
   }
 
   <!-- Table Section -->
-  <div class="mb-4">
+  <div class="mb-2">
     <div class="card">
-      <div class="card-header border-b border-gray-200 pb-3 mb-3">
+      <div class="card-header border-b border-gray-200 pb-3 mb-1">
         <h4 class="text-lg font-semibold">{{ 'wizard.step4.contractorDutiesList' | translate }}</h4>
       </div>
 
-      <!-- PrimeNG Table -->
-      <p-table 
-        [value]="contractorDuties()" 
-        [paginator]="true" 
-        [rows]="5" 
+      <p-table
+        [value]="contractorDuties()"
+        [paginator]="true"
+        [rows]="5"
         [showCurrentPageReport]="true"
         currentPageReportTemplate="{{ 'wizard.step4.showingDuties' | translate }}"
         [rowsPerPageOptions]="[5, 10, 25]"
-        [tableStyle]="{ 'min-width': '50rem' }"
+        [tableStyle]="{ 'min-width': '60rem' }"
         styleClass="p-datatable-striped">
-        
+
         <ng-template pTemplate="header">
           <tr>
             <th>{{ 'wizard.step4.quantity' | translate }}</th>
@@ -189,47 +283,63 @@
             <th>{{ 'wizard.step4.unit' | translate }}</th>
             <th>{{ 'wizard.step4.dutyType' | translate }}</th>
             <th>{{ 'wizard.step4.dutyResponsibility' | translate }}</th>
+            <th>Supplier</th>
+            <th>Expense No</th>
             @if (!isViewMode()) {
-            <th class="text-center" style="width: 120px">{{ 'common.actions' | translate }}</th>
+              <th class="text-center" style="width: 120px">{{ 'common.actions' | translate }}</th>
             }
           </tr>
         </ng-template>
-        
+
         <ng-template pTemplate="body" let-duty let-rowIndex="rowIndex">
           <tr>
             <td>{{ duty.quantity | number:'1.2-2' }}</td>
-            <td>{{ duty.price | currency:'USD':'symbol':'1.2-2' }}</td>
-            <td>{{ duty.subTotal | currency:'USD':'symbol':'1.2-2' }}</td>
+            <td>{{ duty.price | number:'1.2-2' }}</td>
+            <td>{{ duty.subTotal | number:'1.2-2' }}</td>
             <td>{{ getUnitName(duty.unitId) }}</td>
             <td>{{ getDutyTypeName(duty.dutyTypeId) }}</td>
             <td>{{ getDutyResponsibilityName(duty.dutyResponsibilityId) }}</td>
-            @if (!isViewMode()) {
-            <td class="text-center">
-              <button 
-                type="button"
-                class="p-button-rounded p-button-text p-button-info mr-2"
-                (click)="editContractorDuty(rowIndex)"
-                pButton
-                icon="pi pi-pencil"
-                [pTooltip]="'common.edit' | translate">
-              </button>
-              <button 
-                type="button"
-                class="p-button-rounded p-button-text p-button-danger"
-                (click)="deleteContractorDuty(rowIndex)"
-                pButton
-                icon="pi pi-trash"
-                [pTooltip]="'common.delete' | translate">
-              </button>
+            <td>
+              @if (duty.generateExpense) {
+                {{ getSupplierName(duty.supplierId) }}
+              } @else {
+                <span class="text-400">-</span>
+              }
             </td>
+            <td>
+              @if (duty.generateExpense) {
+                {{ duty.expenseNo || '-' }}
+              } @else {
+                <span class="text-400">-</span>
+              }
+            </td>
+            @if (!isViewMode()) {
+              <td class="text-center">
+                <button
+                  type="button"
+                  class="p-button-rounded p-button-text p-button-info mr-2"
+                  (click)="editContractorDuty(rowIndex)"
+                  pButton
+                  icon="pi pi-pencil"
+                  [pTooltip]="'common.edit' | translate">
+                </button>
+                <button
+                  type="button"
+                  class="p-button-rounded p-button-text p-button-danger"
+                  (click)="deleteContractorDuty(rowIndex)"
+                  pButton
+                  icon="pi pi-trash"
+                  [pTooltip]="'common.delete' | translate">
+                </button>
+              </td>
             }
           </tr>
         </ng-template>
-        
+
         <ng-template pTemplate="emptymessage">
           <tr>
-            <td colspan="7" class="text-center p-6">
-              <i class="pi pi-inbox text-4xl mb-3 block text-gray-400"></i>
+            <td colspan="9" class="text-center p-6">
+              <i class="pi pi-inbox text-4xl mb-1 block text-gray-400"></i>
               <p class="text-gray-500">{{ 'wizard.step4.noContractorDuties' | translate }}</p>
             </td>
           </tr>
@@ -241,19 +351,19 @@
   <!-- Dialog Footer -->
   <ng-template pTemplate="footer">
     <div class="flex justify-end gap-2">
-      <p-button 
-        [label]="isViewMode() ? ('common.close' | translate) : ('common.cancel' | translate)" 
-        severity="secondary" 
+      <p-button
+        [label]="isViewMode() ? ('common.close' | translate) : ('common.cancel' | translate)"
+        severity="secondary"
         [icon]="isViewMode() ? 'pi pi-check' : 'pi pi-times'"
-        (onClick)="onDialogHide()">
+        (onClick)="closeContractorDutiesDialog()">
       </p-button>
       @if (!isViewMode()) {
-      <p-button 
-        [label]="'common.saveAll' | translate" 
-        icon="pi pi-save" 
-        (onClick)="saveAllContractorDuties()"
-        [disabled]="contractorDuties().length === 0">
-      </p-button>
+        <p-button
+          [label]="'common.saveAll' | translate"
+          icon="pi pi-save"
+          (onClick)="saveAllContractorDuties()"
+          [disabled]="contractorDuties().length === 0">
+        </p-button>
       }
     </div>
   </ng-template>

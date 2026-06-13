@@ -1,4 +1,4 @@
-<div class="card flex justify-center p-4">
+<div class="card flex justify-center p-2">
   <p-stepper [value]="currentStep()" class="w-full" [linear]="!isViewMode()">
     <p-step-list>
       @for (label of stepLabels; track $index) {
@@ -13,10 +13,10 @@
     </p-step-list>
 
     <p-step-panels>
-      <!-- Step 1: Agreement Details -->
+      <!-- Step 1: Main info -->
       <p-step-panel [value]="1">
         <ng-template #content let-activateCallback="activateCallback">
-          <div class="gap-4">
+          <div class="gap-2">
             <app-step1
               #step1Component
               [currentStep]="currentStep()"
@@ -30,7 +30,7 @@
               <div class="flex pt-4 justify-end gap-2">
                 <p-button 
                   [label]="'wizard.next' | translate" 
-                  icon="pi pi-arrow-right" 
+                  [icon]="isRTL() ? 'pi pi-arrow-left' : 'pi pi-arrow-right'" 
                   iconPos="right"
                   [disabled]="!step1Component.isFormValid()"
                   (onClick)="step1Component.onSubmit()"
@@ -44,7 +44,7 @@
       <!-- Step 2: Payment & Services -->
       <p-step-panel [value]="2">
         <ng-template #content let-activateCallback="activateCallback">
-          <div class="gap-4">
+          <div class="gap-2">
             <app-step2
               #step2Component
               [currentStep]="currentStep()"
@@ -58,12 +58,12 @@
                 <p-button 
                   [label]="'wizard.back' | translate" 
                   severity="secondary" 
-                  icon="pi pi-arrow-left"
+                  [icon]="isRTL() ? 'pi pi-arrow-right' : 'pi pi-arrow-left'"
                   (onClick)="goToStep(1)"
                 />
                 <p-button 
                   [label]="'wizard.next' | translate" 
-                  icon="pi pi-arrow-right" 
+                  [icon]="isRTL() ? 'pi pi-arrow-left' : 'pi pi-arrow-right'" 
                   iconPos="right"
                   [disabled]="!step2Component.isFormValid()"
                   (onClick)="step2Component.onSubmit()"
@@ -74,10 +74,43 @@
         </ng-template>
       </p-step-panel>
 
-      <!-- Step 3: Material & Quality Specifications -->
+      <!-- Step 3: Milestones -->
       <p-step-panel [value]="3">
         <ng-template #content let-activateCallback="activateCallback">
-          <div class="gap-4">
+          <div class="gap-2">
+            <app-step-milestones
+              #stepMilestonesComponent
+              [currentStep]="currentStep()"
+              [agreementId]="agreementId()"
+              [isViewMode]="isViewMode()"
+              (stepData)="onStepMilestonesData($event)"
+            ></app-step-milestones>
+            
+            @if (!isViewMode()) {
+              <div class="flex pt-4 justify-between gap-2">
+                <p-button 
+                  [label]="'wizard.back' | translate" 
+                  severity="secondary" 
+                  [icon]="isRTL() ? 'pi pi-arrow-right' : 'pi pi-arrow-left'"
+                  (onClick)="goToStep(2)"
+                />
+                <p-button 
+                  [label]="'wizard.next' | translate" 
+                  [icon]="isRTL() ? 'pi pi-arrow-left' : 'pi pi-arrow-right'" 
+                  iconPos="right"
+                  [disabled]="stepMilestonesComponent.getActiveEntries().length === 0"
+                  (onClick)="stepMilestonesComponent.onSubmit()"
+                />
+              </div>
+            }
+          </div>
+        </ng-template>
+      </p-step-panel>
+
+      <!-- Step 4: Project areas -->
+      <p-step-panel [value]="4">
+        <ng-template #content let-activateCallback="activateCallback">
+          <div class="gap-2">
             <app-step3
               #step3Component
               [currentStep]="currentStep()"
@@ -91,12 +124,12 @@
                 <p-button 
                   [label]="'wizard.back' | translate" 
                   severity="secondary" 
-                  icon="pi pi-arrow-left"
-                  (onClick)="goToStep(2)"
+                  [icon]="isRTL() ? 'pi pi-arrow-right' : 'pi pi-arrow-left'"
+                  (onClick)="goToStep(3)"
                 />
                 <p-button 
                   [label]="'wizard.next' | translate" 
-                  icon="pi pi-arrow-right" 
+                  [icon]="isRTL() ? 'pi pi-arrow-left' : 'pi pi-arrow-right'" 
                   iconPos="right"
                   [disabled]="step3Component.projectAreaUnits().length === 0"
                   (onClick)="step3Component.onSubmit()"
@@ -107,10 +140,10 @@
         </ng-template>
       </p-step-panel>
 
-      <!-- Step 4: Main Contracts -->
-      <p-step-panel [value]="4">
+      <!-- Step 5: Main Contracts -->
+      <p-step-panel [value]="5">
         <ng-template #content let-activateCallback="activateCallback">
-          <div class="gap-4">
+          <div class="gap-2">
             <app-step4
               #step4Component
               [currentStep]="currentStep()"
@@ -124,12 +157,12 @@
                 <p-button 
                   [label]="'wizard.back' | translate" 
                   severity="secondary" 
-                  icon="pi pi-arrow-left"
-                  (onClick)="goToStep(3)"
+                  [icon]="isRTL() ? 'pi pi-arrow-right' : 'pi pi-arrow-left'"
+                  (onClick)="goToStep(4)"
                 />
                 <p-button 
                   [label]="'wizard.next' | translate" 
-                  icon="pi pi-arrow-right" 
+                  [icon]="isRTL() ? 'pi pi-arrow-left' : 'pi pi-arrow-right'" 
                   iconPos="right"
                   [disabled]="step4Component.mainContracts().length === 0"
                   (onClick)="step4Component.onSubmit()"
@@ -140,10 +173,10 @@
         </ng-template>
       </p-step-panel>
 
-      <!-- Step 5: Supplier Services -->
-      <p-step-panel [value]="5">
+      <!-- Step 6: Supplier -->
+      <p-step-panel [value]="6">
         <ng-template #content let-activateCallback="activateCallback">
-          <div class="gap-4">
+          <div class="gap-2">
             <app-step5
               #step5Component
               [currentStep]="currentStep()"
@@ -157,12 +190,12 @@
                 <p-button 
                   [label]="'wizard.back' | translate" 
                   severity="secondary" 
-                  icon="pi pi-arrow-left"
-                  (onClick)="goToStep(4)"
+                  [icon]="isRTL() ? 'pi pi-arrow-right' : 'pi pi-arrow-left'"
+                  (onClick)="goToStep(5)"
                 />
                 <p-button 
                   [label]="'wizard.next' | translate" 
-                  icon="pi pi-arrow-right" 
+                  [icon]="isRTL() ? 'pi pi-arrow-left' : 'pi pi-arrow-right'" 
                   iconPos="right"
                   (onClick)="step5Component.onSubmit()"
                 />
@@ -172,10 +205,10 @@
         </ng-template>
       </p-step-panel>
 
-      <!-- Step 6: Quantity Bill -->
-      <p-step-panel [value]="6">
+      <!-- Step 7: Quantity Bill -->
+      <p-step-panel [value]="7">
         <ng-template #content let-activateCallback="activateCallback">
-          <div class="gap-4">
+          <div class="gap-2">
             <app-step6
               #step6Component
               [currentStep]="currentStep()"
@@ -189,12 +222,12 @@
                 <p-button 
                   [label]="'wizard.back' | translate" 
                   severity="secondary" 
-                  icon="pi pi-arrow-left"
-                  (onClick)="goToStep(5)"
+                  [icon]="isRTL() ? 'pi pi-arrow-right' : 'pi pi-arrow-left'"
+                  (onClick)="goToStep(6)"
                 />
                 <p-button 
                   [label]="'wizard.next' | translate" 
-                  icon="pi pi-arrow-right" 
+                  [icon]="isRTL() ? 'pi pi-arrow-left' : 'pi pi-arrow-right'" 
                   iconPos="right"
                   (onClick)="step6Component.onSubmit()"
                 />
@@ -204,10 +237,10 @@
         </ng-template>
       </p-step-panel>
 
-      <!-- Step 7: Final Step -->
-      <p-step-panel [value]="7">
+      <!-- Step 8: Final Step -->
+      <p-step-panel [value]="8">
         <ng-template #content let-activateCallback="activateCallback">
-          <div class="gap-4">
+          <div class="gap-2">
             <app-step7
               #step7Component
               [currentStep]="currentStep()"
@@ -221,8 +254,8 @@
                 <p-button 
                   [label]="'wizard.back' | translate" 
                   severity="secondary" 
-                  icon="pi pi-arrow-left"
-                  (onClick)="goToStep(6)"
+                  [icon]="isRTL() ? 'pi pi-arrow-right' : 'pi pi-arrow-left'"
+                  (onClick)="goToStep(7)"
                 />
                 <p-button 
                   [label]="'wizard.submit' | translate" 

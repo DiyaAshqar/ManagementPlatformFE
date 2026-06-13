@@ -1,22 +1,23 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { 
-  AgreementClient, 
-  AttachmentClient, 
-  LookupClient,
+import {
+  AgreementClient,
+  AttachmentClient,
+  BooleanResponse,
+  ConstructorClient,
+  FourthStepDto,
   FullAgreementDto,
   FullAgreementDtoResponse,
-  Int32Response,
   GetAllAgreementDtoListPagedResponseResponse,
-  GetAttachmentMetaDataResponse,
   GetAttachmentMetaDataListResponse,
-  BooleanResponse,
-  StringLookupDtoListDictionaryResponse,
+  GetAttachmentMetaDataResponse,
+  GetConstructorDto,
+  Int32Response,
+  LookupClient,
   LookupDto,
-  FourthStepDto,
-  FifthStepDto,
-  SixthStepDto
+  MileStonesDto,
+  StringLookupDtoListDictionaryResponse
 } from '../../../../nswag/api-client';
 
 @Injectable({
@@ -27,7 +28,8 @@ export class AgreementWizardService {
   constructor(
     private agreementClient: AgreementClient,
     private attachmentClient: AttachmentClient,
-    private lookupClient: LookupClient
+    private lookupClient: LookupClient,
+    private constructorClient: ConstructorClient
   ) { }
 
   // Agreement methods
@@ -53,7 +55,7 @@ export class AgreementWizardService {
   }
 
   getAttachmentsByAgreementId(agreementId: number): Observable<GetAttachmentMetaDataListResponse> {
-    return this.attachmentClient.getAttachmentsByAgreementId(agreementId);
+    return this.attachmentClient.getAttachmentsByAgreementId(agreementId, undefined);
   }
 
   downloadAttachment(id: number): Observable<void> {
@@ -158,9 +160,10 @@ export class AgreementWizardService {
     constructors: LookupDto[],
     units: LookupDto[],
     dutyTypes: LookupDto[],
-    dutyResponsibilities: LookupDto[]
+    dutyResponsibilities: LookupDto[],
+    milestones: LookupDto[]
   }> {
-    return this.getAllLookups(['maincontracttype', 'constructor', 'unit', 'dutytype', 'dutyresponsibility']).pipe(
+    return this.getAllLookups(['maincontracttype', 'constructor', 'unit', 'dutytype', 'dutyresponsibility', 'milestones']).pipe(
       map(response => {
         if (response.succeeded && response.data) {
           return {
@@ -168,10 +171,11 @@ export class AgreementWizardService {
             constructors: response.data['constructor'] || [],
             units: response.data['unit'] || [],
             dutyTypes: response.data['dutytype'] || [],
-            dutyResponsibilities: response.data['dutyresponsibility'] || []
+            dutyResponsibilities: response.data['dutyresponsibility'] || [],
+            milestones: response.data['milestones'] || []
           };
         }
-        return { mainContractTypes: [], constructors: [], units: [], dutyTypes: [], dutyResponsibilities: [] };
+        return { mainContractTypes: [], constructors: [], units: [], dutyTypes: [], dutyResponsibilities: [], milestones: [] };
       })
     );
   }
@@ -192,17 +196,18 @@ export class AgreementWizardService {
   }
 
   // Get lookups for Step 6
-  getStep6Lookups(): Observable<{ materials: LookupDto[], units: LookupDto[], milestones: LookupDto[] }> {
-    return this.getAllLookups(['material', 'unit', 'milestones']).pipe(
+  getStep6Lookups(): Observable<{ materials: LookupDto[], units: LookupDto[], milestones: LookupDto[], constructors: LookupDto[] }> {
+    return this.getAllLookups(['material', 'unit', 'milestones', 'constructor']).pipe(
       map(response => {
         if (response.succeeded && response.data) {
           return {
             materials: response.data['material'] || [],
             units: response.data['unit'] || [],
-            milestones: response.data['milestones'] || []
+            milestones: response.data['milestones'] || [],
+            constructors: response.data['constructor'] || []
           };
         }
-        return { materials: [], units: [], milestones: [] };
+        return { materials: [], units: [], milestones: [], constructors: [] };
       })
     );
   }
@@ -210,7 +215,7 @@ export class AgreementWizardService {
   // Create individual main contract for Step 4
   createMainContract(agreementId: number, mainContractData: any): Observable<Int32Response> {
     const fourthStepDto = new FullAgreementDto();
-    fourthStepDto.step = 4;
+    fourthStepDto.step = 5;
     fourthStepDto.agreementId = agreementId;
     
     const fourthStep = new FourthStepDto();
@@ -218,5 +223,29 @@ export class AgreementWizardService {
     fourthStepDto.fourthStepDto = fourthStep;
     
     return this.agreementClient.createAgreement(fourthStepDto);
+  }
+
+  // Get contractors filtered by main contract type
+  getConstructorsByTypeId(typeId: number): Observable<GetConstructorDto[]> {
+    return this.constructorClient.getByTypeId(typeId, undefined, undefined, undefined).pipe(
+      map(response => {
+        if (response.succeeded && response.data?.data) {
+          return response.data.data;
+        }
+        return [];
+      })
+    );
+  }
+
+  // Get milestones from a specific step of an agreement (defaults to step 3)
+  getMilestonesFromStep3(agreementId: number, step: number = 3): Observable<MileStonesDto[]> {
+    return this.agreementClient.getAgreementById(agreementId, step).pipe(
+      map(response => {
+        if (response.succeeded && response.data?.mileStonesStepDto?.mileStonesDto) {
+          return response.data.mileStonesStepDto.mileStonesDto.filter(m => !m.isDeleted);
+        }
+        return [];
+      })
+    );
   }
 }

@@ -1,0 +1,224 @@
+<p-dialog
+  [(visible)]="visible"
+  (onHide)="onHide()"
+  [header]="dialogHeader"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  [style]="{ width: '50rem' }"
+  [breakpoints]="{ '960px': '75vw', '640px': '95vw' }">
+
+  <form [formGroup]="voForm" (ngSubmit)="onSubmit()">
+    <div class="grid">
+
+      <!-- VO Number -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <input
+              pInputText
+              id="voNumber"
+              formControlName="voNumber"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('voNumber')" />
+            <label for="voNumber">{{ 'dialogs.voucherOrder.voNumber' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('voNumber')" class="p-error">{{ 'dialogs.voucherOrder.voNumberRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <!-- Item -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <input
+              pInputText
+              id="item"
+              formControlName="item"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('item')" />
+            <label for="item">{{ 'dialogs.voucherOrder.voItem' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('item')" class="p-error">{{ 'dialogs.voucherOrder.voItemRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <!-- Description -->
+      <div class="col-12">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <textarea
+              pTextarea
+              id="description"
+              formControlName="description"
+              rows="2"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('description')">
+            </textarea>
+            <label for="description">{{ 'dialogs.voucherOrder.description' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('description')" class="p-error">{{ 'dialogs.voucherOrder.descriptionRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <!-- Quantity -->
+      <div class="col-12 md:col-4">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-inputnumber
+              inputId="quantity"
+              formControlName="quantity"
+              [minFractionDigits]="0"
+              [maxFractionDigits]="2"
+              [min]="0"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('quantity')">
+            </p-inputnumber>
+            <label for="quantity">{{ 'dialogs.voucherOrder.quantity' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('quantity')" class="p-error">{{ 'dialogs.voucherOrder.quantityRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <!-- Unit -->
+      <div class="col-12 md:col-4">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="unitId"
+              formControlName="unitId"
+              [options]="unitOptions"
+              optionLabel="label"
+              optionValue="value"
+              [showClear]="true"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('unitId')">
+            </p-select>
+            <label for="unitId">{{ 'dialogs.voucherOrder.unit' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('unitId')" class="p-error">{{ 'dialogs.voucherOrder.unitRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <!-- Price -->
+      <div class="col-12 md:col-4">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-inputnumber
+              inputId="price"
+              formControlName="price"
+              mode="decimal"
+              [minFractionDigits]="2"
+              [maxFractionDigits]="2"
+              [min]="0"
+              class="w-full"
+              [class.ng-invalid]="isFieldInvalid('price')">
+            </p-inputnumber>
+            <label for="price">{{ 'dialogs.voucherOrder.amount' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('price')" class="p-error">{{ 'dialogs.voucherOrder.amountRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-select
+              inputId="status"
+              formControlName="status"
+              [options]="statusOptions"
+              optionLabel="label"
+              optionValue="value"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('status')">
+            </p-select>
+            <label for="status">{{ 'dialogs.voucherOrder.approvalStatus' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('status')" class="p-error">{{ 'dialogs.voucherOrder.statusRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <!-- Is Effected Checkbox -->
+      <div class="col-12">
+        <div class="field flex align-items-center">
+          <p-checkbox
+            inputId="isEffected"
+            formControlName="isEffected"
+            [binary]="true">
+          </p-checkbox>
+          <label for="isEffected" class="ml-2 cursor-pointer">{{ 'dialogs.voucherOrder.isEffected' | translate }}</label>
+        </div>
+      </div>
+
+      <!-- Effected Dates (only if isEffected is true) -->
+      @if (isEffectedValue) {
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-datepicker
+              inputId="effectedDateStart"
+              formControlName="effectedDateStart"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              iconDisplay="input"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('effectedDateStart')">
+            </p-datepicker>
+            <label for="effectedDateStart">{{ 'dialogs.voucherOrder.effectedDateStart' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('effectedDateStart')" class="p-error">{{ 'dialogs.voucherOrder.effectedDateStartRequired' | translate }}</small>
+        </div>
+      </div>
+
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-datepicker
+              inputId="effectedDateEnd"
+              formControlName="effectedDateEnd"
+              dateFormat="yy-mm-dd"
+              [showIcon]="true"
+              iconDisplay="input"
+              class="w-full"
+              appendTo="body"
+              [class.ng-invalid]="isFieldInvalid('effectedDateEnd')">
+            </p-datepicker>
+            <label for="effectedDateEnd">{{ 'dialogs.voucherOrder.effectedDateEnd' | translate }} <span class="required-asterisk">*</span></label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('effectedDateEnd')" class="p-error">{{ 'dialogs.voucherOrder.effectedDateEndRequired' | translate }}</small>
+        </div>
+      </div>
+      }
+
+      <!-- Subtotal (readonly preview) -->
+      <div class="col-12">
+        <div class="vo-subtotal-preview">
+          <span class="label">{{ 'dialogs.voucherOrder.subtotal' | translate }}:</span>
+          <span class="value">{{ computedSubTotal | number:'1.2-2' }}</span>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      [label]="'dialogs.voucherOrder.cancel' | translate"
+      icon="pi pi-times"
+      (onClick)="onHide()"
+      severity="secondary"
+      [outlined]="true">
+    </p-button>
+    <p-button
+      [label]="(isEditMode ? 'dialogs.voucherOrder.update' : 'dialogs.voucherOrder.create') | translate"
+      icon="pi pi-check"
+      (onClick)="onSubmit()"
+      [loading]="isSubmitting()"
+      [disabled]="voForm.invalid">
+    </p-button>
+  </ng-template>
+</p-dialog>

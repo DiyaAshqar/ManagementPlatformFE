@@ -6,18 +6,15 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { FloatLabelModule } from 'primeng/floatlabel';
+import { InputGroupModule } from 'primeng/inputgroup';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
+import { TextareaModule } from 'primeng/textarea';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
 import { Subject, takeUntil } from 'rxjs';
 import { AgreementWizardService } from '../../../services/agreement-wizard.service';
 import { LookupDto, FullAgreementDto, FirstStepDto, AgreementDto, ClientDto, LandInformationDto } from '../../../../../../nswag/api-client';
-
-interface Lookup {
-  id: number;
-  name: string;
-}
 
 @Component({
   selector: 'app-step1',
@@ -30,9 +27,11 @@ interface Lookup {
     ProgressSpinnerModule,
     InputNumberModule,
     InputTextModule,
+    TextareaModule,
     ButtonModule,
     TranslateModule,
-    FloatLabelModule
+    FloatLabelModule,
+    InputGroupModule
   ],
   templateUrl: './step1.component.html'
 })
@@ -50,6 +49,32 @@ export class Step1Component implements OnInit, OnDestroy {
   agreementTypes = signal<LookupDto[]>([]);
   isLoading = signal(false);
   isFormValid = signal(false);
+
+  phoneCodes = [
+    { name: 'Jordan', iso: 'jo', dialCode: '+962' },
+    { name: 'Saudi Arabia', iso: 'sa', dialCode: '+966' },
+    { name: 'UAE', iso: 'ae', dialCode: '+971' },
+    { name: 'Egypt', iso: 'eg', dialCode: '+20' },
+    { name: 'Palestine', iso: 'ps', dialCode: '+970' },
+    { name: 'Kuwait', iso: 'kw', dialCode: '+965' },
+    { name: 'Qatar', iso: 'qa', dialCode: '+974' },
+    { name: 'Bahrain', iso: 'bh', dialCode: '+973' },
+    { name: 'Oman', iso: 'om', dialCode: '+968' },
+    { name: 'Lebanon', iso: 'lb', dialCode: '+961' },
+    { name: 'Syria', iso: 'sy', dialCode: '+963' },
+    { name: 'Iraq', iso: 'iq', dialCode: '+964' },
+    { name: 'Libya', iso: 'ly', dialCode: '+218' },
+    { name: 'Tunisia', iso: 'tn', dialCode: '+216' },
+    { name: 'Algeria', iso: 'dz', dialCode: '+213' },
+    { name: 'Morocco', iso: 'ma', dialCode: '+212' },
+    { name: 'Turkey', iso: 'tr', dialCode: '+90' },
+    { name: 'USA', iso: 'us', dialCode: '+1' },
+    { name: 'UK', iso: 'gb', dialCode: '+44' },
+  ];
+
+  getFlagUrl(iso: string): string {
+    return `https://flagcdn.com/w20/${iso}.png`;
+  }
   
   minEndDate = signal<Date | null>(null);
   maxStartDate = signal<Date | null>(null);
@@ -94,6 +119,7 @@ export class Step1Component implements OnInit, OnDestroy {
           cityId: [null, Validators.required],
           projectArea: [null, [Validators.required, Validators.min(0)]],
           drillingQuantity: [null, [Validators.required, Validators.min(0)]],
+          description: ['', [Validators.maxLength(500)]],
           agreementTypeId: [null, [Validators.required, Validators.min(0)]]
         },
         { validators: this.dateRangeValidator }
@@ -101,18 +127,20 @@ export class Step1Component implements OnInit, OnDestroy {
       clientDto: this.fb.group({
         id: [0],
         contactPerson: ['', [Validators.required, Validators.maxLength(100)]],
+        contactPersonCountryCode: ['+962'],
         contactPersonNumber: ['', [Validators.required]],
         representerName: ['', [Validators.required, Validators.maxLength(100)]],
+        representerNameCountryCode: ['+962'],
         representerNameNumber: ['', [Validators.required]]
       }),
       landInformationDto: this.fb.group({
         id: [0],
-        basinName: ['', [Validators.required, Validators.maxLength(100)]],
-        village: ['', [Validators.required, Validators.maxLength(100)]],
-        directorate: ['', [Validators.required, Validators.maxLength(100)]],
-        plotNumber: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
-        basinNumber: ['', [Validators.required, Validators.pattern(/^\d+$/)]],
-        floorNumber: ['', [Validators.required, Validators.pattern(/^\d+$/)]]
+        basinName: ['', [Validators.maxLength(100)]],
+        village: ['', [Validators.maxLength(100)]],
+        directorate: ['', [Validators.maxLength(100)]],
+        plotNumber: ['', [Validators.pattern(/^\d+$/)]],
+        basinNumber: ['', [Validators.pattern(/^\d+$/)]],
+        floorNumber: ['', [Validators.pattern(/^\d+$/)]]
       })
     });
 
@@ -182,6 +210,7 @@ export class Step1Component implements OnInit, OnDestroy {
           cityId: data.agreementDto.cityId,
           projectArea: data.agreementDto.projectArea,
           drillingQuantity: data.agreementDto.drillingQuantity,
+          description: (data.agreementDto as any).description ?? '',
           agreementTypeId: data.agreementDto.agreementTypeId
         }
       });
@@ -227,6 +256,13 @@ export class Step1Component implements OnInit, OnDestroy {
       return;
     }
 
+    // Edit mode with no changes — skip API and go to next step
+    if (this.agreementId() > 0 && this.step1Form.pristine) {
+      const formValue = this.convertDatesToStrings(this.step1Form.value);
+      this.stepData.emit(formValue);
+      return;
+    }
+
     this.isLoading.set(true);
     
     // Prepare the FullAgreementDto payload
@@ -261,88 +297,49 @@ export class Step1Component implements OnInit, OnDestroy {
   }
 
   private prepareFullAgreementDto(): FullAgreementDto {
-    const formValue = this.step1Form.getRawValue();
-    
-    // Create the FirstStepDto
-    const firstStepDto = new FirstStepDto();
-    
-    // Map AgreementDto
-    const agreementDto = new AgreementDto();
-    agreementDto.id = formValue.agreementDto.id || 0;
-    agreementDto.projectNumber = formValue.agreementDto.projectNumber || '';
-    agreementDto.agreementDate = this.formatDateToString(formValue.agreementDto.agreementDate);
-    agreementDto.projectName = formValue.agreementDto.projectName;
-    agreementDto.businessSector = formValue.agreementDto.businessSector;
-    agreementDto.estimatedStartDate = this.formatDateToString(formValue.agreementDto.estimatedStartDate);
-    agreementDto.estimatedEndDate = this.formatDateToString(formValue.agreementDto.estimatedEndDate);
-    agreementDto.countryId = formValue.agreementDto.countryId;
-    agreementDto.cityId = formValue.agreementDto.cityId;
-    agreementDto.drillingQuantity = formValue.agreementDto.drillingQuantity;
-    agreementDto.projectArea = formValue.agreementDto.projectArea;
-    agreementDto.agreementTypeId = formValue.agreementDto.agreementTypeId;
-    agreementDto.isSubmitted = true;
-    agreementDto.isDeleted = false;
-    
-    // Map ClientDto
-    const clientDto = new ClientDto();
-    clientDto.id = formValue.clientDto.id || 0;
-    clientDto.contactPerson = formValue.clientDto.contactPerson;
-    clientDto.contactPersonNumber = parseInt(formValue.clientDto.contactPersonNumber) || 0;
-    clientDto.representerName = formValue.clientDto.representerName;
-    clientDto.representerNameNumber = parseInt(formValue.clientDto.representerNameNumber) || 0;
-    
-    // Map LandInformationDto
-    const landInformationDto = new LandInformationDto();
-    landInformationDto.id = formValue.landInformationDto.id || 0;
-    landInformationDto.basinName = formValue.landInformationDto.basinName;
-    landInformationDto.village = formValue.landInformationDto.village;
-    landInformationDto.directorate = formValue.landInformationDto.directorate;
-    landInformationDto.plotNumber = parseInt(formValue.landInformationDto.plotNumber) || 0;
-    landInformationDto.basinNumber = parseInt(formValue.landInformationDto.basinNumber) || 0;
-    landInformationDto.floorNumber = parseInt(formValue.landInformationDto.floorNumber) || 0;
-    landInformationDto.agreementId = this.agreementId() || 0;
-    
-    firstStepDto.agreementDto = agreementDto;
-    firstStepDto.clientDto = clientDto;
-    firstStepDto.landInformationDto = landInformationDto;
-    
-    // Create the FullAgreementDto
-    const fullAgreementDto = new FullAgreementDto();
-    fullAgreementDto.step = 1;
-    fullAgreementDto.agreementId = this.agreementId() || 0;
-    fullAgreementDto.firstStepDto = firstStepDto;
-    
-    return fullAgreementDto;
-  }
+    const { agreementDto: a, clientDto: c, landInformationDto: l } = this.step1Form.getRawValue();
+    const toDate = (v: any) => v ? new Date(v) : undefined;
 
-  private formatDateToString(date: Date | string | undefined): Date | undefined {
-    if (!date) return undefined;
-    
-    if (date instanceof Date) {
-      return date;
-    }
-    
-    return new Date(date);
+    return new FullAgreementDto({
+      step: 1,
+      agreementId: this.agreementId() || 0,
+      firstStepDto: new FirstStepDto({
+        agreementDto: new AgreementDto({
+          ...a,
+          agreementDate: toDate(a.agreementDate),
+          estimatedStartDate: toDate(a.estimatedStartDate),
+          estimatedEndDate: toDate(a.estimatedEndDate),
+          isSubmitted: true,
+          isDeleted: false
+        }),
+        clientDto: new ClientDto({
+          ...c,
+          contactPersonNumber: parseInt(c.contactPersonNumber) || 0,
+          representerNameNumber: parseInt(c.representerNameNumber) || 0
+        }),
+        landInformationDto: new LandInformationDto({
+          ...l,
+          plotNumber: parseInt(l.plotNumber) || 0,
+          basinNumber: parseInt(l.basinNumber) || 0,
+          floorNumber: parseInt(l.floorNumber) || 0,
+          agreementId: this.agreementId() || 0
+        })
+      })
+    });
   }
 
   private convertDatesToStrings(formValue: any): any {
-    const converted = { ...formValue };
-
-    if (converted.agreementDto) {
-      converted.agreementDto = { ...converted.agreementDto };
-      converted.agreementDto.projectNumber = this.step1Form.get('agreementDto.projectNumber')?.value || '';
-
-      if (converted.agreementDto.agreementDate instanceof Date) {
-        converted.agreementDto.agreementDate = this.formatDate(converted.agreementDto.agreementDate);
+    const a = formValue.agreementDto;
+    return {
+      ...formValue,
+      agreementDto: {
+        ...a,
+        projectNumber: this.step1Form.get('agreementDto.projectNumber')?.value || '',
+        agreementDate: a.agreementDate instanceof Date ? this.formatDate(a.agreementDate) : a.agreementDate,
+        estimatedStartDate: a.estimatedStartDate instanceof Date ? this.formatDate(a.estimatedStartDate) : a.estimatedStartDate,
+        estimatedEndDate: a.estimatedEndDate instanceof Date ? this.formatDate(a.estimatedEndDate) : a.estimatedEndDate
       }
-      if (converted.agreementDto.estimatedStartDate instanceof Date) {
-        converted.agreementDto.estimatedStartDate = this.formatDate(converted.agreementDto.estimatedStartDate);
-      }
-      if (converted.agreementDto.estimatedEndDate instanceof Date) {
-        converted.agreementDto.estimatedEndDate = this.formatDate(converted.agreementDto.estimatedEndDate);
-      }
-    }
-    return converted;
+    };
   }
 
   formatDate(date: Date): string {
@@ -353,31 +350,17 @@ export class Step1Component implements OnInit, OnDestroy {
   }
 
   onStartDateChange(event: any): void {
-    const startDate = event.value;
-    if (startDate) {
-      const minEndDate = new Date(startDate);
-      minEndDate.setDate(minEndDate.getDate() + 1);
-      this.minEndDate.set(minEndDate);
-      
-      // Validate the form after date change
-      this.step1Form.get('agreementDto')?.updateValueAndValidity();
-    } else {
-      this.minEndDate.set(null);
-    }
+    const d = event.value ? new Date(event.value) : null;
+    if (d) d.setDate(d.getDate() + 1);
+    this.minEndDate.set(d);
+    this.step1Form.get('agreementDto')?.updateValueAndValidity();
   }
 
   onEndDateChange(event: any): void {
-    const endDate = event.value;
-    if (endDate) {
-      const maxStartDate = new Date(endDate);
-      maxStartDate.setDate(maxStartDate.getDate() - 1);
-      this.maxStartDate.set(maxStartDate);
-      
-      // Validate the form after date change
-      this.step1Form.get('agreementDto')?.updateValueAndValidity();
-    } else {
-      this.maxStartDate.set(null);
-    }
+    const d = event.value ? new Date(event.value) : null;
+    if (d) d.setDate(d.getDate() - 1);
+    this.maxStartDate.set(d);
+    this.step1Form.get('agreementDto')?.updateValueAndValidity();
   }
 
   private dateRangeValidator(group: any) {

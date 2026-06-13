@@ -19,6 +19,15 @@
   box-sizing: border-box;
 }
 
+/* Phone country code select inside p-inputgroup */
+.phone-code-select {
+  width: 9rem !important;
+  flex-shrink: 0;
+  .p-select-label {
+    padding-inline-end: 0.25rem;
+  }
+}
+
 html,
 body {
   height: 100%;
@@ -67,14 +76,14 @@ body {
   
   /* Ensure toast animations work correctly in RTL */
   .p-toast .p-toast-message {
-    margin-left: 0;
-    margin-right: 1rem;
+    margin-inline-start: 0;
+    margin-inline-end: 1rem;
   }
   
   /* Flip icons and content in RTL */
   .p-toast .p-toast-message .p-toast-icon-close {
-    right: auto;
-    left: 0.75rem;
+    inset-inline-end: auto;
+    inset-inline-start: 0.75rem;
   }
 }
 

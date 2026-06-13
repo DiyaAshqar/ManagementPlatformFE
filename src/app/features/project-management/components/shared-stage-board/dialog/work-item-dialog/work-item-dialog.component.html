@@ -1,0 +1,298 @@
+﻿<div class="flex flex-column gap-3 p-3">
+    <div>
+      <label for="item-title" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.title' | translate }} <span class="required-asterisk">*</span></label>
+      <input 
+        id="item-title"
+        type="text" 
+        pInputText 
+        [ngModel]="currentFormData.title"
+        (ngModelChange)="updateFormField('title', $event)"
+        [placeholder]="'workItemDialog.fields.titlePlaceholder' | translate"
+        class="w-full">
+    </div>
+    
+    <div class="grid">
+      <div class="col-6">
+        <label for="item-type" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.type' | translate }}</label>
+        <p-select 
+          id="item-type"
+          [ngModel]="currentFormData.type"
+          (ngModelChange)="onTaskTypeChange($event)"
+          [options]="workItemTypes"
+          optionLabel="label"
+          optionValue="value"
+          [placeholder]="'workItemDialog.fields.typePlaceholder' | translate"
+          [loading]="isLoadingTaskTypes()"
+          styleClass="w-full">
+        </p-select>
+      </div>
+      <div class="col-6">
+        <label for="item-assignTo" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.assignTo' | translate }}</label>
+        <input 
+          id="item-assignTo"
+          type="text" 
+          pInputText 
+          [ngModel]="currentFormData.assignTo"
+          (ngModelChange)="updateFormField('assignTo', $event)"
+          [placeholder]="'workItemDialog.fields.assignToPlaceholder' | translate"
+          class="w-full">
+      </div>
+    </div>
+    
+    <div class="grid">
+      <div class="col-6">
+        <label for="item-start-date" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.startDate' | translate }}</label>
+        <p-datepicker 
+          id="item-start-date"
+          [ngModel]="currentFormData.startDate"
+          (ngModelChange)="updateFormField('startDate', $event)"
+          dateFormat="mm/dd/yy"
+          [showIcon]="true"
+          [showButtonBar]="true"
+          placeholder="mm/dd/yyyy"
+          styleClass="w-full">
+        </p-datepicker>
+      </div>
+      <div class="col-6">
+        <label for="item-end-date" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.endDate' | translate }}</label>
+        <p-datepicker 
+          id="item-end-date"
+          [ngModel]="currentFormData.endDate"
+          (ngModelChange)="updateFormField('endDate', $event)"
+          dateFormat="mm/dd/yy"
+          [showIcon]="true"
+          [showButtonBar]="true"
+          placeholder="mm/dd/yyyy"
+          styleClass="w-full">
+        </p-datepicker>
+      </div>
+    </div>
+    
+    <div class="grid">
+      <div class="col-6">
+        <label for="item-priority" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.priority' | translate }}</label>
+        <p-select 
+          id="item-priority"
+          [ngModel]="currentFormData.priority"
+          (ngModelChange)="updateFormField('priority', $event)"
+          [options]="priorityOptions"
+          optionLabel="label"
+          optionValue="value"
+          [placeholder]="'workItemDialog.fields.priorityPlaceholder' | translate"
+          styleClass="w-full">
+        </p-select>
+      </div>
+      <div class="col-6">
+        <label for="item-task-points" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.taskPoints' | translate }}</label>
+        <input 
+          id="item-task-points"
+          type="text" 
+          pInputText 
+          [ngModel]="currentFormData.taskPoint"
+          (ngModelChange)="updateFormField('taskPoint', $event)"
+          [placeholder]="'workItemDialog.fields.taskPointsPlaceholder' | translate"
+          class="w-full">
+      </div>
+    </div>
+    
+    @if (shouldShowExcavationFields()) {
+      <div class="grid">
+        <div class="col-6">
+          <label for="item-location" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.location' | translate }}</label>
+          <input 
+            id="item-location"
+            type="text" 
+            pInputText 
+            [ngModel]="currentFormData.excavationLocation"
+            (ngModelChange)="updateFormField('excavationLocation', $event)"
+            [placeholder]="'workItemDialog.fields.locationPlaceholder' | translate"
+            class="w-full">
+        </div>
+        <div class="col-6">
+          <label for="item-depth" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.depth' | translate }}</label>
+          <input 
+            id="item-depth"
+            type="text" 
+            pInputText 
+            [ngModel]="currentFormData.excavationDepth"
+            (ngModelChange)="updateFormField('excavationDepth', $event)"
+            [placeholder]="'workItemDialog.fields.depthPlaceholder' | translate"
+            class="w-full">
+        </div>
+      </div>
+      
+      <div class="grid">
+        <div class="col-6">
+          <label for="item-volume" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.volume' | translate }}</label>
+          <input 
+            id="item-volume"
+            type="text" 
+            pInputText 
+            [ngModel]="currentFormData.excavationVolume"
+            (ngModelChange)="updateFormField('excavationVolume', $event)"
+            [placeholder]="'workItemDialog.fields.volumePlaceholder' | translate"
+            class="w-full">
+        </div>
+        <div class="col-6">
+          <label for="item-soil-type" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.soilType' | translate }}</label>
+          <input 
+            id="item-soil-type"
+            type="text" 
+            pInputText 
+            [ngModel]="currentFormData.excavationSoilType"
+            (ngModelChange)="updateFormField('excavationSoilType', $event)"
+            [placeholder]="'workItemDialog.fields.soilTypePlaceholder' | translate"
+            class="w-full">
+        </div>
+      </div>
+      
+      <div>
+        <label for="item-equipment" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.equipment' | translate }}</label>
+        <input 
+          id="item-equipment"
+          type="text" 
+          pInputText 
+          [ngModel]="currentFormData.excavationEquipment"
+          (ngModelChange)="updateFormField('excavationEquipment', $event)"
+          [placeholder]="'workItemDialog.fields.equipmentPlaceholder' | translate"
+          class="w-full">
+      </div>
+    }
+    
+    <div>
+      <label for="item-description" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.description' | translate }}</label>
+      <textarea 
+        id="item-description"
+        pTextarea
+        [ngModel]="currentFormData.description"
+        (ngModelChange)="updateFormField('description', $event)"
+        [placeholder]="'workItemDialog.fields.descriptionPlaceholder' | translate"
+        [rows]="3"
+        class="w-full">
+      </textarea>
+    </div>
+
+    <!-- Subtasks Section -->
+    <div class="border-top-1 surface-border pt-3">
+      <div class="flex align-items-center justify-content-between mb-1">
+        <label class="text-sm font-semibold m-0 text-color">
+          {{ 'workItemDialog.subtasks.title' | translate }} ({{ subtasks().length }})
+        </label>
+        <p-button 
+          [label]="'workItemDialog.subtasks.addSubtask' | translate"
+          icon="pi pi-plus"
+          size="small"
+          [outlined]="true"
+          [disabled]="!formData().backendTaskId"
+          [pTooltip]="!formData().backendTaskId ? ('workItemDialog.subtasks.saveTaskFirst' | translate) : ''"
+          tooltipPosition="left"
+          (onClick)="openAddSubtaskDialog()">
+        </p-button>
+      </div>
+
+      @if (subtasks().length > 0) {
+        <div class="border-round border-1 surface-border overflow-hidden">
+          <p-table [value]="subtasks()" styleClass="p-datatable-sm">
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width: 25%">{{ 'workItemDialog.subtasks.columns.title' | translate }}</th>
+                <th style="width: 20%">{{ 'workItemDialog.subtasks.columns.dates' | translate }}</th>
+                <th style="width: 15%">{{ 'workItemDialog.subtasks.columns.type' | translate }}</th>
+                <th style="width: 15%">{{ 'workItemDialog.subtasks.columns.status' | translate }}</th>
+                <th style="width: 10%">{{ 'workItemDialog.subtasks.columns.cost' | translate }}</th>
+                <th style="width: 10%">{{ 'workItemDialog.subtasks.columns.quantity' | translate }}</th>
+                <th style="width: 5%" class="text-center">{{ 'workItemDialog.subtasks.columns.actions' | translate }}</th>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-subtask>
+              <tr>
+                <td>{{ subtask.title }}</td>
+                <td class="text-xs">
+                  <div>{{ formatSubtaskDate(subtask.startDate) }}</div>
+                  <div>{{ formatSubtaskDate(subtask.endDate) }}</div>
+                </td>
+                <td>{{ subtask.type }}</td>
+                <td>
+                  <p-tag 
+                    [value]="getStatusLabel(subtask.status)"
+                    [severity]="getStatusSeverity(subtask.status)"
+                    styleClass="text-xs">
+                  </p-tag>
+                </td>
+                <td>{{ subtask.cost }}</td>
+                <td>{{ subtask.quantity }}</td>
+                <td class="text-center">
+                  <div class="flex align-items-center justify-content-center gap-1">
+                    <p-button
+                      icon="pi pi-pencil"
+                      [text]="true"
+                      [rounded]="true"
+                      size="small"
+                      severity="secondary"
+                      (onClick)="openEditSubtaskDialog(subtask)"
+                      pTooltip="Edit"
+                      tooltipPosition="top">
+                    </p-button>
+                    <p-button
+                      icon="pi pi-trash"
+                      [text]="true"
+                      [rounded]="true"
+                      size="small"
+                      severity="danger"
+                      (onClick)="deleteSubtask(subtask.id)"
+                      pTooltip="Delete"
+                      tooltipPosition="top">
+                    </p-button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </div>
+      } @else {
+        <div class="text-center p-3 surface-50 border-round border-1 surface-border">
+          <i class="pi pi-list text-2xl text-400 mb-2"></i>
+          <p class="text-xs text-500 m-0">{{ 'workItemDialog.subtasks.noSubtasks' | translate }}</p>
+        </div>
+      }
+    </div>
+
+    <!-- Attachments Section -->
+    <div class="border-top-1 surface-border pt-3">
+      <div class="flex align-items-center justify-content-between mb-2">
+        <label class="block text-sm font-semibold m-0 text-color">Attachments</label>
+        @if (!formData().backendTaskId) {
+          <span class="text-xs text-400">
+            <i class="pi pi-info-circle mr-1"></i>Save the task first to manage attachments
+          </span>
+        }
+      </div>
+      <div [class.pointer-events-none]="!formData().backendTaskId" [class.opacity-50]="!formData().backendTaskId">
+        @if (formData().backendTaskId) {
+          <app-documents-table
+            [attachmentType]="taskAttachmentType"
+            [relationshipId]="formData().backendTaskId!"
+            contextLabel="this task">
+          </app-documents-table>
+        } @else {
+          <div class="text-center p-3 surface-50 border-round border-1 surface-border">
+            <i class="pi pi-paperclip text-2xl text-400 mb-2"></i>
+            <p class="text-xs text-500 m-0">No attachments yet. Save the task first to upload files.</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="flex justify-content-end gap-2 border-top-1 surface-border pt-3">
+      <p-button 
+        [label]="'workItemDialog.buttons.cancel' | translate"
+        [outlined]="true"
+        (onClick)="onCancel()">
+      </p-button>
+      <p-button 
+        [label]="'workItemDialog.buttons.save' | translate"
+        (onClick)="onSave()">
+      </p-button>
+    </div>
+  </div>

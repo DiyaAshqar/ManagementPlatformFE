@@ -1,4 +1,4 @@
-# Step 2 Implementation - Contract & Payment Details
+# Step 2 Implementation - Payment Details
 
 ## Overview
 Step 2 of the Agreement Wizard handles contract types, payment methods, and service selection. This implementation integrates with the backend API and uses proper DTOs from the NSwag-generated client.
@@ -221,7 +221,7 @@ This is implemented in the `onPaymentMethodChange()` method.
 ## Translation Keys Used
 
 All text in Step 2 uses translation keys from the `wizard.step2` namespace:
-- `wizard.step2.title` - "Contract & Payment Details"
+- `wizard.step2.title` - "Payment Details"
 - `wizard.step2.contractDetails` - "Contract Information"
 - `wizard.step2.paymentDetails` - "Payment Information"
 - `wizard.step2.services` - "Services"

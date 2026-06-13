@@ -1,0 +1,10 @@
+<app-shared-stage-board
+  [projectId]="projectId"
+  [projectStageId]="projectStageId"
+  [stageTitle]="'excavationStage.title' | translate"
+  [stageDescription]="'excavationStage.subtitle' | translate"
+  [showExcavationFields]="true"
+  [columnsInput]="columns"
+  (taskCreated)="onTaskCreated()"
+  (taskDeleted)="onTaskDeleted()">
+</app-shared-stage-board>

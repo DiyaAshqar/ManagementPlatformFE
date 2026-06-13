@@ -17,10 +17,8 @@ import { LanguageService } from '../../../core/services/language.service';
 import { AuthService } from '../../../core/auth/services/auth.service';
 import { SidebarService } from '../../../core/services/sidebar.service';
 
-interface Breadcrumb {
-  label: string;
-  url?: string;
-}
+// Components
+import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
 
 @Component({
   selector: 'app-top-nav',
@@ -33,17 +31,13 @@ interface Breadcrumb {
     AvatarModule,
     MenuModule,
     BadgeModule,
-    OverlayPanelModule
+    OverlayPanelModule,
+    BreadcrumbComponent
   ],
   templateUrl: './top-nav.component.html',
   styleUrls: ['./top-nav.component.scss']
 })
 export class TopNavComponent implements OnInit {
-  breadcrumbs: Breadcrumb[] = [
-    { label: 'Management', url: '#' },
-    { label: 'Dashboard', url: '#' }
-  ];
-
   profileMenuItems: MenuItem[] = [];
   notificationsCount = 3;
 

@@ -1,4 +1,4 @@
-<div class="p-4">
+<div class="p-2">
     @if (isLoading()) {
     <div class="flex justify-center align-items-center p-6">
         <p-progressSpinner></p-progressSpinner>
@@ -7,16 +7,16 @@
 
     <!-- File Upload Section -->
     @if (!isViewMode()) {
-    <div class="col-12 mb-4">
-        <h3 class="text-xl font-semibold mb-4">{{ 'wizard.step7.title' | translate }}</h3>
-        <p class="text-color-secondary mb-4">{{ 'wizard.step7.description' | translate }}</p>
+    <div class="col-12 mb-2">
+        <h3 class="text-xl font-semibold mb-2">{{ 'wizard.step7.title' | translate }}</h3>
+        <p class="text-color-secondary mb-2">{{ 'wizard.step7.description' | translate }}</p>
 
         <form [formGroup]="attachmentForm">
             <div class="grid">
                 <!-- File Upload Field -->
-                <div class="col-12 md:col-6 mb-3">
+                <div class="col-12 md:col-6 mb-1">
                     <div class="field">
-                        <label for="fileInput" class="block mb-2 font-semibold">{{ 'wizard.step7.file' | translate }} *</label>
+                        <label for="fileInput" class="block mb-2 font-semibold">{{ 'wizard.step7.file' | translate }} <span class="required-asterisk">*</span></label>
                         <div class="file-upload-wrapper">
                             <input
                                 type="file"
@@ -68,9 +68,9 @@
                 </div>
 
                 <!-- Attachment Name Field -->
-                <div class="col-12 md:col-6 mb-3">
+                <div class="col-12 md:col-6 mb-1">
                     <div class="field">
-                        <label for="attachmentName" class="block mb-2 font-semibold">{{ 'wizard.step7.attachmentName' | translate }} *</label>
+                        <label for="attachmentName" class="block mb-2 font-semibold">{{ 'wizard.step7.attachmentName' | translate }} <span class="required-asterisk">*</span></label>
                         <input
                             pInputText
                             id="attachmentName"
@@ -108,7 +108,7 @@
     <!-- Attachments List -->
     <div class="col-12">
         <div class="card">
-            <div class="card-header border-b border-gray-200 pb-3 mb-3">
+            <div class="card-header border-b border-gray-200 pb-3 mb-1">
                 <h4 class="text-lg font-semibold">{{ 'wizard.step7.attachmentsList' | translate }}</h4>
             </div>
 
@@ -170,7 +170,7 @@
             </div>
             } @else {
             <div class="text-center p-6">
-                <i class="pi pi-inbox text-6xl mb-3 block text-gray-400"></i>
+                <i class="pi pi-inbox text-6xl mb-1 block text-gray-400"></i>
                 <p class="text-gray-500 text-lg">{{ 'wizard.step7.noAttachments' | translate }}</p>
                 <p class="text-gray-400 text-sm mt-2">{{ 'wizard.step7.addFirstAttachment' | translate }}</p>
             </div>

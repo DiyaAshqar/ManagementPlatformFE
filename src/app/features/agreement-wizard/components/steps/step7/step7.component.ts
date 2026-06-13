@@ -251,6 +251,14 @@ export class Step7Component implements OnInit, OnDestroy {
       return;
     }
 
+    // Edit mode with no new attachments — skip API and proceed
+    const newAttachments = this.attachments().filter(att => !att.isFromServer);
+    if (this.agreementId() > 0 && newAttachments.length === 0) {
+      this.stepData.emit({ attachments: this.attachments() });
+      this.router.navigate(['/agreement-wizard/success']);
+      return;
+    }
+
     this.submitStep();
   }
 
@@ -279,7 +287,7 @@ export class Step7Component implements OnInit, OnDestroy {
 
       // Create FullAgreementDto with step 7 data
       const fullAgreementDto = new FullAgreementDto();
-      fullAgreementDto.step = 7;
+      fullAgreementDto.step = 8;
       fullAgreementDto.agreementId = this.agreementId();
       fullAgreementDto.seventhStepDto = stepDataValue;
 
@@ -342,7 +350,7 @@ export class Step7Component implements OnInit, OnDestroy {
 
     this.isLoading.set(true);
     this.attachmentClient
-      .getAttachmentsByAgreementId(agreementId)
+      .getAttachmentsByAgreementId(agreementId, undefined)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.isLoading.set(false))

@@ -1,0 +1,44 @@
+.constructor-form-container {
+  margin: 0 auto;
+
+  h1 {
+    color: var(--text-color);
+  }
+
+  .text-color-secondary {
+    color: var(--text-color-secondary);
+  }
+
+  .field {
+    label {
+      color: var(--text-color);
+      
+      .text-red-500 {
+        color: #ef4444;
+      }
+    }
+  }
+
+  :host ::ng-deep {
+    .p-card {
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+      .p-card-body {
+        padding: 0.75rem;
+      }
+    }
+
+    .p-inputtext,
+    .p-dropdown {
+      &.ng-invalid.ng-dirty,
+      &.ng-invalid.ng-touched {
+        border-color: #ef4444;
+      }
+    }
+
+    .p-error {
+      color: #ef4444;
+      font-size: 0.875rem;
+    }
+  }
+}

@@ -1,0 +1,194 @@
+<!-- Header Row: count + upload button -->
+<div class="flex align-items-center justify-content-between mb-2">
+  <span class="text-primary font-medium">{{ 'documentsTable.totalDocuments' | translate }}: {{ documents().length }}</span>
+  <p-button [label]="'documentsTable.uploadDocument' | translate" icon="pi pi-upload" (onClick)="openUploadDialog()"></p-button>
+</div>
+
+@if (isLoading()) {
+  <div class="flex justify-content-center py-6">
+    <p-progressSpinner styleClass="w-4rem h-4rem" strokeWidth="3"></p-progressSpinner>
+  </div>
+} @else if (documents().length === 0) {
+  <div class="flex flex-column align-items-center justify-content-center py-6 text-center">
+    <i class="pi pi-file text-6xl text-400 mb-1"></i>
+    <h3 class="text-lg font-semibold mb-2 text-color">{{ 'documentsTable.noDocuments' | translate }}</h3>
+    <p class="text-sm text-500 mb-0">{{ 'documentsTable.uploadFilesHint' | translate }}</p>
+  </div>
+} @else {
+  <p-table
+    [value]="documents()"
+    [paginator]="documents().length > 10"
+    [rows]="10"
+    [rowsPerPageOptions]="[10, 25, 50]"
+    styleClass="p-datatable-sm"
+    [tableStyle]="{ 'min-width': '55rem' }">
+    <ng-template pTemplate="header">
+      <tr>
+        <th style="width: 4%"></th>
+        <th style="width: 31%">{{ 'documentsTable.columnName' | translate }}</th>
+        <th style="width: 10%">{{ 'documentsTable.columnType' | translate }}</th>
+        <th style="width: 15%">{{ 'documentsTable.columnUploadDate' | translate }}</th>
+        <th style="width: 10%">{{ 'documentsTable.columnSize' | translate }}</th>
+        <th style="width: 15%">{{ 'documentsTable.columnUploadedBy' | translate }}</th>
+        <th style="width: 15%">{{ 'documentsTable.columnActions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-doc>
+      <tr>
+        <td><i [class]="getFileIcon(doc.fileType)" class="text-xl text-500"></i></td>
+        <td><span class="font-medium text-color">{{ doc.fileName }}</span></td>
+        <td>
+          <p-tag [value]="doc.fileType" [severity]="getTypeSeverity(doc.fileType)" [rounded]="true"></p-tag>
+        </td>
+        <td><span class="text-color-secondary">{{ formatDate(doc.uploadDate) }}</span></td>
+        <td><span class="text-color-secondary">{{ doc.size || '—' }}</span></td>
+        <td><span class="text-primary">{{ doc.uploadedBy || '—' }}</span></td>
+        <td>
+          <div class="flex align-items-center gap-2">
+            <p-button
+              icon="pi pi-eye" [text]="true" [rounded]="true" severity="info"
+              [loading]="isPreviewing()"
+              (onClick)="previewDocument(doc)" [pTooltip]="'documentsTable.preview' | translate" tooltipPosition="bottom">
+            </p-button>
+            <p-button
+              icon="pi pi-download" [text]="true" [rounded]="true" severity="secondary"
+              (onClick)="downloadDocument(doc)" [pTooltip]="'documentsTable.download' | translate" tooltipPosition="bottom">
+            </p-button>
+            <p-button
+              icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger"
+              (onClick)="confirmDelete(doc)" [pTooltip]="'documentsTable.delete' | translate" tooltipPosition="bottom">
+            </p-button>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="7" class="text-center py-4 text-500">{{ 'documentsTable.noDocumentsFound' | translate }}</td>
+      </tr>
+    </ng-template>
+  </p-table>
+
+  <!-- Type summary -->
+  <div class="flex align-items-center gap-4 mt-4 pt-3 border-top-1 surface-border">
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-file-pdf text-red-500"></i>
+      <span class="text-color-secondary text-sm">{{ 'documentsTable.typePdf' | translate }}: {{ getDocumentCountByType('PDF') }}</span>
+    </div>
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-file-excel text-green-600"></i>
+      <span class="text-color-secondary text-sm">{{ 'documentsTable.typeExcel' | translate }}: {{ getDocumentCountByType('Excel') }}</span>
+    </div>
+    <div class="flex align-items-center gap-2">
+      <i class="pi pi-image text-blue-500"></i>
+      <span class="text-color-secondary text-sm">{{ 'documentsTable.typeImages' | translate }}: {{ getDocumentCountByType('Image') }}</span>
+    </div>
+  </div>
+}
+
+<!-- ── Upload Dialog ─────────────────────────────────────────────────────── -->
+<p-dialog
+  [(visible)]="showUploadDialog"
+  [modal]="true"
+  [style]="{ width: '50rem' }"
+  [header]="'documentsTable.uploadDialogHeader' | translate"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="closeUploadDialog()">
+
+  <p class="text-500 mb-1">{{ 'documentsTable.uploadDialogHint' | translate }} {{ contextLabel }}</p>
+
+  <!-- Drop Zone -->
+  <div
+    class="drop-zone border-2 border-dashed surface-border border-round p-6 text-center cursor-pointer transition-colors"
+    [class.drop-zone--active]="isDragging"
+    (click)="fileInput.click()"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave($event)"
+    (drop)="onDrop($event)">
+    <i class="pi pi-cloud-upload text-6xl text-400 mb-1"></i>
+    <p class="font-medium text-color mb-2">{{ 'documentsTable.dropZoneTitle' | translate }}</p>
+    <p class="text-sm text-500">{{ 'documentsTable.dropZoneHint' | translate }}</p>
+    <input
+      #fileInput type="file" multiple
+      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.xls,.xlsx,.csv"
+      (change)="onFileSelect($event)"
+      style="display:none">
+  </div>
+
+  <!-- Selected files -->
+  @if (selectedFiles().length > 0) {
+    <div class="mt-4">
+      <label class="font-medium text-color mb-2 block">
+        {{ 'documentsTable.selectedFiles' | translate }} ({{ selectedFiles().length }})
+      </label>
+      <div class="selected-files-list overflow-y-auto flex flex-column gap-2">
+        @for (file of selectedFiles(); track file.name; let i = $index) {
+          <div class="flex align-items-center gap-3 border-1 surface-border border-round p-3 surface-card">
+            <i [class]="getFileIcon(getFileType(file.name))" class="text-2xl text-primary"></i>
+            <div class="flex-1">
+              <div class="flex align-items-center justify-content-between mb-1">
+                <span class="text-sm font-medium text-color">{{ file.name }}</span>
+                <p-button icon="pi pi-times" [text]="true" [rounded]="true"
+                  size="small" severity="danger" (onClick)="removeFile(i)">
+                </p-button>
+              </div>
+              <div class="flex align-items-center gap-2 text-xs text-500">
+                <span>{{ formatFileSize(file.size) }}</span>
+                <span>•</span>
+                <p-tag [value]="getFileType(file.name)" size="small"
+                  [severity]="getTypeSeverity(getFileType(file.name))">
+                </p-tag>
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <div class="flex justify-content-end gap-2">
+      <p-button [label]="'documentsTable.cancel' | translate" [outlined]="true" severity="secondary" (onClick)="closeUploadDialog()"></p-button>
+      <p-button
+        [label]="isUploading() ? ('documentsTable.uploading' | translate) : ('documentsTable.upload' | translate) + (selectedFiles().length > 0 ? ' (' + selectedFiles().length + ')' : '')"
+        icon="pi pi-upload"
+        [loading]="isUploading()"
+        [disabled]="selectedFiles().length === 0 || isUploading()"
+        (onClick)="uploadFiles()">
+      </p-button>
+    </div>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Preview Dialog ────────────────────────────────────────────────────── -->
+<p-dialog
+  [(visible)]="showPreviewDialog"
+  [modal]="true"
+  [style]="{ width: '80vw', maxWidth: '1000px' }"
+  [header]="previewFileName"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="closePreviewDialog()">
+
+  @if (previewType === 'image' && previewUrl) {
+    <div class="flex justify-content-center">
+      <img [src]="previewUrl" [alt]="previewFileName" style="max-width: 100%; max-height: 70vh; object-fit: contain;" />
+    </div>
+  } @else if (previewType === 'pdf' && previewSafeUrl) {
+    <iframe [src]="previewSafeUrl" style="width: 100%; height: 70vh; border: none;"></iframe>
+  } @else {
+    <div class="flex flex-column align-items-center justify-content-center py-6 text-center">
+      <i class="pi pi-eye-slash text-5xl text-400 mb-3"></i>
+      <p class="text-color-secondary mb-0">{{ 'documentsTable.previewNotAvailable' | translate }}</p>
+    </div>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button [label]="'documentsTable.close' | translate" [outlined]="true" severity="secondary" (onClick)="closePreviewDialog()"></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog></p-confirmDialog>

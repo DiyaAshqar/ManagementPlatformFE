@@ -1,0 +1,425 @@
+<div class="material-management p-2">
+
+  <!-- Page Header -->
+  <div class="flex justify-content-between align-items-center mb-4">
+    <div>
+      <h1 class="text-3xl font-bold m-0">{{ 'material.title' | translate }}</h1>
+      <p class="text-color-secondary mt-1 mb-0">{{ 'material.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Tree Columns Layout -->
+  <div class="tree-columns">
+
+    <!-- ── Column 1: Categories ─────────────────────────────────────────── -->
+    <div class="tree-column">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="column-header">
+            <div class="column-title">
+              <i class="pi pi-tags column-icon"></i>
+              <span>{{ 'material.category.title' | translate }}</span>
+            </div>
+            <p-button
+              icon="pi pi-plus"
+              [rounded]="true"
+              [text]="true"
+              severity="primary"
+              size="small"
+              [pTooltip]="'material.category.add' | translate"
+              tooltipPosition="top"
+              (onClick)="openAddCategory()">
+            </p-button>
+          </div>
+        </ng-template>
+
+        <!-- Search -->
+        <p-iconfield iconPosition="left" class="w-full mb-1">
+          <p-inputicon styleClass="pi pi-search"></p-inputicon>
+          <input
+            type="text"
+            pInputText
+            [(ngModel)]="categorySearch"
+            (ngModelChange)="onCategorySearchChange()"
+            [placeholder]="'common.search' | translate"
+            class="w-full" />
+        </p-iconfield>
+
+        <!-- List -->
+        <div class="item-list" *ngIf="!categoriesLoading(); else catSkeleton">
+          <div *ngIf="categories().length === 0" class="empty-state">
+            <i class="pi pi-inbox"></i>
+            <p>{{ 'material.category.noData' | translate }}</p>
+          </div>
+          <div
+            *ngFor="let cat of categories()"
+            class="list-item"
+            [class.selected]="selectedCategory()?.id === cat.id"
+            (click)="selectCategory(cat)">
+            <div class="item-content">
+              <i class="pi pi-tag item-bullet"></i>
+              <span class="item-name">{{ cat.name }}</span>
+            </div>
+            <div class="item-actions">
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                severity="info"
+                size="small"
+                (onClick)="openEditCategory(cat, $event)"
+                [pTooltip]="'common.edit' | translate"
+                tooltipPosition="top">
+              </p-button>
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                size="small"
+                (onClick)="deleteCategory(cat, $event)"
+                [pTooltip]="'common.delete' | translate"
+                tooltipPosition="top">
+              </p-button>
+            </div>
+          </div>
+        </div>
+
+        <ng-template #catSkeleton>
+          <div class="skeleton-list">
+            <p-skeleton *ngFor="let i of [1,2,3,4]" height="2.5rem" styleClass="mb-2"></p-skeleton>
+          </div>
+        </ng-template>
+
+        <!-- Pagination -->
+        <div class="pagination-row" *ngIf="categoryTotal > categoryPageSize">
+          <p-button
+            icon="pi pi-chevron-left"
+            [text]="true"
+            size="small"
+            [disabled]="categoryPage === 1"
+            (onClick)="categoryPage = categoryPage - 1; categoryFirst = (categoryPage - 1) * categoryPageSize; loadCategories()">
+          </p-button>
+          <span class="page-info">{{ categoryPage }} / {{ Math.ceil(categoryTotal / categoryPageSize) }}</span>
+          <p-button
+            icon="pi pi-chevron-right"
+            [text]="true"
+            size="small"
+            [disabled]="categoryPage >= Math.ceil(categoryTotal / categoryPageSize)"
+            (onClick)="categoryPage = categoryPage + 1; categoryFirst = (categoryPage - 1) * categoryPageSize; loadCategories()">
+          </p-button>
+        </div>
+      </p-card>
+    </div>
+
+    <!-- Arrow -->
+    <div class="tree-arrow" [class.active]="selectedCategory()">
+      <i class="pi pi-chevron-right"></i>
+    </div>
+
+    <!-- ── Column 2: SubCategories ──────────────────────────────────────── -->
+    <div class="tree-column" [class.dimmed]="!selectedCategory()">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="column-header">
+            <div class="column-title">
+              <i class="pi pi-sitemap column-icon"></i>
+              <span>{{ 'material.subCategory.title' | translate }}</span>
+              <p-tag *ngIf="selectedCategory()" [value]="selectedCategory()!.name!" severity="info" styleClass="ml-2 text-xs"></p-tag>
+            </div>
+            <p-button
+              icon="pi pi-plus"
+              [rounded]="true"
+              [text]="true"
+              severity="primary"
+              size="small"
+              [disabled]="!selectedCategory()"
+              [pTooltip]="'material.subCategory.add' | translate"
+              tooltipPosition="top"
+              (onClick)="openAddSubCategory()">
+            </p-button>
+          </div>
+        </ng-template>
+
+        <div *ngIf="!selectedCategory()" class="select-hint">
+          <i class="pi pi-arrow-left"></i>
+          <span>{{ 'material.subCategory.selectCategory' | translate }}</span>
+        </div>
+
+        <ng-container *ngIf="selectedCategory()">
+          <!-- Search -->
+          <p-iconfield iconPosition="left" class="w-full mb-1">
+            <p-inputicon styleClass="pi pi-search"></p-inputicon>
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="subCategorySearch"
+              (ngModelChange)="onSubCategorySearchChange()"
+              [placeholder]="'common.search' | translate"
+              class="w-full" />
+          </p-iconfield>
+
+          <!-- List -->
+          <div class="item-list" *ngIf="!subCategoriesLoading(); else subSkeleton">
+            <div *ngIf="subCategories().length === 0" class="empty-state">
+              <i class="pi pi-inbox"></i>
+              <p>{{ 'material.subCategory.noData' | translate }}</p>
+            </div>
+            <div
+              *ngFor="let sub of subCategories()"
+              class="list-item"
+              [class.selected]="selectedSubCategory()?.id === sub.id"
+              (click)="selectSubCategory(sub)">
+              <div class="item-content">
+                <i class="pi pi-folder item-bullet"></i>
+                <span class="item-name">{{ sub.name }}</span>
+              </div>
+              <div class="item-actions">
+                <p-button
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="info"
+                  size="small"
+                  (onClick)="openEditSubCategory(sub, $event)"
+                  [pTooltip]="'common.edit' | translate"
+                  tooltipPosition="top">
+                </p-button>
+                <p-button
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="danger"
+                  size="small"
+                  (onClick)="deleteSubCategory(sub, $event)"
+                  [pTooltip]="'common.delete' | translate"
+                  tooltipPosition="top">
+                </p-button>
+              </div>
+            </div>
+          </div>
+
+          <ng-template #subSkeleton>
+            <div class="skeleton-list">
+              <p-skeleton *ngFor="let i of [1,2,3,4]" height="2.5rem" styleClass="mb-2"></p-skeleton>
+            </div>
+          </ng-template>
+
+          <!-- Pagination -->
+          <div class="pagination-row" *ngIf="subCategoryTotal > subCategoryPageSize">
+            <p-button
+              icon="pi pi-chevron-left"
+              [text]="true"
+              size="small"
+              [disabled]="subCategoryPage === 1"
+              (onClick)="subCategoryPage = subCategoryPage - 1; subCategoryFirst = (subCategoryPage - 1) * subCategoryPageSize; loadSubCategories()">
+            </p-button>
+            <span class="page-info">{{ subCategoryPage }} / {{ Math.ceil(subCategoryTotal / subCategoryPageSize) }}</span>
+            <p-button
+              icon="pi pi-chevron-right"
+              [text]="true"
+              size="small"
+              [disabled]="subCategoryPage >= Math.ceil(subCategoryTotal / subCategoryPageSize)"
+              (onClick)="subCategoryPage = subCategoryPage + 1; subCategoryFirst = (subCategoryPage - 1) * subCategoryPageSize; loadSubCategories()">
+            </p-button>
+          </div>
+        </ng-container>
+      </p-card>
+    </div>
+
+    <!-- Arrow -->
+    <div class="tree-arrow" [class.active]="selectedSubCategory()">
+      <i class="pi pi-chevron-right"></i>
+    </div>
+
+    <!-- ── Column 3: Materials ──────────────────────────────────────────── -->
+    <div class="tree-column" [class.dimmed]="!selectedSubCategory()">
+      <p-card>
+        <ng-template pTemplate="header">
+          <div class="column-header">
+            <div class="column-title">
+              <i class="pi pi-box column-icon"></i>
+              <span>{{ 'material.item.title' | translate }}</span>
+              <p-tag *ngIf="selectedSubCategory()" [value]="selectedSubCategory()!.name!" severity="success" styleClass="ml-2 text-xs"></p-tag>
+            </div>
+            <p-button
+              icon="pi pi-plus"
+              [rounded]="true"
+              [text]="true"
+              severity="primary"
+              size="small"
+              [disabled]="!selectedSubCategory()"
+              [pTooltip]="'material.item.add' | translate"
+              tooltipPosition="top"
+              (onClick)="openAddMaterial()">
+            </p-button>
+          </div>
+        </ng-template>
+
+        <div *ngIf="!selectedSubCategory()" class="select-hint">
+          <i class="pi pi-arrow-left"></i>
+          <span>{{ 'material.item.selectSubCategory' | translate }}</span>
+        </div>
+
+        <ng-container *ngIf="selectedSubCategory()">
+          <!-- Search -->
+          <p-iconfield iconPosition="left" class="w-full mb-1">
+            <p-inputicon styleClass="pi pi-search"></p-inputicon>
+            <input
+              type="text"
+              pInputText
+              [(ngModel)]="materialSearch"
+              (ngModelChange)="onMaterialSearchChange()"
+              [placeholder]="'common.search' | translate"
+              class="w-full" />
+          </p-iconfield>
+
+          <!-- Table -->
+          <p-table
+            [value]="materials()"
+            [loading]="materialsLoading()"
+            [paginator]="materialTotal > materialPageSize"
+            [rows]="materialPageSize"
+            [totalRecords]="materialTotal"
+            [lazy]="true"
+            (onLazyLoad)="onMaterialPageChange($event)"
+            [first]="materialFirst"
+            [rowsPerPageOptions]="[10, 25, 50]"
+            styleClass="p-datatable-sm p-datatable-striped"
+            [tableStyle]="{'min-width': '100%'}">
+
+            <ng-template pTemplate="header">
+              <tr>
+                <th style="width:3rem">#</th>
+                <th>{{ 'material.item.name' | translate }}</th>
+                <th style="width:7rem">{{ 'common.actions' | translate }}</th>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="body" let-mat let-rowIndex="rowIndex">
+              <tr>
+                <td>{{ materialFirst + rowIndex + 1 }}</td>
+                <td>{{ mat.name }}</td>
+                <td>
+                  <div class="flex gap-1">
+                    <p-button
+                      icon="pi pi-pencil"
+                      [rounded]="true"
+                      [text]="true"
+                      severity="info"
+                      size="small"
+                      (onClick)="openEditMaterial(mat)"
+                      [pTooltip]="'common.edit' | translate"
+                      tooltipPosition="top">
+                    </p-button>
+                    <p-button
+                      icon="pi pi-trash"
+                      [rounded]="true"
+                      [text]="true"
+                      severity="danger"
+                      size="small"
+                      (onClick)="deleteMaterial(mat)"
+                      [pTooltip]="'common.delete' | translate"
+                      tooltipPosition="top">
+                    </p-button>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+
+            <ng-template pTemplate="emptymessage">
+              <tr>
+                <td colspan="3">
+                  <div class="empty-state">
+                    <i class="pi pi-inbox"></i>
+                    <p>{{ 'material.item.noData' | translate }}</p>
+                  </div>
+                </td>
+              </tr>
+            </ng-template>
+          </p-table>
+        </ng-container>
+      </p-card>
+    </div>
+  </div>
+
+</div>
+
+<!-- ── Category Dialog ───────────────────────────────────────────────────── -->
+<p-dialog
+  [(visible)]="categoryDialogVisible"
+  [header]="categoryDialogTitle | translate"
+  [modal]="true"
+  [style]="{ width: '400px' }"
+  [draggable]="false"
+  [resizable]="false">
+  <div class="dialog-form">
+    <div class="field">
+      <label class="form-label required">{{ 'material.category.name' | translate }}</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="categoryForm.name"
+        [placeholder]="'material.category.namePlaceholder' | translate"
+        class="w-full"
+        autofocus />
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button [label]="'common.cancel' | translate" icon="pi pi-times" [text]="true" severity="secondary" (onClick)="categoryDialogVisible = false"></p-button>
+    <p-button [label]="'common.save' | translate" icon="pi pi-check" [loading]="categorySaving" (onClick)="saveCategory()"></p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- ── SubCategory Dialog ────────────────────────────────────────────────── -->
+<p-dialog
+  [(visible)]="subCategoryDialogVisible"
+  [header]="subCategoryDialogTitle | translate"
+  [modal]="true"
+  [style]="{ width: '400px' }"
+  [draggable]="false"
+  [resizable]="false">
+  <div class="dialog-form">
+    <div class="field">
+      <label class="form-label required">{{ 'material.subCategory.name' | translate }}</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="subCategoryForm.name"
+        [placeholder]="'material.subCategory.namePlaceholder' | translate"
+        class="w-full"
+        autofocus />
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button [label]="'common.cancel' | translate" icon="pi pi-times" [text]="true" severity="secondary" (onClick)="subCategoryDialogVisible = false"></p-button>
+    <p-button [label]="'common.save' | translate" icon="pi pi-check" [loading]="subCategorySaving" (onClick)="saveSubCategory()"></p-button>
+  </ng-template>
+</p-dialog>
+
+<!-- ── Material Dialog ───────────────────────────────────────────────────── -->
+<p-dialog
+  [(visible)]="materialDialogVisible"
+  [header]="materialDialogTitle | translate"
+  [modal]="true"
+  [style]="{ width: '400px' }"
+  [draggable]="false"
+  [resizable]="false">
+  <div class="dialog-form">
+    <div class="field">
+      <label class="form-label required">{{ 'material.item.name' | translate }}</label>
+      <input
+        type="text"
+        pInputText
+        [(ngModel)]="materialForm.name"
+        [placeholder]="'material.item.namePlaceholder' | translate"
+        class="w-full"
+        autofocus />
+    </div>
+  </div>
+  <ng-template pTemplate="footer">
+    <p-button [label]="'common.cancel' | translate" icon="pi pi-times" [text]="true" severity="secondary" (onClick)="materialDialogVisible = false"></p-button>
+    <p-button [label]="'common.save' | translate" icon="pi pi-check" [loading]="materialSaving" (onClick)="saveMaterial()"></p-button>
+  </ng-template>
+</p-dialog>
+<p-confirmDialog></p-confirmDialog>

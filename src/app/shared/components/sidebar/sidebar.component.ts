@@ -9,9 +9,11 @@ import { SidebarModule } from 'primeng/sidebar';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuModule } from 'primeng/menu';
 import { MenuItem } from 'primeng/api';
+import { TooltipModule } from 'primeng/tooltip';
 
 // Services
 import { SidebarService } from '../../../core/services/sidebar.service';
+import { ThemeService } from '../../../core/services/theme.service';
 
 interface NavItem {
   label: string;
@@ -35,7 +37,8 @@ interface NavSection {
     ButtonModule,
     SidebarModule,
     AvatarModule,
-    MenuModule
+    MenuModule,
+    TooltipModule
   ],
   templateUrl: './sidebar.component.html',
   styleUrls: ['./sidebar.component.scss']
@@ -44,37 +47,36 @@ export class SidebarComponent implements OnInit {
   
   navSections: NavSection[] = [
     {
-      title: 'Overview',
+      title: 'sidebar.sections.overview',
       items: [
-        { label: 'Agreement Wizard', icon: 'pi pi-briefcase', route: '/agreement-wizard' },
-        // { label: 'Theme Showcase', icon: 'pi pi-palette', route: '/theme-showcase' },
-      ]
-    },
-    {
-      title: 'Modules',
-      items: [
-        { label: 'Module 1', icon: 'pi pi-wallet', route: '/Module1' },
-      ]
-    },
-    {
-      title: 'Modules',
-      items: [
-        { label: 'Module 1', icon: 'pi pi-users', route: '/Module1' },
+        { label: 'sidebar.items.dashboard', icon: 'pi pi-home', route: '/dashboard' },
+        // { label: 'sidebar.items.agreementWizard', icon: 'pi pi-briefcase', route: '/agreement-wizard' },
+        { label: 'sidebar.items.projectManagement', icon: 'pi pi-th-large', route: '/projects' },
+        { label: 'sidebar.items.constructors', icon: 'pi pi-users', route: '/constructor' },
+        { label: 'sidebar.items.suppliers', icon: 'pi pi-building', route: '/supplier' },
+        { label: 'sidebar.items.materials', icon: 'pi pi-box', route: '/materials' },
       ]
     }
   ];
 
   footerItems: NavItem[] = [
-    { label: 'Settings', icon: 'pi pi-cog', route: '/settings' },
-    { label: 'Help', icon: 'pi pi-question-circle', route: '/help' }
+    { label: 'sidebar.footer.settings', icon: 'pi pi-cog', route: '/settings' },
+    { label: 'sidebar.footer.help', icon: 'pi pi-question-circle', route: '/help' }
   ];
 
   constructor(
     private router: Router,
-    public sidebarService: SidebarService
+    public sidebarService: SidebarService,
+    public themeService: ThemeService
   ) {}
 
   ngOnInit(): void {}
+
+  get logoPath(): string {
+    return this.themeService.isDarkTheme() 
+      ? 'assets/logo/neuro code dark.png' 
+      : 'assets/logo/neuro code light.png';
+  }
 
   toggleMobileMenu(): void {
     this.sidebarService.toggleMobile();
@@ -93,6 +95,12 @@ export class SidebarComponent implements OnInit {
 
   isActiveRoute(route: string | undefined): boolean {
     if (!route) return false;
-    return this.router.url === route;
+    if (route === '/dashboard') return this.router.url === '/dashboard';
+    return this.router.url.startsWith(route);
+  }
+
+  goHome(): void {
+    this.router.navigate(['/dashboard']);
+    this.closeMobileMenu();
   }
 }

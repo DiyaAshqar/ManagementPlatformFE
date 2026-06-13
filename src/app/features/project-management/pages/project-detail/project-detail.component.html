@@ -1,0 +1,278 @@
+<div class="min-h-screen bg-surface-ground">
+  @if (isLoading()) {
+    <!-- Loading Skeleton -->
+    <div class="p-2">
+      <p-skeleton width="300px" height="2.5rem" class="mb-2"></p-skeleton>
+      <p-skeleton width="100%" height="200px"></p-skeleton>
+    </div>
+  } @else if (project()) {
+    <!-- Header Section -->
+    <header class="surface-card border-bottom-1 surface-border">
+      <div class="p-2">
+        <div class="flex align-items-center justify-content-between">
+          <div class="flex align-items-center gap-3">
+            <p-button 
+              icon="pi pi-arrow-left"
+              [text]="true"
+              [rounded]="true"
+              (onClick)="goBack()"
+              severity="secondary"
+              [pTooltip]="'projectDetail.backToProjects' | translate"
+              tooltipPosition="bottom">
+            </p-button>
+            <div>
+              <h1 class="text-2xl font-bold m-0 text-color">{{ project()!.name }}</h1>
+              <p class="text-color-secondary text-sm m-0 mt-1">{{ project()!.clientName }}</p>
+            </div>
+          </div>
+          <div class="flex align-items-center gap-2">
+            <p-button 
+              icon="pi pi-print"
+              [label]="'projectDetail.printReport' | translate"
+              [outlined]="true"
+              (onClick)="openPrintDialog()"
+              severity="secondary">
+            </p-button>
+            <p-tag 
+              [value]="getStatusLabel(project()!.status)"
+              [severity]="getStatusSeverity(project()!.status)"
+              styleClass="text-base px-3 py-2">
+            </p-tag>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="p-2">
+      <div class="grid mb-2">
+        <div class="col-12 md:col-6 lg:col-3">
+          <p-card styleClass="h-full">
+            <div class="flex align-items-center gap-3">
+              <div class="flex align-items-center justify-content-center border-circle bg-primary-100" 
+                   style="width: 3rem; height: 3rem;">
+                <i class="pi pi-percentage text-primary text-xl"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-500 text-sm mb-1">{{ 'projectDetail.overallProgress' | translate }}</div>
+                <div class="text-2xl font-bold text-primary">{{ project()!.progress }}%</div>
+              </div>
+            </div>
+            <p-progressbar 
+              [value]="project()!.progress"
+              [showValue]="false"
+              styleClass="mt-3"
+              [style]="{ height: '0.5rem' }">
+            </p-progressbar>
+          </p-card>
+        </div>
+        
+        <div class="col-12 md:col-6 lg:col-3">
+          <p-card styleClass="h-full">
+            <div class="flex align-items-center gap-3">
+              <div class="flex align-items-center justify-content-center border-circle bg-green-100" 
+                   style="width: 3rem; height: 3rem;">
+                <i class="pi pi-dollar text-green-600 text-xl"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-500 text-sm mb-1">{{ 'projectDetail.budget' | translate }}</div>
+                <div class="text-2xl font-bold text-color">{{ formatCurrency(project()!.budget) }}</div>
+                <div class="text-xs text-500 mt-1">{{ formatCurrency(project()!.spent) }} {{ 'projectDetail.spent' | translate }}</div>
+              </div>
+            </div>
+          </p-card>
+        </div>
+        
+        <div class="col-12 md:col-6 lg:col-3">
+          <p-card styleClass="h-full">
+            <div class="flex align-items-center gap-3">
+              <div class="flex align-items-center justify-content-center border-circle bg-blue-100" 
+                   style="width: 3rem; height: 3rem;">
+                <i class="pi pi-calendar text-blue-600 text-xl"></i>
+              </div>
+              <div class="flex-1">
+                <div class="text-500 text-sm mb-1">{{ 'projectDetail.startDate' | translate }}</div>
+                <div class="text-xl font-semibold text-color">{{ formatDate(project()!.startDate) }}</div>
+              </div>
+            </div>
+          </p-card>
+        </div>
+      </div>
+
+      <!-- Project Description Card -->
+      @if (project()!.description) {
+        <p-card styleClass="mb-2">
+          <ng-template pTemplate="header">
+            <div class="px-3 pt-3 pb-0">
+              <h3 class="text-lg font-semibold m-0 text-color">{{ 'projectDetail.projectDescription' | translate }}</h3>
+              <p class="text-sm text-500 mt-1 mb-0">{{ 'projectDetail.overviewDetails' | translate }}</p>
+            </div>
+          </ng-template>
+          <div class="text-color-secondary line-height-3">
+            {{ project()!.description }}
+          </div>
+        </p-card>
+      }
+
+      <!-- Main Content Tabs -->
+      <p-card>
+        <p-tabs [(value)]="activeTabIndex" styleClass="tabview-custom">
+          <p-tablist>
+            <p-tab value="0">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-chart-bar"></i>
+                <span>{{ 'projectDetail.tabs.overview' | translate }}</span>
+              </div>
+            </p-tab>
+            <p-tab value="1">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-wrench"></i>
+                <span>{{ 'projectDetail.tabs.preparing' | translate }}</span>
+              </div>
+            </p-tab>
+            <p-tab value="2">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-shield"></i>
+                <span>{{ 'projectDetail.tabs.excavation' | translate }}</span>
+              </div>
+            </p-tab>
+            <!-- <p-tab value="3">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-sitemap"></i>
+                <span>Staging</span>
+              </div>
+            </p-tab> -->
+            <p-tab value="4">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-flag"></i>
+                <span>{{ 'projectDetail.tabs.milestones' | translate }}</span>
+              </div>
+            </p-tab>
+            <p-tab value="5">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-file"></i>
+                <span>{{ 'projectDetail.tabs.documents' | translate }}</span>
+              </div>
+            </p-tab>
+            <p-tab value="6">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-credit-card"></i>
+                <span>{{ 'projectDetail.tabs.ownerPayment' | translate }}</span>
+              </div>
+            </p-tab>
+            <p-tab value="7">
+              <div class="flex align-items-center gap-2">
+                <i class="pi pi-chart-bar"></i>
+                <span>{{ 'projectDetail.tabs.timeframe' | translate }}</span>
+              </div>
+            </p-tab>
+          </p-tablist>
+          
+          <p-tabpanels>
+            <p-tabpanel value="0">
+              <div class="py-4">
+                @if (activeTabIndex === '0') {
+                  <app-stage-kanban [projectId]="project()!.id"></app-stage-kanban>
+                }
+              </div>
+            </p-tabpanel>
+            <p-tabpanel value="1">
+              <div class="py-4">
+                @if (activeTabIndex === '1') {
+                  <app-preparing-stage 
+                    [projectId]="project()!.id" 
+                    [projectStageId]="preparingStageId()">
+                  </app-preparing-stage>
+                }
+              </div>
+            </p-tabpanel>
+            <p-tabpanel value="2">
+              <div class="py-4">
+                @if (activeTabIndex === '2') {
+                  <app-excavation-stage 
+                    [projectId]="project()!.id"
+                    [projectStageId]="excavationStageId()">
+                  </app-excavation-stage>
+                }
+              </div>
+            </p-tabpanel>
+            <!-- <p-tabpanel value="3">
+              <div class="py-4">
+                <app-staging-board [projectId]="project()!.id"></app-staging-board>
+              </div>
+            </p-tabpanel> -->
+            <p-tabpanel value="4">
+              <div class="py-4">
+                <app-milestone-stage 
+                  [projectId]="project()!.id"
+                  [milestoneStages]="milestoneStages()"
+                  [agreementId]="project()!.agreementId || 0">
+                </app-milestone-stage>
+              </div>
+            </p-tabpanel>
+            <p-tabpanel value="5">
+              <div class="py-4">
+                <app-documents-stage [projectId]="project()!.id"></app-documents-stage>
+              </div>
+            </p-tabpanel>
+            <p-tabpanel value="6">
+              <div class="py-4">
+                @if (activeTabIndex === '6') {
+                  <app-owner-payment-tab [project]="project()"></app-owner-payment-tab>
+                }
+              </div>
+            </p-tabpanel>
+            <p-tabpanel value="7">
+              <div class="py-4">
+                @if (activeTabIndex === '7') {
+                  <app-timeframe [projectId]="project()!.id"></app-timeframe>
+                }
+              </div>
+            </p-tabpanel>
+          </p-tabpanels>
+        </p-tabs>
+      </p-card>
+    </div>
+  }
+</div>
+
+<!-- Print Dialog -->
+<p-dialog 
+  [(visible)]="showPrintDialog"
+  [modal]="true"
+  [style]="{ width: '40rem' }"
+  [header]="'projectDetail.printDialog.header' | translate"
+  [draggable]="false"
+  [resizable]="false">
+  <p class="text-color-secondary mb-2">{{ 'projectDetail.printDialog.description' | translate }}</p>
+  
+  <div class="mb-2">
+    <label class="block text-sm font-medium mb-2 text-color">{{ 'projectDetail.printDialog.reportType' | translate }}</label>
+    <p-select 
+      [(ngModel)]="selectedReportType"
+      [options]="reportTypes"
+      optionLabel="label"
+      optionValue="value"
+      [placeholder]="'projectDetail.printDialog.selectReportType' | translate"
+      styleClass="w-full">
+    </p-select>
+  </div>
+  
+  <ng-template pTemplate="footer">
+    <p-button 
+      [label]="'projectDetail.printDialog.cancel' | translate"
+      [outlined]="true"
+      (onClick)="showPrintDialog = false">
+    </p-button>
+    <p-button 
+      [label]="'projectDetail.printDialog.downloadPdf' | translate"
+      icon="pi pi-download"
+      [outlined]="true"
+      (onClick)="downloadReport()">
+    </p-button>
+    <p-button 
+      [label]="'projectDetail.printDialog.print' | translate"
+      icon="pi pi-print"
+      (onClick)="printReport()">
+    </p-button>
+  </ng-template>
+</p-dialog>

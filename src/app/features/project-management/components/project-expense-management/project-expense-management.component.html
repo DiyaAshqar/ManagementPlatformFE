@@ -1,0 +1,307 @@
+<p-confirmDialog></p-confirmDialog>
+
+@if (currentView() === 'list') {
+  <p-card>
+    <ng-template pTemplate="header">
+      <div class="px-4 pt-4 pb-0">
+        <div class="flex align-items-center gap-3">
+          <div class="flex align-items-center justify-content-center border-circle bg-primary-100"
+               style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-receipt text-primary"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold m-0 text-color">{{ 'projectTabs.expenses.title' | translate }}</h3>
+            <p class="text-sm text-500 mt-1 mb-0">{{ 'projectTabs.expenses.subtitle' | translate }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="flex align-items-center justify-content-between mb-2">
+      <div class="flex align-items-center gap-4">
+        <div class="flex align-items-center gap-2">
+          <span class="text-500 text-sm">{{ 'projectTabs.expenses.list.totalRecords' | translate }}:</span>
+          <span class="font-semibold text-color">{{ expenses().length }}</span>
+        </div>
+        <div class="flex align-items-center gap-2">
+          <span class="text-500 text-sm">{{ 'projectTabs.expenses.list.totalAmount' | translate }}:</span>
+          <span class="font-bold text-primary">{{ formatAmount(totalExpensesAmount()) }}</span>
+        </div>
+      </div>
+      <p-button
+        [label]="'projectTabs.expenses.list.newExpense' | translate"
+        icon="pi pi-plus"
+        (onClick)="openNewForm()">
+      </p-button>
+    </div>
+
+    <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+    <p-table
+      [value]="expenses()"
+      [loading]="isLoadingList()"
+      [tableStyle]="{ 'min-width': '55rem' }"
+      styleClass="p-datatable-gridlines p-datatable-striped"
+      responsiveLayout="scroll"
+      [paginator]="expenses().length > 10"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="{{ 'projectTabs.expenses.list.pagination' | translate }}">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem;" class="text-center">#</th>
+          <th style="min-width: 10rem;">{{ 'projectTabs.expenses.columns.expenseNo' | translate }}</th>
+          <th style="min-width: 12rem;">{{ 'projectTabs.expenses.columns.supplier' | translate }}</th>
+          <th style="width: 10rem;">{{ 'projectTabs.expenses.columns.date' | translate }}</th>
+          <th style="width: 10rem;" class="text-right">{{ 'projectTabs.expenses.columns.total' | translate }}</th>
+          <th style="min-width: 14rem;">{{ 'projectTabs.expenses.columns.notes' | translate }}</th>
+          <th style="width: 8rem;" class="text-center">{{ 'common.actions' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-expense let-i="rowIndex">
+        <tr>
+          <td class="text-center text-500 font-medium">{{ i + 1 }}</td>
+          <td><span class="font-semibold text-color">{{ expense.expenseNo || '—' }}</span></td>
+          <td>{{ expense.supplierName || '—' }}</td>
+          <td>{{ expense.expenseDate | date: 'yyyy-MM-dd' }}</td>
+          <td class="text-right font-semibold text-primary">{{ formatAmount(expense.totalAmount) }}</td>
+          <td><span class="text-500 text-sm">{{ expense.notes || '—' }}</span></td>
+          <td class="text-center">
+            <div class="flex align-items-center justify-content-center gap-1">
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                severity="secondary"
+                size="small"
+                [pTooltip]="'common.edit' | translate"
+                tooltipPosition="top"
+                (onClick)="openEditForm(expense)">
+              </p-button>
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                size="small"
+                [pTooltip]="'common.delete' | translate"
+                tooltipPosition="top"
+                (onClick)="confirmDelete(expense)">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="7">
+            <div class="flex flex-column align-items-center justify-content-center py-6 gap-3">
+              <div class="flex align-items-center justify-content-center border-circle bg-primary-50"
+                   style="width: 4rem; height: 4rem;">
+                <i class="pi pi-receipt text-primary text-2xl"></i>
+              </div>
+              <p class="text-500 m-0 font-medium">{{ 'projectTabs.expenses.list.empty' | translate }}</p>
+              <p-button
+                [label]="'projectTabs.expenses.list.newExpense' | translate"
+                icon="pi pi-plus"
+                size="small"
+                [outlined]="true"
+                (onClick)="openNewForm()">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+    </div>
+  </p-card>
+}
+
+@if (currentView() === 'form') {
+  <p-card>
+    <ng-template pTemplate="header">
+      <div class="px-4 pt-4 pb-0">
+        <div class="flex align-items-center gap-3">
+          <p-button
+            icon="pi pi-arrow-left"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            [pTooltip]="'projectTabs.expenses.form.backToList' | translate"
+            tooltipPosition="bottom"
+            (onClick)="backToList()">
+          </p-button>
+          <div class="flex align-items-center justify-content-center border-circle bg-primary-100"
+               style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-receipt text-primary"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold m-0 text-color">{{ formTitle() }}</h3>
+            <p class="text-sm text-500 mt-1 mb-0">{{ 'projectTabs.expenses.form.subtitle' | translate }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="mb-1">
+      <div class="surface-50 border-round p-2 border-1 surface-border">
+        <div class="grid">
+          <div class="col-12 md:col-6 lg:col-3">
+            <div class="flex flex-column gap-2">
+              <label class="text-sm font-medium text-color">{{ 'projectTabs.expenses.columns.expenseNo' | translate }}</label>
+              <input pInputText type="text"
+                [placeholder]="'projectTabs.expenses.form.expenseNoPlaceholder' | translate"
+                [ngModel]="formExpenseNo()" (ngModelChange)="formExpenseNo.set($event)"
+                maxlength="50" class="w-full" />
+            </div>
+          </div>
+          <div class="col-12 md:col-6 lg:col-3">
+            <div class="flex flex-column gap-2">
+              <label class="text-sm font-medium text-color">{{ 'projectTabs.expenses.columns.date' | translate }}</label>
+              <p-datepicker
+                [ngModel]="formExpenseDate()" (ngModelChange)="formExpenseDate.set($event)"
+                dateFormat="yy-mm-dd" [showIcon]="true" styleClass="w-full">
+              </p-datepicker>
+            </div>
+          </div>
+          <div class="col-12 md:col-6 lg:col-3">
+            <div class="flex flex-column gap-2">
+              <label class="text-sm font-medium text-color">{{ 'projectTabs.expenses.columns.supplier' | translate }}</label>
+              <p-select
+                [ngModel]="formSupplierId()" (ngModelChange)="formSupplierId.set($event)"
+                [options]="suppliers()" optionLabel="name" optionValue="id"
+                [placeholder]="'projectTabs.expenses.form.selectSupplier' | translate"
+                [loading]="isLoadingLookups()" styleClass="w-full">
+              </p-select>
+            </div>
+          </div>
+          <div class="col-12 md:col-6 lg:col-3">
+            <div class="flex flex-column gap-2">
+              <label class="text-sm font-medium text-color">{{ 'projectTabs.expenses.columns.total' | translate }}</label>
+              <input pInputText [value]="formatAmount(calculateFormTotal())" readonly
+                class="w-full font-semibold surface-100 text-primary" />
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="flex flex-column gap-2">
+              <label class="text-sm font-medium text-color">{{ 'projectTabs.expenses.columns.notes' | translate }}</label>
+              <textarea pTextarea rows="2"
+                [placeholder]="'projectTabs.expenses.form.notesPlaceholder' | translate"
+                [ngModel]="formNotes()" (ngModelChange)="formNotes.set($event)"
+                class="w-full">
+              </textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="flex align-items-center justify-content-between mb-1">
+        <div>
+          <h4 class="m-0 text-color font-semibold">{{ 'projectTabs.expenses.lineItems.title' | translate }}</h4>
+          <p class="text-sm text-500 mt-1 mb-0">{{ 'projectTabs.expenses.lineItems.subtitle' | translate }}</p>
+        </div>
+        <p-button
+          [label]="'projectTabs.expenses.lineItems.addRow' | translate"
+          icon="pi pi-plus" [outlined]="true" size="small" (onClick)="addRow()">
+        </p-button>
+      </div>
+
+      <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+      <p-table [value]="formDetails" [tableStyle]="{ 'min-width': '60rem' }"
+               styleClass="p-datatable-striped p-datatable-sm" dataKey="id">
+        <ng-template pTemplate="header">
+          <tr>
+            <th class="text-center" style="width: 4rem;">#</th>
+            <th style="min-width: 12rem;">{{ 'projectTabs.expenses.lineItems.columns.item' | translate }}</th>
+            <th style="width: 9rem;">{{ 'projectTabs.expenses.lineItems.columns.qty' | translate }}</th>
+            <th style="width: 10rem;">{{ 'projectTabs.expenses.lineItems.columns.unitPrice' | translate }}</th>
+            <th style="width: 10rem;">{{ 'projectTabs.expenses.lineItems.columns.subTotal' | translate }}</th>
+            <th style="min-width: 11rem;">{{ 'projectTabs.expenses.lineItems.columns.currency' | translate }}</th>
+            <th style="width: 4rem;"></th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-detail let-i="rowIndex">
+          <tr>
+            <td class="text-center text-500 font-medium">{{ i + 1 }}</td>
+            <td>
+              <p-select [(ngModel)]="detail.itemId" (ngModelChange)="updateSelectField(detail, 'itemId', $event)"
+                [options]="items()" optionLabel="name" optionValue="id" appendTo="body"
+                [loading]="isLoadingLookups()"
+                [placeholder]="'projectTabs.expenses.lineItems.selectItem' | translate" styleClass="w-full">
+              </p-select>
+            </td>
+            <td>
+              <p-inputNumber [(ngModel)]="detail.qty"
+                [min]="0" [minFractionDigits]="0" [maxFractionDigits]="2" placeholder="0" inputStyleClass="w-full">
+              </p-inputNumber>
+            </td>
+            <td>
+              <p-inputNumber [(ngModel)]="detail.unitPrice"
+                [min]="0" [minFractionDigits]="0" [maxFractionDigits]="2" placeholder="0.00" inputStyleClass="w-full">
+              </p-inputNumber>
+            </td>
+            <td>
+              <input pInputText [value]="formatAmount(calculateSubTotal(detail))" readonly
+                class="w-full surface-100 font-medium" />
+            </td>
+            <td>
+              <p-select appendTo="body" [(ngModel)]="detail.currencyId" (ngModelChange)="updateSelectField(detail, 'currencyId', $event)"
+                [options]="currencies()" optionLabel="abb" optionValue="id"
+                [loading]="isLoadingCurrencies()"
+                [placeholder]="'projectTabs.expenses.lineItems.selectCurrency' | translate" styleClass="w-full">
+              </p-select>
+            </td>
+            <td class="text-center">
+              <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger" size="small"
+                [disabled]="formDetails.length === 1"
+                [pTooltip]="'common.delete' | translate" tooltipPosition="top"
+                (onClick)="removeRow(detail.id)">
+              </p-button>
+            </td>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="footer">
+          <tr>
+            <td colspan="4" class="text-right font-semibold text-color">{{ 'projectTabs.expenses.lineItems.total' | translate }}:</td>
+            <td class="font-bold text-primary">{{ formatAmount(calculateFormTotal()) }}</td>
+            <td colspan="2"></td>
+          </tr>
+        </ng-template>
+      </p-table>
+      </div>
+    </div>
+
+    <!-- Attachments section — only available after the expense is saved -->
+    <div class="mt-5">
+      <div class="border-top-1 surface-border pt-4">
+        <div class="flex align-items-center gap-2 mb-1">
+          <i class="pi pi-paperclip text-primary"></i>
+          <h4 class="m-0 text-color font-semibold">{{ 'projectTabs.expenses.attachments.title' | translate }}</h4>
+        </div>
+
+        @if (editingExpenseId()) {
+          <app-documents-table
+            [attachmentType]="expenseAttachmentType"
+            [relationshipId]="editingExpenseId()!"
+            contextLabel="this expense">
+          </app-documents-table>
+        } @else {
+          <div class="flex align-items-center gap-2 p-2 surface-50 border-round border-1 surface-border">
+            <i class="pi pi-info-circle text-500 text-xl"></i>
+            <p class="m-0 text-500 text-sm">{{ 'projectTabs.expenses.attachments.saveFirst' | translate }}</p>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="flex justify-content-end gap-2 mt-2 pt-2 border-top-1 surface-border">
+      <p-button [label]="'common.cancel' | translate" [outlined]="true" severity="secondary" (onClick)="backToList()"></p-button>
+      <p-button [label]="'projectTabs.expenses.form.save' | translate" icon="pi pi-save" [loading]="isSaving()" (onClick)="handleSave()"></p-button>
+    </div>
+  </p-card>
+}

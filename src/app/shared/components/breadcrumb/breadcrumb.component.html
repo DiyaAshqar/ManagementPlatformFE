@@ -12,7 +12,9 @@
         <i *ngIf="item.icon" [class]="'pi ' + item.icon"></i>
         <span>{{ item.label }}</span>
       </span>
-      <i *ngIf="!last" class="pi pi-angle-right breadcrumb-separator"></i>
+      <i *ngIf="!last" class="pi breadcrumb-separator"
+        [ngClass]="languageService.isRightToLeft() ? 'pi-angle-left' : 'pi-angle-right'">
+      </i>
     </li>
   </ol>
 </nav>

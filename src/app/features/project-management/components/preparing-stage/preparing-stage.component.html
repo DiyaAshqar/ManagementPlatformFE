@@ -1,0 +1,10 @@
+<app-shared-stage-board
+  [projectId]="projectId"
+  [projectStageId]="projectStageId"
+  [stageTitle]="'Preparing Stage'"
+  [stageDescription]="'Manage pre-construction tasks and activities'"
+  [showExcavationFields]="false"
+  [columnsInput]="columns"
+  (taskCreated)="onTaskCreated()"
+  (taskDeleted)="onTaskDeleted()">
+</app-shared-stage-board>

@@ -1,0 +1,89 @@
+.po-card {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  padding: 1.5rem;
+
+  .po-card-header {
+    margin-bottom: 1rem;
+
+    .po-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text-color);
+    }
+
+    .po-card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-color-secondary);
+      margin: 0.2rem 0 0;
+    }
+  }
+
+  .po-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+
+    .po-total-label {
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+    }
+  }
+}
+
+.po-number {
+  font-family: monospace;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: var(--primary-color);
+  background: var(--primary-50);
+  padding: 0.25rem 0.5rem;
+  border-radius: 4px;
+}
+
+.po-unit-badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  background: var(--blue-50, #eff6ff);
+  color: var(--blue-600, #2563eb);
+  border: 1px solid var(--blue-200, #bfdbfe);
+}
+
+.po-subtotal {
+  font-weight: 600;
+}
+
+.po-actions {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+.po-grand-total-row {
+  td {
+    border-top: 2px solid var(--surface-border) !important;
+    background: transparent;
+  }
+
+  .po-grand-total-label {
+    color: var(--text-color-secondary);
+    font-size: 0.9rem;
+  }
+
+  .po-grand-total-value {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-color);
+  }
+}

@@ -6,11 +6,11 @@
   
   <!-- Logo Section -->
   <div class="sidebar-header">
-    <div class="flex align-items-center gap-3" *ngIf="sidebarService.isOpen()">
-      <img src="assets/logo/logo-h.svg" alt="Logo" class="sidebar-logo">
+    <div class="flex align-items-center gap-3 cursor-pointer" *ngIf="sidebarService.isOpen()" (click)="goHome()">
+      <img [src]="logoPath" alt="Logo" class="sidebar-logo">
     </div>
-    <div class="flex align-items-center justify-content-center" *ngIf="!sidebarService.isOpen()">
-      <img src="assets/logo/icon.svg" alt="Logo" class="sidebar-logo-collapsed">
+    <div class="flex align-items-center justify-content-center cursor-pointer" *ngIf="!sidebarService.isOpen()" (click)="goHome()">
+      <img [src]="logoPath" alt="Logo" class="sidebar-logo-collapsed">
     </div>
   </div>
 
@@ -18,16 +18,18 @@
   <div class="sidebar-content">
     <div class="nav-sections">
       <div *ngFor="let section of navSections" class="nav-section">
-        <div class="section-title">{{ section.title }}</div>
+        <div class="section-title">{{ section.title | translate }}</div>
         <div class="nav-items">
           <a 
             *ngFor="let item of section.items"
             class="nav-item"
             [class.active]="isActiveRoute(item.route)"
             (click)="navigateTo(item.route)"
-            [attr.aria-label]="item.label">
+            [attr.aria-label]="item.label | translate"
+            [pTooltip]="!sidebarService.isOpen() ? (item.label | translate) : ''"
+            tooltipPosition="right">
             <i [class]="item.icon + ' nav-icon'"></i>
-            <span class="nav-label" *ngIf="sidebarService.isOpen()">{{ item.label }}</span>
+            <span class="nav-label" *ngIf="sidebarService.isOpen()">{{ item.label | translate }}</span>
           </a>
         </div>
       </div>
@@ -42,9 +44,11 @@
         class="nav-item"
         [class.active]="isActiveRoute(item.route)"
         (click)="navigateTo(item.route)"
-        [attr.aria-label]="item.label">
+        [attr.aria-label]="item.label | translate"
+        [pTooltip]="!sidebarService.isOpen() ? (item.label | translate) : ''"
+        tooltipPosition="right">
         <i [class]="item.icon + ' nav-icon'"></i>
-        <span class="nav-label" *ngIf="sidebarService.isOpen()">{{ item.label }}</span>
+        <span class="nav-label" *ngIf="sidebarService.isOpen()">{{ item.label | translate }}</span>
       </a>
     </div>
   </div>
