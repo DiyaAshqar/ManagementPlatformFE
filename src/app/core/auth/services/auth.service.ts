@@ -1,129 +1,207 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { StorageService } from '../../services/storage.service';
+import { Observable, map, tap, throwError } from 'rxjs';
+
 import { environment } from '../../../../environments/environment';
+import { StorageService } from '../../services/storage.service';
+import {
+  AuthUser,
+  Claim,
+  LoginRequest,
+  LoginResult,
+} from '../models/auth.models';
+import { AuthApiService } from './auth-api.service';
+import { JwtService } from './jwt.service';
 
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role?: string;
-  permissions?: string[];
-}
-
-export interface AuthTokens {
-  accessToken: string;
-  refreshToken?: string;
-}
-
-@Injectable({
-  providedIn: 'root'
-})
+/**
+ * Central session/authorization state for the app.
+ *
+ * Holds the current user, tokens and derived claims as signals, and is the
+ * only thing components/guards/directives should depend on. It talks to the
+ * backend exclusively through {@link AuthApiService}, so it is agnostic to
+ * whether the mock or real API is active.
+ */
+@Injectable({ providedIn: 'root' })
 export class AuthService {
-  private currentUserSignal = signal<User | null>(null);
-  private isAuthenticatedSignal = signal<boolean>(false);
+  private readonly storage = inject(StorageService);
+  private readonly router = inject(Router);
+  private readonly authApi = inject(AuthApiService);
+  private readonly jwt = inject(JwtService);
 
-  currentUser = this.currentUserSignal.asReadonly();
-  isAuthenticated = this.isAuthenticatedSignal.asReadonly();
+  private readonly keys = environment.auth;
 
-  constructor(
-    private storageService: StorageService,
-    private router: Router
-  ) {
+  // --- Reactive state -----------------------------------------------------
+  private readonly currentUserSignal = signal<AuthUser | null>(null);
+  private readonly accessTokenSignal = signal<string | null>(null);
+
+  /** The authenticated user, or `null`. */
+  readonly currentUser = this.currentUserSignal.asReadonly();
+  /** The raw access token, or `null`. */
+  readonly accessToken = this.accessTokenSignal.asReadonly();
+
+  /** Whether a user is currently authenticated. */
+  readonly isAuthenticated = computed(() => this.currentUserSignal() !== null);
+  /** Roles of the current user. */
+  readonly roles = computed(() => this.currentUserSignal()?.roles ?? []);
+  /** Permissions of the current user. */
+  readonly permissions = computed(() => this.currentUserSignal()?.permissions ?? []);
+  /** Flattened JWT claims of the current access token. */
+  readonly claims = computed<Claim[]>(() => this.jwt.getClaims(this.accessTokenSignal()));
+
+  constructor() {
     this.initializeAuth();
   }
 
+  // ----------------------------------------------------------------------
+  // Public API
+  // ----------------------------------------------------------------------
+
   /**
-   * Initialize authentication state from storage
+   * Authenticate a user. On success the session is persisted and signals are
+   * updated. Emits the authenticated user; errors with a message on failure.
    */
+  login(request: LoginRequest): Observable<AuthUser> {
+    return this.authApi.login(request).pipe(
+      map((response) => {
+        if (!response.succeeded || !response.data) {
+          throw new Error(response.message || 'Login failed. Please try again.');
+        }
+        this.persistSession(response.data);
+        return response.data.user;
+      })
+    );
+  }
+
+  /**
+   * Exchange the stored refresh token for a fresh access token. Used by the
+   * auth interceptor on `401`. Clears the session if refresh is not possible.
+   */
+  refreshToken(): Observable<AuthUser> {
+    const accessToken = this.getToken();
+    const refreshToken = this.getRefreshToken();
+
+    if (!accessToken || !refreshToken) {
+      this.clearSession();
+      return throwError(() => new Error('No refresh token available.'));
+    }
+
+    return this.authApi.refreshToken({ accessToken, refreshToken }).pipe(
+      map((response) => {
+        if (!response.succeeded || !response.data) {
+          throw new Error(response.message || 'Session refresh failed.');
+        }
+        this.persistSession(response.data);
+        return response.data.user;
+      }),
+      tap({ error: () => this.clearSession() })
+    );
+  }
+
+  /** Log out: notify the backend (best-effort), clear state, go to login. */
+  logout(): void {
+    const refreshToken = this.getRefreshToken();
+    this.authApi.logout(refreshToken).subscribe({
+      next: () => this.completeLogout(),
+      error: () => this.completeLogout(),
+    });
+  }
+
+  // --- Authorization helpers ---------------------------------------------
+
+  hasRole(role: string): boolean {
+    return this.roles().includes(role);
+  }
+
+  hasAnyRole(roles: string[]): boolean {
+    return roles.some((role) => this.hasRole(role));
+  }
+
+  hasPermission(permission: string): boolean {
+    return this.permissions().includes(permission);
+  }
+
+  hasAnyPermission(permissions: string[]): boolean {
+    return permissions.some((permission) => this.hasPermission(permission));
+  }
+
+  hasAllPermissions(permissions: string[]): boolean {
+    return permissions.every((permission) => this.hasPermission(permission));
+  }
+
+  /** True when the token carries a claim of the given type (and value). */
+  hasClaim(type: string, value?: string): boolean {
+    return this.claims().some(
+      (claim) => claim.type === type && (value === undefined || claim.value === value)
+    );
+  }
+
+  // --- Token accessors (used by interceptors) ----------------------------
+
+  getToken(): string | null {
+    return this.storage.getItem<string>(this.keys.tokenStorageKey);
+  }
+
+  getRefreshToken(): string | null {
+    return this.storage.getItem<string>(this.keys.refreshTokenStorageKey);
+  }
+
+  /** True when there is a token and it has not expired. */
+  isTokenValid(): boolean {
+    const token = this.getToken();
+    return !!token && !this.jwt.isExpired(token, 0);
+  }
+
+  // ----------------------------------------------------------------------
+  // Internals
+  // ----------------------------------------------------------------------
+
+  /** Restore the session from storage on startup. */
   private initializeAuth(): void {
     const token = this.getToken();
-    const user = this.storageService.getItem<User>(environment.auth.userStorageKey);
+    const user = this.storage.getItem<AuthUser>(this.keys.userStorageKey);
 
-    if (token && user) {
-      this.currentUserSignal.set(user);
-      this.isAuthenticatedSignal.set(true);
-    }
-  }
-
-  /**
-   * Login user with tokens
-   */
-  login(tokens: AuthTokens, user: User): void {
-    this.setToken(tokens.accessToken);
-    
-    if (tokens.refreshToken) {
-      this.setRefreshToken(tokens.refreshToken);
+    if (!token || !user) {
+      this.clearSession();
+      return;
     }
 
-    this.storageService.setItem(environment.auth.userStorageKey, user);
+    // Restore optimistically so the UI is not blocked on a refresh round-trip.
     this.currentUserSignal.set(user);
-    this.isAuthenticatedSignal.set(true);
+    this.accessTokenSignal.set(token);
+
+    // If the access token is already expired, try a silent refresh; if there is
+    // no usable refresh token, drop the stale session.
+    if (this.jwt.isExpired(token, 0)) {
+      if (this.getRefreshToken()) {
+        this.refreshToken().subscribe({ error: () => this.clearSession() });
+      } else {
+        this.clearSession();
+      }
+    }
   }
 
-  /**
-   * Logout user
-   */
-  logout(): void {
-    this.storageService.removeItem(environment.auth.tokenStorageKey);
-    this.storageService.removeItem(environment.auth.refreshTokenStorageKey);
-    this.storageService.removeItem(environment.auth.userStorageKey);
-    
+  /** Save tokens + user to storage and update signals. */
+  private persistSession(result: LoginResult): void {
+    this.storage.setItem(this.keys.tokenStorageKey, result.accessToken);
+    this.storage.setItem(this.keys.refreshTokenStorageKey, result.refreshToken);
+    this.storage.setItem(this.keys.userStorageKey, result.user);
+
+    this.accessTokenSignal.set(result.accessToken);
+    this.currentUserSignal.set(result.user);
+  }
+
+  /** Wipe all session state from storage and signals. */
+  private clearSession(): void {
+    this.storage.removeItem(this.keys.tokenStorageKey);
+    this.storage.removeItem(this.keys.refreshTokenStorageKey);
+    this.storage.removeItem(this.keys.userStorageKey);
+
+    this.accessTokenSignal.set(null);
     this.currentUserSignal.set(null);
-    this.isAuthenticatedSignal.set(false);
-    
+  }
+
+  private completeLogout(): void {
+    this.clearSession();
     this.router.navigate(['/auth/login']);
-  }
-
-  /**
-   * Get access token
-   */
-  getToken(): string | null {
-    return this.storageService.getItem<string>(environment.auth.tokenStorageKey);
-  }
-
-  /**
-   * Set access token
-   */
-  setToken(token: string): void {
-    this.storageService.setItem(environment.auth.tokenStorageKey, token);
-  }
-
-  /**
-   * Get refresh token
-   */
-  getRefreshToken(): string | null {
-    return this.storageService.getItem<string>(environment.auth.refreshTokenStorageKey);
-  }
-
-  /**
-   * Set refresh token
-   */
-  setRefreshToken(token: string): void {
-    this.storageService.setItem(environment.auth.refreshTokenStorageKey, token);
-  }
-
-  /**
-   * Check if user has specific role
-   */
-  hasRole(role: string): boolean {
-    const user = this.currentUserSignal();
-    return user?.role === role;
-  }
-
-  /**
-   * Check if user has specific permission
-   */
-  hasPermission(permission: string): boolean {
-    const user = this.currentUserSignal();
-    return user?.permissions?.includes(permission) ?? false;
-  }
-
-  /**
-   * Update current user
-   */
-  updateUser(user: User): void {
-    this.storageService.setItem(environment.auth.userStorageKey, user);
-    this.currentUserSignal.set(user);
   }
 }

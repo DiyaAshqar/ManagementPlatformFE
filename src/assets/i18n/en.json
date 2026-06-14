@@ -10,7 +10,20 @@
     "email": "Email",
     "password": "Password",
     "forgotPassword": "Forgot Password?",
-    "rememberMe": "Remember Me"
+    "rememberMe": "Remember Me",
+    "signInSubtitle": "Sign in to your account",
+    "emailPlaceholder": "Enter your email",
+    "passwordPlaceholder": "Enter your password",
+    "errors": {
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "invalidCredentials": "Invalid email or password"
+    },
+    "demo": {
+      "title": "Demo accounts (mock mode) — click to fill"
+    }
   },
   "common": {
     "save": "Save",

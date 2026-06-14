@@ -1,143 +1,111 @@
-import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Component, inject, signal } from '@angular/core';
+import {
+  FormBuilder,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+
 import { ButtonModule } from 'primeng/button';
-import { InputTextModule } from 'primeng/inputtext';
-import { PasswordModule } from 'primeng/password';
 import { CardModule } from 'primeng/card';
 import { CheckboxModule } from 'primeng/checkbox';
+import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
+import { PasswordModule } from 'primeng/password';
+
+import { environment } from '../../../../../environments/environment';
 import { AuthService } from '../../../../core/auth/services/auth.service';
+import { MOCK_USERS } from '../../../../core/auth/mock/mock-auth';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
+    ReactiveFormsModule,
     TranslateModule,
     ButtonModule,
     InputTextModule,
     PasswordModule,
     CardModule,
-    CheckboxModule
+    CheckboxModule,
+    MessageModule,
   ],
-  template: `
-    <div class="login-card">
-      <p-card>
-        <div class="text-center mb-2">
-          <h2>{{ 'app.title' | translate }}</h2>
-          <p class="text-secondary">{{ 'auth.login' | translate }}</p>
-        </div>
-        
-        <form (ngSubmit)="onLogin()">
-          <div class="field">
-            <label for="email">{{ 'auth.email' | translate }}</label>
-            <input 
-              pInputText 
-              id="email" 
-              [(ngModel)]="credentials.email" 
-              name="email"
-              type="email"
-              class="w-full"
-              placeholder="Enter your email" />
-          </div>
-          
-          <div class="field">
-            <label for="password">{{ 'auth.password' | translate }}</label>
-            <p-password 
-              [(ngModel)]="credentials.password" 
-              name="password"
-              [toggleMask]="true"
-              [feedback]="false"
-              placeholder="Enter your password"
-              styleClass="w-full"
-              [inputStyleClass]="'w-full'">
-            </p-password>
-          </div>
-
-          <div class="field-checkbox mb-2">
-            <p-checkbox 
-              [(ngModel)]="rememberMe" 
-              name="rememberMe"
-              [binary]="true"
-              inputId="rememberMe">
-            </p-checkbox>
-            <label for="rememberMe" class="ml-2">{{ 'auth.rememberMe' | translate }}</label>
-          </div>
-
-          <p-button 
-            type="submit" 
-            [label]="'auth.login' | translate"
-            styleClass="w-full"
-            size="large">
-          </p-button>
-
-          <div class="text-center mt-3">
-            <a href="#" class="text-sm">{{ 'auth.forgotPassword' | translate }}</a>
-          </div>
-        </form>
-      </p-card>
-    </div>
-  `,
-  styles: [`
-    .login-card {
-      width: 100%;
-    }
-
-    .field {
-      margin-bottom: 1.5rem;
-    }
-
-    label {
-      display: block;
-      margin-bottom: 0.5rem;
-      font-weight: 500;
-      color: var(--text-color);
-    }
-
-    .text-secondary {
-      color: var(--text-secondary);
-    }
-
-    h2 {
-      color: var(--primary-color);
-      margin: 0;
-    }
-
-    .field-checkbox {
-      display: flex;
-      align-items: center;
-    }
-  `]
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss'],
 })
 export class LoginComponent {
-  credentials = {
-    email: 'admin@construction.com',
-    password: 'password123'
-  };
-  rememberMe = false;
+  private readonly fb = inject(FormBuilder);
+  private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
+  private readonly route = inject(ActivatedRoute);
 
-  constructor(
-    private authService: AuthService,
-    private router: Router
-  ) {}
+  /** True while a login request is in flight. */
+  readonly loading = signal(false);
+  /** Backend/credential error to surface to the user. */
+  readonly errorMessage = signal<string | null>(null);
 
-  onLogin(): void {
-    // Mock login for testing
-    const mockTokens = {
-      accessToken: 'mock-token-12345'
-    };
+  /** Whether the in-memory mock backend is active (drives the demo hint). */
+  readonly isMock = environment.auth.useMock;
+  /** Demo accounts shown only when running on the mock backend. */
+  readonly demoAccounts = MOCK_USERS.map((u) => ({
+    label: u.fullName,
+    email: u.email,
+    password: u.password,
+  }));
 
-    const mockUser = {
-      id: '1',
-      email: this.credentials.email,
-      name: 'Test User',
-      role: 'admin'
-    };
+  readonly form = this.fb.nonNullable.group({
+    email: ['', [Validators.required, Validators.email]],
+    password: ['', [Validators.required, Validators.minLength(6)]],
+    rememberMe: [false],
+  });
 
-    this.authService.login(mockTokens, mockUser);
-    this.router.navigate(['/dashboard']);
+  get email() {
+    return this.form.controls.email;
+  }
+
+  get password() {
+    return this.form.controls.password;
+  }
+
+  onSubmit(): void {
+    this.errorMessage.set(null);
+
+    if (this.form.invalid) {
+      this.form.markAllAsTouched();
+      return;
+    }
+
+    this.loading.set(true);
+    const { email, password, rememberMe } = this.form.getRawValue();
+
+    this.authService.login({ email, password, rememberMe }).subscribe({
+      next: () => {
+        this.loading.set(false);
+        this.router.navigateByUrl(this.resolveReturnUrl());
+      },
+      error: (error: unknown) => {
+        this.loading.set(false);
+        this.errorMessage.set(
+          error instanceof Error ? error.message : 'Login failed. Please try again.'
+        );
+      },
+    });
+  }
+
+  /** Quick-fill a demo account (mock mode only). */
+  useDemoAccount(account: { email: string; password: string }): void {
+    this.form.patchValue({ email: account.email, password: account.password });
+  }
+
+  private resolveReturnUrl(): string {
+    const returnUrl = this.route.snapshot.queryParamMap.get('returnUrl');
+    // Guard against open-redirects: only allow in-app paths.
+    if (returnUrl && returnUrl.startsWith('/') && !returnUrl.startsWith('//')) {
+      return returnUrl;
+    }
+    return '/dashboard';
   }
 }

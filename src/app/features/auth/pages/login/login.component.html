@@ -1,0 +1,100 @@
+<div class="login-card">
+  <p-card>
+    <div class="text-center mb-4">
+      <h2>{{ 'app.title' | translate }}</h2>
+      <p class="text-secondary">{{ 'auth.signInSubtitle' | translate }}</p>
+    </div>
+
+    @if (errorMessage()) {
+      <p-message
+        severity="error"
+        [text]="errorMessage()!"
+        styleClass="w-full mb-3 login-error">
+      </p-message>
+    }
+
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <label for="email">{{ 'auth.email' | translate }}</label>
+        <input
+          pInputText
+          id="email"
+          type="email"
+          formControlName="email"
+          class="w-full"
+          autocomplete="username"
+          [placeholder]="'auth.emailPlaceholder' | translate" />
+        @if (email.invalid && email.touched) {
+          <small class="p-error block mt-1">
+            @if (email.errors?.['required']) {
+              {{ 'auth.errors.emailRequired' | translate }}
+            } @else if (email.errors?.['email']) {
+              {{ 'auth.errors.emailInvalid' | translate }}
+            }
+          </small>
+        }
+      </div>
+
+      <div class="field">
+        <label for="password">{{ 'auth.password' | translate }}</label>
+        <p-password
+          inputId="password"
+          formControlName="password"
+          [toggleMask]="true"
+          [feedback]="false"
+          autocomplete="current-password"
+          [placeholder]="'auth.passwordPlaceholder' | translate"
+          styleClass="w-full"
+          [inputStyleClass]="'w-full'">
+        </p-password>
+        @if (password.invalid && password.touched) {
+          <small class="p-error block mt-1">
+            @if (password.errors?.['required']) {
+              {{ 'auth.errors.passwordRequired' | translate }}
+            } @else if (password.errors?.['minlength']) {
+              {{ 'auth.errors.passwordMinLength' | translate }}
+            }
+          </small>
+        }
+      </div>
+
+      <div class="flex align-items-center justify-content-between mb-3">
+        <div class="field-checkbox m-0">
+          <p-checkbox
+            formControlName="rememberMe"
+            [binary]="true"
+            inputId="rememberMe">
+          </p-checkbox>
+          <label for="rememberMe" class="ml-2">{{ 'auth.rememberMe' | translate }}</label>
+        </div>
+        <a href="#" class="text-sm forgot-link">{{ 'auth.forgotPassword' | translate }}</a>
+      </div>
+
+      <p-button
+        type="submit"
+        [label]="'auth.login' | translate"
+        styleClass="w-full"
+        size="large"
+        [loading]="loading()"
+        [disabled]="loading()">
+      </p-button>
+    </form>
+
+    @if (isMock) {
+      <div class="demo-hint mt-4">
+        <p class="demo-hint-title">{{ 'auth.demo.title' | translate }}</p>
+        <div class="demo-accounts">
+          @for (account of demoAccounts; track account.email) {
+            <button
+              type="button"
+              class="demo-account"
+              (click)="useDemoAccount(account)">
+              <span class="demo-account-role">{{ account.label }}</span>
+              <span class="demo-account-email">{{ account.email }}</span>
+            </button>
+          }
+        </div>
+      </div>
+    }
+  </p-card>
+</div>

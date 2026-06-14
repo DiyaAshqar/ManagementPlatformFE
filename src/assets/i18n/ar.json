@@ -10,7 +10,20 @@
     "email": "البريد الإلكتروني",
     "password": "كلمة المرور",
     "forgotPassword": "نسيت كلمة المرور؟",
-    "rememberMe": "تذكرني"
+    "rememberMe": "تذكرني",
+    "signInSubtitle": "سجّل الدخول إلى حسابك",
+    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "passwordPlaceholder": "أدخل كلمة المرور",
+    "errors": {
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "يرجى إدخال بريد إلكتروني صالح",
+      "passwordRequired": "كلمة المرور مطلوبة",
+      "passwordMinLength": "يجب ألا تقل كلمة المرور عن 6 أحرف",
+      "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+    },
+    "demo": {
+      "title": "حسابات تجريبية (وضع المحاكاة) — اضغط للتعبئة"
+    }
   },
   "common": {
     "save": "حفظ",
