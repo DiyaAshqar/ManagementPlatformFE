@@ -68,6 +68,12 @@
                   </p-tab>
                   <p-tab value="7">
                     <div class="flex align-items-center gap-2">
+                      <i class="pi pi-check-square" style="color: #22C55E"></i>
+                      <span>{{ 'projectDetail.tabs.tasks' | translate }}</span>
+                    </div>
+                  </p-tab>
+                  <p-tab value="8">
+                    <div class="flex align-items-center gap-2">
                       <i class="pi pi-file-check" style="color: #84CC16"></i>
                       <span>{{ 'ownerPayment.tabTitle' | translate }}</span>
                     </div>
@@ -119,6 +125,15 @@
 
                   <p-tabpanel value="7">
                     @if (shouldLoadTab(stage.id!, '7')) {
+                      <app-preparing-stage
+                        [projectId]="projectId"
+                        [projectStageId]="stage.id!">
+                      </app-preparing-stage>
+                    }
+                  </p-tabpanel>
+
+                  <p-tabpanel value="8">
+                    @if (shouldLoadTab(stage.id!, '8')) {
                       <app-payment-claim-tab
                         [projectStageId]="stage.id!"
                         [projectId]="projectId">

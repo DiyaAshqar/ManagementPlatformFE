@@ -518,6 +518,7 @@
       "milestones": "Milestones",
       "documents": "Documents",
       "expenses": "Expenses",
+      "tasks": "Task",
       "ownerPayment": "Owner Payment",
       "timeframe": "Timeframe"
     },

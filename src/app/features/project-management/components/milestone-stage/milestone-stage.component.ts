@@ -13,6 +13,7 @@ import { MilestoneDocumentsTabComponent } from './tabs/documents-tab/documents-t
 import { ProjectMainContractorTabComponent } from './tabs/project-main-contractor-tab/project-main-contractor-tab.component';
 import { ProjectExpenseManagementComponent } from '../project-expense-management/project-expense-management.component';
 import { PaymentClaimTabComponent } from './tabs/payment-claim-tab/payment-claim-tab.component';
+import { PreparingStageComponent } from '../preparing-stage/preparing-stage.component';
 
 @Component({
   selector: 'app-milestone-stage',
@@ -30,7 +31,8 @@ import { PaymentClaimTabComponent } from './tabs/payment-claim-tab/payment-claim
     MilestoneDocumentsTabComponent,
     ProjectMainContractorTabComponent,
     ProjectExpenseManagementComponent,
-    PaymentClaimTabComponent
+    PaymentClaimTabComponent,
+    PreparingStageComponent
   ],
   templateUrl: './milestone-stage.component.html',
   styleUrls: ['./milestone-stage.component.scss']
