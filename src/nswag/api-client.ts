@@ -6247,6 +6247,8 @@ export enum AttachmentType {
     _5 = 5,
     _6 = 6,
     _7 = 7,
+    _8 = 8,
+    _9 = 9,
 }
 
 export class BooleanResponse implements IBooleanResponse {

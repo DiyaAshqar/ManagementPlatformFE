@@ -945,6 +945,51 @@
       "save": "Save"
     }
   },
+  "milestoneTaskDialog": {
+    "title": "Add Task",
+    "fields": {
+      "title": "Title",
+      "titlePlaceholder": "Enter task title",
+      "type": "Type",
+      "typePlaceholder": "Select type",
+      "assignTo": "Assign To",
+      "assignToPlaceholder": "Mike Johnson",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "priority": "Priority",
+      "priorityPlaceholder": "Select priority",
+      "taskPoints": "Task Points",
+      "taskPointsPlaceholder": "8",
+      "responsibilitySection": "Responsibility & Resources",
+      "responsibility": "Responsibility",
+      "responsibilityPlaceholder": "Select responsibility",
+      "mainContractor": "Main Contractor",
+      "mainContractorPlaceholder": "Select main contractor",
+      "suppliers": "Supplier",
+      "suppliersPlaceholder": "Select supplier",
+      "location": "Location",
+      "locationPlaceholder": "Grid A1-A5",
+      "depth": "Depth",
+      "depthPlaceholder": "3.5m",
+      "volume": "Volume",
+      "volumePlaceholder": "450 m³",
+      "soilType": "Soil Type",
+      "soilTypePlaceholder": "Clay",
+      "equipment": "Equipment",
+      "equipmentPlaceholder": "Excavator CAT 320",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the task..."
+    },
+    "attachments": {
+      "title": "Attachments",
+      "saveTaskFirst": "Save the task first to manage attachments",
+      "noAttachments": "No attachments yet. Save the task first to upload files."
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save"
+    }
+  },
   "excavationStage": {
     "title": "Excavation Stage",
     "subtitle": "Track excavation activities and measurements"

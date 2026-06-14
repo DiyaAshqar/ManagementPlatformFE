@@ -23,6 +23,7 @@ import { TooltipModule } from 'primeng/tooltip';
 
 import { CreateTaskCommand, StatusTask } from '../../../../../nswag/api-client';
 import { TaskService } from '../../services/task.service';
+import { MilestoneTaskDialogComponent } from './dialog/milestone-task-dialog/milestone-task-dialog.component';
 import { SubtaskDialogComponent } from './dialog/subtask-dialog/subtask-dialog.component';
 import { WorkItemDialogComponent } from './dialog/work-item-dialog/work-item-dialog.component';
 
@@ -115,6 +116,7 @@ export class SharedStageBoardComponent implements OnInit {
   @Input() stageTitle: string = 'Stage Board';
   @Input() stageDescription: string = 'Manage tasks and activities';
   @Input() showExcavationFields: boolean = false; // Controls visibility of excavation-specific fields
+  @Input() useMilestoneTaskDialog: boolean = false; // Use the extended milestone task dialog (Responsibility/Main Contractor/Suppliers) for "Add Task"
   @Input({ required: true }) columnsInput!: Signal<Column[]>;
   @Output() taskCreated = new EventEmitter<void>();
   @Output() taskUpdated = new EventEmitter<void>();
@@ -291,40 +293,56 @@ export class SharedStageBoardComponent implements OnInit {
 
   openAddDialog(columnId: TaskStatus): void {
     this.selectedColumn.set(columnId);
-    
-    this.dialogRef = this.dialogService.open(WorkItemDialogComponent, {
-      header: 'Add Work Item',
-      width: '1200px',
-      height: '900px',
-      modal: true,
-      closable: true,
-      data: {
-        mode: 'add',
-        projectStageId: this.projectStageId,
-        showExcavationFields: this.showExcavationFields,
-        workItem: {
-          title: '',
-          type: WorkItemType.TASK,
-          priority: 'medium',
-          assignTo: '',
-          taskPoints: '',
-          tags: [],
-          description: '',
-          startDate: '',
-          endDate: '',
-          location: '',
-          depth: '',
-          volume: '',
-          soilType: '',
-          equipment: '',
-          projectStageId: this.projectStageId
+
+    if (this.useMilestoneTaskDialog) {
+      // Extended "Add Task" form for the Milestone Tasks tab (Responsibility/Main Contractor/Suppliers)
+      this.dialogRef = this.dialogService.open(MilestoneTaskDialogComponent, {
+        header: 'Add Task',
+        width: '800px',
+        modal: true,
+        closable: true,
+        data: {
+          projectStageId: this.projectStageId,
+          showExcavationFields: this.showExcavationFields
         }
-      }
-    });
-    
+      });
+    } else {
+      this.dialogRef = this.dialogService.open(WorkItemDialogComponent, {
+        header: 'Add Work Item',
+        width: '1200px',
+        height: '900px',
+        modal: true,
+        closable: true,
+        data: {
+          mode: 'add',
+          projectStageId: this.projectStageId,
+          showExcavationFields: this.showExcavationFields,
+          workItem: {
+            title: '',
+            type: WorkItemType.TASK,
+            priority: 'medium',
+            assignTo: '',
+            taskPoints: '',
+            tags: [],
+            description: '',
+            startDate: '',
+            endDate: '',
+            location: '',
+            depth: '',
+            volume: '',
+            soilType: '',
+            equipment: '',
+            projectStageId: this.projectStageId
+          }
+        }
+      });
+    }
+
     this.dialogRef.onClose.subscribe((result: any) => {
       if (result) {
         // Prepare the CreateTaskCommand for API using the proper constructor
+        // Note: when using the milestone task dialog, the Responsibility/Main Contractor/Supplier
+        // selections are captured in the UI but not yet sent to the API until the backend supports these fields.
         const createCommand = new CreateTaskCommand({
           title: result.title,
           description: result.description,
@@ -342,7 +360,7 @@ export class SharedStageBoardComponent implements OnInit {
           projectStageId: this.getStageIdFromProjectId(),
           status: this.mapTaskStatusToApiStatus(columnId)
         });
-        
+
         // Call the API to create the task
         this.taskService.createTask(createCommand).subscribe({
           next: (response) => {

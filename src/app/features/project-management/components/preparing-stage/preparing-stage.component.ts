@@ -22,6 +22,7 @@ import { Column, SharedStageBoardComponent, TaskStatus, WorkItem, WorkItemType }
 export class PreparingStageComponent implements OnInit {
   @Input() projectId!: string;
   @Input() projectStageId!: number; // The projectStageId for Preparing stage (stageType: 1)
+  @Input() useMilestoneTaskDialog: boolean = false; // Use the extended milestone task dialog (Responsibility/Main Contractor/Suppliers) for "Add Task"
 
   private tasks = signal<GetProjectTaskDto[]>([]);
   private isLoading = signal<boolean>(true);

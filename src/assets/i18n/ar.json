@@ -941,6 +941,51 @@
       "save": "حفظ"
     }
   },
+  "milestoneTaskDialog": {
+    "title": "إضافة مهمة",
+    "fields": {
+      "title": "العنوان",
+      "titlePlaceholder": "أدخل عنوان المهمة",
+      "type": "النوع",
+      "typePlaceholder": "اختر النوع",
+      "assignTo": "تعيين إلى",
+      "assignToPlaceholder": "محمد أحمد",
+      "startDate": "تاريخ البداية",
+      "endDate": "تاريخ النهاية",
+      "priority": "الأولوية",
+      "priorityPlaceholder": "اختر الأولوية",
+      "taskPoints": "نقاط المهمة",
+      "taskPointsPlaceholder": "8",
+      "responsibilitySection": "المسؤولية والموارد",
+      "responsibility": "المسؤولية",
+      "responsibilityPlaceholder": "اختر المسؤولية",
+      "mainContractor": "المقاول الرئيسي",
+      "mainContractorPlaceholder": "اختر المقاول الرئيسي",
+      "suppliers": "المورد",
+      "suppliersPlaceholder": "اختر المورد",
+      "location": "الموقع",
+      "locationPlaceholder": "الشبكة أ1-أ5",
+      "depth": "العمق",
+      "depthPlaceholder": "3.5 متر",
+      "volume": "الحجم",
+      "volumePlaceholder": "450 متر مكعب",
+      "soilType": "نوع التربة",
+      "soilTypePlaceholder": "طين",
+      "equipment": "المعدات",
+      "equipmentPlaceholder": "حفار كات 320",
+      "description": "الوصف",
+      "descriptionPlaceholder": "صف المهمة..."
+    },
+    "attachments": {
+      "title": "المرفقات",
+      "saveTaskFirst": "يرجى حفظ المهمة أولاً لإدارة المرفقات",
+      "noAttachments": "لا توجد مرفقات بعد. يرجى حفظ المهمة أولاً لتحميل الملفات."
+    },
+    "buttons": {
+      "cancel": "إلغاء",
+      "save": "حفظ"
+    }
+  },
   "excavationStage": {
     "title": "مرحلة الحفر",
     "subtitle": "تتبع أنشطة وقياسات الحفر"

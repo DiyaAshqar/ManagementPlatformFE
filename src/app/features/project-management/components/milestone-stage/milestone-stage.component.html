@@ -127,7 +127,8 @@
                     @if (shouldLoadTab(stage.id!, '7')) {
                       <app-preparing-stage
                         [projectId]="projectId"
-                        [projectStageId]="stage.id!">
+                        [projectStageId]="stage.id!"
+                        [useMilestoneTaskDialog]="true">
                       </app-preparing-stage>
                     }
                   </p-tabpanel>

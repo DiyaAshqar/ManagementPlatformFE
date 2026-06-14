@@ -1,0 +1,265 @@
+<div class="flex flex-column gap-3 p-3">
+  <div>
+    <label for="milestone-task-title" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.title' | translate }} <span class="required-asterisk">*</span></label>
+    <input
+      id="milestone-task-title"
+      type="text"
+      pInputText
+      [ngModel]="currentFormData.title"
+      (ngModelChange)="updateFormField('title', $event)"
+      [placeholder]="'milestoneTaskDialog.fields.titlePlaceholder' | translate"
+      class="w-full">
+  </div>
+
+  <div class="grid">
+    <div class="col-6">
+      <label for="milestone-task-type" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.type' | translate }}</label>
+      <p-select
+        id="milestone-task-type"
+        [ngModel]="currentFormData.type"
+        (ngModelChange)="onTaskTypeChange($event)"
+        [options]="workItemTypes"
+        optionLabel="label"
+        optionValue="value"
+        [placeholder]="'milestoneTaskDialog.fields.typePlaceholder' | translate"
+        [loading]="isLoadingTaskTypes()"
+        styleClass="w-full">
+      </p-select>
+    </div>
+    <div class="col-6">
+      <label for="milestone-task-assignTo" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.assignTo' | translate }}</label>
+      <input
+        id="milestone-task-assignTo"
+        type="text"
+        pInputText
+        [ngModel]="currentFormData.assignTo"
+        (ngModelChange)="updateFormField('assignTo', $event)"
+        [placeholder]="'milestoneTaskDialog.fields.assignToPlaceholder' | translate"
+        class="w-full">
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="col-6">
+      <label for="milestone-task-start-date" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.startDate' | translate }}</label>
+      <p-datepicker
+        id="milestone-task-start-date"
+        [ngModel]="currentFormData.startDate"
+        (ngModelChange)="updateFormField('startDate', $event)"
+        dateFormat="mm/dd/yy"
+        [showIcon]="true"
+        [showButtonBar]="true"
+        placeholder="mm/dd/yyyy"
+        styleClass="w-full">
+      </p-datepicker>
+    </div>
+    <div class="col-6">
+      <label for="milestone-task-end-date" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.endDate' | translate }}</label>
+      <p-datepicker
+        id="milestone-task-end-date"
+        [ngModel]="currentFormData.endDate"
+        (ngModelChange)="updateFormField('endDate', $event)"
+        dateFormat="mm/dd/yy"
+        [showIcon]="true"
+        [showButtonBar]="true"
+        placeholder="mm/dd/yyyy"
+        styleClass="w-full">
+      </p-datepicker>
+    </div>
+  </div>
+
+  <div class="grid">
+    <div class="col-6">
+      <label for="milestone-task-priority" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.priority' | translate }}</label>
+      <p-select
+        id="milestone-task-priority"
+        [ngModel]="currentFormData.priority"
+        (ngModelChange)="updateFormField('priority', $event)"
+        [options]="priorityOptions"
+        optionLabel="label"
+        optionValue="value"
+        [placeholder]="'milestoneTaskDialog.fields.priorityPlaceholder' | translate"
+        styleClass="w-full">
+      </p-select>
+    </div>
+    <div class="col-6">
+      <label for="milestone-task-points" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.taskPoints' | translate }}</label>
+      <input
+        id="milestone-task-points"
+        type="text"
+        pInputText
+        [ngModel]="currentFormData.taskPoint"
+        (ngModelChange)="updateFormField('taskPoint', $event)"
+        [placeholder]="'milestoneTaskDialog.fields.taskPointsPlaceholder' | translate"
+        class="w-full">
+    </div>
+  </div>
+
+  <!-- Responsibility & Resources -->
+  <div class="border-top-1 surface-border pt-3">
+    <label class="block text-sm font-semibold mb-2 text-color">{{ 'milestoneTaskDialog.fields.responsibilitySection' | translate }}</label>
+    <div class="grid">
+      <div class="col-12 md:col-4">
+        <label for="milestone-task-responsibility" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.responsibility' | translate }}</label>
+        <p-select
+          id="milestone-task-responsibility"
+          [ngModel]="currentFormData.dutyResponsibilityId"
+          (ngModelChange)="updateFormField('dutyResponsibilityId', $event)"
+          [options]="responsibilityOptions"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+          [showClear]="true"
+          [placeholder]="'milestoneTaskDialog.fields.responsibilityPlaceholder' | translate"
+          styleClass="w-full">
+        </p-select>
+      </div>
+      <div class="col-12 md:col-4">
+        <label for="milestone-task-main-contractor" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.mainContractor' | translate }}</label>
+        <p-select
+          id="milestone-task-main-contractor"
+          [ngModel]="currentFormData.constructorId"
+          (ngModelChange)="updateFormField('constructorId', $event)"
+          [options]="mainContractorOptions"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+          [showClear]="true"
+          [placeholder]="'milestoneTaskDialog.fields.mainContractorPlaceholder' | translate"
+          styleClass="w-full">
+        </p-select>
+      </div>
+      <div class="col-12 md:col-4">
+        <label for="milestone-task-supplier" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.suppliers' | translate }}</label>
+        <p-select
+          id="milestone-task-supplier"
+          [ngModel]="currentFormData.supplierId"
+          (ngModelChange)="updateFormField('supplierId', $event)"
+          [options]="supplierOptions"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+          [showClear]="true"
+          [placeholder]="'milestoneTaskDialog.fields.suppliersPlaceholder' | translate"
+          styleClass="w-full">
+        </p-select>
+      </div>
+    </div>
+  </div>
+
+  @if (shouldShowExcavationFields()) {
+    <div class="grid">
+      <div class="col-6">
+        <label for="milestone-task-location" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.location' | translate }}</label>
+        <input
+          id="milestone-task-location"
+          type="text"
+          pInputText
+          [ngModel]="currentFormData.excavationLocation"
+          (ngModelChange)="updateFormField('excavationLocation', $event)"
+          [placeholder]="'milestoneTaskDialog.fields.locationPlaceholder' | translate"
+          class="w-full">
+      </div>
+      <div class="col-6">
+        <label for="milestone-task-depth" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.depth' | translate }}</label>
+        <input
+          id="milestone-task-depth"
+          type="text"
+          pInputText
+          [ngModel]="currentFormData.excavationDepth"
+          (ngModelChange)="updateFormField('excavationDepth', $event)"
+          [placeholder]="'milestoneTaskDialog.fields.depthPlaceholder' | translate"
+          class="w-full">
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="col-6">
+        <label for="milestone-task-volume" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.volume' | translate }}</label>
+        <input
+          id="milestone-task-volume"
+          type="text"
+          pInputText
+          [ngModel]="currentFormData.excavationVolume"
+          (ngModelChange)="updateFormField('excavationVolume', $event)"
+          [placeholder]="'milestoneTaskDialog.fields.volumePlaceholder' | translate"
+          class="w-full">
+      </div>
+      <div class="col-6">
+        <label for="milestone-task-soil-type" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.soilType' | translate }}</label>
+        <input
+          id="milestone-task-soil-type"
+          type="text"
+          pInputText
+          [ngModel]="currentFormData.excavationSoilType"
+          (ngModelChange)="updateFormField('excavationSoilType', $event)"
+          [placeholder]="'milestoneTaskDialog.fields.soilTypePlaceholder' | translate"
+          class="w-full">
+      </div>
+    </div>
+
+    <div>
+      <label for="milestone-task-equipment" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.equipment' | translate }}</label>
+      <input
+        id="milestone-task-equipment"
+        type="text"
+        pInputText
+        [ngModel]="currentFormData.excavationEquipment"
+        (ngModelChange)="updateFormField('excavationEquipment', $event)"
+        [placeholder]="'milestoneTaskDialog.fields.equipmentPlaceholder' | translate"
+        class="w-full">
+    </div>
+  }
+
+  <div>
+    <label for="milestone-task-description" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.description' | translate }}</label>
+    <textarea
+      id="milestone-task-description"
+      pTextarea
+      [ngModel]="currentFormData.description"
+      (ngModelChange)="updateFormField('description', $event)"
+      [placeholder]="'milestoneTaskDialog.fields.descriptionPlaceholder' | translate"
+      [rows]="3"
+      class="w-full">
+    </textarea>
+  </div>
+
+  <!-- Attachments Section -->
+  <div class="border-top-1 surface-border pt-3">
+    <div class="flex align-items-center justify-content-between mb-2">
+      <label class="block text-sm font-semibold m-0 text-color">{{ 'milestoneTaskDialog.attachments.title' | translate }}</label>
+      @if (!formData().backendTaskId) {
+        <span class="text-xs text-400">
+          <i class="pi pi-info-circle mr-1"></i>{{ 'milestoneTaskDialog.attachments.saveTaskFirst' | translate }}
+        </span>
+      }
+    </div>
+    <div [class.pointer-events-none]="!formData().backendTaskId" [class.opacity-50]="!formData().backendTaskId">
+      @if (formData().backendTaskId) {
+        <app-documents-table
+          [attachmentType]="taskAttachmentType"
+          [relationshipId]="formData().backendTaskId!"
+          contextLabel="this task">
+        </app-documents-table>
+      } @else {
+        <div class="text-center p-3 surface-50 border-round border-1 surface-border">
+          <i class="pi pi-paperclip text-2xl text-400 mb-2"></i>
+          <p class="text-xs text-500 m-0">{{ 'milestoneTaskDialog.attachments.noAttachments' | translate }}</p>
+        </div>
+      }
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <div class="flex justify-content-end gap-2 border-top-1 surface-border pt-3">
+    <p-button
+      [label]="'milestoneTaskDialog.buttons.cancel' | translate"
+      [outlined]="true"
+      (onClick)="onCancel()">
+    </p-button>
+    <p-button
+      [label]="'milestoneTaskDialog.buttons.save' | translate"
+      (onClick)="onSave()">
+    </p-button>
+  </div>
+</div>
