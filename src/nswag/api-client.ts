@@ -1061,7 +1061,7 @@ export class ExpenseClient {
      * @param body (optional) 
      * @return OK
      */
-    createOrUpdate(body: CreateExpenseCommand | undefined): Observable<BooleanResponse> {
+    createOrUpdate(body: CreateExpenseCommand | undefined): Observable<Int32Response> {
         let url_ = this.baseUrl + "/api/Expense";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1084,14 +1084,14 @@ export class ExpenseClient {
                 try {
                     return this.processCreateOrUpdate(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                    return _observableThrow(e) as any as Observable<Int32Response>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+                return _observableThrow(response_) as any as Observable<Int32Response>;
         }));
     }
 
-    protected processCreateOrUpdate(response: HttpResponseBase): Observable<BooleanResponse> {
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<Int32Response> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1102,7 +1102,7 @@ export class ExpenseClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = BooleanResponse.fromJS(resultData200);
+            result200 = Int32Response.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -1115,14 +1115,19 @@ export class ExpenseClient {
 
     /**
      * @param id (optional) 
+     * @param isEndpointCall (optional) 
      * @return OK
      */
-    delete(id: number | undefined): Observable<BooleanResponse> {
+    delete(id: number | undefined, isEndpointCall: boolean | undefined): Observable<BooleanResponse> {
         let url_ = this.baseUrl + "/api/Expense?";
         if (id === null)
             throw new globalThis.Error("The parameter 'id' cannot be null.");
         else if (id !== undefined)
             url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        if (isEndpointCall === null)
+            throw new globalThis.Error("The parameter 'isEndpointCall' cannot be null.");
+        else if (isEndpointCall !== undefined)
+            url_ += "IsEndpointCall=" + encodeURIComponent("" + isEndpointCall) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1556,9 +1561,10 @@ export class MaterialClient {
      * @param requestParameter_PageNumber (optional) 
      * @param requestParameter_PageSize (optional) 
      * @param requestParameter_Filter (optional) 
+     * @param name (optional) 
      * @return OK
      */
-    getAll(requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetMaterialDtoListPagedResponseResponse> {
+    getAll(requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined, name: string | undefined): Observable<GetMaterialDtoListPagedResponseResponse> {
         let url_ = this.baseUrl + "/api/Material?";
         if (requestParameter_PageNumber === null)
             throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
@@ -1572,6 +1578,10 @@ export class MaterialClient {
             throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
         else if (requestParameter_Filter !== undefined)
             url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        if (name === null)
+            throw new globalThis.Error("The parameter 'name' cannot be null.");
+        else if (name !== undefined)
+            url_ += "Name=" + encodeURIComponent("" + name) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -1731,6 +1741,57 @@ export class MaterialClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = GetMaterialDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getCategoriesWithMaterials(): Observable<GetMaterialCategoryWithMaterialsDtoListResponse> {
+        let url_ = this.baseUrl + "/api/Material/Categories";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetCategoriesWithMaterials(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetCategoriesWithMaterials(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetMaterialCategoryWithMaterialsDtoListResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetMaterialCategoryWithMaterialsDtoListResponse>;
+        }));
+    }
+
+    protected processGetCategoriesWithMaterials(response: HttpResponseBase): Observable<GetMaterialCategoryWithMaterialsDtoListResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetMaterialCategoryWithMaterialsDtoListResponse.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -3423,6 +3484,321 @@ export class ProjectMainContractorClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = GetProjectMainContractorDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class ProjectMainContractorDutyClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createOrUpdate(body: CreateProjectMainContractorDutyCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/ProjectMainContractorDuty";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return OK
+     */
+    delete(id: number | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/ProjectMainContractorDuty?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getAll(requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetProjectMainContractorDutyDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/ProjectMainContractorDuty?";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectMainContractorDutyDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectMainContractorDutyDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<GetProjectMainContractorDutyDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectMainContractorDutyDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getById(id: number): Observable<GetProjectMainContractorDutyDtoResponse> {
+        let url_ = this.baseUrl + "/api/ProjectMainContractorDuty/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectMainContractorDutyDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectMainContractorDutyDtoResponse>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<GetProjectMainContractorDutyDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectMainContractorDutyDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param projectMainContractorId (optional) 
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getByContractorId(projectMainContractorId: number | undefined, requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetProjectMainContractorDutyDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/ProjectMainContractorDuty/by-contractor?";
+        if (projectMainContractorId === null)
+            throw new globalThis.Error("The parameter 'projectMainContractorId' cannot be null.");
+        else if (projectMainContractorId !== undefined)
+            url_ += "ProjectMainContractorId=" + encodeURIComponent("" + projectMainContractorId) + "&";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByContractorId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByContractorId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectMainContractorDutyDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectMainContractorDutyDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetByContractorId(response: HttpResponseBase): Observable<GetProjectMainContractorDutyDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectMainContractorDutyDtoListPagedResponseResponse.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -6181,6 +6557,7 @@ export class AttachmentDto implements IAttachmentDto {
     relationshipId?: number;
     fileName?: string | undefined;
     filePath?: string | undefined;
+    originalName?: string | undefined;
     base64Data?: string | undefined;
     contentType?: string | undefined;
     isDeleted?: boolean;
@@ -6201,6 +6578,7 @@ export class AttachmentDto implements IAttachmentDto {
             this.relationshipId = _data["relationshipId"];
             this.fileName = _data["fileName"];
             this.filePath = _data["filePath"];
+            this.originalName = _data["originalName"];
             this.base64Data = _data["base64Data"];
             this.contentType = _data["contentType"];
             this.isDeleted = _data["isDeleted"];
@@ -6221,6 +6599,7 @@ export class AttachmentDto implements IAttachmentDto {
         data["relationshipId"] = this.relationshipId;
         data["fileName"] = this.fileName;
         data["filePath"] = this.filePath;
+        data["originalName"] = this.originalName;
         data["base64Data"] = this.base64Data;
         data["contentType"] = this.contentType;
         data["isDeleted"] = this.isDeleted;
@@ -6234,6 +6613,7 @@ export interface IAttachmentDto {
     relationshipId?: number;
     fileName?: string | undefined;
     filePath?: string | undefined;
+    originalName?: string | undefined;
     base64Data?: string | undefined;
     contentType?: string | undefined;
     isDeleted?: boolean;
@@ -6353,6 +6733,11 @@ export interface ICity {
     name: string | undefined;
     countryId?: number;
     country?: Country;
+}
+
+export enum ClassificationProjectMainContractor {
+    _1 = 1,
+    _2 = 2,
 }
 
 export class Client implements IClient {
@@ -6661,6 +7046,14 @@ export class ContractorDuty implements IContractorDuty {
     dutyResponsibility?: DutyResponsibility;
     mainContractId?: number;
     mainContract?: MainContract;
+    supplier?: Supplier;
+    supplierId?: number | undefined;
+    autoPost?: boolean;
+    expenseId?: number | undefined;
+    expense?: Expense;
+    expenseNumber?: string | undefined;
+    material?: Material;
+    materialId?: number | undefined;
 
     constructor(data?: IContractorDuty) {
         if (data) {
@@ -6686,6 +7079,14 @@ export class ContractorDuty implements IContractorDuty {
             this.dutyResponsibility = _data["dutyResponsibility"] ? DutyResponsibility.fromJS(_data["dutyResponsibility"]) : undefined as any;
             this.mainContractId = _data["mainContractId"];
             this.mainContract = _data["mainContract"] ? MainContract.fromJS(_data["mainContract"]) : undefined as any;
+            this.supplier = _data["supplier"] ? Supplier.fromJS(_data["supplier"]) : undefined as any;
+            this.supplierId = _data["supplierId"];
+            this.autoPost = _data["autoPost"];
+            this.expenseId = _data["expenseId"];
+            this.expense = _data["expense"] ? Expense.fromJS(_data["expense"]) : undefined as any;
+            this.expenseNumber = _data["expenseNumber"];
+            this.material = _data["material"] ? Material.fromJS(_data["material"]) : undefined as any;
+            this.materialId = _data["materialId"];
         }
     }
 
@@ -6711,6 +7112,14 @@ export class ContractorDuty implements IContractorDuty {
         data["dutyResponsibility"] = this.dutyResponsibility ? this.dutyResponsibility.toJSON() : undefined as any;
         data["mainContractId"] = this.mainContractId;
         data["mainContract"] = this.mainContract ? this.mainContract.toJSON() : undefined as any;
+        data["supplier"] = this.supplier ? this.supplier.toJSON() : undefined as any;
+        data["supplierId"] = this.supplierId;
+        data["autoPost"] = this.autoPost;
+        data["expenseId"] = this.expenseId;
+        data["expense"] = this.expense ? this.expense.toJSON() : undefined as any;
+        data["expenseNumber"] = this.expenseNumber;
+        data["material"] = this.material ? this.material.toJSON() : undefined as any;
+        data["materialId"] = this.materialId;
         return data;
     }
 }
@@ -6729,6 +7138,14 @@ export interface IContractorDuty {
     dutyResponsibility?: DutyResponsibility;
     mainContractId?: number;
     mainContract?: MainContract;
+    supplier?: Supplier;
+    supplierId?: number | undefined;
+    autoPost?: boolean;
+    expenseId?: number | undefined;
+    expense?: Expense;
+    expenseNumber?: string | undefined;
+    material?: Material;
+    materialId?: number | undefined;
 }
 
 export class ContractorDutyDto implements IContractorDutyDto {
@@ -6741,6 +7158,8 @@ export class ContractorDutyDto implements IContractorDutyDto {
     dutyResponsibilityId?: number;
     mainContractId?: number;
     isDeleted?: boolean;
+    supplierId?: number | undefined;
+    materialId?: number | undefined;
 
     constructor(data?: IContractorDutyDto) {
         if (data) {
@@ -6762,6 +7181,8 @@ export class ContractorDutyDto implements IContractorDutyDto {
             this.dutyResponsibilityId = _data["dutyResponsibilityId"];
             this.mainContractId = _data["mainContractId"];
             this.isDeleted = _data["isDeleted"];
+            this.supplierId = _data["supplierId"];
+            this.materialId = _data["materialId"];
         }
     }
 
@@ -6783,6 +7204,8 @@ export class ContractorDutyDto implements IContractorDutyDto {
         data["dutyResponsibilityId"] = this.dutyResponsibilityId;
         data["mainContractId"] = this.mainContractId;
         data["isDeleted"] = this.isDeleted;
+        data["supplierId"] = this.supplierId;
+        data["materialId"] = this.materialId;
         return data;
     }
 }
@@ -6797,6 +7220,8 @@ export interface IContractorDutyDto {
     dutyResponsibilityId?: number;
     mainContractId?: number;
     isDeleted?: boolean;
+    supplierId?: number | undefined;
+    materialId?: number | undefined;
 }
 
 export class Country implements ICountry {
@@ -7018,9 +7443,11 @@ export class CreateExpenseCommand implements ICreateExpenseCommand {
     totalAmount?: number;
     notes?: string | undefined;
     autoPost?: boolean;
-    projectStageId?: number;
+    projectStageId?: number | undefined;
     supplierId?: number;
+    contractorDutyId?: number | undefined;
     expenseDetails?: CreateExpenseDetailModel[] | undefined;
+    isEndpointCall?: boolean | undefined;
 
     constructor(data?: ICreateExpenseCommand) {
         if (data) {
@@ -7041,11 +7468,13 @@ export class CreateExpenseCommand implements ICreateExpenseCommand {
             this.autoPost = _data["autoPost"];
             this.projectStageId = _data["projectStageId"];
             this.supplierId = _data["supplierId"];
+            this.contractorDutyId = _data["contractorDutyId"];
             if (Array.isArray(_data["expenseDetails"])) {
                 this.expenseDetails = [] as any;
                 for (let item of _data["expenseDetails"])
                     this.expenseDetails!.push(CreateExpenseDetailModel.fromJS(item));
             }
+            this.isEndpointCall = _data["isEndpointCall"];
         }
     }
 
@@ -7066,11 +7495,13 @@ export class CreateExpenseCommand implements ICreateExpenseCommand {
         data["autoPost"] = this.autoPost;
         data["projectStageId"] = this.projectStageId;
         data["supplierId"] = this.supplierId;
+        data["contractorDutyId"] = this.contractorDutyId;
         if (Array.isArray(this.expenseDetails)) {
             data["expenseDetails"] = [];
             for (let item of this.expenseDetails)
                 data["expenseDetails"].push(item ? item.toJSON() : undefined as any);
         }
+        data["isEndpointCall"] = this.isEndpointCall;
         return data;
     }
 }
@@ -7082,9 +7513,11 @@ export interface ICreateExpenseCommand {
     totalAmount?: number;
     notes?: string | undefined;
     autoPost?: boolean;
-    projectStageId?: number;
+    projectStageId?: number | undefined;
     supplierId?: number;
+    contractorDutyId?: number | undefined;
     expenseDetails?: CreateExpenseDetailModel[] | undefined;
+    isEndpointCall?: boolean | undefined;
 }
 
 export class CreateExpenseDetailModel implements ICreateExpenseDetailModel {
@@ -7401,6 +7834,7 @@ export class CreateProjectBOQCommand implements ICreateProjectBOQCommand {
     actualQuantity?: number;
     description?: string | undefined;
     subTotal?: number;
+    supplierId?: number;
 
     constructor(data?: ICreateProjectBOQCommand) {
         if (data) {
@@ -7422,6 +7856,7 @@ export class CreateProjectBOQCommand implements ICreateProjectBOQCommand {
             this.actualQuantity = _data["actualQuantity"];
             this.description = _data["description"];
             this.subTotal = _data["subTotal"];
+            this.supplierId = _data["supplierId"];
         }
     }
 
@@ -7443,6 +7878,7 @@ export class CreateProjectBOQCommand implements ICreateProjectBOQCommand {
         data["actualQuantity"] = this.actualQuantity;
         data["description"] = this.description;
         data["subTotal"] = this.subTotal;
+        data["supplierId"] = this.supplierId;
         return data;
     }
 }
@@ -7457,6 +7893,7 @@ export interface ICreateProjectBOQCommand {
     actualQuantity?: number;
     description?: string | undefined;
     subTotal?: number;
+    supplierId?: number;
 }
 
 export class CreateProjectCommand implements ICreateProjectCommand {
@@ -7528,6 +7965,7 @@ export class CreateProjectMainContractorCommand implements ICreateProjectMainCon
     totalPayments?: number;
     startDate?: Date;
     endDate?: Date;
+    classification?: ClassificationProjectMainContractor;
 
     constructor(data?: ICreateProjectMainContractorCommand) {
         if (data) {
@@ -7548,6 +7986,7 @@ export class CreateProjectMainContractorCommand implements ICreateProjectMainCon
             this.totalPayments = _data["totalPayments"];
             this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
             this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.classification = _data["classification"];
         }
     }
 
@@ -7568,6 +8007,7 @@ export class CreateProjectMainContractorCommand implements ICreateProjectMainCon
         data["totalPayments"] = this.totalPayments;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
         data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        data["classification"] = this.classification;
         return data;
     }
 }
@@ -7581,6 +8021,87 @@ export interface ICreateProjectMainContractorCommand {
     totalPayments?: number;
     startDate?: Date;
     endDate?: Date;
+    classification?: ClassificationProjectMainContractor;
+}
+
+export class CreateProjectMainContractorDutyCommand implements ICreateProjectMainContractorDutyCommand {
+    id?: number | undefined;
+    subTotal?: number;
+    quantity?: number;
+    price?: number;
+    unitId?: number;
+    dutyTypeId?: number;
+    dutyResponsibilityId?: number;
+    projectMainContractorId?: number;
+    supplierId?: number | undefined;
+    materialId?: number | undefined;
+    autoPost?: boolean;
+    expenseNumber?: string | undefined;
+
+    constructor(data?: ICreateProjectMainContractorDutyCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.subTotal = _data["subTotal"];
+            this.quantity = _data["quantity"];
+            this.price = _data["price"];
+            this.unitId = _data["unitId"];
+            this.dutyTypeId = _data["dutyTypeId"];
+            this.dutyResponsibilityId = _data["dutyResponsibilityId"];
+            this.projectMainContractorId = _data["projectMainContractorId"];
+            this.supplierId = _data["supplierId"];
+            this.materialId = _data["materialId"];
+            this.autoPost = _data["autoPost"];
+            this.expenseNumber = _data["expenseNumber"];
+        }
+    }
+
+    static fromJS(data: any): CreateProjectMainContractorDutyCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateProjectMainContractorDutyCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["subTotal"] = this.subTotal;
+        data["quantity"] = this.quantity;
+        data["price"] = this.price;
+        data["unitId"] = this.unitId;
+        data["dutyTypeId"] = this.dutyTypeId;
+        data["dutyResponsibilityId"] = this.dutyResponsibilityId;
+        data["projectMainContractorId"] = this.projectMainContractorId;
+        data["supplierId"] = this.supplierId;
+        data["materialId"] = this.materialId;
+        data["autoPost"] = this.autoPost;
+        data["expenseNumber"] = this.expenseNumber;
+        return data;
+    }
+}
+
+export interface ICreateProjectMainContractorDutyCommand {
+    id?: number | undefined;
+    subTotal?: number;
+    quantity?: number;
+    price?: number;
+    unitId?: number;
+    dutyTypeId?: number;
+    dutyResponsibilityId?: number;
+    projectMainContractorId?: number;
+    supplierId?: number | undefined;
+    materialId?: number | undefined;
+    autoPost?: boolean;
+    expenseNumber?: string | undefined;
 }
 
 export class CreateProjectMainContractorPaymentCommand implements ICreateProjectMainContractorPaymentCommand {
@@ -8635,6 +9156,8 @@ export class Expense implements IExpense {
     projectStage?: ProjectStage;
     supplierId?: number;
     supplier?: Supplier;
+    contractorDutyId?: number | undefined;
+    contractorDuty?: ContractorDuty;
     expenseDetails?: ExpenseDetail[] | undefined;
     attachments?: Attachment[] | undefined;
 
@@ -8660,6 +9183,8 @@ export class Expense implements IExpense {
             this.projectStage = _data["projectStage"] ? ProjectStage.fromJS(_data["projectStage"]) : undefined as any;
             this.supplierId = _data["supplierId"];
             this.supplier = _data["supplier"] ? Supplier.fromJS(_data["supplier"]) : undefined as any;
+            this.contractorDutyId = _data["contractorDutyId"];
+            this.contractorDuty = _data["contractorDuty"] ? ContractorDuty.fromJS(_data["contractorDuty"]) : undefined as any;
             if (Array.isArray(_data["expenseDetails"])) {
                 this.expenseDetails = [] as any;
                 for (let item of _data["expenseDetails"])
@@ -8693,6 +9218,8 @@ export class Expense implements IExpense {
         data["projectStage"] = this.projectStage ? this.projectStage.toJSON() : undefined as any;
         data["supplierId"] = this.supplierId;
         data["supplier"] = this.supplier ? this.supplier.toJSON() : undefined as any;
+        data["contractorDutyId"] = this.contractorDutyId;
+        data["contractorDuty"] = this.contractorDuty ? this.contractorDuty.toJSON() : undefined as any;
         if (Array.isArray(this.expenseDetails)) {
             data["expenseDetails"] = [];
             for (let item of this.expenseDetails)
@@ -8719,6 +9246,8 @@ export interface IExpense {
     projectStage?: ProjectStage;
     supplierId?: number;
     supplier?: Supplier;
+    contractorDutyId?: number | undefined;
+    contractorDuty?: ContractorDuty;
     expenseDetails?: ExpenseDetail[] | undefined;
     attachments?: Attachment[] | undefined;
 }
@@ -9753,6 +10282,7 @@ export class GetExpenseDto implements IGetExpenseDto {
     projectStageId?: number | undefined;
     supplierId?: number;
     supplierName?: string | undefined;
+    contractorDutyId?: number | undefined;
     expenseDetails?: ExpenseDetailDto[] | undefined;
 
     constructor(data?: IGetExpenseDto) {
@@ -9775,6 +10305,7 @@ export class GetExpenseDto implements IGetExpenseDto {
             this.projectStageId = _data["projectStageId"];
             this.supplierId = _data["supplierId"];
             this.supplierName = _data["supplierName"];
+            this.contractorDutyId = _data["contractorDutyId"];
             if (Array.isArray(_data["expenseDetails"])) {
                 this.expenseDetails = [] as any;
                 for (let item of _data["expenseDetails"])
@@ -9801,6 +10332,7 @@ export class GetExpenseDto implements IGetExpenseDto {
         data["projectStageId"] = this.projectStageId;
         data["supplierId"] = this.supplierId;
         data["supplierName"] = this.supplierName;
+        data["contractorDutyId"] = this.contractorDutyId;
         if (Array.isArray(this.expenseDetails)) {
             data["expenseDetails"] = [];
             for (let item of this.expenseDetails)
@@ -9820,6 +10352,7 @@ export interface IGetExpenseDto {
     projectStageId?: number | undefined;
     supplierId?: number;
     supplierName?: string | undefined;
+    contractorDutyId?: number | undefined;
     expenseDetails?: ExpenseDetailDto[] | undefined;
 }
 
@@ -10261,6 +10794,122 @@ export interface IGetMaterialCategoryDtoResponse {
     message?: string | undefined;
     errors?: string[] | undefined;
     data?: GetMaterialCategoryDto;
+}
+
+export class GetMaterialCategoryWithMaterialsDto implements IGetMaterialCategoryWithMaterialsDto {
+    id?: number;
+    name?: string | undefined;
+    subCategories?: GetMaterialSubCategoryWithMaterialsDto[] | undefined;
+
+    constructor(data?: IGetMaterialCategoryWithMaterialsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            if (Array.isArray(_data["subCategories"])) {
+                this.subCategories = [] as any;
+                for (let item of _data["subCategories"])
+                    this.subCategories!.push(GetMaterialSubCategoryWithMaterialsDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GetMaterialCategoryWithMaterialsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetMaterialCategoryWithMaterialsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        if (Array.isArray(this.subCategories)) {
+            data["subCategories"] = [];
+            for (let item of this.subCategories)
+                data["subCategories"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IGetMaterialCategoryWithMaterialsDto {
+    id?: number;
+    name?: string | undefined;
+    subCategories?: GetMaterialSubCategoryWithMaterialsDto[] | undefined;
+}
+
+export class GetMaterialCategoryWithMaterialsDtoListResponse implements IGetMaterialCategoryWithMaterialsDtoListResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetMaterialCategoryWithMaterialsDto[] | undefined;
+
+    constructor(data?: IGetMaterialCategoryWithMaterialsDtoListResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetMaterialCategoryWithMaterialsDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GetMaterialCategoryWithMaterialsDtoListResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetMaterialCategoryWithMaterialsDtoListResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IGetMaterialCategoryWithMaterialsDtoListResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetMaterialCategoryWithMaterialsDto[] | undefined;
 }
 
 export class GetMaterialDto implements IGetMaterialDto {
@@ -10759,6 +11408,58 @@ export interface IGetMaterialSubCategoryDtoResponse {
     data?: GetMaterialSubCategoryDto;
 }
 
+export class GetMaterialSubCategoryWithMaterialsDto implements IGetMaterialSubCategoryWithMaterialsDto {
+    id?: number;
+    name?: string | undefined;
+    materials?: GetMaterialDto[] | undefined;
+
+    constructor(data?: IGetMaterialSubCategoryWithMaterialsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            if (Array.isArray(_data["materials"])) {
+                this.materials = [] as any;
+                for (let item of _data["materials"])
+                    this.materials!.push(GetMaterialDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GetMaterialSubCategoryWithMaterialsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetMaterialSubCategoryWithMaterialsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        if (Array.isArray(this.materials)) {
+            data["materials"] = [];
+            for (let item of this.materials)
+                data["materials"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IGetMaterialSubCategoryWithMaterialsDto {
+    id?: number;
+    name?: string | undefined;
+    materials?: GetMaterialDto[] | undefined;
+}
+
 export class GetPaymentFlowDto implements IGetPaymentFlowDto {
     id?: number;
     cash?: number;
@@ -11051,6 +11752,7 @@ export class GetProjectBOQDto implements IGetProjectBOQDto {
     actualPrice?: number;
     expectedPrice?: number;
     actualQuantity?: number;
+    supplierId?: number;
 
     constructor(data?: IGetProjectBOQDto) {
         if (data) {
@@ -11074,6 +11776,7 @@ export class GetProjectBOQDto implements IGetProjectBOQDto {
             this.actualPrice = _data["actualPrice"];
             this.expectedPrice = _data["expectedPrice"];
             this.actualQuantity = _data["actualQuantity"];
+            this.supplierId = _data["supplierId"];
         }
     }
 
@@ -11097,6 +11800,7 @@ export class GetProjectBOQDto implements IGetProjectBOQDto {
         data["actualPrice"] = this.actualPrice;
         data["expectedPrice"] = this.expectedPrice;
         data["actualQuantity"] = this.actualQuantity;
+        data["supplierId"] = this.supplierId;
         return data;
     }
 }
@@ -11113,6 +11817,7 @@ export interface IGetProjectBOQDto {
     actualPrice?: number;
     expectedPrice?: number;
     actualQuantity?: number;
+    supplierId?: number;
 }
 
 export class GetProjectBOQDtoListPagedResponse implements IGetProjectBOQDtoListPagedResponse {
@@ -11632,6 +12337,7 @@ export class GetProjectMainContractorDto implements IGetProjectMainContractorDto
     contractorTypeId?: number;
     startDate?: Date;
     endDate?: Date;
+    classification?: ClassificationProjectMainContractor;
 
     constructor(data?: IGetProjectMainContractorDto) {
         if (data) {
@@ -11652,6 +12358,7 @@ export class GetProjectMainContractorDto implements IGetProjectMainContractorDto
             this.contractorTypeId = _data["contractorTypeId"];
             this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
             this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.classification = _data["classification"];
         }
     }
 
@@ -11672,6 +12379,7 @@ export class GetProjectMainContractorDto implements IGetProjectMainContractorDto
         data["contractorTypeId"] = this.contractorTypeId;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
         data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        data["classification"] = this.classification;
         return data;
     }
 }
@@ -11685,6 +12393,7 @@ export interface IGetProjectMainContractorDto {
     contractorTypeId?: number;
     startDate?: Date;
     endDate?: Date;
+    classification?: ClassificationProjectMainContractor;
 }
 
 export class GetProjectMainContractorDtoListPagedResponse implements IGetProjectMainContractorDtoListPagedResponse {
@@ -11885,6 +12594,290 @@ export interface IGetProjectMainContractorDtoResponse {
     message?: string | undefined;
     errors?: string[] | undefined;
     data?: GetProjectMainContractorDto;
+}
+
+export class GetProjectMainContractorDutyDto implements IGetProjectMainContractorDutyDto {
+    id?: number;
+    subTotal?: number;
+    quantity?: number;
+    price?: number;
+    unitId?: number;
+    dutyTypeId?: number;
+    dutyResponsibilityId?: number;
+    projectMainContractorId?: number;
+    supplierId?: number | undefined;
+    materialId?: number | undefined;
+    autoPost?: boolean;
+    expenseNumber?: string | undefined;
+    expenseId?: number | undefined;
+
+    constructor(data?: IGetProjectMainContractorDutyDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.subTotal = _data["subTotal"];
+            this.quantity = _data["quantity"];
+            this.price = _data["price"];
+            this.unitId = _data["unitId"];
+            this.dutyTypeId = _data["dutyTypeId"];
+            this.dutyResponsibilityId = _data["dutyResponsibilityId"];
+            this.projectMainContractorId = _data["projectMainContractorId"];
+            this.supplierId = _data["supplierId"];
+            this.materialId = _data["materialId"];
+            this.autoPost = _data["autoPost"];
+            this.expenseNumber = _data["expenseNumber"];
+            this.expenseId = _data["expenseId"];
+        }
+    }
+
+    static fromJS(data: any): GetProjectMainContractorDutyDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectMainContractorDutyDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["subTotal"] = this.subTotal;
+        data["quantity"] = this.quantity;
+        data["price"] = this.price;
+        data["unitId"] = this.unitId;
+        data["dutyTypeId"] = this.dutyTypeId;
+        data["dutyResponsibilityId"] = this.dutyResponsibilityId;
+        data["projectMainContractorId"] = this.projectMainContractorId;
+        data["supplierId"] = this.supplierId;
+        data["materialId"] = this.materialId;
+        data["autoPost"] = this.autoPost;
+        data["expenseNumber"] = this.expenseNumber;
+        data["expenseId"] = this.expenseId;
+        return data;
+    }
+}
+
+export interface IGetProjectMainContractorDutyDto {
+    id?: number;
+    subTotal?: number;
+    quantity?: number;
+    price?: number;
+    unitId?: number;
+    dutyTypeId?: number;
+    dutyResponsibilityId?: number;
+    projectMainContractorId?: number;
+    supplierId?: number | undefined;
+    materialId?: number | undefined;
+    autoPost?: boolean;
+    expenseNumber?: string | undefined;
+    expenseId?: number | undefined;
+}
+
+export class GetProjectMainContractorDutyDtoListPagedResponse implements IGetProjectMainContractorDutyDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectMainContractorDutyDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IGetProjectMainContractorDutyDtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetProjectMainContractorDutyDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): GetProjectMainContractorDutyDtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectMainContractorDutyDtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IGetProjectMainContractorDutyDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectMainContractorDutyDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class GetProjectMainContractorDutyDtoListPagedResponseResponse implements IGetProjectMainContractorDutyDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectMainContractorDutyDtoListPagedResponse;
+
+    constructor(data?: IGetProjectMainContractorDutyDtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectMainContractorDutyDtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectMainContractorDutyDtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectMainContractorDutyDtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectMainContractorDutyDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectMainContractorDutyDtoListPagedResponse;
+}
+
+export class GetProjectMainContractorDutyDtoResponse implements IGetProjectMainContractorDutyDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectMainContractorDutyDto;
+
+    constructor(data?: IGetProjectMainContractorDutyDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectMainContractorDutyDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectMainContractorDutyDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectMainContractorDutyDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectMainContractorDutyDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectMainContractorDutyDto;
 }
 
 export class GetProjectMainContractorPaymentDto implements IGetProjectMainContractorPaymentDto {
@@ -13536,6 +14529,8 @@ export class MainContract implements IMainContract {
     constructorId?: number;
     constructor_?: Constructor;
     contractorDuty?: ContractorDuty[] | undefined;
+    mainContractorType?: MainContractorType;
+    mainContractorTypeId?: number | undefined;
 
     constructor(data?: IMainContract) {
         if (data) {
@@ -13568,6 +14563,8 @@ export class MainContract implements IMainContract {
                 for (let item of _data["contractorDuty"])
                     this.contractorDuty!.push(ContractorDuty.fromJS(item));
             }
+            this.mainContractorType = _data["mainContractorType"] ? MainContractorType.fromJS(_data["mainContractorType"]) : undefined as any;
+            this.mainContractorTypeId = _data["mainContractorTypeId"];
         }
     }
 
@@ -13600,6 +14597,8 @@ export class MainContract implements IMainContract {
             for (let item of this.contractorDuty)
                 data["contractorDuty"].push(item ? item.toJSON() : undefined as any);
         }
+        data["mainContractorType"] = this.mainContractorType ? this.mainContractorType.toJSON() : undefined as any;
+        data["mainContractorTypeId"] = this.mainContractorTypeId;
         return data;
     }
 }
@@ -13621,6 +14620,8 @@ export interface IMainContract {
     constructorId?: number;
     constructor_?: Constructor;
     contractorDuty?: ContractorDuty[] | undefined;
+    mainContractorType?: MainContractorType;
+    mainContractorTypeId?: number | undefined;
 }
 
 export class MainContractDto implements IMainContractDto {
@@ -14800,6 +15801,8 @@ export class ProjectBOQ implements IProjectBOQ {
     subTotal?: number;
     constructor_?: Constructor;
     constructorId?: number;
+    supplier?: Supplier;
+    supplierId?: number | undefined;
 
     constructor(data?: IProjectBOQ) {
         if (data) {
@@ -14828,6 +15831,8 @@ export class ProjectBOQ implements IProjectBOQ {
             this.subTotal = _data["subTotal"];
             this.constructor_ = _data["constructor"] ? Constructor.fromJS(_data["constructor"]) : undefined as any;
             this.constructorId = _data["constructorId"];
+            this.supplier = _data["supplier"] ? Supplier.fromJS(_data["supplier"]) : undefined as any;
+            this.supplierId = _data["supplierId"];
         }
     }
 
@@ -14856,6 +15861,8 @@ export class ProjectBOQ implements IProjectBOQ {
         data["subTotal"] = this.subTotal;
         data["constructor"] = this.constructor_ ? this.constructor_.toJSON() : undefined as any;
         data["constructorId"] = this.constructorId;
+        data["supplier"] = this.supplier ? this.supplier.toJSON() : undefined as any;
+        data["supplierId"] = this.supplierId;
         return data;
     }
 }
@@ -14877,6 +15884,8 @@ export interface IProjectBOQ {
     subTotal?: number;
     constructor_?: Constructor;
     constructorId?: number;
+    supplier?: Supplier;
+    supplierId?: number | undefined;
 }
 
 export class ProjectMainContractor implements IProjectMainContractor {
@@ -14890,8 +15899,10 @@ export class ProjectMainContractor implements IProjectMainContractor {
     totalPayments?: number;
     startDate?: Date;
     endDate?: Date;
+    classification?: ClassificationProjectMainContractor;
     attachments?: Attachment[] | undefined;
     projectMainContractorPayments?: ProjectMainContractorPayment[] | undefined;
+    projectMainContractorDuties?: ProjectMainContractorDuty[] | undefined;
 
     constructor(data?: IProjectMainContractor) {
         if (data) {
@@ -14914,6 +15925,7 @@ export class ProjectMainContractor implements IProjectMainContractor {
             this.totalPayments = _data["totalPayments"];
             this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
             this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.classification = _data["classification"];
             if (Array.isArray(_data["attachments"])) {
                 this.attachments = [] as any;
                 for (let item of _data["attachments"])
@@ -14923,6 +15935,11 @@ export class ProjectMainContractor implements IProjectMainContractor {
                 this.projectMainContractorPayments = [] as any;
                 for (let item of _data["projectMainContractorPayments"])
                     this.projectMainContractorPayments!.push(ProjectMainContractorPayment.fromJS(item));
+            }
+            if (Array.isArray(_data["projectMainContractorDuties"])) {
+                this.projectMainContractorDuties = [] as any;
+                for (let item of _data["projectMainContractorDuties"])
+                    this.projectMainContractorDuties!.push(ProjectMainContractorDuty.fromJS(item));
             }
         }
     }
@@ -14946,6 +15963,7 @@ export class ProjectMainContractor implements IProjectMainContractor {
         data["totalPayments"] = this.totalPayments;
         data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
         data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        data["classification"] = this.classification;
         if (Array.isArray(this.attachments)) {
             data["attachments"] = [];
             for (let item of this.attachments)
@@ -14955,6 +15973,11 @@ export class ProjectMainContractor implements IProjectMainContractor {
             data["projectMainContractorPayments"] = [];
             for (let item of this.projectMainContractorPayments)
                 data["projectMainContractorPayments"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.projectMainContractorDuties)) {
+            data["projectMainContractorDuties"] = [];
+            for (let item of this.projectMainContractorDuties)
+                data["projectMainContractorDuties"].push(item ? item.toJSON() : undefined as any);
         }
         return data;
     }
@@ -14971,8 +15994,126 @@ export interface IProjectMainContractor {
     totalPayments?: number;
     startDate?: Date;
     endDate?: Date;
+    classification?: ClassificationProjectMainContractor;
     attachments?: Attachment[] | undefined;
     projectMainContractorPayments?: ProjectMainContractorPayment[] | undefined;
+    projectMainContractorDuties?: ProjectMainContractorDuty[] | undefined;
+}
+
+export class ProjectMainContractorDuty implements IProjectMainContractorDuty {
+    id?: number;
+    isDeleted?: boolean;
+    subTotal?: number;
+    quantity?: number;
+    price?: number;
+    unitId?: number;
+    unit?: Unit;
+    dutyTypeId?: number;
+    dutyType?: DutyType;
+    dutyResponsibilityId?: number;
+    dutyResponsibility?: DutyResponsibility;
+    projectMainContractorId?: number;
+    projectMainContractor?: ProjectMainContractor;
+    supplier?: Supplier;
+    supplierId?: number | undefined;
+    autoPost?: boolean;
+    expenseId?: number | undefined;
+    expense?: Expense;
+    expenseNumber?: string | undefined;
+    material?: Material;
+    materialId?: number | undefined;
+
+    constructor(data?: IProjectMainContractorDuty) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.subTotal = _data["subTotal"];
+            this.quantity = _data["quantity"];
+            this.price = _data["price"];
+            this.unitId = _data["unitId"];
+            this.unit = _data["unit"] ? Unit.fromJS(_data["unit"]) : undefined as any;
+            this.dutyTypeId = _data["dutyTypeId"];
+            this.dutyType = _data["dutyType"] ? DutyType.fromJS(_data["dutyType"]) : undefined as any;
+            this.dutyResponsibilityId = _data["dutyResponsibilityId"];
+            this.dutyResponsibility = _data["dutyResponsibility"] ? DutyResponsibility.fromJS(_data["dutyResponsibility"]) : undefined as any;
+            this.projectMainContractorId = _data["projectMainContractorId"];
+            this.projectMainContractor = _data["projectMainContractor"] ? ProjectMainContractor.fromJS(_data["projectMainContractor"]) : undefined as any;
+            this.supplier = _data["supplier"] ? Supplier.fromJS(_data["supplier"]) : undefined as any;
+            this.supplierId = _data["supplierId"];
+            this.autoPost = _data["autoPost"];
+            this.expenseId = _data["expenseId"];
+            this.expense = _data["expense"] ? Expense.fromJS(_data["expense"]) : undefined as any;
+            this.expenseNumber = _data["expenseNumber"];
+            this.material = _data["material"] ? Material.fromJS(_data["material"]) : undefined as any;
+            this.materialId = _data["materialId"];
+        }
+    }
+
+    static fromJS(data: any): ProjectMainContractorDuty {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectMainContractorDuty();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["subTotal"] = this.subTotal;
+        data["quantity"] = this.quantity;
+        data["price"] = this.price;
+        data["unitId"] = this.unitId;
+        data["unit"] = this.unit ? this.unit.toJSON() : undefined as any;
+        data["dutyTypeId"] = this.dutyTypeId;
+        data["dutyType"] = this.dutyType ? this.dutyType.toJSON() : undefined as any;
+        data["dutyResponsibilityId"] = this.dutyResponsibilityId;
+        data["dutyResponsibility"] = this.dutyResponsibility ? this.dutyResponsibility.toJSON() : undefined as any;
+        data["projectMainContractorId"] = this.projectMainContractorId;
+        data["projectMainContractor"] = this.projectMainContractor ? this.projectMainContractor.toJSON() : undefined as any;
+        data["supplier"] = this.supplier ? this.supplier.toJSON() : undefined as any;
+        data["supplierId"] = this.supplierId;
+        data["autoPost"] = this.autoPost;
+        data["expenseId"] = this.expenseId;
+        data["expense"] = this.expense ? this.expense.toJSON() : undefined as any;
+        data["expenseNumber"] = this.expenseNumber;
+        data["material"] = this.material ? this.material.toJSON() : undefined as any;
+        data["materialId"] = this.materialId;
+        return data;
+    }
+}
+
+export interface IProjectMainContractorDuty {
+    id?: number;
+    isDeleted?: boolean;
+    subTotal?: number;
+    quantity?: number;
+    price?: number;
+    unitId?: number;
+    unit?: Unit;
+    dutyTypeId?: number;
+    dutyType?: DutyType;
+    dutyResponsibilityId?: number;
+    dutyResponsibility?: DutyResponsibility;
+    projectMainContractorId?: number;
+    projectMainContractor?: ProjectMainContractor;
+    supplier?: Supplier;
+    supplierId?: number | undefined;
+    autoPost?: boolean;
+    expenseId?: number | undefined;
+    expense?: Expense;
+    expenseNumber?: string | undefined;
+    material?: Material;
+    materialId?: number | undefined;
 }
 
 export class ProjectMainContractorPayment implements IProjectMainContractorPayment {
@@ -16048,6 +17189,8 @@ export class QuantityBill implements IQuantityBill {
     mileStone?: MileStones;
     constructor_?: Constructor;
     constructorId?: number;
+    supplier?: Supplier;
+    supplierId?: number | undefined;
 
     constructor(data?: IQuantityBill) {
         if (data) {
@@ -16078,6 +17221,8 @@ export class QuantityBill implements IQuantityBill {
             this.mileStone = _data["mileStone"] ? MileStones.fromJS(_data["mileStone"]) : undefined as any;
             this.constructor_ = _data["constructor"] ? Constructor.fromJS(_data["constructor"]) : undefined as any;
             this.constructorId = _data["constructorId"];
+            this.supplier = _data["supplier"] ? Supplier.fromJS(_data["supplier"]) : undefined as any;
+            this.supplierId = _data["supplierId"];
         }
     }
 
@@ -16108,6 +17253,8 @@ export class QuantityBill implements IQuantityBill {
         data["mileStone"] = this.mileStone ? this.mileStone.toJSON() : undefined as any;
         data["constructor"] = this.constructor_ ? this.constructor_.toJSON() : undefined as any;
         data["constructorId"] = this.constructorId;
+        data["supplier"] = this.supplier ? this.supplier.toJSON() : undefined as any;
+        data["supplierId"] = this.supplierId;
         return data;
     }
 }
@@ -16131,6 +17278,8 @@ export interface IQuantityBill {
     mileStone?: MileStones;
     constructor_?: Constructor;
     constructorId?: number;
+    supplier?: Supplier;
+    supplierId?: number | undefined;
 }
 
 export class QuantityBillDto implements IQuantityBillDto {
@@ -16143,6 +17292,7 @@ export class QuantityBillDto implements IQuantityBillDto {
     mileStoneId?: number;
     isDeleted?: boolean;
     constructorId?: number;
+    supplierId?: number;
 
     constructor(data?: IQuantityBillDto) {
         if (data) {
@@ -16164,6 +17314,7 @@ export class QuantityBillDto implements IQuantityBillDto {
             this.mileStoneId = _data["mileStoneId"];
             this.isDeleted = _data["isDeleted"];
             this.constructorId = _data["constructorId"];
+            this.supplierId = _data["supplierId"];
         }
     }
 
@@ -16185,6 +17336,7 @@ export class QuantityBillDto implements IQuantityBillDto {
         data["mileStoneId"] = this.mileStoneId;
         data["isDeleted"] = this.isDeleted;
         data["constructorId"] = this.constructorId;
+        data["supplierId"] = this.supplierId;
         return data;
     }
 }
@@ -16199,6 +17351,7 @@ export interface IQuantityBillDto {
     mileStoneId?: number;
     isDeleted?: boolean;
     constructorId?: number;
+    supplierId?: number;
 }
 
 export class Result implements IResult {
@@ -16663,6 +17816,7 @@ export class Supplier implements ISupplier {
     phoneNumber?: string | undefined;
     email?: string | undefined;
     expenses?: Expense[] | undefined;
+    quantityBills?: QuantityBill[] | undefined;
 
     constructor(data?: ISupplier) {
         if (data) {
@@ -16684,6 +17838,11 @@ export class Supplier implements ISupplier {
                 this.expenses = [] as any;
                 for (let item of _data["expenses"])
                     this.expenses!.push(Expense.fromJS(item));
+            }
+            if (Array.isArray(_data["quantityBills"])) {
+                this.quantityBills = [] as any;
+                for (let item of _data["quantityBills"])
+                    this.quantityBills!.push(QuantityBill.fromJS(item));
             }
         }
     }
@@ -16707,6 +17866,11 @@ export class Supplier implements ISupplier {
             for (let item of this.expenses)
                 data["expenses"].push(item ? item.toJSON() : undefined as any);
         }
+        if (Array.isArray(this.quantityBills)) {
+            data["quantityBills"] = [];
+            for (let item of this.quantityBills)
+                data["quantityBills"].push(item ? item.toJSON() : undefined as any);
+        }
         return data;
     }
 }
@@ -16718,6 +17882,7 @@ export interface ISupplier {
     phoneNumber?: string | undefined;
     email?: string | undefined;
     expenses?: Expense[] | undefined;
+    quantityBills?: QuantityBill[] | undefined;
 }
 
 export class SupplierListPagedResponse implements ISupplierListPagedResponse {
@@ -17201,6 +18366,7 @@ export class UploadAttachmentCommand implements IUploadAttachmentCommand {
     relationshipId?: number;
     fileName?: string | undefined;
     filePath?: string | undefined;
+    originalName?: string | undefined;
     base64Data?: string | undefined;
     contentType?: string | undefined;
 
@@ -17219,6 +18385,7 @@ export class UploadAttachmentCommand implements IUploadAttachmentCommand {
             this.relationshipId = _data["relationshipId"];
             this.fileName = _data["fileName"];
             this.filePath = _data["filePath"];
+            this.originalName = _data["originalName"];
             this.base64Data = _data["base64Data"];
             this.contentType = _data["contentType"];
         }
@@ -17237,6 +18404,7 @@ export class UploadAttachmentCommand implements IUploadAttachmentCommand {
         data["relationshipId"] = this.relationshipId;
         data["fileName"] = this.fileName;
         data["filePath"] = this.filePath;
+        data["originalName"] = this.originalName;
         data["base64Data"] = this.base64Data;
         data["contentType"] = this.contentType;
         return data;
@@ -17248,6 +18416,7 @@ export interface IUploadAttachmentCommand {
     relationshipId?: number;
     fileName?: string | undefined;
     filePath?: string | undefined;
+    originalName?: string | undefined;
     base64Data?: string | undefined;
     contentType?: string | undefined;
 }

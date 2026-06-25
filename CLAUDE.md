@@ -25,7 +25,7 @@ Guidance for Claude Code (and humans) working in this repository.
 
 The HTTP layer is **generated**, not hand-written.
 
-- Config: [src/nswag/nswag.json](src/nswag/nswag.json) — pulls `http://62.84.178.178:93/swagger/all/swagger.json`
+- Config: [src/nswag/nswag.json](src/nswag/nswag.json) — pulls `http://62.84.178.178:8102/swagger/all/swagger.json`
 - Output: `src/nswag/api-client.ts` (one `XxxClient` class per controller, e.g. `ProjectClient`, `TaskClient`)
 - After the backend changes, run `npm run generate-api` and the typed clients/DTOs update automatically.
 - Clients are registered as providers in [src/app/app.config.ts](src/app/app.config.ts) and the base URL is bound to the `API_BASE_URL` token from `environment.nSwagUrl`.
@@ -106,6 +106,6 @@ Nothing else in the app should need to change — components, guards, and direct
 ## Gotchas
 
 - Keep `en.json` and `ar.json` keys identical — a missing key renders the raw key.
-- The backend lives at `http://62.84.178.178:93`; `apiUrl` includes `/api`, `nSwagUrl` does not (the generated client appends paths).
+- The backend lives at `http://62.84.178.178:8102` (dev); `apiUrl` includes `/api`, `nSwagUrl` does not (the generated client appends paths).
 - Toasts are driven by interceptors, not components — don't double-toast on success/error.
 - PrimeNG dark mode uses the `.dark-theme` selector (see `providePrimeNG` in app.config).

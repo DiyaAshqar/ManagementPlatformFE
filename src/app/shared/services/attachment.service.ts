@@ -75,6 +75,7 @@ export class AttachmentService {
         command.attachmentType = params.attachmentType;
         command.relationshipId = params.relationshipId;
         command.fileName = params.fileName || params.file.name;
+        command.originalName = params.fileName || params.file.name;
         command.filePath = ''; // Server will handle path
         command.base64Data = base64Data;
         command.contentType = params.file.type || this.getMimeType(params.file.name);

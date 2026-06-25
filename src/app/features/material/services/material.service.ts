@@ -85,9 +85,10 @@ export class MaterialService {
   getAllMaterials(
     pageNumber?: number,
     pageSize?: number,
-    filter?: string
+    filter?: string,
+    name?: string
   ): Observable<GetMaterialDtoListPagedResponseResponse> {
-    return this.materialClient.getAll(pageNumber, pageSize, filter);
+    return this.materialClient.getAll(pageNumber, pageSize, filter, name);
   }
 
   getMaterialsBySubCategoryId(
