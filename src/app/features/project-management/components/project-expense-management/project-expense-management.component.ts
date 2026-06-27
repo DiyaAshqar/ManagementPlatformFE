@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnDestroy, OnInit, computed, signal } from '@angular/core';
+import { Component, Input, OnInit, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
@@ -11,14 +11,12 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectFilterEvent, SelectModule } from 'primeng/select';
+import { SelectModule } from 'primeng/select';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
-import { Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, finalize, takeUntil } from 'rxjs/operators';
 
 import {
   AttachmentType,
@@ -27,13 +25,12 @@ import {
   CurrencyClient,
   CurrencyDto,
   GetExpenseDto,
-  GetMaterialDto,
   IExpenseDetailDto,
   LookupClient,
   LookupDto,
-  MaterialClient,
 } from '../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../shared/components/documents-table/documents-table.component';
+import { MaterialSelectComponent } from '../../../../shared/components/material-select/material-select.component';
 import { ExpenseApiService } from '../../services/expense-api.service';
 
 // Expense attachment type: backend uses 6 for Expense (expenseId FK on Attachment entity)
@@ -67,12 +64,13 @@ const emptyDetails = (): IExpenseDetailDto[] => [createEmptyDetail()];
     SkeletonModule,
     ConfirmDialogModule,
     DocumentsTableComponent,
+    MaterialSelectComponent,
   ],
-  providers: [ConfirmationService, LookupClient, MaterialClient],
+  providers: [ConfirmationService, LookupClient],
   templateUrl: './project-expense-management.component.html',
   styleUrls: ['./project-expense-management.component.scss'],
 })
-export class ProjectExpenseManagementComponent implements OnInit, OnDestroy {
+export class ProjectExpenseManagementComponent implements OnInit {
   @Input() projectId!: string;
   @Input() projectStageId: number = 0;
 
@@ -98,36 +96,10 @@ export class ProjectExpenseManagementComponent implements OnInit, OnDestroy {
   suppliers = signal<LookupDto[]>([]);
   isLoadingLookups = signal<boolean>(false);
 
-  materials = signal<GetMaterialDto[]>([]);
-  materialGroups = computed(() => {
-    const groups = new Map<string, { label: string; items: GetMaterialDto[] }>();
-
-    for (const material of this.materials()) {
-      const label = material.subCategoryName?.trim() || 'Uncategorized';
-      const key = `${material.subCategoryId ?? 'none'}:${label}`;
-      const group = groups.get(key) ?? { label, items: [] };
-
-      group.items.push(material);
-      groups.set(key, group);
-    }
-
-    return Array.from(groups.values());
-  });
-  isLoadingMaterials = signal<boolean>(false);
-  materialTotalRecords = 0;
-  materialCurrentPage = 0;
-
   currencies = signal<CurrencyDto[]>([]);
   isLoadingCurrencies = signal<boolean>(false);
 
   readonly expenseAttachmentType = EXPENSE_ATTACHMENT_TYPE;
-
-  private destroy$ = new Subject<void>();
-  private materialFilter$ = new Subject<string>();
-  private readonly materialPageSize = 20;
-  private activeMaterialFilter = '';
-  private loadedMaterialPages = new Set<string>();
-  private loadingMaterialPages = new Set<string>();
 
   // -- Computed -----------------------------------------------------------------
   formTitle = computed(() =>
@@ -143,7 +115,6 @@ export class ProjectExpenseManagementComponent implements OnInit, OnDestroy {
   constructor(
     private expenseService: ExpenseApiService,
     private lookupClient: LookupClient,
-    private materialClient: MaterialClient,
     private currencyClient: CurrencyClient,
     private confirmationService: ConfirmationService,
     private translate: TranslateService
@@ -151,14 +122,8 @@ export class ProjectExpenseManagementComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.loadLookups();
-    this.initializeMaterialSearch();
     this.loadCurrencies();
     this.loadExpenses();
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
   }
 
   // -- Loaders -------------------------------------------------------------------
@@ -186,86 +151,6 @@ export class ProjectExpenseManagementComponent implements OnInit, OnDestroy {
       },
       error: () => this.isLoadingLookups.set(false),
     });
-  }
-
-  private initializeMaterialSearch(): void {
-    this.loadMaterialPage(1, '', false);
-
-    this.materialFilter$
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe((filter) => {
-        this.activeMaterialFilter = filter;
-        this.materials.set([]);
-        this.loadedMaterialPages.clear();
-        this.loadingMaterialPages.clear();
-        this.materialTotalRecords = 0;
-        this.materialCurrentPage = 0;
-        this.loadMaterialPage(1, filter, false);
-      });
-  }
-
-  onMaterialFilter(event: SelectFilterEvent): void {
-    this.materialFilter$.next((event.filter || '').trim());
-  }
-
-  loadMoreMaterials(event: Event): void {
-    event.stopPropagation();
-    this.loadMaterialPage(this.materialCurrentPage + 1, this.activeMaterialFilter, true);
-  }
-
-  get hasMoreMaterials(): boolean {
-    return this.materials().length < this.materialTotalRecords;
-  }
-
-  private loadMaterialPage(page: number, filter: string, append: boolean): void {
-    const requestKey = `${filter}\u0000${page}`;
-
-    if (this.loadedMaterialPages.has(requestKey) || this.loadingMaterialPages.has(requestKey)) {
-      return;
-    }
-
-    this.loadingMaterialPages.add(requestKey);
-    this.isLoadingMaterials.set(true);
-
-    this.materialClient
-      .getAll(page, this.materialPageSize, filter || undefined, undefined)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => this.finishMaterialPageLoad(requestKey))
-      )
-      .subscribe({
-        next: (response) => {
-          if (filter !== this.activeMaterialFilter) {
-            return;
-          }
-
-          const result = response?.succeeded && response.data?.succeeded ? response.data : undefined;
-          const pageItems = result?.data ?? [];
-          const existing = append ? this.materials() : [];
-          const merged = [...existing, ...pageItems].filter(
-            (material, index, items) => items.findIndex((item) => item.id === material.id) === index
-          );
-
-          this.materials.set(merged);
-          this.materialTotalRecords = result?.totalRecords ?? merged.length;
-          this.materialCurrentPage = result?.pageNumber ?? page;
-          this.loadedMaterialPages.add(requestKey);
-        },
-        error: (error) => {
-          if (filter === this.activeMaterialFilter) {
-            console.error('Error loading materials:', error);
-          }
-        },
-      });
-  }
-
-  private finishMaterialPageLoad(requestKey: string): void {
-    this.loadingMaterialPages.delete(requestKey);
-    this.isLoadingMaterials.set(this.loadingMaterialPages.size > 0);
   }
 
   private loadCurrencies(): void {

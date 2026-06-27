@@ -51,7 +51,7 @@
         </tr>
       } @else {
         <tr>
-          <td>{{ materialMap[item.materialId ?? 0] || '—' }}</td>
+          <td>{{ getMaterialName(item.materialId) }}</td>
           <td>{{ item.description }}</td>
           <td><span class="boq-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
           <td>{{ constructorMap[item.constructorId ?? 0] || '—' }}</td>
@@ -109,7 +109,6 @@
   (visibleChange)="showBoqDialog.set($event)"
   [projectStageId]="projectStageId"
   [editItem]="editBoqItem()"
-  [materialOptions]="materialOptions"
   [unitOptions]="unitOptions"
   [constructorOptions]="constructorOptions"
   [supplierOptions]="supplierOptions"

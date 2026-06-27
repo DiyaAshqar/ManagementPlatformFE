@@ -6,14 +6,16 @@ import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { Select, SelectFilterEvent, SelectModule } from 'primeng/select';
+import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
-import { catchError, forkJoin, of, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
+import { forkJoin, of, Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 import { AgreementWizardService } from '../../../services/agreement-wizard.service';
-import { FullAgreementDto, GetMaterialDto, LookupDto, MileStonesDto, QuantityBillDto, SixthStepDto } from '../../../../../../nswag/api-client';
+import { MaterialSelectComponent } from '../../../../../shared/components/material-select/material-select.component';
+import { MaterialCatalogService } from '../../../../../shared/services/material-catalog.service';
+import { FullAgreementDto, LookupDto, MileStonesDto, QuantityBillDto, SixthStepDto } from '../../../../../../nswag/api-client';
 
 @Component({
   selector: 'app-step6',
@@ -28,7 +30,8 @@ import { FullAgreementDto, GetMaterialDto, LookupDto, MileStonesDto, QuantityBil
     TranslateModule,
     FloatLabelModule,
     TableModule,
-    TooltipModule
+    TooltipModule,
+    MaterialSelectComponent
   ],
   templateUrl: './step6.component.html'
 })
@@ -41,12 +44,10 @@ export class Step6Component implements OnInit, OnDestroy {
 
   step6Form!: FormGroup;
   quantityBills = signal<QuantityBillDto[]>([]);
-  materials = signal<GetMaterialDto[]>([]);
   units = signal<LookupDto[]>([]);
   milestones = signal<MileStonesDto[]>([]);
   constructors = signal<LookupDto[]>([]);
   suppliers = signal<LookupDto[]>([]);
-  materialsLoading = signal(false);
   isLoading = signal(false);
 
   // Editing state
@@ -54,17 +55,16 @@ export class Step6Component implements OnInit, OnDestroy {
 
   private pristineSnapshot: string = '';
   private destroy$ = new Subject<void>();
-  private materialFilter$ = new Subject<string>();
 
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
-    private agreementWizardService: AgreementWizardService
+    private agreementWizardService: AgreementWizardService,
+    private materialCatalog: MaterialCatalogService
   ) { }
 
   ngOnInit(): void {
     this.initializeForm();
-    this.initializeMaterialSearch();
     this.loadLookups();
     this.loadAgreementData();
 
@@ -122,41 +122,6 @@ export class Step6Component implements OnInit, OnDestroy {
       });
   }
 
-  private initializeMaterialSearch(): void {
-    this.materialFilter$
-      .pipe(
-        startWith(''),
-        debounceTime(300),
-        distinctUntilChanged(),
-        tap(() => this.materialsLoading.set(true)),
-        switchMap(filter => this.agreementWizardService
-          .getStep6Materials(1, 1000, filter || undefined)
-          .pipe(
-            catchError(error => {
-              console.error('Error loading materials:', error);
-              return of(null);
-            })
-          )),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(response => {
-        this.materials.set(response?.succeeded && response.data?.succeeded
-          ? (response.data.data || [])
-          : []);
-        this.materialsLoading.set(false);
-      });
-  }
-
-  onMaterialFilter(event: SelectFilterEvent): void {
-    this.materialFilter$.next((event.filter || '').trim());
-  }
-
-  resetMaterialFilter(materialSelect: Select, event?: Event): void {
-    event?.stopPropagation();
-    materialSelect.resetFilter();
-    this.materialFilter$.next('');
-  }
-
   private loadAgreementData(): void {
     // Only load data in edit mode (when agreementId > 0)
     if (this.agreementId() > 0) {
@@ -183,6 +148,9 @@ export class Step6Component implements OnInit, OnDestroy {
       // Map the existing DTO objects directly since they already have the correct structure
       this.quantityBills.set([...data.quantityBillDto]);
       this.pristineSnapshot = JSON.stringify(data.quantityBillDto);
+      this.materialCatalog.ensureByIds(data.quantityBillDto.map((entry) => entry.materialId))
+        .pipe(takeUntil(this.destroy$))
+        .subscribe();
     }
   }
 
@@ -396,8 +364,7 @@ export class Step6Component implements OnInit, OnDestroy {
 
   // Helper methods to get names
   getMaterialName(materialId: number): string {
-    const material = this.materials().find(m => m.id === materialId);
-    return material ? (material.name || 'Unknown') : 'Unknown';
+    return this.materialCatalog.getName(materialId);
   }
 
   getUnitName(unitId: number): string {

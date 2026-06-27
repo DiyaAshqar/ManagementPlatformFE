@@ -17,32 +17,13 @@
                     <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
-                                <p-select #materialSelect inputId="materialId" formControlName="materialId" [options]="materials()"
-                                    optionLabel="name" optionValue="id" dataKey="id"
-                                    [filter]="true" filterBy="name,subCategoryName"
-                                    [loading]="materialsLoading()" [resetFilterOnHide]="true"
-                                    (onFilter)="onMaterialFilter($event)"
-                                    filterPlaceholder="{{ 'wizard.step6.searchMaterial' | translate }}"
-                                    [class]="isFieldInvalid('materialId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'">
-                                    <ng-template pTemplate="item" let-material>
-                                        <div class="flex flex-column">
-                                            <span>{{ material.name }}</span>
-                                            @if (material.subCategoryName) {
-                                            <small class="text-color-secondary">{{ material.subCategoryName }}</small>
-                                            }
-                                        </div>
-                                    </ng-template>
-                                    <ng-template pTemplate="emptyfilter">
-                                        <div class="flex flex-column align-items-center gap-2 p-3">
-                                            <span>{{ 'wizard.step6.noMaterialsFound' | translate }}</span>
-                                            <p-button type="button" icon="pi pi-refresh"
-                                                [label]="'wizard.step6.showAllMaterials' | translate"
-                                                severity="secondary" [text]="true" size="small"
-                                                (onClick)="resetMaterialFilter(materialSelect, $event)">
-                                            </p-button>
-                                        </div>
-                                    </ng-template>
-                                </p-select>
+                                <app-material-select inputId="materialId" formControlName="materialId"
+                                    [filterPlaceholder]="'wizard.step6.searchMaterial' | translate"
+                                    [emptyMessage]="'wizard.step6.noMaterialsFound' | translate"
+                                    [showClear]="false"
+                                    [invalid]="isFieldInvalid('materialId')"
+                                    selectClass="w-full md:w-56">
+                                </app-material-select>
                                 <label for="materialId">{{ 'wizard.step6.material' | translate }}</label>
                             </p-floatlabel>
                             @if (isFieldInvalid('materialId')) {

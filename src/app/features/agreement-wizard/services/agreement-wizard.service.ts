@@ -13,11 +13,9 @@ import {
   GetAttachmentMetaDataListResponse,
   GetAttachmentMetaDataResponse,
   GetConstructorDto,
-  GetMaterialDtoListPagedResponseResponse,
   Int32Response,
   LookupClient,
   LookupDto,
-  MaterialClient,
   MileStonesDto,
   StringLookupDtoListDictionaryResponse
 } from '../../../../nswag/api-client';
@@ -31,8 +29,7 @@ export class AgreementWizardService {
     private agreementClient: AgreementClient,
     private attachmentClient: AttachmentClient,
     private lookupClient: LookupClient,
-    private constructorClient: ConstructorClient,
-    private materialClient: MaterialClient
+    private constructorClient: ConstructorClient
   ) { }
 
   // Agreement methods
@@ -184,16 +181,15 @@ export class AgreementWizardService {
   }
 
   // Get lookups for Step 5
-  getStep5Lookups(): Observable<{ materials: LookupDto[], suppliers: LookupDto[] }> {
-    return this.getAllLookups(['material', 'supplier']).pipe(
+  getStep5Lookups(): Observable<{ suppliers: LookupDto[] }> {
+    return this.getAllLookups(['supplier']).pipe(
       map(response => {
         if (response.succeeded && response.data) {
           return {
-            materials: response.data['material'] || [],
             suppliers: response.data['supplier'] || []
           };
         }
-        return { materials: [], suppliers: [] };
+        return { suppliers: [] };
       })
     );
   }
@@ -213,15 +209,6 @@ export class AgreementWizardService {
         return { units: [], milestones: [], constructors: [], suppliers: [] };
       })
     );
-  }
-
-  getStep6Materials(
-    pageNumber = 1,
-    pageSize = 100,
-    filter?: string,
-    name?: string
-  ): Observable<GetMaterialDtoListPagedResponseResponse> {
-    return this.materialClient.getAll(pageNumber, pageSize, filter, name);
   }
 
   // Create individual main contract for Step 4

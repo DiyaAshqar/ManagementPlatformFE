@@ -13,6 +13,8 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 import { AgreementWizardService } from '../../../services/agreement-wizard.service';
+import { MaterialSelectComponent } from '../../../../../shared/components/material-select/material-select.component';
+import { MaterialCatalogService } from '../../../../../shared/services/material-catalog.service';
 import { LookupDto, SupplierServiceDto, FifthStepDto, FullAgreementDto } from '../../../../../../nswag/api-client';
 
 @Component({
@@ -28,7 +30,8 @@ import { LookupDto, SupplierServiceDto, FifthStepDto, FullAgreementDto } from '.
     TranslateModule,
     FloatLabelModule,
     TableModule,
-    TooltipModule
+    TooltipModule,
+    MaterialSelectComponent
   ],
   templateUrl: './step5.component.html'
 })
@@ -41,7 +44,6 @@ export class Step5Component implements OnInit, OnDestroy {
 
   step5Form!: FormGroup;
   supplierServices = signal<SupplierServiceDto[]>([]);
-  materials = signal<LookupDto[]>([]);
   suppliers = signal<LookupDto[]>([]);
   isLoading = signal(false);
   
@@ -54,7 +56,8 @@ export class Step5Component implements OnInit, OnDestroy {
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
-    private agreementWizardService: AgreementWizardService
+    private agreementWizardService: AgreementWizardService,
+    private materialCatalog: MaterialCatalogService
   ) {}
 
   ngOnInit(): void {
@@ -92,7 +95,6 @@ export class Step5Component implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          this.materials.set(response.materials || []);
           this.suppliers.set(response.suppliers || []);
           this.isLoading.set(false);
         },
@@ -129,6 +131,9 @@ export class Step5Component implements OnInit, OnDestroy {
       // Map the existing DTO objects directly since they already have the correct structure
       this.supplierServices.set([...data.supplierServiceDto]);
       this.pristineSnapshot = JSON.stringify(data.supplierServiceDto);
+      this.materialCatalog.ensureByIds(data.supplierServiceDto.map((entry) => entry.materialId))
+        .pipe(takeUntil(this.destroy$))
+        .subscribe();
     }
   }
 
@@ -343,8 +348,7 @@ export class Step5Component implements OnInit, OnDestroy {
 
   // Helper methods to get names
   getMaterialName(materialId: number): string {
-    const material = this.materials().find(m => m.id === materialId);
-    return material ? (material.name || 'Unknown') : 'Unknown';
+    return this.materialCatalog.getName(materialId);
   }
 
   getSupplierName(supplierId: number): string {

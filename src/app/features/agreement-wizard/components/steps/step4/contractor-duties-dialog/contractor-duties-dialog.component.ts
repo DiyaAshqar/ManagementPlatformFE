@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, input, OnDestroy, OnInit, output, signal, effect } from '@angular/core';
+import { Component, input, OnDestroy, OnInit, output, signal, effect } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
@@ -13,12 +13,12 @@ import { SelectFilterEvent, SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
 import { catchError, of, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, finalize, startWith, switchMap, takeUntil } from 'rxjs/operators';
+import { debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 import { AgreementWizardService } from '../../../../services/agreement-wizard.service';
+import { MaterialSelectComponent } from '../../../../../../shared/components/material-select/material-select.component';
 import {
   ContractorDutyDto,
-  GetMaterialDto,
   LookupDto,
   MainContractDto,
   Supplier,
@@ -41,7 +41,8 @@ import {
     TranslateModule,
     FloatLabelModule,
     TableModule,
-    TooltipModule
+    TooltipModule,
+    MaterialSelectComponent
   ],
   providers: [SupplierClient],
   templateUrl: './contractor-duties-dialog.component.html'
@@ -65,34 +66,11 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
   suppliers = signal<{ label: string; value: number }[]>([]);
   isLoading = signal(false);
   isLoadingSuppliers = signal(false);
-  materials = signal<GetMaterialDto[]>([]);
-  materialGroups = computed(() => {
-    const groups = new Map<string, { label: string; items: GetMaterialDto[] }>();
-
-    for (const material of this.materials()) {
-      const label = material.subCategoryName?.trim() || 'Uncategorized';
-      const key = `${material.subCategoryId ?? 'none'}:${label}`;
-      const group = groups.get(key) ?? { label, items: [] };
-
-      group.items.push(material);
-      groups.set(key, group);
-    }
-
-    return Array.from(groups.values());
-  });
-  isLoadingMaterials = signal(false);
-  materialTotalRecords = 0;
-  materialCurrentPage = 0;
 
   editingIndex = signal<number | null>(null);
 
   private destroy$ = new Subject<void>();
   private supplierFilter$ = new Subject<string>();
-  private materialFilter$ = new Subject<string>();
-  private readonly materialPageSize = 20;
-  private activeMaterialFilter = '';
-  private loadedMaterialPages = new Set<string>();
-  private loadingMaterialPages = new Set<string>();
 
   constructor(
     private fb: FormBuilder,
@@ -111,7 +89,6 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
     this.initializeForm();
     this.loadLookups();
     this.initializeSupplierSearch();
-    this.initializeMaterialSearch();
   }
 
   ngOnDestroy(): void {
@@ -214,86 +191,6 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
 
   onSupplierFilter(event: SelectFilterEvent): void {
     this.supplierFilter$.next((event.filter || '').trim());
-  }
-
-  private initializeMaterialSearch(): void {
-    this.loadMaterialPage(1, '', false);
-
-    this.materialFilter$
-      .pipe(
-        debounceTime(300),
-        distinctUntilChanged(),
-        takeUntil(this.destroy$)
-      )
-      .subscribe(filter => {
-        this.activeMaterialFilter = filter;
-        this.materials.set([]);
-        this.loadedMaterialPages.clear();
-        this.loadingMaterialPages.clear();
-        this.materialTotalRecords = 0;
-        this.materialCurrentPage = 0;
-        this.loadMaterialPage(1, filter, false);
-      });
-  }
-
-  onMaterialFilter(event: SelectFilterEvent): void {
-    this.materialFilter$.next((event.filter || '').trim());
-  }
-
-  loadMoreMaterials(event: Event): void {
-    event.stopPropagation();
-    this.loadMaterialPage(this.materialCurrentPage + 1, this.activeMaterialFilter, true);
-  }
-
-  get hasMoreMaterials(): boolean {
-    return this.materials().length < this.materialTotalRecords;
-  }
-
-  private loadMaterialPage(page: number, filter: string, append: boolean): void {
-    const requestKey = `${filter}\u0000${page}`;
-
-    if (this.loadedMaterialPages.has(requestKey) || this.loadingMaterialPages.has(requestKey)) {
-      return;
-    }
-
-    this.loadingMaterialPages.add(requestKey);
-    this.isLoadingMaterials.set(true);
-
-    this.agreementWizardService
-      .getStep6Materials(page, this.materialPageSize, filter || undefined)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => this.finishMaterialPageLoad(requestKey))
-      )
-      .subscribe({
-        next: response => {
-          if (filter !== this.activeMaterialFilter) {
-            return;
-          }
-
-          const result = response?.succeeded && response.data?.succeeded ? response.data : undefined;
-          const pageItems = result?.data ?? [];
-          const existing = append ? this.materials() : [];
-          const merged = [...existing, ...pageItems].filter(
-            (material, index, items) => items.findIndex(item => item.id === material.id) === index
-          );
-
-          this.materials.set(merged);
-          this.materialTotalRecords = result?.totalRecords ?? merged.length;
-          this.materialCurrentPage = result?.pageNumber ?? page;
-          this.loadedMaterialPages.add(requestKey);
-        },
-        error: error => {
-          if (filter === this.activeMaterialFilter) {
-            console.error('Error loading materials:', error);
-          }
-        }
-      });
-  }
-
-  private finishMaterialPageLoad(requestKey: string): void {
-    this.loadingMaterialPages.delete(requestKey);
-    this.isLoadingMaterials.set(this.loadingMaterialPages.size > 0);
   }
 
   private loadExistingContractorDuties(): void {

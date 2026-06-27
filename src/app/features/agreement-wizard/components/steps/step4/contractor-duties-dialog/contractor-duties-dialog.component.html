@@ -214,56 +214,13 @@
         <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="field">
             <p-floatlabel variant="in">
-              <p-select
+              <app-material-select
                 inputId="materialId"
                 formControlName="materialId"
-                [options]="materialGroups()"
-                [group]="true"
-                optionGroupLabel="label"
-                optionGroupChildren="items"
-                optionLabel="name"
-                optionValue="id"
-                dataKey="id"
                 [showClear]="true"
-                [filter]="true"
-                filterBy="name,subCategoryName"
                 filterPlaceholder="Search materials..."
-                (onFilter)="onMaterialFilter($event)"
-                [loading]="isLoadingMaterials()"
-                class="w-full">
-                <ng-template pTemplate="group" let-group>
-                  <div class="flex align-items-center gap-2 font-semibold">
-                    <i class="pi pi-folder text-primary"></i>
-                    <span>{{ group.label }}</span>
-                  </div>
-                </ng-template>
-                <ng-template pTemplate="item" let-material>
-                  <div class="flex flex-column">
-                    <span>{{ material.name?.trim() }}</span>
-                  </div>
-                </ng-template>
-                <ng-template pTemplate="emptyfilter">
-                  <div class="text-center p-2 text-color-secondary">
-                    {{ isLoadingMaterials() ? 'Loading...' : 'No materials found' }}
-                  </div>
-                </ng-template>
-                <ng-template pTemplate="footer">
-                  @if (hasMoreMaterials) {
-                    <div class="p-2 border-top-1 surface-border">
-                      <p-button
-                        type="button"
-                        label="Load more"
-                        icon="pi pi-angle-down"
-                        severity="secondary"
-                        [text]="true"
-                        [loading]="isLoadingMaterials()"
-                        styleClass="w-full"
-                        (onClick)="loadMoreMaterials($event)">
-                      </p-button>
-                    </div>
-                  }
-                </ng-template>
-              </p-select>
+                selectClass="w-full">
+              </app-material-select>
               <label for="materialId">Materials</label>
             </p-floatlabel>
           </div>

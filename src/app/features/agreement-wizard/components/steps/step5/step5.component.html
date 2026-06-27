@@ -17,10 +17,11 @@
                     <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
-                                <p-select inputId="materialId" formControlName="materialId" [options]="materials()"
-                                    optionLabel="name" optionValue="id"
-                                    [class]="isFieldInvalid('materialId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'">
-                                </p-select>
+                                <app-material-select inputId="materialId" formControlName="materialId"
+                                    [invalid]="isFieldInvalid('materialId')"
+                                    [showClear]="false"
+                                    selectClass="w-full md:w-56">
+                                </app-material-select>
                                 <label for="materialId">{{ 'wizard.step5.material' | translate }}</label>
                             </p-floatlabel>
                             @if (isFieldInvalid('materialId')) {

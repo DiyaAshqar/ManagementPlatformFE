@@ -14,6 +14,7 @@ import { TextareaModule } from 'primeng/textarea';
 
 import { MessageService } from 'primeng/api';
 import { CreateProjectBOQCommand, IGetProjectBOQDto } from '../../../../../../nswag/api-client';
+import { MaterialSelectComponent } from '../../../../../shared/components/material-select/material-select.component';
 
 @Component({
     selector: 'app-add-boq-dialog',
@@ -28,7 +29,8 @@ import { CreateProjectBOQCommand, IGetProjectBOQDto } from '../../../../../../ns
         TextareaModule,
         InputNumberModule,
         SelectModule,
-        FloatLabelModule
+        FloatLabelModule,
+        MaterialSelectComponent
     ],
     templateUrl: './add-boq-dialog.component.html',
     styleUrls: ['./add-boq-dialog.component.scss']
@@ -62,7 +64,6 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
 
     /** Dynamic lookup options received from the parent (boq-tab) */
     @Input() unitOptions: { label: string; value: number }[] = [];
-    @Input() materialOptions: { label: string; value: number }[] = [];
     @Input() constructorOptions: { label: string; value: number }[] = [];
     @Input() supplierOptions: { label: string; value: number }[] = [];
     @Input() supplierLoading = false;

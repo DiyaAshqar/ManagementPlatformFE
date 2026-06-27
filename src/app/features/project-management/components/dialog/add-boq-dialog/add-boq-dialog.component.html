@@ -15,19 +15,15 @@
       <div class="col-12 md:col-6">
         <div class="field">
           <p-floatlabel variant="in">
-            <p-select
+            <app-material-select
               inputId="materialId"
               formControlName="materialId"
-              [options]="materialOptions"
-              optionLabel="label"
-              optionValue="value"
-              [filter]="true"
               [filterPlaceholder]="'projectTabs.boq.dialog.searchMaterial' | translate"
               [showClear]="true"
-              class="w-full"
               appendTo="body"
-              [class.ng-invalid]="isFieldInvalid('materialId')">
-            </p-select>
+              [invalid]="isFieldInvalid('materialId')"
+              selectClass="w-full">
+            </app-material-select>
             <label for="materialId">{{ 'projectTabs.boq.dialog.material' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('materialId')" class="p-error">{{ 'projectTabs.boq.dialog.materialRequired' | translate }}</small>

@@ -21,6 +21,7 @@ import {
   SupplierClient
 } from '../../../../../../../nswag/api-client';
 import { AddBoqDialogComponent } from '../../../dialog/add-boq-dialog/add-boq-dialog.component';
+import { MaterialCatalogService } from '../../../../../../shared/services/material-catalog.service';
 
 @Component({
   selector: 'app-boq-tab',
@@ -49,13 +50,11 @@ export class BoqTabComponent implements OnInit, OnDestroy {
 
   // ─── Lookup maps (for table display) ───────────────────────────────────────
   unitMap: Record<number, string> = {};
-  materialMap: Record<number, string> = {};
   constructorMap: Record<number, string> = {};
   supplierMap: Record<number, string> = {};
 
   // ─── Option arrays (passed to dialog) ──────────────────────────────────────
   unitOptions: { label: string; value: number }[] = [];
-  materialOptions: { label: string; value: number }[] = [];
   constructorOptions: { label: string; value: number }[] = [];
   supplierOptions: { label: string; value: number }[] = [];
   supplierLoading = signal(false);
@@ -76,6 +75,7 @@ export class BoqTabComponent implements OnInit, OnDestroy {
     private lookupClient: LookupClient,
     private constructorClient: ConstructorClient,
     private supplierClient: SupplierClient,
+    private materialCatalog: MaterialCatalogService,
     private confirmationService: ConfirmationService,
     private translate: TranslateService
   ) { }
@@ -95,17 +95,11 @@ export class BoqTabComponent implements OnInit, OnDestroy {
 
   loadLookups(): void {
     forkJoin({
-      lookups: this.lookupClient.getAllLookups(['material', 'unit']),
+      lookups: this.lookupClient.getAllLookups(['unit']),
       constructors: this.constructorClient.getAll(1, 200, undefined)
     }).subscribe({
       next: ({ lookups, constructors }) => {
         const data = lookups.data as any;
-
-        if (data?.['material']) {
-          this.materialOptions = (data['material'] as { id: number; name: string }[])
-            .map(m => ({ label: m.name, value: m.id }));
-          this.materialMap = Object.fromEntries(this.materialOptions.map(o => [o.value, o.label]));
-        }
 
         if (data?.['unit']) {
           this.unitOptions = (data['unit'] as { id: number; name: string }[])
@@ -166,6 +160,9 @@ export class BoqTabComponent implements OnInit, OnDestroy {
       next: (res) => {
         if (res.succeeded && res.data?.data) {
           this.boqItems.set(res.data.data);
+          this.materialCatalog.ensureByIds(res.data.data.map((item) => item.materialId))
+            .pipe(takeUntil(this.destroy$))
+            .subscribe();
         } else {
           this.boqItems.set([]);
         }
@@ -176,6 +173,10 @@ export class BoqTabComponent implements OnInit, OnDestroy {
         this.isLoading.set(false);
       }
     });
+  }
+
+  getMaterialName(materialId: number | undefined): string {
+    return this.materialCatalog.getName(materialId, '—');
   }
 
   // ── Dialog ───────────────────────────────────────────────────────────────
