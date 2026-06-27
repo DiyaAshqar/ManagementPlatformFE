@@ -874,7 +874,8 @@
         "totalRecords": "Total Expenses",
         "totalAmount": "Total Amount",
         "empty": "No expenses recorded yet. Click \"New Expense\" to add one.",
-        "pagination": "Showing {first} to {last} of {totalRecords} expenses"
+        "pagination": "Showing {first} to {last} of {totalRecords} expenses",
+        "autoPostedNoEdit": "Auto-posted expenses cannot be edited"
       },
       "form": {
         "newTitle": "New Expense",

@@ -9,6 +9,7 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
+import { DialogModule } from 'primeng/dialog';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
@@ -33,8 +34,8 @@ import { DocumentsTableComponent } from '../../../../shared/components/documents
 import { MaterialSelectComponent } from '../../../../shared/components/material-select/material-select.component';
 import { ExpenseApiService } from '../../services/expense-api.service';
 
-// Expense attachment type: backend uses 6 for Expense (expenseId FK on Attachment entity)
-const EXPENSE_ATTACHMENT_TYPE = 6 as AttachmentType;
+// Expense attachment type used by the backend and existing expense documents.
+const EXPENSE_ATTACHMENT_TYPE = AttachmentType._6;
 
 let _rowSeq = 0;
 const tempId = (): number => --_rowSeq; // negative IDs for unsaved rows
@@ -63,6 +64,7 @@ const emptyDetails = (): IExpenseDetailDto[] => [createEmptyDetail()];
     TagModule,
     SkeletonModule,
     ConfirmDialogModule,
+    DialogModule,
     DocumentsTableComponent,
     MaterialSelectComponent,
   ],
@@ -100,6 +102,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
   isLoadingCurrencies = signal<boolean>(false);
 
   readonly expenseAttachmentType = EXPENSE_ATTACHMENT_TYPE;
+  selectedExpenseForAttachments: GetExpenseDto | null = null;
 
   // -- Computed -----------------------------------------------------------------
   formTitle = computed(() =>
@@ -175,6 +178,9 @@ export class ProjectExpenseManagementComponent implements OnInit {
   }
 
   openEditForm(expense: GetExpenseDto): void {
+    if (expense.autoPost) {
+      return;
+    }
     this.editingExpenseId.set(expense.id ?? null);
     this.formExpenseNo.set(expense.expenseNo ?? '');
     this.formExpenseDate.set(expense.expenseDate ? new Date(expense.expenseDate) : new Date());
@@ -190,6 +196,16 @@ export class ProjectExpenseManagementComponent implements OnInit {
     this.currentView.set('list');
     this.editingExpenseId.set(null);
     this.resetForm();
+  }
+
+  openAttachments(expense: GetExpenseDto): void {
+    if ((expense.id ?? 0) > 0) {
+      this.selectedExpenseForAttachments = expense;
+    }
+  }
+
+  closeAttachmentsDialog(): void {
+    this.selectedExpenseForAttachments = null;
   }
 
   // -- Form helpers --------------------------------------------------------------

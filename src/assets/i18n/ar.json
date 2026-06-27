@@ -870,7 +870,8 @@
         "totalRecords": "إجمالي المصروفات",
         "totalAmount": "المبلغ الإجمالي",
         "empty": "لا توجد مصروفات مسجلة حتى الآن.",
-        "pagination": "عرض {first} إلى {last} من {totalRecords} مصروف"
+        "pagination": "عرض {first} إلى {last} من {totalRecords} مصروف",
+        "autoPostedNoEdit": "لا يمكن تعديل المصروفات المرحّلة تلقائياً"
       },
       "form": {
         "newTitle": "مصروف جديد",

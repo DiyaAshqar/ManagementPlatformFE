@@ -75,9 +75,20 @@
                 [text]="true"
                 severity="secondary"
                 size="small"
-                [pTooltip]="'common.edit' | translate"
+                [disabled]="expense.autoPost"
+                [pTooltip]="(expense.autoPost ? 'projectTabs.expenses.list.autoPostedNoEdit' : 'common.edit') | translate"
                 tooltipPosition="top"
                 (onClick)="openEditForm(expense)">
+              </p-button>
+              <p-button
+                icon="pi pi-paperclip"
+                [rounded]="true"
+                [text]="true"
+                severity="info"
+                size="small"
+                [pTooltip]="'common.attachments' | translate"
+                tooltipPosition="top"
+                (onClick)="openAttachments(expense)">
               </p-button>
               <p-button
                 icon="pi pi-trash"
@@ -119,6 +130,26 @@
     </div>
   </p-card>
 }
+
+<p-dialog
+  [visible]="!!selectedExpenseForAttachments"
+  (visibleChange)="!$event && closeAttachmentsDialog()"
+  [header]="'projectTabs.expenses.attachments.title' | translate"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  appendTo="body"
+  [style]="{ width: '90vw', 'max-width': '1400px' }"
+  [breakpoints]="{ '1160px': '90vw', '640px': '96vw' }">
+
+  @if (selectedExpenseForAttachments && (selectedExpenseForAttachments.id ?? 0) > 0) {
+    <app-documents-table
+      [attachmentType]="expenseAttachmentType"
+      [relationshipId]="selectedExpenseForAttachments.id!"
+      contextLabel="this expense">
+    </app-documents-table>
+  }
+</p-dialog>
 
 @if (currentView() === 'form') {
   <p-card>
