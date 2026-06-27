@@ -13,7 +13,12 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 
-import { ConstructorClient, CreateProjectMainContractorCommand, IGetProjectMainContractorDto } from '../../../../../../nswag/api-client';
+import {
+  ClassificationProjectMainContractor,
+  ConstructorClient,
+  CreateProjectMainContractorCommand,
+  IGetProjectMainContractorDto
+} from '../../../../../../nswag/api-client';
 
 @Component({
   selector: 'app-add-contractor-dialog',
@@ -47,10 +52,29 @@ export class AddContractorDialogComponent implements OnInit, OnChanges, OnDestro
   isLoadingContractors = signal(false);
   contractorOptions: { label: string; value: number }[] = [];
 
-  classificationOptions = [
-    { label: 'Main Contractor', value: 1 },
-    { label: 'Sub Contractor', value: 2 }
-  ];
+  get classificationOptions(): { label: string; value: number }[] {
+    const options: { label: string; value: number }[] = [
+      {
+        label: this.translate.instant('dialogs.contractor.classificationMain'),
+        value: ClassificationProjectMainContractor._1
+      },
+      {
+        label: this.translate.instant('dialogs.contractor.classificationSub'),
+        value: ClassificationProjectMainContractor._2
+      }
+    ];
+
+    // Older records can contain the enum's default value (0). Keep it visible
+    // while editing, without offering it when a new contractor is created.
+    if (Number(this.editItem?.classification) === 0) {
+      options.unshift({
+        label: this.translate.instant('dialogs.contractor.classificationUnclassified'),
+        value: 0
+      });
+    }
+
+    return options;
+  }
 
   private destroy$ = new Subject<void>();
 
@@ -75,7 +99,9 @@ export class AddContractorDialogComponent implements OnInit, OnChanges, OnDestro
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['visible'] && this.visible) {
+    // On the first render, ngOnChanges runs before ngOnInit. Let ngOnInit do
+    // that initial setup so the edit lookups are requested only once.
+    if (changes['visible'] && this.visible && this.contractorForm) {
       this.initForm();
     }
   }
@@ -113,8 +139,7 @@ export class AddContractorDialogComponent implements OnInit, OnChanges, OnDestro
     if (this.isEditMode && this.editItem) {
       this.contractorForm.patchValue({
         amount: this.editItem.amount,
-        // TODO: remove cast once BE adds classification to IGetProjectMainContractorDto
-        classification: (this.editItem as any).classification ?? null,
+        classification: this.editItem.classification ?? null,
         startDate: this.editItem.startDate ? new Date(this.editItem.startDate) : null,
         endDate: this.editItem.endDate ? new Date(this.editItem.endDate) : null
       });
@@ -180,10 +205,9 @@ export class AddContractorDialogComponent implements OnInit, OnChanges, OnDestro
       constructorId,
       amount,
       startDate,
-      endDate
+      endDate,
+      classification
     });
-    // TODO: remove cast and move classification into CreateProjectMainContractorCommand once BE adds the field
-    (command as any).classification = classification;
 
     this.isSubmitting.set(true);
     this.saved.emit(command);

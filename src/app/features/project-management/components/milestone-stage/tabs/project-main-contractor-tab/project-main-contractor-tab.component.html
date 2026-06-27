@@ -26,7 +26,7 @@
   <!-- Table -->
   <p-table
     [value]="contractorItems()"
-    [tableStyle]="{ 'min-width': '62rem' }"
+    [tableStyle]="{ 'min-width': '70rem' }"
     styleClass="p-datatable-gridlines"
     responsiveLayout="scroll"
     [loading]="isLoading()">
@@ -35,6 +35,7 @@
       <tr>
         <th style="width: 5rem">{{ 'projectTabs.projectMainContractor.columnId' | translate }}</th>
         <th>{{ 'projectTabs.projectMainContractor.columnName' | translate }}</th>
+        <th>{{ 'projectTabs.projectMainContractor.columnClassification' | translate }}</th>
         <th class="text-right">{{ 'projectTabs.projectMainContractor.columnAmount' | translate }}</th>
         <th class="text-right">{{ 'projectTabs.projectMainContractor.columnTotalPayments' | translate }}</th>
         <th>{{ 'projectTabs.projectMainContractor.columnStartDate' | translate }}</th>
@@ -49,6 +50,7 @@
         <td>
           <span class="contractor-name">{{ contractorMap[item.constructorId ?? 0] || '—' }}</span>
         </td>
+        <td>{{ getClassificationLabel(item.classification) }}</td>
         <td class="text-right contractor-amount">
           {{ item.amount | number:'1.0-0' }}
         </td>
@@ -106,7 +108,7 @@
 
     <ng-template pTemplate="emptymessage">
       <tr>
-        <td colspan="7" class="text-center empty-state">
+        <td colspan="8" class="text-center empty-state">
           <i class="pi pi-users" style="font-size: 3rem; color: var(--text-color-secondary);"></i>
           <p class="mt-3">{{ 'projectTabs.projectMainContractor.emptyMessage' | translate }}</p>
           <p class="text-sm text-muted-color">{{ 'projectTabs.projectMainContractor.emptySubMessage' | translate }}</p>
@@ -116,7 +118,7 @@
 
     <ng-template pTemplate="footer">
       <tr>
-        <td colspan="2" class="font-semibold text-right">{{ 'common.total' | translate }}</td>
+        <td colspan="3" class="font-semibold text-right">{{ 'common.total' | translate }}</td>
         <td class="text-right font-bold contractor-amount">{{ totalContractValue | number:'1.0-0' }}</td>
         <td colspan="4"></td>
       </tr>
@@ -145,6 +147,7 @@
     [mainContractId]="selectedMainContractId()"
     [existingContractorDuties]="selectedContractorDuties()"
     [isViewMode]="false"
+    [allowEmpty]="true"
     (closeDialog)="onContractorDutiesDialogClose()"
     (contractorDutyData)="onContractorDutyDataReceived($event)">
   </app-contractor-duties-dialog>
