@@ -9,11 +9,11 @@ import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { SelectModule } from 'primeng/select';
+import { SelectFilterEvent, SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { catchError, of, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 import { AgreementWizardService } from '../../../../services/agreement-wizard.service';
 import {
@@ -71,6 +71,7 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
   editingIndex = signal<number | null>(null);
 
   private destroy$ = new Subject<void>();
+  private supplierFilter$ = new Subject<string>();
 
   constructor(
     private fb: FormBuilder,
@@ -88,7 +89,7 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookups();
-    this.loadSuppliers();
+    this.initializeSupplierSearch();
   }
 
   ngOnDestroy(): void {
@@ -163,20 +164,34 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
       });
   }
 
-  private loadSuppliers(): void {
-    this.isLoadingSuppliers.set(true);
-    this.supplierClient.getAllSuppliers(1, 1000, undefined)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (res) => {
-          const data: Supplier[] = res.data?.data ?? [];
-          this.suppliers.set(
-            data.filter(s => s.id != null && s.name).map(s => ({ label: s.name!, value: s.id! }))
+  private initializeSupplierSearch(): void {
+    this.supplierFilter$
+      .pipe(
+        startWith(''),
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap(filter => {
+          this.isLoadingSuppliers.set(true);
+          return this.supplierClient.getAllSuppliers(1, 100, filter || undefined).pipe(
+            catchError(error => {
+              console.error('Error loading suppliers:', error);
+              return of(null);
+            })
           );
-          this.isLoadingSuppliers.set(false);
-        },
-        error: () => this.isLoadingSuppliers.set(false)
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(res => {
+        const data: Supplier[] = res?.data?.data ?? [];
+        this.suppliers.set(
+          data.filter(s => s.id != null && s.name).map(s => ({ label: s.name!, value: s.id! }))
+        );
+        this.isLoadingSuppliers.set(false);
       });
+  }
+
+  onSupplierFilter(event: SelectFilterEvent): void {
+    this.supplierFilter$.next((event.filter || '').trim());
   }
 
   private loadExistingContractorDuties(): void {

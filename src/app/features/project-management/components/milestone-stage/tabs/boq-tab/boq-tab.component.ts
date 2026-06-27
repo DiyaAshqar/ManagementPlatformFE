@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, signal } from '@angular/core';
-import { forkJoin } from 'rxjs';
+import { Component, Input, OnDestroy, OnInit, signal } from '@angular/core';
+import { catchError, forkJoin, of, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { TranslateService } from '@ngx-translate/core';
 import { TranslateModule } from '@ngx-translate/core';
 
@@ -37,7 +38,7 @@ import { AddBoqDialogComponent } from '../../../dialog/add-boq-dialog/add-boq-di
   templateUrl: './boq-tab.component.html',
   styleUrls: ['./boq-tab.component.scss']
 })
-export class BoqTabComponent implements OnInit {
+export class BoqTabComponent implements OnInit, OnDestroy {
   @Input() projectStageId: number = 0;
 
   boqItems = signal<IGetProjectBOQDto[]>([]);
@@ -57,6 +58,10 @@ export class BoqTabComponent implements OnInit {
   materialOptions: { label: string; value: number }[] = [];
   constructorOptions: { label: string; value: number }[] = [];
   supplierOptions: { label: string; value: number }[] = [];
+  supplierLoading = signal(false);
+
+  private supplierFilter$ = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
   get grandTotal(): number {
     return this.boqItems().reduce((sum, item) => sum + (item.subTotal ?? 0), 0);
@@ -76,8 +81,14 @@ export class BoqTabComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.initializeSupplierSearch();
     this.loadLookups();
     this.loadBoqItems();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // ── Lookups ───────────────────────────────────────────────────────────────
@@ -85,10 +96,9 @@ export class BoqTabComponent implements OnInit {
   loadLookups(): void {
     forkJoin({
       lookups: this.lookupClient.getAllLookups(['material', 'unit']),
-      constructors: this.constructorClient.getAll(1, 200, undefined),
-      suppliers: this.supplierClient.getAllSuppliers(1, 200, undefined)
+      constructors: this.constructorClient.getAll(1, 200, undefined)
     }).subscribe({
-      next: ({ lookups, constructors, suppliers }) => {
+      next: ({ lookups, constructors }) => {
         const data = lookups.data as any;
 
         if (data?.['material']) {
@@ -109,13 +119,42 @@ export class BoqTabComponent implements OnInit {
           .map(c => ({ label: c.name!, value: c.id! }));
         this.constructorMap = Object.fromEntries(this.constructorOptions.map(o => [o.value, o.label]));
 
-        const sups = suppliers.data?.data ?? [];
-        this.supplierOptions = sups
-          .filter(s => s.id != null && s.name)
-          .map(s => ({ label: s.name!, value: s.id! }));
-        this.supplierMap = Object.fromEntries(this.supplierOptions.map(o => [o.value, o.label]));
       }
     });
+  }
+
+  private initializeSupplierSearch(): void {
+    this.supplierFilter$
+      .pipe(
+        startWith(''),
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap(filter => {
+          this.supplierLoading.set(true);
+          return this.supplierClient.getAllSuppliers(1, 100, filter || undefined).pipe(
+            catchError(error => {
+              console.error('Error loading suppliers:', error);
+              return of(null);
+            })
+          );
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(response => {
+        const suppliers = response?.data?.data ?? [];
+        this.supplierOptions = suppliers
+          .filter(s => s.id != null && s.name)
+          .map(s => ({ label: s.name!, value: s.id! }));
+        this.supplierMap = {
+          ...this.supplierMap,
+          ...Object.fromEntries(this.supplierOptions.map(option => [option.value, option.label]))
+        };
+        this.supplierLoading.set(false);
+      });
+  }
+
+  onSupplierFilter(filter: string): void {
+    this.supplierFilter$.next(filter);
   }
 
   // ── Load ─────────────────────────────────────────────────────────────────

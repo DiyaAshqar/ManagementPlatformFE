@@ -198,6 +198,7 @@
                 optionValue="value"
                 [showClear]="true"
                 [filter]="true"
+                (onFilter)="onSupplierFilter($event)"
                 filterPlaceholder="Search suppliers..."
                 [loading]="isLoadingSuppliers()"
                 [disabled]="!generateExpenseChecked"

@@ -9,7 +9,7 @@ import { DialogModule } from 'primeng/dialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
+import { SelectFilterEvent, SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 
 import { MessageService } from 'primeng/api';
@@ -43,6 +43,7 @@ export class AddPoDialogComponent implements OnInit, OnChanges {
 
     @Output() visibleChange = new EventEmitter<boolean>();
     @Output() saved = new EventEmitter<CreateProjectPOCommand>();
+    @Output() supplierFilter = new EventEmitter<string>();
 
     poForm!: FormGroup;
     isSubmitting = signal(false);
@@ -74,6 +75,7 @@ export class AddPoDialogComponent implements OnInit, OnChanges {
     /** Dynamic lookup options received from the parent (purchase-orders-tab) */
     @Input() unitOptions: { label: string; value: number }[] = [];
     @Input() supplierOptions: { label: string; value: number }[] = [];
+    @Input() supplierLoading = false;
 
     constructor(private fb: FormBuilder, private messageService: MessageService, private translate: TranslateService) { }
 
@@ -121,6 +123,10 @@ export class AddPoDialogComponent implements OnInit, OnChanges {
             status: 2 // Reset to Pending
         });
         this.isSubmitting.set(false);
+    }
+
+    onSupplierFilter(event: SelectFilterEvent): void {
+        this.supplierFilter.emit((event.filter || '').trim());
     }
 
     onSubmit(): void {

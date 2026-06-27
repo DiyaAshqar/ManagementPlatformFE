@@ -109,6 +109,8 @@
           optionLabel="label"
           optionValue="value"
           [filter]="true"
+          [loading]="isLoadingSuppliers()"
+          (onFilter)="onSupplierFilter($event)"
           [showClear]="true"
           [placeholder]="'milestoneTaskDialog.fields.responsibilityPlaceholder' | translate"
           styleClass="w-full">

@@ -9,7 +9,7 @@ import { DialogModule } from 'primeng/dialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
+import { SelectFilterEvent, SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 
 import { MessageService } from 'primeng/api';
@@ -41,6 +41,7 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
 
     @Output() visibleChange = new EventEmitter<boolean>();
     @Output() saved = new EventEmitter<CreateProjectBOQCommand>();
+    @Output() supplierFilter = new EventEmitter<string>();
 
     boqForm!: FormGroup;
     isSubmitting = signal(false);
@@ -64,6 +65,7 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
     @Input() materialOptions: { label: string; value: number }[] = [];
     @Input() constructorOptions: { label: string; value: number }[] = [];
     @Input() supplierOptions: { label: string; value: number }[] = [];
+    @Input() supplierLoading = false;
 
     constructor(private fb: FormBuilder, private messageService: MessageService) { }
 
@@ -109,6 +111,10 @@ export class AddBoqDialogComponent implements OnInit, OnChanges {
         this.visibleChange.emit(false);
         this.boqForm.reset();
         this.isSubmitting.set(false);
+    }
+
+    onSupplierFilter(event: SelectFilterEvent): void {
+        this.supplierFilter.emit((event.filter || '').trim());
     }
 
     onSubmit(): void {

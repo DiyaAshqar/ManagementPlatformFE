@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, inject, OnInit, signal } from '@angular/core';
+import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { format } from 'date-fns';
@@ -7,8 +7,10 @@ import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
 import { InputTextModule } from 'primeng/inputtext';
-import { SelectModule } from 'primeng/select';
+import { SelectFilterEvent, SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
+import { catchError, of, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { AttachmentType, ConstructorClient, ICreateTaskCommand, LookupClient, SupplierClient } from '../../../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../../../shared/components/documents-table/documents-table.component';
 import { TaskService } from '../../../../services/task.service';
@@ -38,7 +40,7 @@ export interface MilestoneTaskFormData extends ICreateTaskCommand {
   templateUrl: './milestone-task-dialog.component.html',
   styleUrls: ['./milestone-task-dialog.component.scss']
 })
-export class MilestoneTaskDialogComponent implements OnInit {
+export class MilestoneTaskDialogComponent implements OnInit, OnDestroy {
   private dialogRef = inject(DynamicDialogRef);
   private config = inject(DynamicDialogConfig);
   private taskService = inject(TaskService);
@@ -49,6 +51,7 @@ export class MilestoneTaskDialogComponent implements OnInit {
   readonly taskAttachmentType = AttachmentType._4;
 
   isLoadingTaskTypes = signal(false);
+  isLoadingSuppliers = signal(false);
 
   // Excavation fields are only relevant for the Excavation stage
   shouldShowExcavationFields = signal(false);
@@ -89,6 +92,8 @@ export class MilestoneTaskDialogComponent implements OnInit {
   ];
 
   private taskTypeMap = new Map<string, number>();
+  private supplierFilter$ = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
   ngOnInit(): void {
     const data = this.config.data;
@@ -102,7 +107,12 @@ export class MilestoneTaskDialogComponent implements OnInit {
     this.loadTaskTypes();
     this.loadResponsibilities();
     this.loadMainContractors();
-    this.loadSuppliers();
+    this.initializeSupplierSearch();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   get currentFormData(): MilestoneTaskFormData {
@@ -162,15 +172,34 @@ export class MilestoneTaskDialogComponent implements OnInit {
     });
   }
 
-  private loadSuppliers(): void {
-    this.supplierClient.getAllSuppliers(1, 200, undefined).subscribe({
-      next: (response) => {
-        const data = response.data?.data ?? [];
+  private initializeSupplierSearch(): void {
+    this.supplierFilter$
+      .pipe(
+        startWith(''),
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap(filter => {
+          this.isLoadingSuppliers.set(true);
+          return this.supplierClient.getAllSuppliers(1, 100, filter || undefined).pipe(
+            catchError(error => {
+              console.error('Error loading suppliers:', error);
+              return of(null);
+            })
+          );
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(response => {
+        const data = response?.data?.data ?? [];
         this.supplierOptions = data
           .filter(item => item.id != null && item.name)
           .map(item => ({ label: item.name!, value: item.id! }));
-      }
-    });
+        this.isLoadingSuppliers.set(false);
+      });
+  }
+
+  onSupplierFilter(event: SelectFilterEvent): void {
+    this.supplierFilter$.next((event.filter || '').trim());
   }
 
   onTaskTypeChange(typeName: string): void {

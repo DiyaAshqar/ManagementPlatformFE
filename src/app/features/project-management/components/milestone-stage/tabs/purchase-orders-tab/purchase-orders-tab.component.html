@@ -139,6 +139,8 @@
     [editItem]="editPoItem()"
     [unitOptions]="unitOptions"
     [supplierOptions]="supplierOptions"
+    [supplierLoading]="supplierLoading()"
+    (supplierFilter)="onSupplierFilter($event)"
     (saved)="onDialogSaved($event)">
   </app-add-po-dialog>
 }

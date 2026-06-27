@@ -113,5 +113,7 @@
   [unitOptions]="unitOptions"
   [constructorOptions]="constructorOptions"
   [supplierOptions]="supplierOptions"
+  [supplierLoading]="supplierLoading()"
+  (supplierFilter)="onSupplierFilter($event)"
   (saved)="onDialogSaved($event)">
 </app-add-boq-dialog>

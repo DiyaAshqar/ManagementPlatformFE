@@ -38,6 +38,8 @@
               optionLabel="label"
               optionValue="value"
               [filter]="true"
+              [loading]="supplierLoading"
+              (onFilter)="onSupplierFilter($event)"
               [filterPlaceholder]="'dialogs.purchaseOrder.searchSupplier' | translate"
               [showClear]="true"
               class="w-full"

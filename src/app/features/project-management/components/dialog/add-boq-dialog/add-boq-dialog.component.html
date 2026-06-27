@@ -89,6 +89,8 @@
               optionLabel="label"
               optionValue="value"
               [filter]="true"
+              [loading]="supplierLoading"
+              (onFilter)="onSupplierFilter($event)"
               [filterPlaceholder]="'projectTabs.boq.dialog.searchSupplier' | translate"
               [showClear]="true"
               class="w-full"

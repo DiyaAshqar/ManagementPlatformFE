@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, signal } from '@angular/core';
-import { forkJoin } from 'rxjs';
+import { Component, Input, OnDestroy, OnInit, signal } from '@angular/core';
+import { catchError, forkJoin, of, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 
 // PrimeNG
@@ -44,7 +45,7 @@ export enum POStatus {
   templateUrl: './purchase-orders-tab.component.html',
   styleUrls: ['./purchase-orders-tab.component.scss']
 })
-export class PurchaseOrdersTabComponent implements OnInit {
+export class PurchaseOrdersTabComponent implements OnInit, OnDestroy {
   @Input() projectStageId: number = 0;
 
   poItems = signal<IGetProjectPODto[]>([]);
@@ -60,6 +61,10 @@ export class PurchaseOrdersTabComponent implements OnInit {
   // ─── Option arrays (passed to dialog) ──────────────────────────────────────
   unitOptions: { label: string; value: number }[] = [];
   supplierOptions: { label: string; value: number }[] = [];
+  supplierLoading = signal(false);
+
+  private supplierFilter$ = new Subject<string>();
+  private destroy$ = new Subject<void>();
 
   POStatus = POStatus;
 
@@ -80,18 +85,23 @@ export class PurchaseOrdersTabComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
+    this.initializeSupplierSearch();
     this.loadLookups();
     this.loadPOItems();
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
   // ── Lookups ───────────────────────────────────────────────────────────────
 
   loadLookups(): void {
     forkJoin({
-      lookups: this.lookupClient.getAllLookups(['unit']),
-      suppliers: this.supplierClient.getAllSuppliers(1, 200, undefined)
+      lookups: this.lookupClient.getAllLookups(['unit'])
     }).subscribe({
-      next: ({ lookups, suppliers }) => {
+      next: ({ lookups }) => {
         const data = lookups.data as any;
 
         if (data?.['unit']) {
@@ -100,13 +110,42 @@ export class PurchaseOrdersTabComponent implements OnInit {
           this.unitMap = Object.fromEntries(this.unitOptions.map(o => [o.value, o.label]));
         }
 
-        const supplierData = suppliers.data?.data ?? [];
-        this.supplierOptions = supplierData
-          .filter(s => s.id != null && s.name)
-          .map(s => ({ label: s.name!, value: s.id! }));
-        this.supplierMap = Object.fromEntries(this.supplierOptions.map(o => [o.value, o.label]));
       }
     });
+  }
+
+  private initializeSupplierSearch(): void {
+    this.supplierFilter$
+      .pipe(
+        startWith(''),
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap(filter => {
+          this.supplierLoading.set(true);
+          return this.supplierClient.getAllSuppliers(1, 100, filter || undefined).pipe(
+            catchError(error => {
+              console.error('Error loading suppliers:', error);
+              return of(null);
+            })
+          );
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(response => {
+        const suppliers = response?.data?.data ?? [];
+        this.supplierOptions = suppliers
+          .filter(s => s.id != null && s.name)
+          .map(s => ({ label: s.name!, value: s.id! }));
+        this.supplierMap = {
+          ...this.supplierMap,
+          ...Object.fromEntries(this.supplierOptions.map(option => [option.value, option.label]))
+        };
+        this.supplierLoading.set(false);
+      });
+  }
+
+  onSupplierFilter(filter: string): void {
+    this.supplierFilter$.next(filter);
   }
 
   // ── Load ─────────────────────────────────────────────────────────────────
