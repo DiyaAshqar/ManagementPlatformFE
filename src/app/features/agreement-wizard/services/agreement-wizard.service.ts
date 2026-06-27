@@ -13,9 +13,11 @@ import {
   GetAttachmentMetaDataListResponse,
   GetAttachmentMetaDataResponse,
   GetConstructorDto,
+  GetMaterialDtoListPagedResponseResponse,
   Int32Response,
   LookupClient,
   LookupDto,
+  MaterialClient,
   MileStonesDto,
   StringLookupDtoListDictionaryResponse
 } from '../../../../nswag/api-client';
@@ -29,7 +31,8 @@ export class AgreementWizardService {
     private agreementClient: AgreementClient,
     private attachmentClient: AttachmentClient,
     private lookupClient: LookupClient,
-    private constructorClient: ConstructorClient
+    private constructorClient: ConstructorClient,
+    private materialClient: MaterialClient
   ) { }
 
   // Agreement methods
@@ -196,20 +199,29 @@ export class AgreementWizardService {
   }
 
   // Get lookups for Step 6
-  getStep6Lookups(): Observable<{ materials: LookupDto[], units: LookupDto[], milestones: LookupDto[], constructors: LookupDto[] }> {
-    return this.getAllLookups(['material', 'unit', 'milestones', 'constructor']).pipe(
+  getStep6Lookups(): Observable<{ units: LookupDto[], milestones: LookupDto[], constructors: LookupDto[], suppliers: LookupDto[] }> {
+    return this.getAllLookups(['unit', 'milestones', 'constructor', 'supplier']).pipe(
       map(response => {
         if (response.succeeded && response.data) {
           return {
-            materials: response.data['material'] || [],
             units: response.data['unit'] || [],
             milestones: response.data['milestones'] || [],
-            constructors: response.data['constructor'] || []
+            constructors: response.data['constructor'] || [],
+            suppliers: response.data['supplier'] || []
           };
         }
-        return { materials: [], units: [], milestones: [], constructors: [] };
+        return { units: [], milestones: [], constructors: [], suppliers: [] };
       })
     );
+  }
+
+  getStep6Materials(
+    pageNumber = 1,
+    pageSize = 100,
+    filter?: string,
+    name?: string
+  ): Observable<GetMaterialDtoListPagedResponseResponse> {
+    return this.materialClient.getAll(pageNumber, pageSize, filter, name);
   }
 
   // Create individual main contract for Step 4

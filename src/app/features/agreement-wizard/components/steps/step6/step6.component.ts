@@ -6,14 +6,14 @@ import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputNumberModule } from 'primeng/inputnumber';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { SelectModule } from 'primeng/select';
+import { Select, SelectFilterEvent, SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
-import { forkJoin, of, Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { catchError, forkJoin, of, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil, tap } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 import { AgreementWizardService } from '../../../services/agreement-wizard.service';
-import { LookupDto, MileStonesDto, QuantityBillDto, SixthStepDto, FullAgreementDto } from '../../../../../../nswag/api-client';
+import { FullAgreementDto, GetMaterialDto, LookupDto, MileStonesDto, QuantityBillDto, SixthStepDto } from '../../../../../../nswag/api-client';
 
 @Component({
   selector: 'app-step6',
@@ -41,10 +41,12 @@ export class Step6Component implements OnInit, OnDestroy {
 
   step6Form!: FormGroup;
   quantityBills = signal<QuantityBillDto[]>([]);
-  materials = signal<LookupDto[]>([]);
+  materials = signal<GetMaterialDto[]>([]);
   units = signal<LookupDto[]>([]);
   milestones = signal<MileStonesDto[]>([]);
   constructors = signal<LookupDto[]>([]);
+  suppliers = signal<LookupDto[]>([]);
+  materialsLoading = signal(false);
   isLoading = signal(false);
 
   // Editing state
@@ -52,6 +54,7 @@ export class Step6Component implements OnInit, OnDestroy {
 
   private pristineSnapshot: string = '';
   private destroy$ = new Subject<void>();
+  private materialFilter$ = new Subject<string>();
 
   constructor(
     private fb: FormBuilder,
@@ -61,6 +64,7 @@ export class Step6Component implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.initializeForm();
+    this.initializeMaterialSearch();
     this.loadLookups();
     this.loadAgreementData();
 
@@ -83,6 +87,7 @@ export class Step6Component implements OnInit, OnDestroy {
         unitId: [null, [Validators.required, Validators.min(1)]],
         mileStoneId: [null, [Validators.required, Validators.min(1)]],
         constructorId: [null, [Validators.required, Validators.min(1)]],
+        supplierId: [null, [Validators.required, Validators.min(1)]],
         ammount: [null, [Validators.required, Validators.min(0)]],
         price: [null, [Validators.required, Validators.min(0)]],
         agreementId: [this.agreementId()]
@@ -104,10 +109,10 @@ export class Step6Component implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: ({ lookups, milestones }) => {
-          this.materials.set(lookups.materials || []);
           this.units.set(lookups.units || []);
           this.milestones.set(milestones);
           this.constructors.set(lookups.constructors || []);
+          this.suppliers.set(lookups.suppliers || []);
           this.isLoading.set(false);
         },
         error: (error) => {
@@ -115,6 +120,41 @@ export class Step6Component implements OnInit, OnDestroy {
           this.isLoading.set(false);
         }
       });
+  }
+
+  private initializeMaterialSearch(): void {
+    this.materialFilter$
+      .pipe(
+        startWith(''),
+        debounceTime(300),
+        distinctUntilChanged(),
+        tap(() => this.materialsLoading.set(true)),
+        switchMap(filter => this.agreementWizardService
+          .getStep6Materials(1, 1000, filter || undefined)
+          .pipe(
+            catchError(error => {
+              console.error('Error loading materials:', error);
+              return of(null);
+            })
+          )),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(response => {
+        this.materials.set(response?.succeeded && response.data?.succeeded
+          ? (response.data.data || [])
+          : []);
+        this.materialsLoading.set(false);
+      });
+  }
+
+  onMaterialFilter(event: SelectFilterEvent): void {
+    this.materialFilter$.next((event.filter || '').trim());
+  }
+
+  resetMaterialFilter(materialSelect: Select, event?: Event): void {
+    event?.stopPropagation();
+    materialSelect.resetFilter();
+    this.materialFilter$.next('');
   }
 
   private loadAgreementData(): void {
@@ -201,6 +241,7 @@ export class Step6Component implements OnInit, OnDestroy {
       dto.unitId = entry.unitId;
       dto.mileStoneId = entry.mileStoneId;
       dto.constructorId = entry.constructorId;
+      dto.supplierId = entry.supplierId;
       dto.quantity = entry.quantity;
       dto.price = entry.price;
       dto.agreementId = this.agreementId();
@@ -219,7 +260,8 @@ export class Step6Component implements OnInit, OnDestroy {
         id: entry.id,
         materialId: entry.materialId,
         unitId: entry.unitId,
-        mileStoneId: entry.mileStoneId, constructorId: entry.constructorId, quantity: entry.quantity,
+        mileStoneId: entry.mileStoneId, constructorId: entry.constructorId, supplierId: entry.supplierId,
+        quantity: entry.quantity,
         price: entry.price,
         agreementId: this.agreementId(),
         isDeleted: entry.isDeleted || false
@@ -242,6 +284,7 @@ export class Step6Component implements OnInit, OnDestroy {
     entryData.unitId = formValue.unitId;
     entryData.mileStoneId = formValue.mileStoneId;
     entryData.constructorId = formValue.constructorId;
+    entryData.supplierId = formValue.supplierId;
     entryData.quantity = formValue.ammount;
     entryData.price = formValue.price;
     entryData.agreementId = this.agreementId();
@@ -271,6 +314,8 @@ export class Step6Component implements OnInit, OnDestroy {
       e.materialId === entry.materialId &&
       e.unitId === entry.unitId &&
       e.mileStoneId === entry.mileStoneId &&
+      e.constructorId === entry.constructorId &&
+      e.supplierId === entry.supplierId &&
       e.quantity === entry.quantity &&
       e.price === entry.price
     );
@@ -283,6 +328,7 @@ export class Step6Component implements OnInit, OnDestroy {
         unitId: entry.unitId,
         mileStoneId: entry.mileStoneId,
         constructorId: entry.constructorId,
+        supplierId: entry.supplierId,
         ammount: entry.quantity,
         price: entry.price,
         agreementId: entry.agreementId,
@@ -301,6 +347,8 @@ export class Step6Component implements OnInit, OnDestroy {
       e.materialId === entry.materialId &&
       e.unitId === entry.unitId &&
       e.mileStoneId === entry.mileStoneId &&
+      e.constructorId === entry.constructorId &&
+      e.supplierId === entry.supplierId &&
       e.quantity === entry.quantity &&
       e.price === entry.price
     );
@@ -327,6 +375,7 @@ export class Step6Component implements OnInit, OnDestroy {
         unitId: null,
         mileStoneId: null,
         constructorId: null,
+        supplierId: null,
         ammount: null,
         price: null,
         agreementId: this.agreementId()
@@ -366,6 +415,11 @@ export class Step6Component implements OnInit, OnDestroy {
     return constructor ? (constructor.name || 'Unknown') : 'Unknown';
   }
 
+  getSupplierName(supplierId: number): string {
+    const supplier = this.suppliers().find(s => s.id === supplierId);
+    return supplier ? (supplier.name || 'Unknown') : 'Unknown';
+  }
+
   // Validation methods
   isFieldInvalid(fieldName: string): boolean {
     const field = this.step6Form.get('quantityBillDto')?.get(fieldName);
@@ -379,6 +433,7 @@ export class Step6Component implements OnInit, OnDestroy {
       if (field.errors['min']) {
         if (fieldName === 'mileStoneId') return 'Please select a valid milestone';
         if (fieldName === 'constructorId') return 'Please select a valid constructor';
+        if (fieldName === 'supplierId') return 'Please select a valid supplier';
         return 'Value must be greater than 0';
       }
     }

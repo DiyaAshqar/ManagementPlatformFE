@@ -17,10 +17,31 @@
                     <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
-                                <p-select inputId="materialId" formControlName="materialId" [options]="materials()"
-                                    optionLabel="name" optionValue="id"
-                                    [filter]="true" filterPlaceholder="{{ 'wizard.step6.searchMaterial' | translate }}"
+                                <p-select #materialSelect inputId="materialId" formControlName="materialId" [options]="materials()"
+                                    optionLabel="name" optionValue="id" dataKey="id"
+                                    [filter]="true" filterBy="name,subCategoryName"
+                                    [loading]="materialsLoading()" [resetFilterOnHide]="true"
+                                    (onFilter)="onMaterialFilter($event)"
+                                    filterPlaceholder="{{ 'wizard.step6.searchMaterial' | translate }}"
                                     [class]="isFieldInvalid('materialId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'">
+                                    <ng-template pTemplate="item" let-material>
+                                        <div class="flex flex-column">
+                                            <span>{{ material.name }}</span>
+                                            @if (material.subCategoryName) {
+                                            <small class="text-color-secondary">{{ material.subCategoryName }}</small>
+                                            }
+                                        </div>
+                                    </ng-template>
+                                    <ng-template pTemplate="emptyfilter">
+                                        <div class="flex flex-column align-items-center gap-2 p-3">
+                                            <span>{{ 'wizard.step6.noMaterialsFound' | translate }}</span>
+                                            <p-button type="button" icon="pi pi-refresh"
+                                                [label]="'wizard.step6.showAllMaterials' | translate"
+                                                severity="secondary" [text]="true" size="small"
+                                                (onClick)="resetMaterialFilter(materialSelect, $event)">
+                                            </p-button>
+                                        </div>
+                                    </ng-template>
                                 </p-select>
                                 <label for="materialId">{{ 'wizard.step6.material' | translate }}</label>
                             </p-floatlabel>
@@ -94,6 +115,23 @@
                         </div>
                     </div>
 
+                    <!-- Supplier field -->
+                    <div class="col-12 md:col-6 lg:col-3 mb-1">
+                        <div class="field">
+                            <p-floatlabel variant="in">
+                                <p-select inputId="supplierId" formControlName="supplierId" [options]="suppliers()"
+                                    optionLabel="name" optionValue="id" [filter]="true"
+                                    [filterPlaceholder]="'wizard.step6.searchSupplier' | translate"
+                                    [class]="isFieldInvalid('supplierId') ? 'ng-dirty ng-invalid w-full md:w-56' : 'w-full md:w-56'">
+                                </p-select>
+                                <label for="supplierId">{{ 'wizard.step6.supplier' | translate }}</label>
+                            </p-floatlabel>
+                            @if (isFieldInvalid('supplierId')) {
+                            <small class="text-red-500 block mt-1">{{ getFieldError('supplierId') }}</small>
+                            }
+                        </div>
+                    </div>
+
                     <!-- Price field -->
                     <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
@@ -149,6 +187,7 @@
                         <th>{{ 'wizard.step6.unit' | translate }}</th>
                         <th>{{ 'wizard.step6.milestone' | translate }}</th>
                         <th>{{ 'wizard.step6.constructor' | translate }}</th>
+                        <th>{{ 'wizard.step6.supplier' | translate }}</th>
                         <th>{{ 'wizard.step6.price' | translate }}</th>
                         <th>{{ 'wizard.step6.total' | translate }}</th>
                         @if (!isViewMode()) {
@@ -160,10 +199,11 @@
                 <ng-template pTemplate="body" let-entry let-rowIndex="rowIndex">
                     <tr>
                         <td>{{ getMaterialName(entry.materialId) }}</td>
-                        <td>{{ entry.ammount | number }}</td>
+                        <td>{{ entry.quantity | number }}</td>
                         <td>{{ getUnitName(entry.unitId) }}</td>
                         <td>{{ getMilestoneName(entry.mileStoneId) }}</td>
                         <td>{{ getConstructorName(entry.constructorId) }}</td>
+                        <td>{{ getSupplierName(entry.supplierId) }}</td>
                         <td>{{ entry.price | number:'1.2-2' }}</td>
                         <td class="font-semibold">{{ calculateTotal(entry) | number:'1.2-2' }}</td>
                         @if (!isViewMode()) {
@@ -183,7 +223,7 @@
 
                 <ng-template pTemplate="emptymessage">
                     <tr>
-                        <td colspan="8" class="text-center p-6">
+                        <td colspan="9" class="text-center p-6">
                             <i class="pi pi-inbox text-4xl mb-1 block text-gray-400"></i>
                             <p class="text-gray-500">{{ 'wizard.step6.noData' | translate }}</p>
                         </td>

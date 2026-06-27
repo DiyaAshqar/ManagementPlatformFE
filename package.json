@@ -8,7 +8,7 @@
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "nswag": "nswag run src/nswag/nswag.json",
-    "generate-api": "nswag run src/nswag/nswag.json"
+    "generate:api": "nswag run src/nswag/nswag.json"
   },
   "private": true,
   "dependencies": {
