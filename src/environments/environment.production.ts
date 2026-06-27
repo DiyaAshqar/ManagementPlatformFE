@@ -15,6 +15,12 @@ export const environment = {
     userStorageKey: 'current_user',
     tokenExpirationWarningMinutes: 5
   },
+  advances: {
+    // Mock advances are enabled until AdvancesController is deployed and
+    // `npm run generate-api` produces an AdvanceClient. Flip to `false` (and
+    // wire the generated client) when ready.
+    useMock: true
+  },
   api: {
     timeout: 30000,
     retryAttempts: 3,

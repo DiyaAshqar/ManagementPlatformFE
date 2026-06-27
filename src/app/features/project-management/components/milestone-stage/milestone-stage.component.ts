@@ -12,6 +12,7 @@ import { VoucherOrdersTabComponent } from './tabs/voucher-orders-tab/voucher-ord
 import { MilestoneDocumentsTabComponent } from './tabs/documents-tab/documents-tab.component';
 import { ProjectMainContractorTabComponent } from './tabs/project-main-contractor-tab/project-main-contractor-tab.component';
 import { ProjectExpenseManagementComponent } from '../project-expense-management/project-expense-management.component';
+import { ProjectAdvanceManagementComponent } from '../project-advance-management/project-advance-management.component';
 import { PaymentClaimTabComponent } from './tabs/payment-claim-tab/payment-claim-tab.component';
 import { PreparingStageComponent } from '../preparing-stage/preparing-stage.component';
 
@@ -31,6 +32,7 @@ import { PreparingStageComponent } from '../preparing-stage/preparing-stage.comp
     MilestoneDocumentsTabComponent,
     ProjectMainContractorTabComponent,
     ProjectExpenseManagementComponent,
+    ProjectAdvanceManagementComponent,
     PaymentClaimTabComponent,
     PreparingStageComponent
   ],

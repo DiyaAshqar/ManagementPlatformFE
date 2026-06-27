@@ -532,6 +532,7 @@
       "milestones": "المراحل",
       "documents": "المستندات",
       "expenses": "المصروفات",
+      "advances": "السلف المالية",
       "tasks": "المهام",
       "ownerPayment": "دفعات المالك",
       "timeframe": "الإطار الزمني"
@@ -871,7 +872,8 @@
         "totalAmount": "المبلغ الإجمالي",
         "empty": "لا توجد مصروفات مسجلة حتى الآن.",
         "pagination": "عرض {first} إلى {last} من {totalRecords} مصروف",
-        "autoPostedNoEdit": "لا يمكن تعديل المصروفات المرحّلة تلقائياً"
+        "autoPostedNoEdit": "لا يمكن تعديل المصروفات المرحّلة تلقائياً",
+        "lockedByAdvance": "تم تسديد هذا المصروف ضمن سلفة مالية ولا يمكن تعديله"
       },
       "form": {
         "newTitle": "مصروف جديد",
@@ -909,6 +911,68 @@
       "attachments": {
         "title": "المرفقات",
         "saveFirst": "احفظ المصروف أولاً لإضافة المرفقات."
+      }
+    },
+    "advances": {
+      "title": "إدارة السلف المالية",
+      "subtitle": "إدارة السلف المالية للمهندس المقيم",
+      "summary": {
+        "openAdvances": "السلف المفتوحة",
+        "remainingAmount": "المبلغ المتبقي",
+        "totalAmount": "إجمالي المبالغ",
+        "totalAdvances": "إجمالي السلف"
+      },
+      "columns": {
+        "advanceNo": "رقم السلفة",
+        "engineer": "المهندس",
+        "date": "التاريخ",
+        "amount": "المبلغ",
+        "remaining": "المتبقي"
+      },
+      "status": {
+        "all": "جميع الحالات",
+        "open": "مفتوحة",
+        "partiallySettled": "مسددة جزئياً",
+        "settled": "مسددة بالكامل"
+      },
+      "list": {
+        "newAdvance": "سلفة جديدة",
+        "searchPlaceholder": "بحث بالرقم أو المهندس...",
+        "empty": "لا توجد سلف مسجلة حتى الآن. اضغط \"سلفة جديدة\" لإضافة واحدة.",
+        "pagination": "عرض {first} إلى {last} من {totalRecords} سلفة",
+        "notOpenNoEdit": "يمكن تعديل أو حذف السلف المفتوحة فقط"
+      },
+      "actions": {
+        "settle": "تسديد"
+      },
+      "form": {
+        "newTitle": "سلفة جديدة",
+        "editTitle": "تعديل السلفة",
+        "subtitle": "أدخل تفاصيل السلفة أدناه",
+        "backToList": "عودة للقائمة",
+        "advanceNoPlaceholder": "سيتم التوليد تلقائياً",
+        "selectEngineer": "اختر المهندس",
+        "currency": "العملة",
+        "paymentMethod": "طريقة الدفع",
+        "selectPaymentMethod": "اختر طريقة الدفع",
+        "reference": "مرجع",
+        "referencePlaceholder": "رقم مرجعي اختياري...",
+        "notesPlaceholder": "أدخل ملاحظات إضافية...",
+        "save": "حفظ السلفة"
+      },
+      "confirmDelete": {
+        "header": "حذف السلفة",
+        "message": "هل أنت متأكد من حذف السلفة \"{{name}}\"؟"
+      },
+      "settle": {
+        "title": "تسديد السلفة",
+        "remainingBalance": "المبلغ المتبقي",
+        "linkedExpenses": "المصاريف المرتبطة",
+        "availableExpenses": "المصاريف المتاحة",
+        "selectedTotal": "إجمالي المحدد",
+        "overLimit": "المصاريف المحددة تتجاوز المبلغ المتبقي.",
+        "noAvailable": "لا توجد مصاريف متاحة للربط بهذه السلفة.",
+        "confirm": "تأكيد التسديد"
       }
     }
   },

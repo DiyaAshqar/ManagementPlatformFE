@@ -32,6 +32,7 @@ import {
 } from '../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../shared/components/documents-table/documents-table.component';
 import { MaterialSelectComponent } from '../../../../shared/components/material-select/material-select.component';
+import { AdvanceApiService } from '../../services/advance-api.service';
 import { ExpenseApiService } from '../../services/expense-api.service';
 
 // Expense attachment type used by the backend and existing expense documents.
@@ -117,6 +118,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
 
   constructor(
     private expenseService: ExpenseApiService,
+    private advanceService: AdvanceApiService,
     private lookupClient: LookupClient,
     private currencyClient: CurrencyClient,
     private confirmationService: ConfirmationService,
@@ -177,8 +179,23 @@ export class ProjectExpenseManagementComponent implements OnInit {
     this.currentView.set('form');
   }
 
+  /** True once this expense has been linked to an advance via settlement — locked from further edits. */
+  isLockedByAdvance(expense: GetExpenseDto): boolean {
+    return this.advanceService.isExpenseLocked(expense.id);
+  }
+
+  isLocked(expense: GetExpenseDto): boolean {
+    return !!expense.autoPost || this.isLockedByAdvance(expense);
+  }
+
+  lockTooltipKey(expense: GetExpenseDto, defaultKey: string): string {
+    if (expense.autoPost) return 'projectTabs.expenses.list.autoPostedNoEdit';
+    if (this.isLockedByAdvance(expense)) return 'projectTabs.expenses.list.lockedByAdvance';
+    return defaultKey;
+  }
+
   openEditForm(expense: GetExpenseDto): void {
-    if (expense.autoPost) {
+    if (this.isLocked(expense)) {
       return;
     }
     this.editingExpenseId.set(expense.id ?? null);
@@ -291,6 +308,9 @@ export class ProjectExpenseManagementComponent implements OnInit {
   }
 
   confirmDelete(expense: GetExpenseDto): void {
+    if (this.isLocked(expense)) {
+      return;
+    }
     this.confirmationService.confirm({
       message: this.translate.instant('projectTabs.expenses.confirmDelete.message', {
         name: expense.expenseNo || expense.id,

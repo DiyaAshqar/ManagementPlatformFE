@@ -75,8 +75,8 @@
                 [text]="true"
                 severity="secondary"
                 size="small"
-                [disabled]="expense.autoPost"
-                [pTooltip]="(expense.autoPost ? 'projectTabs.expenses.list.autoPostedNoEdit' : 'common.edit') | translate"
+                [disabled]="isLocked(expense)"
+                [pTooltip]="lockTooltipKey(expense, 'common.edit') | translate"
                 tooltipPosition="top"
                 (onClick)="openEditForm(expense)">
               </p-button>
@@ -96,7 +96,8 @@
                 [text]="true"
                 severity="danger"
                 size="small"
-                [pTooltip]="'common.delete' | translate"
+                [disabled]="isLocked(expense)"
+                [pTooltip]="lockTooltipKey(expense, 'common.delete') | translate"
                 tooltipPosition="top"
                 (onClick)="confirmDelete(expense)">
               </p-button>

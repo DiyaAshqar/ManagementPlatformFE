@@ -1,0 +1,414 @@
+<p-confirmDialog></p-confirmDialog>
+
+@if (currentView() === 'list') {
+  <p-card>
+    <ng-template pTemplate="header">
+      <div class="px-4 pt-4 pb-0">
+        <div class="flex align-items-center gap-3">
+          <div class="flex align-items-center justify-content-center border-circle bg-primary-100"
+               style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-money-bill text-primary"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold m-0 text-color">{{ 'projectTabs.advances.title' | translate }}</h3>
+            <p class="text-sm text-500 mt-1 mb-0">{{ 'projectTabs.advances.subtitle' | translate }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="grid mb-3">
+      <div class="col-12 sm:col-6 lg:col-3">
+        <div class="surface-50 border-round p-3 border-1 surface-border flex align-items-center gap-3 h-full">
+          <div class="flex align-items-center justify-content-center border-circle bg-blue-100" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-folder-open text-blue-500"></i>
+          </div>
+          <div>
+            <p class="text-500 text-sm m-0">{{ 'projectTabs.advances.summary.openAdvances' | translate }}</p>
+            <p class="text-xl font-bold m-0 text-color">{{ summary().open_count }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 sm:col-6 lg:col-3">
+        <div class="surface-50 border-round p-3 border-1 surface-border flex align-items-center gap-3 h-full">
+          <div class="flex align-items-center justify-content-center border-circle bg-orange-100" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-arrow-down text-orange-500"></i>
+          </div>
+          <div>
+            <p class="text-500 text-sm m-0">{{ 'projectTabs.advances.summary.remainingAmount' | translate }}</p>
+            <p class="text-xl font-bold m-0 text-color">{{ formatAmount(summary().total_remaining) }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 sm:col-6 lg:col-3">
+        <div class="surface-50 border-round p-3 border-1 surface-border flex align-items-center gap-3 h-full">
+          <div class="flex align-items-center justify-content-center border-circle bg-green-100" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-wallet text-green-500"></i>
+          </div>
+          <div>
+            <p class="text-500 text-sm m-0">{{ 'projectTabs.advances.summary.totalAmount' | translate }}</p>
+            <p class="text-xl font-bold m-0 text-color">{{ formatAmount(summary().total_amount) }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-12 sm:col-6 lg:col-3">
+        <div class="surface-50 border-round p-3 border-1 surface-border flex align-items-center gap-3 h-full">
+          <div class="flex align-items-center justify-content-center border-circle bg-purple-100" style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-file text-purple-500"></i>
+          </div>
+          <div>
+            <p class="text-500 text-sm m-0">{{ 'projectTabs.advances.summary.totalAdvances' | translate }}</p>
+            <p class="text-xl font-bold m-0 text-color">{{ summary().total_advances }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+      <div class="flex flex-wrap align-items-center gap-2">
+        <p-select
+          [options]="statusOptions()" optionLabel="label" optionValue="value"
+          [ngModel]="statusFilter()" (ngModelChange)="statusFilter.set($event)"
+          styleClass="w-12rem">
+        </p-select>
+        <p-iconfield iconPosition="left">
+          <p-inputicon styleClass="pi pi-search"></p-inputicon>
+          <input pInputText type="text"
+            [ngModel]="searchTerm()" (ngModelChange)="searchTerm.set($event)"
+            [placeholder]="'projectTabs.advances.list.searchPlaceholder' | translate"
+            class="w-15rem" />
+        </p-iconfield>
+      </div>
+      <p-button
+        [label]="'projectTabs.advances.list.newAdvance' | translate"
+        icon="pi pi-plus"
+        (onClick)="openNewForm()">
+      </p-button>
+    </div>
+
+    <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
+    <p-table
+      [value]="filteredAdvances()"
+      [loading]="isLoadingList()"
+      [tableStyle]="{ 'min-width': '60rem' }"
+      styleClass="p-datatable-gridlines p-datatable-striped"
+      responsiveLayout="scroll"
+      [paginator]="filteredAdvances().length > 10"
+      [rows]="10"
+      [showCurrentPageReport]="true"
+      currentPageReportTemplate="{{ 'projectTabs.advances.list.pagination' | translate }}">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 4rem;" class="text-center">#</th>
+          <th style="min-width: 9rem;">{{ 'projectTabs.advances.columns.advanceNo' | translate }}</th>
+          <th style="min-width: 11rem;">{{ 'projectTabs.advances.columns.engineer' | translate }}</th>
+          <th style="width: 9rem;">{{ 'projectTabs.advances.columns.date' | translate }}</th>
+          <th style="width: 9rem;" class="text-right">{{ 'projectTabs.advances.columns.amount' | translate }}</th>
+          <th style="width: 9rem;" class="text-right">{{ 'projectTabs.advances.columns.remaining' | translate }}</th>
+          <th style="width: 9rem;" class="text-center">{{ 'common.status' | translate }}</th>
+          <th style="width: 9rem;" class="text-center">{{ 'common.actions' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-advance let-i="rowIndex">
+        <tr>
+          <td class="text-center text-500 font-medium">{{ i + 1 }}</td>
+          <td><span class="font-semibold text-color">{{ advance.advance_no }}</span></td>
+          <td>{{ advance.engineer || '—' }}</td>
+          <td>{{ advance.created_at | date: 'yyyy-MM-dd' }}</td>
+          <td class="text-right font-semibold text-color">{{ formatAmount(advance.amount) }}</td>
+          <td class="text-right font-semibold text-primary">{{ formatAmount(advance.remaining_balance) }}</td>
+          <td class="text-center">
+            <p-tag [value]="statusLabel(advance.status)" [severity]="statusSeverity(advance.status)"></p-tag>
+          </td>
+          <td class="text-center">
+            <div class="flex align-items-center justify-content-center gap-1">
+              <p-button
+                icon="pi pi-pencil"
+                [rounded]="true"
+                [text]="true"
+                severity="secondary"
+                size="small"
+                [disabled]="!canEdit(advance)"
+                [pTooltip]="(!canEdit(advance) ? 'projectTabs.advances.list.notOpenNoEdit' : 'common.edit') | translate"
+                tooltipPosition="top"
+                (onClick)="openEditForm(advance)">
+              </p-button>
+              <p-button
+                icon="pi pi-money-bill"
+                [rounded]="true"
+                [text]="true"
+                severity="success"
+                size="small"
+                [disabled]="!canSettle(advance)"
+                [pTooltip]="'projectTabs.advances.actions.settle' | translate"
+                tooltipPosition="top"
+                (onClick)="openSettleDialog(advance)">
+              </p-button>
+              <p-button
+                icon="pi pi-trash"
+                [rounded]="true"
+                [text]="true"
+                severity="danger"
+                size="small"
+                [disabled]="!canEdit(advance)"
+                [pTooltip]="(!canEdit(advance) ? 'projectTabs.advances.list.notOpenNoEdit' : 'common.delete') | translate"
+                tooltipPosition="top"
+                (onClick)="confirmDelete(advance)">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="8">
+            <div class="flex flex-column align-items-center justify-content-center py-6 gap-3">
+              <div class="flex align-items-center justify-content-center border-circle bg-primary-50"
+                   style="width: 4rem; height: 4rem;">
+                <i class="pi pi-money-bill text-primary text-2xl"></i>
+              </div>
+              <p class="text-500 m-0 font-medium">{{ 'projectTabs.advances.list.empty' | translate }}</p>
+              <p-button
+                [label]="'projectTabs.advances.list.newAdvance' | translate"
+                icon="pi pi-plus"
+                size="small"
+                [outlined]="true"
+                (onClick)="openNewForm()">
+              </p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+    </p-table>
+    </div>
+  </p-card>
+}
+
+<p-dialog
+  [visible]="!!settlingAdvance()"
+  (visibleChange)="!$event && closeSettleDialog()"
+  [header]="'projectTabs.advances.settle.title' | translate"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  appendTo="body"
+  [style]="{ width: '90vw', 'max-width': '900px' }"
+  [breakpoints]="{ '960px': '90vw', '640px': '96vw' }">
+
+  @if (settlingAdvance()) {
+    <div class="flex flex-wrap align-items-center justify-content-between gap-2 mb-3 surface-50 border-round p-3 border-1 surface-border">
+      <div>
+        <span class="text-500 text-sm">{{ 'projectTabs.advances.columns.advanceNo' | translate }}:</span>
+        <span class="font-semibold ml-1">{{ settlingAdvance()!.advance_no }}</span>
+      </div>
+      <div>
+        <span class="text-500 text-sm">{{ 'projectTabs.advances.settle.remainingBalance' | translate }}:</span>
+        <span class="font-bold text-primary ml-1">{{ formatAmount(settlingAdvance()!.remaining_balance, settlingAdvance()!.currency) }}</span>
+      </div>
+    </div>
+
+    @if (settlingAdvance()!.expenses.length) {
+      <div class="mb-3">
+        <h5 class="mb-2 text-color font-semibold">{{ 'projectTabs.advances.settle.linkedExpenses' | translate }}</h5>
+        <p-table [value]="settlingAdvance()!.expenses" styleClass="p-datatable-sm p-datatable-striped">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'projectTabs.expenses.columns.expenseNo' | translate }}</th>
+              <th>{{ 'projectTabs.advances.columns.date' | translate }}</th>
+              <th class="text-right">{{ 'projectTabs.advances.columns.amount' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-exp>
+            <tr>
+              <td>{{ exp.expense_no }}</td>
+              <td>{{ exp.date | date: 'yyyy-MM-dd' }}</td>
+              <td class="text-right">{{ formatAmount(exp.amount, settlingAdvance()!.currency) }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    }
+
+    <h5 class="mb-2 text-color font-semibold">{{ 'projectTabs.advances.settle.availableExpenses' | translate }}</h5>
+    <div style="overflow-x: auto;">
+    <p-table
+      [value]="availableExpenses()"
+      [loading]="isLoadingAvailableExpenses()"
+      [selection]="selectedExpenses()" (selectionChange)="selectedExpenses.set($event)"
+      dataKey="id"
+      styleClass="p-datatable-sm p-datatable-striped">
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 3rem;"><p-tableHeaderCheckbox></p-tableHeaderCheckbox></th>
+          <th>{{ 'projectTabs.expenses.columns.expenseNo' | translate }}</th>
+          <th>{{ 'projectTabs.advances.columns.date' | translate }}</th>
+          <th class="text-right">{{ 'projectTabs.advances.columns.amount' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-exp>
+        <tr>
+          <td><p-tableCheckbox [value]="exp"></p-tableCheckbox></td>
+          <td>{{ exp.expense_no }}</td>
+          <td>{{ exp.date | date: 'yyyy-MM-dd' }}</td>
+          <td class="text-right">{{ formatAmount(exp.amount, settlingAdvance()!.currency) }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="4" class="text-center text-500 py-4">{{ 'projectTabs.advances.settle.noAvailable' | translate }}</td>
+        </tr>
+      </ng-template>
+    </p-table>
+    </div>
+
+    <div class="flex align-items-center justify-content-between mt-3 p-3 border-round border-1 surface-border"
+         [ngClass]="isOverRemainingBalance() ? 'bg-red-50' : 'surface-50'">
+      <span class="font-medium text-color">{{ 'projectTabs.advances.settle.selectedTotal' | translate }}:</span>
+      <span class="font-bold" [ngClass]="isOverRemainingBalance() ? 'text-red-500' : 'text-primary'">
+        {{ formatAmount(selectedTotal(), settlingAdvance()!.currency) }}
+      </span>
+    </div>
+    @if (isOverRemainingBalance()) {
+      <p class="text-red-500 text-sm mt-2 mb-0">{{ 'projectTabs.advances.settle.overLimit' | translate }}</p>
+    }
+
+    <div class="flex justify-content-end gap-2 mt-4 pt-2 border-top-1 surface-border">
+      <p-button [label]="'common.cancel' | translate" [outlined]="true" severity="secondary" (onClick)="closeSettleDialog()"></p-button>
+      <p-button
+        [label]="'projectTabs.advances.settle.confirm' | translate"
+        icon="pi pi-check"
+        [loading]="isSettling()"
+        [disabled]="selectedExpenses().length === 0 || isOverRemainingBalance()"
+        (onClick)="confirmSettle()">
+      </p-button>
+    </div>
+  }
+</p-dialog>
+
+@if (currentView() === 'form') {
+  <p-card>
+    <ng-template pTemplate="header">
+      <div class="px-4 pt-4 pb-0">
+        <div class="flex align-items-center gap-3">
+          <p-button
+            icon="pi pi-arrow-left"
+            [text]="true"
+            [rounded]="true"
+            severity="secondary"
+            [pTooltip]="'projectTabs.advances.form.backToList' | translate"
+            tooltipPosition="bottom"
+            (onClick)="backToList()">
+          </p-button>
+          <div class="flex align-items-center justify-content-center border-circle bg-primary-100"
+               style="width: 2.5rem; height: 2.5rem;">
+            <i class="pi pi-money-bill text-primary"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-semibold m-0 text-color">{{ formTitle() }}</h3>
+            <p class="text-sm text-500 mt-1 mb-0">{{ 'projectTabs.advances.form.subtitle' | translate }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+
+    <div class="mb-1">
+      <div class="surface-50 border-round p-2 border-1 surface-border">
+        <div class="grid">
+          <div class="col-12 md:col-6 lg:col-3">
+            <div class="flex flex-column gap-2">
+              <label class="text-sm font-medium text-color">{{ 'projectTabs.advances.columns.advanceNo' | translate }}</label>
+              <input pInputText type="text"
+                [value]="formAdvanceNo() || ('projectTabs.advances.form.advanceNoPlaceholder' | translate)"
+                readonly class="w-full surface-100 text-500" />
+            </div>
+          </div>
+          <div class="col-12 md:col-6 lg:col-3">
+            <div class="flex flex-column gap-2">
+              <label class="text-sm font-medium text-color">{{ 'projectTabs.advances.columns.engineer' | translate }} *</label>
+              <p-select
+                [ngModel]="formEngineerId()" (ngModelChange)="formEngineerId.set($event)"
+                [options]="engineers()" optionLabel="name" optionValue="id"
+                [placeholder]="'projectTabs.advances.form.selectEngineer' | translate"
+                [loading]="isLoadingEngineers()" styleClass="w-full">
+              </p-select>
+            </div>
+          </div>
+          <div class="col-12 md:col-6 lg:col-3">
+            <div class="flex flex-column gap-2">
+              <label class="text-sm font-medium text-color">{{ 'projectTabs.advances.columns.date' | translate }} *</label>
+              <p-datepicker
+                [ngModel]="formAdvanceDate()" (ngModelChange)="formAdvanceDate.set($event)"
+                dateFormat="yy-mm-dd" [showIcon]="true" styleClass="w-full">
+              </p-datepicker>
+            </div>
+          </div>
+          <div class="col-12 md:col-6 lg:col-3">
+            <div class="flex flex-column gap-2">
+              <label class="text-sm font-medium text-color">{{ 'projectTabs.advances.columns.amount' | translate }} *</label>
+              <p-inputNumber
+                [ngModel]="formAmount()" (ngModelChange)="formAmount.set($event)"
+                [min]="0" [minFractionDigits]="0" [maxFractionDigits]="2" placeholder="0.00" inputStyleClass="w-full">
+              </p-inputNumber>
+            </div>
+          </div>
+          <div class="col-12 md:col-6 lg:col-4">
+            <div class="flex flex-column gap-2">
+              <label class="text-sm font-medium text-color">{{ 'projectTabs.advances.form.currency' | translate }}</label>
+              <p-select
+                [ngModel]="formCurrency()" (ngModelChange)="formCurrency.set($event)"
+                [options]="currencies()" optionLabel="abb" optionValue="abb"
+                [loading]="isLoadingCurrencies()"
+                [placeholder]="'projectTabs.expenses.lineItems.selectCurrency' | translate" styleClass="w-full">
+              </p-select>
+            </div>
+          </div>
+          <div class="col-12 md:col-6 lg:col-4">
+            <div class="flex flex-column gap-2">
+              <label class="text-sm font-medium text-color">{{ 'projectTabs.advances.form.paymentMethod' | translate }} *</label>
+              <p-select
+                [ngModel]="formPaymentMethodId()" (ngModelChange)="formPaymentMethodId.set($event)"
+                [options]="paymentMethods()" optionLabel="name" optionValue="id"
+                [placeholder]="'projectTabs.advances.form.selectPaymentMethod' | translate"
+                [loading]="isLoadingPaymentMethods()" styleClass="w-full">
+              </p-select>
+            </div>
+          </div>
+          <div class="col-12 md:col-6 lg:col-4">
+            <div class="flex flex-column gap-2">
+              <label class="text-sm font-medium text-color">{{ 'projectTabs.advances.form.reference' | translate }}</label>
+              <input pInputText type="text"
+                [placeholder]="'projectTabs.advances.form.referencePlaceholder' | translate"
+                [ngModel]="formReference()" (ngModelChange)="formReference.set($event)"
+                maxlength="100" class="w-full" />
+            </div>
+          </div>
+          <div class="col-12">
+            <div class="flex flex-column gap-2">
+              <label class="text-sm font-medium text-color">{{ 'projectTabs.expenses.columns.notes' | translate }}</label>
+              <textarea pTextarea rows="2"
+                [placeholder]="'projectTabs.advances.form.notesPlaceholder' | translate"
+                [ngModel]="formNotes()" (ngModelChange)="formNotes.set($event)"
+                class="w-full">
+              </textarea>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flex justify-content-end gap-2 mt-2 pt-2 border-top-1 surface-border">
+      <p-button [label]="'common.cancel' | translate" [outlined]="true" severity="secondary" (onClick)="backToList()"></p-button>
+      <p-button
+        [label]="'projectTabs.advances.form.save' | translate"
+        icon="pi pi-save"
+        [loading]="isSaving()"
+        [disabled]="!formEngineerId() || !formAmount() || !formPaymentMethodId()"
+        (onClick)="handleSave()">
+      </p-button>
+    </div>
+  </p-card>
+}
