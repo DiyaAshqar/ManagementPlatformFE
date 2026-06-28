@@ -1,12 +1,27 @@
 import { Injectable } from '@angular/core';
-import { Observable, delay, of, throwError } from 'rxjs';
+import { Observable, catchError, delay, map, of, throwError } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import {
+  ApiException,
+  AuthClient,
+  AuthResponse,
+  AuthResponseResponse,
+  BooleanResponse,
+  ChangePasswordCommand,
+  LoginCommand,
+  RefreshTokenCommand,
+  RegisterCommand,
+  UserDto,
+} from '../../../../nswag/api-client';
+import {
   ApiResponse,
+  AuthUser,
+  ChangePasswordRequest,
   LoginRequest,
   LoginResult,
   RefreshTokenRequest,
+  RegisterRequest,
 } from '../models/auth.models';
 import {
   buildMockLoginResult,
@@ -14,22 +29,24 @@ import {
   findMockUserById,
   userIdFromRefreshToken,
 } from '../mock/mock-auth';
+import { JwtService } from './jwt.service';
 
 /**
  * The single seam between the application and the authentication backend.
  *
  * Everything above this service (AuthService, guards, components) is unaware of
  * whether requests are served by the in-memory mock or the real HTTP API. Flip
- * `environment.auth.useMock` to switch; wire the generated client in the
- * `// REAL API` blocks below once `npm run generate-api` produces an AuthClient.
+ * `environment.auth.useMock` to switch.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthApiService {
   /** Simulated network latency for the mock (ms). */
   private readonly mockLatency = 600;
 
-  // When the real backend is ready, inject the generated client here, e.g.:
-  // constructor(private authClient: AuthClient) {}
+  constructor(
+    private readonly authClient: AuthClient,
+    private readonly jwt: JwtService
+  ) {}
 
   /** Authenticate with email/username + password. */
   login(request: LoginRequest): Observable<ApiResponse<LoginResult>> {
@@ -37,10 +54,34 @@ export class AuthApiService {
       return this.mockLogin(request);
     }
 
-    // REAL API — replace with the generated client call, mapping its DTO to
-    // `ApiResponse<LoginResult>` (the shapes already align with the envelope):
-    //   return this.authClient.login(new LoginCommand({ ... }));
-    return this.notImplemented('login');
+    return this.authClient
+      .login(new LoginCommand({ email: request.email, password: request.password }))
+      .pipe(
+        map((response) => this.toLoginApiResponse(response)),
+        catchError((error) => this.recoverError<LoginResult>(error))
+      );
+  }
+
+  /** Create a new account. The backend logs the account in immediately. */
+  register(request: RegisterRequest): Observable<ApiResponse<LoginResult>> {
+    if (environment.auth.useMock) {
+      return this.notImplemented('register');
+    }
+
+    return this.authClient
+      .register(
+        new RegisterCommand({
+          email: request.email,
+          password: request.password,
+          fullName: request.fullName,
+          arabicFullName: request.arabicFullName,
+          phoneNumber: request.phoneNumber,
+        })
+      )
+      .pipe(
+        map((response) => this.toLoginApiResponse(response)),
+        catchError((error) => this.recoverError<LoginResult>(error))
+      );
   }
 
   /** Exchange a refresh token for a fresh access token. */
@@ -49,9 +90,12 @@ export class AuthApiService {
       return this.mockRefresh(request);
     }
 
-    // REAL API:
-    //   return this.authClient.refreshToken(new RefreshTokenCommand({ ... }));
-    return this.notImplemented('refreshToken');
+    return this.authClient
+      .refreshToken(new RefreshTokenCommand({ refreshToken: request.refreshToken }))
+      .pipe(
+        map((response) => this.toLoginApiResponse(response)),
+        catchError((error) => this.recoverError<LoginResult>(error))
+      );
   }
 
   /** Invalidate the session server-side (best-effort). */
@@ -62,9 +106,47 @@ export class AuthApiService {
       );
     }
 
-    // REAL API:
-    //   return this.authClient.logout(new LogoutCommand({ refreshToken }));
-    return this.notImplemented('logout');
+    return this.authClient.logout(refreshToken ?? undefined).pipe(
+      map((response) => this.toBooleanApiResponse(response)),
+      catchError((error) => this.recoverError<boolean>(error))
+    );
+  }
+
+  /** Change the current user's password. */
+  changePassword(request: ChangePasswordRequest): Observable<ApiResponse<boolean>> {
+    if (environment.auth.useMock) {
+      return this.notImplemented('changePassword');
+    }
+
+    return this.authClient
+      .changePassword(
+        new ChangePasswordCommand({
+          currentPassword: request.currentPassword,
+          newPassword: request.newPassword,
+          confirmNewPassword: request.confirmNewPassword,
+        })
+      )
+      .pipe(
+        map((response) => this.toBooleanApiResponse(response)),
+        catchError((error) => this.recoverError<boolean>(error))
+      );
+  }
+
+  /** Fetch the profile of the currently authenticated user. */
+  getCurrentUser(): Observable<ApiResponse<AuthUser>> {
+    if (environment.auth.useMock) {
+      return this.notImplemented('getCurrentUser');
+    }
+
+    return this.authClient.getCurrentUser().pipe(
+      map((response) => ({
+        succeeded: response.succeeded ?? false,
+        message: response.message,
+        errors: response.errors,
+        data: response.data ? this.mapUserDto(response.data) : undefined,
+      })),
+      catchError((error) => this.recoverError<AuthUser>(error))
+    );
   }
 
   /** Begin a password-reset flow. */
@@ -77,9 +159,100 @@ export class AuthApiService {
       }).pipe(delay(this.mockLatency));
     }
 
-    // REAL API:
-    //   return this.authClient.forgotPassword(new ForgotPasswordCommand({ email }));
+    // The backend does not yet expose a forgot-password endpoint.
     return this.notImplemented('forgotPassword');
+  }
+
+  // ----------------------------------------------------------------------
+  // Real-API response mapping
+  // ----------------------------------------------------------------------
+
+  /**
+   * The backend doesn't fail auth requests with the standard `ApiResponse`
+   * envelope — invalid credentials/tokens surface as a non-200 status with an
+   * ad-hoc `{ message }` body (NSwag wraps this as `ApiException` with the raw
+   * body in `.response`). Recover that message into a normal `succeeded: false`
+   * value so it flows through the same path as a real envelope; anything that
+   * doesn't look like a known error shape is rethrown for the generic
+   * HTTP-error toast to handle.
+   */
+  private recoverError<T>(error: unknown): Observable<ApiResponse<T>> {
+    const message = this.extractErrorMessage(error);
+    if (message === null) {
+      return throwError(() => error);
+    }
+    return of<ApiResponse<T>>({ succeeded: false, message });
+  }
+
+  private extractErrorMessage(error: unknown): string | null {
+    if (!(error instanceof ApiException) || !error.response) {
+      return null;
+    }
+    try {
+      const parsed = JSON.parse(error.response);
+      return typeof parsed?.message === 'string' ? parsed.message : null;
+    } catch {
+      return null;
+    }
+  }
+
+  private toLoginApiResponse(response: AuthResponseResponse): ApiResponse<LoginResult> {
+    return {
+      succeeded: response.succeeded ?? false,
+      message: response.message,
+      errors: response.errors,
+      data: response.data ? this.mapAuthResponse(response.data) : undefined,
+    };
+  }
+
+  private toBooleanApiResponse(response: BooleanResponse): ApiResponse<boolean> {
+    return {
+      succeeded: response.succeeded ?? false,
+      message: response.message,
+      errors: response.errors,
+      data: response.data,
+    };
+  }
+
+  /** Map the backend's auth payload to the app's backend-agnostic `LoginResult`. */
+  private mapAuthResponse(data: AuthResponse): LoginResult {
+    const accessToken = data.accessToken ?? '';
+    return {
+      accessToken,
+      refreshToken: data.refreshToken ?? '',
+      expiresIn: this.expiresInSeconds(accessToken),
+      user: {
+        id: data.id?.toString() ?? '',
+        userName: data.email ?? '',
+        email: data.email ?? '',
+        fullName: data.fullName ?? '',
+        roles: data.roles ?? [],
+        // The backend does not return permissions in the envelope; they are
+        // embedded as claims in the access token itself.
+        permissions: this.jwt.getPermissions(accessToken),
+      },
+    };
+  }
+
+  private mapUserDto(data: UserDto): AuthUser {
+    return {
+      id: data.id?.toString() ?? '',
+      userName: data.email ?? '',
+      email: data.email ?? '',
+      fullName: data.fullName ?? '',
+      roles: data.roles ?? [],
+      permissions: [],
+      avatarUrl: data.profileImage,
+    };
+  }
+
+  /** Seconds remaining until the access token's `exp` claim, derived from the JWT itself. */
+  private expiresInSeconds(accessToken: string): number {
+    const expiration = this.jwt.getExpiration(accessToken);
+    if (!expiration) {
+      return 0;
+    }
+    return Math.max(0, Math.round((expiration.getTime() - Date.now()) / 1000));
   }
 
   // ----------------------------------------------------------------------
@@ -126,8 +299,8 @@ export class AuthApiService {
     return throwError(
       () =>
         new Error(
-          `AuthApiService.${operation}: real backend not wired yet. ` +
-            `Set environment.auth.useMock = true or implement the REAL API block.`
+          `AuthApiService.${operation}: not available while environment.auth.useMock is true ` +
+            `(no mock implementation for this operation). Set useMock = false to hit the real API.`
         )
     );
   }

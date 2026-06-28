@@ -33,6 +33,22 @@ export interface RefreshTokenRequest {
   refreshToken: string;
 }
 
+/** Payload to create a new account. */
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  fullName: string;
+  arabicFullName?: string;
+  phoneNumber?: string;
+}
+
+/** Payload to change the current user's password. */
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
+}
+
 /**
  * The successful login/refresh result `data` payload.
  * This is what the backend is expected to return inside `ApiResponse<LoginResult>`.

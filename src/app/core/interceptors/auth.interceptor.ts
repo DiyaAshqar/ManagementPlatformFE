@@ -24,7 +24,10 @@ const refreshedToken$ = new BehaviorSubject<string | null>(null);
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
 
-  // Never touch the auth endpoints (login / refresh / logout).
+  // Never touch the anonymous auth endpoints (login / refresh-token). Every
+  // other endpoint — including register/change-password/me/logout on this
+  // backend — requires the bearer token, so it must go through the normal
+  // attach-and-retry-on-401 flow below.
   if (isAuthEndpoint(req.url)) {
     return next(req);
   }
@@ -85,5 +88,5 @@ function addToken(req: HttpRequest<unknown>, token: string): HttpRequest<unknown
 }
 
 function isAuthEndpoint(url: string): boolean {
-  return /\/auth(\/|$)|\/(login|refresh-token|refreshtoken)(\/|$)/i.test(url);
+  return /\/auth\/(login|refresh-token|refreshtoken)(\/|$|\?)/i.test(url);
 }
