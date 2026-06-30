@@ -9,8 +9,9 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
 
 import { ButtonModule } from 'primeng/button';
-import { CardModule } from 'primeng/card';
 import { CheckboxModule } from 'primeng/checkbox';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
 import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
@@ -29,9 +30,10 @@ import { MOCK_USERS } from '../../../../core/auth/mock/mock-auth';
     ButtonModule,
     InputTextModule,
     PasswordModule,
-    CardModule,
     CheckboxModule,
     MessageModule,
+    IconFieldModule,
+    InputIconModule,
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss'],
