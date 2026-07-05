@@ -21,6 +21,7 @@ import {
   GetProjectMainContractorDutyDto,
   IGetProjectMainContractorDto,
   LookupClient,
+  LookupType,
   ProjectMainContractorClient,
   ProjectMainContractorDutyClient
 } from '../../../../../../../nswag/api-client';
@@ -101,9 +102,9 @@ export class ProjectMainContractorTabComponent implements OnInit {
     });
 
     // Load contractor types from the lookup API
-    this.lookupClient.getAllLookups(['MainContractType']).subscribe({
+    this.lookupClient.getAllLookups([LookupType.MainContractType]).subscribe({
       next: (res) => {
-        const types = res.data?.['MainContractType'] ?? [];
+        const types = res.data?.[LookupType.MainContractType] ?? [];
         this.contractorTypeOptions = types
           .filter((t: any) => t.id != null && t.name)
           .map((t: any) => ({ label: t.name, value: t.id }));
@@ -153,9 +154,9 @@ export class ProjectMainContractorTabComponent implements OnInit {
 
   getClassificationLabel(classification: ClassificationProjectMainContractor | 0 | undefined): string {
     switch (classification) {
-      case ClassificationProjectMainContractor._1:
+      case ClassificationProjectMainContractor.MainContractor:
         return this.translate.instant('dialogs.contractor.classificationMain');
-      case ClassificationProjectMainContractor._2:
+      case ClassificationProjectMainContractor.SubContractor:
         return this.translate.instant('dialogs.contractor.classificationSub');
       case 0:
         return this.translate.instant('dialogs.contractor.classificationUnclassified');

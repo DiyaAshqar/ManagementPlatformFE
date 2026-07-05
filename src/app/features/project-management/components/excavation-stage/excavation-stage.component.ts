@@ -3,7 +3,7 @@ import { Component, Input, OnInit, computed, inject, signal } from '@angular/cor
 import { TranslateModule } from '@ngx-translate/core';
 import { format } from 'date-fns';
 import { DialogService, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { CreateTaskCommand, GetProjectTaskDto } from '../../../../../nswag/api-client';
+import { CreateTaskCommand, GetProjectTaskDto, StatusTask } from '../../../../../nswag/api-client';
 import { TaskStatus } from '../../models';
 import { ProjectService } from '../../services/project.service';
 import { TaskService } from '../../services/task.service';
@@ -40,22 +40,22 @@ export class ExcavationStageComponent implements OnInit {
       {
         id: BoardTaskStatus.TODO,
         title: 'To Do',
-        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 0))
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === StatusTask.ToDO))
       },
       {
         id: BoardTaskStatus.IN_PROGRESS,
         title: 'In Progress',
-        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 1))
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === StatusTask.InProgress))
       },
       {
         id: BoardTaskStatus.REVIEW,
         title: 'Review',
-        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 2))
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === StatusTask.Review))
       },
       {
         id: BoardTaskStatus.DONE,
         title: 'Done',
-        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 3))
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === StatusTask.Completed))
       }
     ];
   });
@@ -148,12 +148,12 @@ export class ExcavationStageComponent implements OnInit {
    * Map API status to TaskStatus enum used in shared-stage-board
    * API status: 0=To Do, 1=In Progress, 2=Review, 3=Completed
    */
-  private mapStatus(status?: number): BoardTaskStatus {
+  private mapStatus(status?: StatusTask): BoardTaskStatus {
     switch (status) {
-      case 0: return BoardTaskStatus.TODO;
-      case 1: return BoardTaskStatus.IN_PROGRESS;
-      case 2: return BoardTaskStatus.REVIEW;
-      case 3: return BoardTaskStatus.DONE;
+      case StatusTask.ToDO: return BoardTaskStatus.TODO;
+      case StatusTask.InProgress: return BoardTaskStatus.IN_PROGRESS;
+      case StatusTask.Review: return BoardTaskStatus.REVIEW;
+      case StatusTask.Completed: return BoardTaskStatus.DONE;
       default: return BoardTaskStatus.TODO;
     }
   }
@@ -257,13 +257,13 @@ export class ExcavationStageComponent implements OnInit {
   /**
    * Map TaskStatus enum to StatusTask API enum
    */
-  private mapTaskStatusToStatusTask(status: TaskStatus): number {
+  private mapTaskStatusToStatusTask(status: TaskStatus): StatusTask {
     switch (status) {
-      case TaskStatus.TODO: return 0;
-      case TaskStatus.IN_PROGRESS: return 1;
-      case TaskStatus.REVIEW: return 2;
-      case TaskStatus.COMPLETED: return 3;
-      default: return 0;
+      case TaskStatus.TODO: return StatusTask.ToDO;
+      case TaskStatus.IN_PROGRESS: return StatusTask.InProgress;
+      case TaskStatus.REVIEW: return StatusTask.Review;
+      case TaskStatus.COMPLETED: return StatusTask.Completed;
+      default: return StatusTask.ToDO;
     }
   }
 

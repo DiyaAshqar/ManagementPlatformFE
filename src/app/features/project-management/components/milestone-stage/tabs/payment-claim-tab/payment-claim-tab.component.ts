@@ -24,6 +24,7 @@ import {
   IGetProjectMainContractorDto,
   IGetProjectVODto,
   LookupClient,
+  LookupType,
   ProjectBOQClient,
   ProjectMainContractorClient,
   ProjectSurveyingVisitClient,
@@ -197,14 +198,14 @@ export class PaymentClaimTabComponent implements OnInit {
       : of([]);
 
     const exp$ = selected.has('EXP')
-      ? this.expClient.getByProjectId(this.projectStageId, 1, 500, undefined).pipe(
+      ? this.expClient.getByProjectId(this.projectStageId, Number(this.projectId), 1, 500, undefined).pipe(
           map((r) => r.data?.data ?? []),
           catchError(() => of([]))
         )
       : of([]);
 
     const lookups$ = selected.has('BOQ') || selected.has('SV')
-      ? this.lookupClient.getAllLookups(['material', 'unit']).pipe(
+      ? this.lookupClient.getAllLookups([LookupType.Material, LookupType.Unit]).pipe(
           map((r) => r.data as Record<string, { id: number; name: string }[]> | undefined),
           catchError(() => of(undefined))
         )

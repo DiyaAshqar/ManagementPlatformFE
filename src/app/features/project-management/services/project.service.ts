@@ -69,11 +69,11 @@ export class ProjectService {
   // Map backend status enum to frontend status
   private mapApiStatusToProjectStatus(status: ApiProjectStatus | undefined): ProjectStatus {
     switch (status) {
-      case ApiProjectStatus._0:
+      case ApiProjectStatus.ToDO:
         return ProjectStatus.PLANNING;
-      case ApiProjectStatus._1:
+      case ApiProjectStatus.InProgress:
         return ProjectStatus.IN_PROGRESS;
-      case ApiProjectStatus._2:
+      case ApiProjectStatus.Review:
         return ProjectStatus.COMPLETED;
       default:
         return ProjectStatus.PLANNING;
@@ -107,11 +107,11 @@ export class ProjectService {
   // Get stage name from stage type
   private getStageNameByType(stageType: ProjectStageType | undefined): string {
     switch (stageType) {
-      case ProjectStageType._1:
+      case ProjectStageType.Preparing:
         return 'Preparing';
-      case ProjectStageType._2:
+      case ProjectStageType.Excavation:
         return 'Excavation';
-      case ProjectStageType._3:
+      case ProjectStageType.Milestones:
         return 'Foundation';
       default:
         return 'Unknown Stage';
@@ -121,11 +121,11 @@ export class ProjectService {
   // Map stage type to stage status
   private mapStageTypeToStageStatus(stageType: ProjectStageType | undefined): StageStatus {
     switch (stageType) {
-      case ProjectStageType._1:
+      case ProjectStageType.Preparing:
         return StageStatus.PREPARING;
-      case ProjectStageType._2:
+      case ProjectStageType.Excavation:
         return StageStatus.EXCAVATION;
-      case ProjectStageType._3:
+      case ProjectStageType.Milestones:
         return StageStatus.FOUNDATION;
       default:
         return StageStatus.PREPARING;

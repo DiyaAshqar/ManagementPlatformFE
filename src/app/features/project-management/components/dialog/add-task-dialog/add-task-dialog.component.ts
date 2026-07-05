@@ -8,7 +8,7 @@ import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
-import { AttachmentType, CreateTaskCommand } from '../../../../../../nswag/api-client';
+import { AttachmentType, CreateTaskCommand, StatusTask } from '../../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../../shared/components/documents-table/documents-table.component';
 import { ProjectService } from '../../../services/project.service';
 import { TaskService } from '../../../services/task.service';
@@ -55,7 +55,7 @@ export class AddTaskDialogComponent implements OnInit {
   private taskService = inject(TaskService);
   private fb = inject(FormBuilder);
 
-  readonly taskAttachmentType = AttachmentType._4;
+  readonly taskAttachmentType = AttachmentType.Task;
 
   isLoading = signal(false);
   isLoadingTaskTypes = signal(false);
@@ -159,7 +159,7 @@ export class AddTaskDialogComponent implements OnInit {
       excavationVolume: this.formData.volume,
       excavationSoilType: this.formData.soilType,
       excavationEquipment: this.formData.equipment,
-      status: 0,
+      status: StatusTask.ToDO,
       projectStageId: this.formData.projectStageId,
       taskTypeId: this.formData.taskTypeId
     });

@@ -23,6 +23,7 @@ import {
   GetProjectMainContractorPaymentDto,
   IGetProjectMainContractorDto,
   LookupClient,
+  LookupType,
   ProjectMainContractorPaymentClient
 } from '../../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../../shared/components/documents-table/documents-table.component';
@@ -69,7 +70,7 @@ export class ProjectMainContractorPaymentsComponent implements OnInit, OnChanges
   paymentMethodOptions: { label: string; value: number }[] = [];
   paymentMethodMap: Record<number, string> = {};
 
-  readonly paymentAttachmentType = AttachmentType._7;
+  readonly paymentAttachmentType = AttachmentType.ProjectMainContractorPayment;
   selectedPaymentForAttachments: GetProjectMainContractorPaymentDto | null = null;
 
   private tempIdSeq = -1;
@@ -96,11 +97,11 @@ export class ProjectMainContractorPaymentsComponent implements OnInit, OnChanges
   }
 
   loadLookups(): void {
-    this.lookupClient.getAllLookups(['paymentMethod']).subscribe({
+    this.lookupClient.getAllLookups([LookupType.PaymentMethod]).subscribe({
       next: (res) => {
         const data = res.data as any;
-        if (data?.['paymentMethod']) {
-          this.paymentMethodOptions = (data['paymentMethod'] as { id: number; name: string }[])
+        if (data?.[LookupType.PaymentMethod]) {
+          this.paymentMethodOptions = (data[LookupType.PaymentMethod] as { id: number; name: string }[])
             .map(m => ({ label: m.name, value: m.id }));
           this.paymentMethodMap = Object.fromEntries(this.paymentMethodOptions.map(o => [o.value, o.label]));
         }

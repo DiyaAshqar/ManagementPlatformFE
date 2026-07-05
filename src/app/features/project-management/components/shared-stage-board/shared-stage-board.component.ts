@@ -538,15 +538,15 @@ export class SharedStageBoardComponent implements OnInit {
     switch (status) {
       case TaskStatus.TODO:
       case TaskStatus.BACKLOG:
-        return StatusTask._0; // TODO
+        return StatusTask.ToDO; // TODO
       case TaskStatus.IN_PROGRESS:
-        return StatusTask._1; // In Progress
+        return StatusTask.InProgress; // In Progress
       case TaskStatus.REVIEW:
-        return StatusTask._2; // Review
+        return StatusTask.Review; // Review
       case TaskStatus.DONE:
-        return StatusTask._3; // Done
+        return StatusTask.Completed; // Done
       default:
-        return StatusTask._0; // Default to TODO
+        return StatusTask.ToDO; // Default to TODO
     }
   }
 

@@ -15,6 +15,7 @@ import {
   CreateProjectVOCommand,
   IGetProjectVODto,
   LookupClient,
+  LookupType,
   ProjectVOClient
 } from '../../../../../../../nswag/api-client';
 import { AddVoDialogComponent } from '../../../dialog/add-vo-dialog/add-vo-dialog.component';
@@ -80,7 +81,7 @@ export class VoucherOrdersTabComponent implements OnInit {
   // ── Lookups ───────────────────────────────────────────────────────────────
 
   loadLookups(): void {
-    this.lookupClient.getAllLookups(['unit']).subscribe({
+    this.lookupClient.getAllLookups([LookupType.Unit]).subscribe({
       next: (lookups) => {
         const data = lookups.data as any;
 

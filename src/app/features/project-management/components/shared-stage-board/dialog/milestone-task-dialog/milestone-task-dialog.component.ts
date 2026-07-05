@@ -11,7 +11,7 @@ import { SelectFilterEvent, SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { catchError, of, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil } from 'rxjs/operators';
-import { AttachmentType, ConstructorClient, ICreateTaskCommand, LookupClient, SupplierClient } from '../../../../../../../nswag/api-client';
+import { AttachmentType, ConstructorClient, ICreateTaskCommand, LookupClient, LookupType, SupplierClient } from '../../../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../../../shared/components/documents-table/documents-table.component';
 import { TaskService } from '../../../../services/task.service';
 
@@ -48,7 +48,7 @@ export class MilestoneTaskDialogComponent implements OnInit, OnDestroy {
   private constructorClient = inject(ConstructorClient);
   private supplierClient = inject(SupplierClient);
 
-  readonly taskAttachmentType = AttachmentType._4;
+  readonly taskAttachmentType = AttachmentType.Task;
 
   isLoadingTaskTypes = signal(false);
   isLoadingSuppliers = signal(false);
@@ -151,9 +151,9 @@ export class MilestoneTaskDialogComponent implements OnInit, OnDestroy {
   }
 
   private loadResponsibilities(): void {
-    this.lookupClient.getAllLookups(['dutyresponsibility']).subscribe({
+    this.lookupClient.getAllLookups([LookupType.DutyResponsibility]).subscribe({
       next: (response) => {
-        const data = response.data?.['dutyresponsibility'] ?? [];
+        const data = response.data?.[LookupType.DutyResponsibility] ?? [];
         this.responsibilityOptions = data
           .filter(item => item.id != null && item.name)
           .map(item => ({ label: item.name!, value: item.id! }));

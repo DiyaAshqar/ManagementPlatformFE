@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { format } from 'date-fns';
 import { DialogService } from 'primeng/dynamicdialog';
-import { CreateTaskCommand, GetProjectTaskDto } from '../../../../../nswag/api-client';
+import { CreateTaskCommand, GetProjectTaskDto, StatusTask } from '../../../../../nswag/api-client';
 import { TaskStatus as ModelTaskStatus } from '../../models/project.model';
 import { ProjectService } from '../../services/project.service';
 import { TaskService } from '../../services/task.service';
@@ -33,22 +33,22 @@ export class PreparingStageComponent implements OnInit {
       {
         id: TaskStatus.TODO,
         title: 'To Do',
-        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 0))
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === StatusTask.ToDO))
       },
       {
         id: TaskStatus.IN_PROGRESS,
         title: 'In Progress',
-        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 1))
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === StatusTask.InProgress))
       },
       {
         id: TaskStatus.REVIEW,
         title: 'Review',
-        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 2))
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === StatusTask.Review))
       },
       {
         id: TaskStatus.DONE,
         title: 'Done',
-        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === 3))
+        items: this.mapTasksToWorkItems(tasksList.filter(t => t.status === StatusTask.Completed))
       }
     ];
   });
@@ -127,13 +127,13 @@ export class PreparingStageComponent implements OnInit {
   /**
    * Map TaskStatus enum to StatusTask API enum
    */
-  private mapTaskStatusToStatusTask(status: ModelTaskStatus): number {
+  private mapTaskStatusToStatusTask(status: ModelTaskStatus): StatusTask {
     switch (status) {
-      case ModelTaskStatus.TODO: return 0;
-      case ModelTaskStatus.IN_PROGRESS: return 1;
-      case ModelTaskStatus.REVIEW: return 2;
-      case ModelTaskStatus.COMPLETED: return 3;
-      default: return 0;
+      case ModelTaskStatus.TODO: return StatusTask.ToDO;
+      case ModelTaskStatus.IN_PROGRESS: return StatusTask.InProgress;
+      case ModelTaskStatus.REVIEW: return StatusTask.Review;
+      case ModelTaskStatus.COMPLETED: return StatusTask.Completed;
+      default: return StatusTask.ToDO;
     }
   }
 
@@ -249,12 +249,12 @@ export class PreparingStageComponent implements OnInit {
    * Map API status to TaskStatus enum
    * API status: 0=To Do, 1=In Progress, 2=Review, 3=Completed
    */
-  private mapStatus(status?: number): TaskStatus {
+  private mapStatus(status?: StatusTask): TaskStatus {
     switch (status) {
-      case 0: return TaskStatus.TODO;
-      case 1: return TaskStatus.IN_PROGRESS;
-      case 2: return TaskStatus.REVIEW;
-      case 3: return TaskStatus.DONE;
+      case StatusTask.ToDO: return TaskStatus.TODO;
+      case StatusTask.InProgress: return TaskStatus.IN_PROGRESS;
+      case StatusTask.Review: return TaskStatus.REVIEW;
+      case StatusTask.Completed: return TaskStatus.DONE;
       default: return TaskStatus.TODO;
     }
   }

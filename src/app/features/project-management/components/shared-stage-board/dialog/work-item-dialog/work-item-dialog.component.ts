@@ -45,7 +45,7 @@ export class WorkItemDialogComponent implements OnInit {
   private taskService = inject(TaskService);
   private subtaskApiService = inject(SubtaskApiService);
 
-  readonly taskAttachmentType = AttachmentType._4;
+  readonly taskAttachmentType = AttachmentType.Task;
 
   subtasks = signal<ProjectSubTaskDto[]>([]);
   isLoadingTaskTypes = signal(false);
@@ -345,9 +345,9 @@ export class WorkItemDialogComponent implements OnInit {
   getStatusSeverity(status: ProjectStatusSubTask | undefined): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' {
     // 0 = pending, 1 = in-progress, 2 = completed
     switch (status) {
-      case ProjectStatusSubTask._0:
+      case ProjectStatusSubTask.Complited:
         return 'warning';
-      case ProjectStatusSubTask._1:
+      case ProjectStatusSubTask.InProgress:
         return 'info';
       default:
         return 'secondary';
@@ -357,9 +357,9 @@ export class WorkItemDialogComponent implements OnInit {
   getStatusLabel(status: ProjectStatusSubTask | undefined): string {
     // 0 = pending, 1 = in-progress, 2 = completed
     switch (status) {
-      case ProjectStatusSubTask._0:
+      case ProjectStatusSubTask.Complited:
         return 'Pending';
-      case ProjectStatusSubTask._1:
+      case ProjectStatusSubTask.InProgress:
         return 'In Progress';
       default:
         return 'Unknown';

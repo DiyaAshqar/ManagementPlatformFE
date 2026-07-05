@@ -8,7 +8,8 @@ import {
   GetConstructorDtoResponse,
   BooleanResponse,
   LookupClient,
-  LookupDto
+  LookupDto,
+  LookupType
 } from '../../../../nswag/api-client';
 
 @Injectable({
@@ -51,10 +52,10 @@ export class ConstructorService {
 
   // Lookup methods
   getMainContractorTypes(): Observable<LookupDto[]> {
-    return this.lookupClient.getAllLookups(['MainContractType']).pipe(
+    return this.lookupClient.getAllLookups([LookupType.MainContractType]).pipe(
       map(response => {
-        if (response.succeeded && response.data && response.data['MainContractType']) {
-          return response.data['MainContractType'];
+        if (response.succeeded && response.data && response.data[LookupType.MainContractType]) {
+          return response.data[LookupType.MainContractType];
         }
         return [];
       })
