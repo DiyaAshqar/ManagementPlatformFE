@@ -20,6 +20,7 @@ import {
   MileStonesDto,
   StringLookupDtoListDictionaryResponse
 } from '../../../../nswag/api-client';
+import { getLookupData } from '../../../shared/utils/lookup.util';
 
 @Injectable({
   providedIn: 'root'
@@ -72,8 +73,8 @@ export class AgreementWizardService {
   getCountries(): Observable<LookupDto[]> {
     return this.getAllLookups([LookupType.Country]).pipe(
       map(response => {
-        if (response.succeeded && response.data && response.data[LookupType.Country]) {
-          return response.data[LookupType.Country];
+        if (response.succeeded) {
+          return getLookupData(response.data, LookupType.Country) ?? [];
         }
         return [];
       })
@@ -83,8 +84,8 @@ export class AgreementWizardService {
   getCities(): Observable<LookupDto[]> {
     return this.getAllLookups([LookupType.City]).pipe(
       map(response => {
-        if (response.succeeded && response.data && response.data[LookupType.City]) {
-          return response.data[LookupType.City];
+        if (response.succeeded) {
+          return getLookupData(response.data, LookupType.City) ?? [];
         }
         return [];
       })
@@ -94,8 +95,8 @@ export class AgreementWizardService {
   getAgreementTypes(): Observable<LookupDto[]> {
     return this.getAllLookups([LookupType.AgreementType]).pipe(
       map(response => {
-        if (response.succeeded && response.data && response.data[LookupType.AgreementType]) {
-          return response.data[LookupType.AgreementType];
+        if (response.succeeded) {
+          return getLookupData(response.data, LookupType.AgreementType) ?? [];
         }
         return [];
       })
@@ -108,9 +109,9 @@ export class AgreementWizardService {
       map(response => {
         if (response.succeeded && response.data) {
           return {
-            countries: response.data[LookupType.Country] || [],
-            cities: response.data[LookupType.City] || [],
-            agreementTypes: response.data[LookupType.AgreementType] || []
+            countries: getLookupData(response.data, LookupType.Country) ?? [],
+            cities: getLookupData(response.data, LookupType.City) ?? [],
+            agreementTypes: getLookupData(response.data, LookupType.AgreementType) ?? []
           };
         }
         return { countries: [], cities: [], agreementTypes: [] };
@@ -129,10 +130,10 @@ export class AgreementWizardService {
       map(response => {
         if (response.succeeded && response.data) {
           return {
-            contractTypes: response.data[LookupType.ContractType] || [],
-            contractModels: response.data[LookupType.ContractModel] || [],
-            paymentMethods: response.data[LookupType.PaymentMethod] || [],
-            services: response.data[LookupType.Service] || []
+            contractTypes: getLookupData(response.data, LookupType.ContractType) ?? [],
+            contractModels: getLookupData(response.data, LookupType.ContractModel) ?? [],
+            paymentMethods: getLookupData(response.data, LookupType.PaymentMethod) ?? [],
+            services: getLookupData(response.data, LookupType.Service) ?? []
           };
         }
         return { contractTypes: [], contractModels: [], paymentMethods: [], services: [] };
@@ -146,8 +147,8 @@ export class AgreementWizardService {
       map(response => {
         if (response.succeeded && response.data) {
           return {
-            units: response.data[LookupType.Unit] || [],
-            annexes: response.data[LookupType.Annex] || []
+            units: getLookupData(response.data, LookupType.Unit) ?? [],
+            annexes: getLookupData(response.data, LookupType.Annex) ?? []
           };
         }
         return { units: [], annexes: [] };
@@ -168,12 +169,12 @@ export class AgreementWizardService {
       map(response => {
         if (response.succeeded && response.data) {
           return {
-            mainContractTypes: response.data[LookupType.MainContractType] || [],
-            constructors: response.data[LookupType.Constructor] || [],
-            units: response.data[LookupType.Unit] || [],
-            dutyTypes: response.data[LookupType.DutyType] || [],
-            dutyResponsibilities: response.data[LookupType.DutyResponsibility] || [],
-            milestones: response.data[LookupType.MileStones] || []
+            mainContractTypes: getLookupData(response.data, LookupType.MainContractType) ?? [],
+            constructors: getLookupData(response.data, LookupType.Constructor) ?? [],
+            units: getLookupData(response.data, LookupType.Unit) ?? [],
+            dutyTypes: getLookupData(response.data, LookupType.DutyType) ?? [],
+            dutyResponsibilities: getLookupData(response.data, LookupType.DutyResponsibility) ?? [],
+            milestones: getLookupData(response.data, LookupType.MileStones) ?? []
           };
         }
         return { mainContractTypes: [], constructors: [], units: [], dutyTypes: [], dutyResponsibilities: [], milestones: [] };
@@ -187,7 +188,7 @@ export class AgreementWizardService {
       map(response => {
         if (response.succeeded && response.data) {
           return {
-            suppliers: response.data[LookupType.Supplier] || []
+            suppliers: getLookupData(response.data, LookupType.Supplier) ?? []
           };
         }
         return { suppliers: [] };
@@ -201,10 +202,10 @@ export class AgreementWizardService {
       map(response => {
         if (response.succeeded && response.data) {
           return {
-            units: response.data[LookupType.Unit] || [],
-            milestones: response.data[LookupType.MileStones] || [],
-            constructors: response.data[LookupType.Constructor] || [],
-            suppliers: response.data[LookupType.Supplier] || []
+            units: getLookupData(response.data, LookupType.Unit) ?? [],
+            milestones: getLookupData(response.data, LookupType.MileStones) ?? [],
+            constructors: getLookupData(response.data, LookupType.Constructor) ?? [],
+            suppliers: getLookupData(response.data, LookupType.Supplier) ?? []
           };
         }
         return { units: [], milestones: [], constructors: [], suppliers: [] };

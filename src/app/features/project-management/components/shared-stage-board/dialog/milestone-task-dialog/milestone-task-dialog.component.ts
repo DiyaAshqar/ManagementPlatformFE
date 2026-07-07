@@ -13,6 +13,7 @@ import { catchError, of, Subject } from 'rxjs';
 import { debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { AttachmentType, ConstructorClient, ICreateTaskCommand, LookupClient, LookupType, SupplierClient } from '../../../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../../../shared/components/documents-table/documents-table.component';
+import { getLookupData } from '../../../../../../shared/utils/lookup.util';
 import { TaskService } from '../../../../services/task.service';
 
 export interface MilestoneTaskFormData extends ICreateTaskCommand {
@@ -153,7 +154,7 @@ export class MilestoneTaskDialogComponent implements OnInit, OnDestroy {
   private loadResponsibilities(): void {
     this.lookupClient.getAllLookups([LookupType.DutyResponsibility]).subscribe({
       next: (response) => {
-        const data = response.data?.[LookupType.DutyResponsibility] ?? [];
+        const data = getLookupData(response.data, LookupType.DutyResponsibility) ?? [];
         this.responsibilityOptions = data
           .filter(item => item.id != null && item.name)
           .map(item => ({ label: item.name!, value: item.id! }));

@@ -11,6 +11,7 @@ import {
   LookupDto,
   LookupType
 } from '../../../../nswag/api-client';
+import { getLookupData } from '../../../shared/utils/lookup.util';
 
 @Injectable({
   providedIn: 'root'
@@ -54,8 +55,8 @@ export class ConstructorService {
   getMainContractorTypes(): Observable<LookupDto[]> {
     return this.lookupClient.getAllLookups([LookupType.MainContractType]).pipe(
       map(response => {
-        if (response.succeeded && response.data && response.data[LookupType.MainContractType]) {
-          return response.data[LookupType.MainContractType];
+        if (response.succeeded) {
+          return getLookupData(response.data, LookupType.MainContractType) ?? [];
         }
         return [];
       })

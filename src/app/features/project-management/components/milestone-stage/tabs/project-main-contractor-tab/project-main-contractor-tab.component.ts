@@ -25,6 +25,7 @@ import {
   ProjectMainContractorClient,
   ProjectMainContractorDutyClient
 } from '../../../../../../../nswag/api-client';
+import { getLookupData } from '../../../../../../shared/utils/lookup.util';
 import { AddContractorDialogComponent } from '../../../dialog/add-contractor-dialog/add-contractor-dialog.component';
 import { ContractorDutiesDialogComponent } from '../../../../../agreement-wizard/components/steps/step4/contractor-duties-dialog/contractor-duties-dialog.component';
 import { ProjectMainContractorPaymentsComponent } from '../../../../components/project-main-contractor/project-main-contractor-payments/project-main-contractor-payments.component';
@@ -104,7 +105,7 @@ export class ProjectMainContractorTabComponent implements OnInit {
     // Load contractor types from the lookup API
     this.lookupClient.getAllLookups([LookupType.MainContractType]).subscribe({
       next: (res) => {
-        const types = res.data?.[LookupType.MainContractType] ?? [];
+        const types = getLookupData(res.data, LookupType.MainContractType) ?? [];
         this.contractorTypeOptions = types
           .filter((t: any) => t.id != null && t.name)
           .map((t: any) => ({ label: t.name, value: t.id }));

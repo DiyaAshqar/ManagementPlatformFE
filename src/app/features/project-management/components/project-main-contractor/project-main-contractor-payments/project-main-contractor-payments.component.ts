@@ -26,6 +26,7 @@ import {
   LookupType,
   ProjectMainContractorPaymentClient
 } from '../../../../../../nswag/api-client';
+import { getLookupData } from '../../../../../shared/utils/lookup.util';
 import { DocumentsTableComponent } from '../../../../../shared/components/documents-table/documents-table.component';
 
 @Component({
@@ -99,9 +100,9 @@ export class ProjectMainContractorPaymentsComponent implements OnInit, OnChanges
   loadLookups(): void {
     this.lookupClient.getAllLookups([LookupType.PaymentMethod]).subscribe({
       next: (res) => {
-        const data = res.data as any;
-        if (data?.[LookupType.PaymentMethod]) {
-          this.paymentMethodOptions = (data[LookupType.PaymentMethod] as { id: number; name: string }[])
+        const methods = getLookupData(res.data as any, LookupType.PaymentMethod);
+        if (methods) {
+          this.paymentMethodOptions = (methods as { id: number; name: string }[])
             .map(m => ({ label: m.name, value: m.id }));
           this.paymentMethodMap = Object.fromEntries(this.paymentMethodOptions.map(o => [o.value, o.label]));
         }
