@@ -28,14 +28,19 @@
     </div>
     <div class="col-6">
       <label for="milestone-task-assignTo" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.assignTo' | translate }}</label>
-      <input
+      <p-select
         id="milestone-task-assignTo"
-        type="text"
-        pInputText
         [ngModel]="currentFormData.assignTo"
         (ngModelChange)="updateFormField('assignTo', $event)"
+        [options]="userOptions"
+        optionLabel="label"
+        optionValue="value"
+        [filter]="true"
+        [showClear]="true"
+        [loading]="isLoadingUsers()"
         [placeholder]="'milestoneTaskDialog.fields.assignToPlaceholder' | translate"
-        class="w-full">
+        styleClass="w-full">
+      </p-select>
     </div>
   </div>
 
@@ -84,14 +89,14 @@
     </div>
     <div class="col-6">
       <label for="milestone-task-points" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.taskPoints' | translate }}</label>
-      <input
+      <p-inputNumber
         id="milestone-task-points"
-        type="text"
-        pInputText
         [ngModel]="currentFormData.taskPoint"
         (ngModelChange)="updateFormField('taskPoint', $event)"
+        [min]="0"
         [placeholder]="'milestoneTaskDialog.fields.taskPointsPlaceholder' | translate"
-        class="w-full">
+        styleClass="w-full">
+      </p-inputNumber>
     </div>
   </div>
 
@@ -103,14 +108,12 @@
         <label for="milestone-task-responsibility" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.responsibility' | translate }}</label>
         <p-select
           id="milestone-task-responsibility"
-          [ngModel]="currentFormData.dutyResponsibilityId"
-          (ngModelChange)="updateFormField('dutyResponsibilityId', $event)"
+          [ngModel]="currentFormData.responsibility"
+          (ngModelChange)="updateFormField('responsibility', $event)"
           [options]="responsibilityOptions"
           optionLabel="label"
           optionValue="value"
           [filter]="true"
-          [loading]="isLoadingSuppliers()"
-          (onFilter)="onSupplierFilter($event)"
           [showClear]="true"
           [placeholder]="'milestoneTaskDialog.fields.responsibilityPlaceholder' | translate"
           styleClass="w-full">
@@ -120,12 +123,13 @@
         <label for="milestone-task-main-contractor" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.mainContractor' | translate }}</label>
         <p-select
           id="milestone-task-main-contractor"
-          [ngModel]="currentFormData.constructorId"
-          (ngModelChange)="updateFormField('constructorId', $event)"
+          [ngModel]="currentFormData.projectMainContractorId"
+          (ngModelChange)="updateFormField('projectMainContractorId', $event)"
           [options]="mainContractorOptions"
           optionLabel="label"
           optionValue="value"
           [filter]="true"
+          [loading]="isLoadingMainContractors()"
           [showClear]="true"
           [placeholder]="'milestoneTaskDialog.fields.mainContractorPlaceholder' | translate"
           styleClass="w-full">

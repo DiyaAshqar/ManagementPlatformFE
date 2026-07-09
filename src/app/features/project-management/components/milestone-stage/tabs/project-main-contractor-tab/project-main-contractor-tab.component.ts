@@ -233,7 +233,7 @@ export class ProjectMainContractorTabComponent implements OnInit {
     const requests = [
       ...contractorDuties.map(duty => this.contractorDutyClient.createOrUpdate(
         new CreateProjectMainContractorDutyCommand({
-          id: duty.id ?? 0,
+          id: duty.id && duty.id > 0 ? duty.id : undefined,
           subTotal: duty.subTotal,
           quantity: duty.quantity,
           price: duty.price,

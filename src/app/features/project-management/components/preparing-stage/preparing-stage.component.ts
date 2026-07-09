@@ -210,6 +210,10 @@ export class PreparingStageComponent implements OnInit {
       taskId: task.id, // Backend task ID
       projectStageId: task.projectStageId, // Stage ID for subtask creation
       taskTypeId: task.taskTypeId, // Task type ID from API
+      source: task.source,
+      responsibility: task.responsibility,
+      projectMainContractorId: task.projectMainContractorId,
+      supplierId: task.supplierId,
       title: task.title || 'Untitled Task',
       type: WorkItemType.TASK,
       priority: this.mapPriority(task.priority),
