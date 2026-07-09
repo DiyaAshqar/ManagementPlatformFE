@@ -118,9 +118,13 @@ function isGetRequest(request: HttpRequest<any>): boolean {
 function isSkippedUrl(request: HttpRequest<any>): boolean {
   const skipUrls = [
     '/api/Lookup',
+    '/api/Auth/login',
+    '/api/Auth/refresh-token',
+    '/api/Auth/logout',
   ];
 
-  return skipUrls.some(url => request.url.includes(url));
+  const requestUrl = request.url.toLowerCase();
+  return skipUrls.some(url => requestUrl.includes(url.toLowerCase()));
 }
 
 function shouldShowSuccessToast(

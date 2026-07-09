@@ -238,7 +238,8 @@
             [label]="editingIndex() !== null ? ('common.edit' | translate) : ('common.add' | translate)"
             icon="pi pi-check"
             (onClick)="addContractorDuty()"
-            [disabled]="contractorDutyForm.invalid">
+            [loading]="isSaving()"
+            [disabled]="contractorDutyForm.invalid || isSaving()">
           </p-button>
         </div>
 
@@ -310,6 +311,7 @@
                   (click)="editContractorDuty(rowIndex)"
                   pButton
                   icon="pi pi-pencil"
+                  [disabled]="isSaving()"
                   [pTooltip]="'common.edit' | translate">
                 </button>
                 <button
@@ -318,6 +320,7 @@
                   (click)="deleteContractorDuty(rowIndex)"
                   pButton
                   icon="pi pi-trash"
+                  [disabled]="isSaving()"
                   [pTooltip]="'common.delete' | translate">
                 </button>
               </td>
@@ -346,7 +349,7 @@
         [icon]="isViewMode() ? 'pi pi-check' : 'pi pi-times'"
         (onClick)="closeContractorDutiesDialog()">
       </p-button>
-      @if (!isViewMode()) {
+      @if (!isViewMode() && !persistImmediately()) {
         <p-button
           [label]="'common.saveAll' | translate"
           icon="pi pi-save"

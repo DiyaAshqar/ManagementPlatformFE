@@ -213,6 +213,18 @@ export class ProjectMainContractorTabComponent implements OnInit {
     this.selectedContractorDuties.set([]);
   }
 
+  onContractorDutiesChanged(): void {
+    const contractId = this.selectedMainContractId();
+    if (!contractId) return;
+
+    this.contractorDutyClient.getByContractorId(contractId, 1, 1000, undefined).subscribe({
+      next: (response) => {
+        this.selectedContractorDuties.set(this.mapContractorDuties(response.data?.data ?? []));
+      },
+      error: (error) => console.error('Error refreshing contractor duties:', error)
+    });
+  }
+
   onContractorDutyDataReceived(contractorDuties: ContractorDutyDto[]): void {
     const contractId = this.selectedMainContractId();
 
