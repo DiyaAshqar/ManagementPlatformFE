@@ -81,27 +81,18 @@ Useful request headers: `X-Skip-Error-Toast`, `X-Skip-Success-Toast`, `X-Skip-Lo
 
 ## Authentication, authorization & claims
 
-Lives under [src/app/core/auth/](src/app/core/auth/). Built to run **fully on a mock backend today** and swap to the real API by flipping one flag once the backend exposes auth endpoints.
+Lives under [src/app/core/auth/](src/app/core/auth/) and uses the generated backend `AuthClient`.
 
-- `environment.auth.useMock` — `true` uses the in-memory mock (`core/auth/mock`); set to `false` once the generated `AuthClient` exists.
 - **AuthService** — signal-based session: `currentUser`, `isAuthenticated`, `roles`, `permissions`, `claims`. Exposes `login()`, `logout()`, `refreshToken()`, and `hasRole`/`hasAnyRole`/`hasPermission`/`hasClaim`.
 - **JwtService** — decodes JWTs (no external lib), reads expiry and claims.
-- **AuthApiService** — single seam between the app and the backend; delegates to the mock or the real client based on `useMock`.
+- **AuthApiService** — maps between the app's authentication models and the generated backend client.
 - **Guards** ([guards/auth.guard.ts](src/app/core/auth/guards/auth.guard.ts)): `AuthGuard`, `GuestGuard`, `roleGuard([...])`, `permissionGuard([...])` — unauthenticated users are redirected to `/auth/login?returnUrl=...`.
 - **Directives**: `*appHasPermission` and `*appHasRole` conditionally render UI based on the current session.
 - **Claims/permissions** are centralized as constants in [models/auth.models.ts](src/app/core/auth/models/auth.models.ts) — reference these, don't hardcode strings.
 
-### Switching from mock to real backend
-
-1. Run `npm run generate-api` after the backend adds the auth controller.
-2. Set `environment.auth.useMock = false` in all `environment*.ts`.
-3. Wire the generated client inside `AuthApiService` (a `// REAL API` block marks the exact spot) and register it in `app.config.ts`.
-
-Nothing else in the app should need to change — components, guards, and directives depend only on `AuthService`.
-
 ## Environment
 
-[src/environments/](src/environments/) holds `environment.ts` (base), `.development.ts`, `.production.ts`. Keys: `apiUrl`, `nSwagUrl`, `auth` (storage keys, mock flag), `api` (timeout/retry), `cache`, `features`.
+[src/environments/](src/environments/) holds `environment.ts` (base), `.development.ts`, `.production.ts`. Keys: `apiUrl`, `nSwagUrl`, `auth` (storage keys), `api` (timeout/retry), `cache`, `features`.
 
 ## Gotchas
 

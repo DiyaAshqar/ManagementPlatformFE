@@ -14,6 +14,7 @@ import {
   CreateProjectSurveyingVisitCommand,
   GetProjectSurveyingVisitDto,
   LookupClient,
+  LookupType,
   ProjectSurveyingVisitClient
 } from '../../../../../../../nswag/api-client';
 import { AddSurveyingVisitDialogComponent } from '../../../dialog/add-surveying-visit-dialog/add-surveying-visit-dialog.component';
@@ -81,7 +82,7 @@ export class SurveyingVisitsTabComponent implements OnInit {
   // ── Lookups ───────────────────────────────────────────────────────────────
 
   loadLookups(): void {
-    this.lookupClient.getAllLookups(['unit']).subscribe({
+    this.lookupClient.getAllLookups([LookupType.Unit]).subscribe({
       next: (lookups) => {
         const data = lookups.data as any;
         if (data?.['unit']) {

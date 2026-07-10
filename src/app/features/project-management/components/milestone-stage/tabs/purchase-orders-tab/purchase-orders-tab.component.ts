@@ -16,6 +16,7 @@ import {
   CreateProjectPOCommand,
   IGetProjectPODto,
   LookupClient,
+  LookupType,
   ProjectPOClient,
   SupplierClient
 } from '../../../../../../../nswag/api-client';
@@ -99,7 +100,7 @@ export class PurchaseOrdersTabComponent implements OnInit, OnDestroy {
 
   loadLookups(): void {
     forkJoin({
-      lookups: this.lookupClient.getAllLookups(['unit'])
+      lookups: this.lookupClient.getAllLookups([LookupType.Unit])
     }).subscribe({
       next: ({ lookups }) => {
         const data = lookups.data as any;

@@ -16,9 +16,7 @@ import { InputTextModule } from 'primeng/inputtext';
 import { MessageModule } from 'primeng/message';
 import { PasswordModule } from 'primeng/password';
 
-import { environment } from '../../../../../environments/environment';
 import { AuthService } from '../../../../core/auth/services/auth.service';
-import { MOCK_USERS } from '../../../../core/auth/mock/mock-auth';
 
 @Component({
   selector: 'app-login',
@@ -48,15 +46,6 @@ export class LoginComponent {
   readonly loading = signal(false);
   /** Backend/credential error to surface to the user. */
   readonly errorMessage = signal<string | null>(null);
-
-  /** Whether the in-memory mock backend is active (drives the demo hint). */
-  readonly isMock = environment.auth.useMock;
-  /** Demo accounts shown only when running on the mock backend. */
-  readonly demoAccounts = MOCK_USERS.map((u) => ({
-    label: u.fullName,
-    email: u.email,
-    password: u.password,
-  }));
 
   readonly form = this.fb.nonNullable.group({
     email: ['', [Validators.required, Validators.email]],
@@ -95,11 +84,6 @@ export class LoginComponent {
         );
       },
     });
-  }
-
-  /** Quick-fill a demo account (mock mode only). */
-  useDemoAccount(account: { email: string; password: string }): void {
-    this.form.patchValue({ email: account.email, password: account.password });
   }
 
   private resolveReturnUrl(): string {

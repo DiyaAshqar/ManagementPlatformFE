@@ -139,6 +139,11 @@ export const routes: Routes = [
         path: 'materials',
         loadComponent: () => import('./features/material/pages/material-management/material-management.component')
           .then(m => m.MaterialManagementComponent)
+      },
+      {
+        path: 'users',
+        loadComponent: () => import('./features/user-management/pages/user-list/user-list.component')
+          .then(m => m.UserListComponent)
       }
     ]
   },

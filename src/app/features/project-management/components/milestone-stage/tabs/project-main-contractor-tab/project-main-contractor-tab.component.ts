@@ -21,9 +21,11 @@ import {
   GetProjectMainContractorDutyDto,
   IGetProjectMainContractorDto,
   LookupClient,
+  LookupType,
   ProjectMainContractorClient,
   ProjectMainContractorDutyClient
 } from '../../../../../../../nswag/api-client';
+import { getLookupData } from '../../../../../../shared/utils/lookup.util';
 import { AddContractorDialogComponent } from '../../../dialog/add-contractor-dialog/add-contractor-dialog.component';
 import { ContractorDutiesDialogComponent } from '../../../../../agreement-wizard/components/steps/step4/contractor-duties-dialog/contractor-duties-dialog.component';
 import { ProjectMainContractorPaymentsComponent } from '../../../../components/project-main-contractor/project-main-contractor-payments/project-main-contractor-payments.component';
@@ -101,9 +103,9 @@ export class ProjectMainContractorTabComponent implements OnInit {
     });
 
     // Load contractor types from the lookup API
-    this.lookupClient.getAllLookups(['MainContractType']).subscribe({
+    this.lookupClient.getAllLookups([LookupType.MainContractType]).subscribe({
       next: (res) => {
-        const types = res.data?.['MainContractType'] ?? [];
+        const types = getLookupData(res.data, LookupType.MainContractType) ?? [];
         this.contractorTypeOptions = types
           .filter((t: any) => t.id != null && t.name)
           .map((t: any) => ({ label: t.name, value: t.id }));
@@ -153,9 +155,9 @@ export class ProjectMainContractorTabComponent implements OnInit {
 
   getClassificationLabel(classification: ClassificationProjectMainContractor | 0 | undefined): string {
     switch (classification) {
-      case ClassificationProjectMainContractor._1:
+      case ClassificationProjectMainContractor.MainContractor:
         return this.translate.instant('dialogs.contractor.classificationMain');
-      case ClassificationProjectMainContractor._2:
+      case ClassificationProjectMainContractor.SubContractor:
         return this.translate.instant('dialogs.contractor.classificationSub');
       case 0:
         return this.translate.instant('dialogs.contractor.classificationUnclassified');
@@ -211,6 +213,18 @@ export class ProjectMainContractorTabComponent implements OnInit {
     this.selectedContractorDuties.set([]);
   }
 
+  onContractorDutiesChanged(): void {
+    const contractId = this.selectedMainContractId();
+    if (!contractId) return;
+
+    this.contractorDutyClient.getByContractorId(contractId, 1, 1000, undefined).subscribe({
+      next: (response) => {
+        this.selectedContractorDuties.set(this.mapContractorDuties(response.data?.data ?? []));
+      },
+      error: (error) => console.error('Error refreshing contractor duties:', error)
+    });
+  }
+
   onContractorDutyDataReceived(contractorDuties: ContractorDutyDto[]): void {
     const contractId = this.selectedMainContractId();
 
@@ -231,7 +245,7 @@ export class ProjectMainContractorTabComponent implements OnInit {
     const requests = [
       ...contractorDuties.map(duty => this.contractorDutyClient.createOrUpdate(
         new CreateProjectMainContractorDutyCommand({
-          id: duty.id ?? 0,
+          id: duty.id && duty.id > 0 ? duty.id : undefined,
           subTotal: duty.subTotal,
           quantity: duty.quantity,
           price: duty.price,

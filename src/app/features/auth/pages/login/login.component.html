@@ -91,28 +91,5 @@
       </p-button>
     </form>
 
-    @if (isMock) {
-      <div class="demo-hint mt-4">
-        <p class="demo-hint-title">
-          <i class="pi pi-sparkles"></i>
-          {{ 'auth.demo.title' | translate }}
-        </p>
-        <div class="demo-accounts">
-          @for (account of demoAccounts; track account.email) {
-            <button
-              type="button"
-              class="demo-account"
-              (click)="useDemoAccount(account)">
-              <span class="demo-account-avatar">{{ account.label.charAt(0) }}</span>
-              <span class="demo-account-info">
-                <span class="demo-account-role">{{ account.label }}</span>
-                <span class="demo-account-email">{{ account.email }}</span>
-              </span>
-              <i class="pi pi-chevron-right demo-account-arrow"></i>
-            </button>
-          }
-        </div>
-      </div>
-    }
   </div>
 </div>

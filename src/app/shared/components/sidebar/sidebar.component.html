@@ -20,17 +20,19 @@
       <div *ngFor="let section of navSections" class="nav-section">
         <div class="section-title">{{ section.title | translate }}</div>
         <div class="nav-items">
-          <a 
-            *ngFor="let item of section.items"
-            class="nav-item"
-            [class.active]="isActiveRoute(item.route)"
-            (click)="navigateTo(item.route)"
-            [attr.aria-label]="item.label | translate"
-            [pTooltip]="!sidebarService.isOpen() ? (item.label | translate) : ''"
-            tooltipPosition="right">
-            <i [class]="item.icon + ' nav-icon'"></i>
-            <span class="nav-label" *ngIf="sidebarService.isOpen()">{{ item.label | translate }}</span>
-          </a>
+          <ng-container *ngFor="let item of section.items">
+            <a
+              *ngIf="canShow(item)"
+              class="nav-item"
+              [class.active]="isActiveRoute(item.route)"
+              (click)="navigateTo(item.route)"
+              [attr.aria-label]="item.label | translate"
+              [pTooltip]="!sidebarService.isOpen() ? (item.label | translate) : ''"
+              tooltipPosition="right">
+              <i [class]="item.icon + ' nav-icon'"></i>
+              <span class="nav-label" *ngIf="sidebarService.isOpen()">{{ item.label | translate }}</span>
+            </a>
+          </ng-container>
         </div>
       </div>
     </div>

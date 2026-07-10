@@ -52,15 +52,15 @@ export class AddContractorDialogComponent implements OnInit, OnChanges, OnDestro
   isLoadingContractors = signal(false);
   contractorOptions: { label: string; value: number }[] = [];
 
-  get classificationOptions(): { label: string; value: number }[] {
-    const options: { label: string; value: number }[] = [
+  get classificationOptions(): { label: string; value: ClassificationProjectMainContractor | 0 }[] {
+    const options: { label: string; value: ClassificationProjectMainContractor | 0 }[] = [
       {
         label: this.translate.instant('dialogs.contractor.classificationMain'),
-        value: ClassificationProjectMainContractor._1
+        value: ClassificationProjectMainContractor.MainContractor
       },
       {
         label: this.translate.instant('dialogs.contractor.classificationSub'),
-        value: ClassificationProjectMainContractor._2
+        value: ClassificationProjectMainContractor.SubContractor
       }
     ];
 

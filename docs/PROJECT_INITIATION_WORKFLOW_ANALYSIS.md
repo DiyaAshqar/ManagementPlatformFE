@@ -25,7 +25,7 @@ This report is based entirely on the current code (verified with file/line citat
 | **Supplier** | `/supplier` | Master data for material/service suppliers — [app.routes.ts:119-137](../src/app/app.routes.ts#L119-L137) |
 | **Material** | `/materials` | Hierarchical catalog: Category → SubCategory → Material — [app.routes.ts:139-142](../src/app/app.routes.ts#L139-L142) |
 | **Analytics / Theme showcase** | `/analytics`, `/theme-showcase` | Secondary/demo screens |
-| **Auth** | `/auth/login` | Mock-backed login (`environment.auth.useMock`) |
+| **Auth** | `/auth/login` | Backend-backed login |
 
 Sidebar navigation only exposes 5 of these (Dashboard, Project Management, Constructors, Suppliers, Materials) — **the Agreement Wizard link is commented out of the sidebar**, even though its route is fully active ([sidebar.component.html](../src/app/shared/components/sidebar/sidebar.component.html)). Today, an agreement is therefore reached only via direct URL or as a step the create‑project flow depends on.
 

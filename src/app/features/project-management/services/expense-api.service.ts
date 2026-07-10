@@ -6,7 +6,6 @@ import {
   GetExpenseDtoListPagedResponseResponse,
   GetExpenseDtoResponse,
   BooleanResponse,
-  Int32Response,
 } from '../../../../nswag/api-client';
 
 @Injectable({
@@ -15,20 +14,21 @@ import {
 export class ExpenseApiService {
   constructor(private expenseClient: ExpenseClient) {}
 
-  createOrUpdate(command: CreateExpenseCommand): Observable<Int32Response> {
+  createOrUpdate(command: CreateExpenseCommand): Observable<BooleanResponse> {
     return this.expenseClient.createOrUpdate(command);
   }
 
-  delete(id: number): Observable<BooleanResponse> {
+  delete(id: number): Observable<void> {
     return this.expenseClient.delete(id, true);
   }
 
   getByProjectStageId(
     projectStageId: number,
+    projectId: number,
     pageNumber: number = 1,
     pageSize: number = 100
   ): Observable<GetExpenseDtoListPagedResponseResponse> {
-    return this.expenseClient.getByProjectId(projectStageId, pageNumber, pageSize, undefined);
+    return this.expenseClient.getByProjectId(projectStageId, projectId, pageNumber, pageSize, undefined);
   }
 
   getById(id: number): Observable<GetExpenseDtoResponse> {

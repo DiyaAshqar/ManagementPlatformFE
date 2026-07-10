@@ -15,6 +15,418 @@ import { HttpClient, HttpHeaders, HttpResponse, HttpResponseBase } from '@angula
 export const API_BASE_URL = new InjectionToken<string>('API_BASE_URL');
 
 @Injectable()
+export class AdvancesClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param status (optional) 
+     * @param search (optional) 
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getAll(status: string | undefined, search: string | undefined, requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<AdvanceListResponseDtoResponse> {
+        let url_ = this.baseUrl + "/api/advances?";
+        if (status === null)
+            throw new globalThis.Error("The parameter 'status' cannot be null.");
+        else if (status !== undefined)
+            url_ += "Status=" + encodeURIComponent("" + status) + "&";
+        if (search === null)
+            throw new globalThis.Error("The parameter 'search' cannot be null.");
+        else if (search !== undefined)
+            url_ += "Search=" + encodeURIComponent("" + search) + "&";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AdvanceListResponseDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AdvanceListResponseDtoResponse>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<AdvanceListResponseDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AdvanceListResponseDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    create(body: CreateAdvanceCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/advances";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreate(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getById(id: number): Observable<AdvanceDetailDtoResponse> {
+        let url_ = this.baseUrl + "/api/advances/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AdvanceDetailDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AdvanceDetailDtoResponse>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<AdvanceDetailDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AdvanceDetailDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    update(id: number, body: UpdateAdvanceCommand | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/advances/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("patch", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processUpdate(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    delete(id: number): Observable<void> {
+        let url_ = this.baseUrl + "/api/advances/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    settle(id: number, body: SettleAdvanceCommand | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/advances/{id}/settle";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processSettle(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processSettle(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processSettle(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getAvailableExpenses(id: number): Observable<AvailableAdvanceExpensesDtoResponse> {
+        let url_ = this.baseUrl + "/api/advances/{id}/available-expenses";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAvailableExpenses(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAvailableExpenses(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AvailableAdvanceExpensesDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AvailableAdvanceExpensesDtoResponse>;
+        }));
+    }
+
+    protected processGetAvailableExpenses(response: HttpResponseBase): Observable<AvailableAdvanceExpensesDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AvailableAdvanceExpensesDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class AgreementClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -1404,7 +1816,7 @@ export class ExpenseClient {
      * @param body (optional) 
      * @return OK
      */
-    createOrUpdate(body: CreateExpenseCommand | undefined): Observable<Int32Response> {
+    createOrUpdate(body: CreateExpenseCommand | undefined): Observable<BooleanResponse> {
         let url_ = this.baseUrl + "/api/Expense";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -1427,14 +1839,14 @@ export class ExpenseClient {
                 try {
                     return this.processCreateOrUpdate(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<Int32Response>;
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<Int32Response>;
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
         }));
     }
 
-    protected processCreateOrUpdate(response: HttpResponseBase): Observable<Int32Response> {
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<BooleanResponse> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1445,7 +1857,7 @@ export class ExpenseClient {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = Int32Response.fromJS(resultData200);
+            result200 = BooleanResponse.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -1461,7 +1873,7 @@ export class ExpenseClient {
      * @param isEndpointCall (optional) 
      * @return OK
      */
-    delete(id: number | undefined, isEndpointCall: boolean | undefined): Observable<BooleanResponse> {
+    delete(id: number | undefined, isEndpointCall: boolean | undefined): Observable<void> {
         let url_ = this.baseUrl + "/api/Expense?";
         if (id === null)
             throw new globalThis.Error("The parameter 'id' cannot be null.");
@@ -1477,7 +1889,6 @@ export class ExpenseClient {
             observe: "response",
             responseType: "blob",
             headers: new HttpHeaders({
-                "Accept": "application/json"
             })
         };
 
@@ -1488,14 +1899,14 @@ export class ExpenseClient {
                 try {
                     return this.processDelete(response_ as any);
                 } catch (e) {
-                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                    return _observableThrow(e) as any as Observable<void>;
                 }
             } else
-                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+                return _observableThrow(response_) as any as Observable<void>;
         }));
     }
 
-    protected processDelete(response: HttpResponseBase): Observable<BooleanResponse> {
+    protected processDelete(response: HttpResponseBase): Observable<void> {
         const status = response.status;
         const responseBlob =
             response instanceof HttpResponse ? response.body :
@@ -1504,10 +1915,7 @@ export class ExpenseClient {
         let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
         if (status === 200) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
-            let result200: any = null;
-            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
-            result200 = BooleanResponse.fromJS(resultData200);
-            return _observableOf(result200);
+            return _observableOf(null as any);
             }));
         } else if (status !== 200 && status !== 204) {
             return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
@@ -1639,17 +2047,22 @@ export class ExpenseClient {
 
     /**
      * @param projectStageId (optional) 
+     * @param projectId (optional) 
      * @param requestParameter_PageNumber (optional) 
      * @param requestParameter_PageSize (optional) 
      * @param requestParameter_Filter (optional) 
      * @return OK
      */
-    getByProjectId(projectStageId: number | undefined, requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetExpenseDtoListPagedResponseResponse> {
+    getByProjectId(projectStageId: number | undefined, projectId: number | undefined, requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetExpenseDtoListPagedResponseResponse> {
         let url_ = this.baseUrl + "/api/Expense/by-project?";
         if (projectStageId === null)
             throw new globalThis.Error("The parameter 'projectStageId' cannot be null.");
         else if (projectStageId !== undefined)
             url_ += "ProjectStageId=" + encodeURIComponent("" + projectStageId) + "&";
+        if (projectId === null)
+            throw new globalThis.Error("The parameter 'projectId' cannot be null.");
+        else if (projectId !== undefined)
+            url_ += "ProjectId=" + encodeURIComponent("" + projectId) + "&";
         if (requestParameter_PageNumber === null)
             throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
         else if (requestParameter_PageNumber !== undefined)
@@ -1707,6 +2120,85 @@ export class ExpenseClient {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param projectStageId (optional) 
+     * @param projectIdQuery (optional) 
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getByProjectId2(projectIdPath: number, projectStageId: number | undefined, projectIdQuery: number | undefined, requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetExpenseDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/Expense/by-project/{projectId}?";
+        if (projectIdPath === undefined || projectIdPath === null)
+            throw new globalThis.Error("The parameter 'projectIdPath' must be defined.");
+        url_ = url_.replace("{projectId}", encodeURIComponent("" + projectIdPath));
+        if (projectStageId === null)
+            throw new globalThis.Error("The parameter 'projectStageId' cannot be null.");
+        else if (projectStageId !== undefined)
+            url_ += "ProjectStageId=" + encodeURIComponent("" + projectStageId) + "&";
+        if (projectIdQuery === null)
+            throw new globalThis.Error("The parameter 'projectIdQuery' cannot be null.");
+        else if (projectIdQuery !== undefined)
+            url_ += "ProjectId=" + encodeURIComponent("" + projectIdQuery) + "&";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByProjectId2(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByProjectId2(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetExpenseDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetExpenseDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetByProjectId2(response: HttpResponseBase): Observable<GetExpenseDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetExpenseDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -1724,7 +2216,7 @@ export class LookupClient {
      * @param body (optional) 
      * @return OK
      */
-    getAllLookups(body: string[] | undefined): Observable<StringLookupDtoListDictionaryResponse> {
+    getAllLookups(body: LookupType[] | undefined): Observable<StringLookupDtoListDictionaryResponse> {
         let url_ = this.baseUrl + "/api/Lookup";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -6089,9 +6581,13 @@ export class TaskClient {
     /**
      * @param id (optional) 
      * @param status (optional) 
+     * @param source (optional) 
+     * @param responsibility (optional) 
+     * @param projectMainContractorId (optional) 
+     * @param supplierId (optional) 
      * @return OK
      */
-    updateStatus(id: number | undefined, status: StatusTask | undefined): Observable<BooleanResponse> {
+    updateStatus(id: number | undefined, status: StatusTask | undefined, source: TaskSource | undefined, responsibility: Responsibility | undefined, projectMainContractorId: number | undefined, supplierId: number | undefined): Observable<BooleanResponse> {
         let url_ = this.baseUrl + "/api/Task/update-status?";
         if (id === null)
             throw new globalThis.Error("The parameter 'id' cannot be null.");
@@ -6101,6 +6597,22 @@ export class TaskClient {
             throw new globalThis.Error("The parameter 'status' cannot be null.");
         else if (status !== undefined)
             url_ += "Status=" + encodeURIComponent("" + status) + "&";
+        if (source === null)
+            throw new globalThis.Error("The parameter 'source' cannot be null.");
+        else if (source !== undefined)
+            url_ += "Source=" + encodeURIComponent("" + source) + "&";
+        if (responsibility === null)
+            throw new globalThis.Error("The parameter 'responsibility' cannot be null.");
+        else if (responsibility !== undefined)
+            url_ += "Responsibility=" + encodeURIComponent("" + responsibility) + "&";
+        if (projectMainContractorId === null)
+            throw new globalThis.Error("The parameter 'projectMainContractorId' cannot be null.");
+        else if (projectMainContractorId !== undefined)
+            url_ += "ProjectMainContractorId=" + encodeURIComponent("" + projectMainContractorId) + "&";
+        if (supplierId === null)
+            throw new globalThis.Error("The parameter 'supplierId' cannot be null.");
+        else if (supplierId !== undefined)
+            url_ += "SupplierId=" + encodeURIComponent("" + supplierId) + "&";
         url_ = url_.replace(/[?&]$/, "");
 
         let options_ : any = {
@@ -6540,18 +7052,632 @@ export class UsersClient {
 }
 
 export enum AcceptenceStatus {
-    _1 = 1,
-    _2 = 2,
-    _3 = 3,
+    Approved = "approved",
+    Rejected = "rejected",
+    Pending = "pending",
+}
+
+export class AdvanceDetailDto implements IAdvanceDetailDto {
+    id?: number;
+    advance_no?: string | undefined;
+    project?: string | undefined;
+    engineer?: string | undefined;
+    amount?: number;
+    remaining_balance?: number;
+    status?: string | undefined;
+    created_at?: Date;
+    project_stage_id?: number;
+    engineer_id?: number;
+    advance_date?: Date;
+    currency?: string | undefined;
+    payment_method?: PaymentMethod;
+    notes?: string | undefined;
+    reference?: string | undefined;
+    expenses?: AdvanceExpenseDto[] | undefined;
+
+    constructor(data?: IAdvanceDetailDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.advance_no = _data["advance_no"];
+            this.project = _data["project"];
+            this.engineer = _data["engineer"];
+            this.amount = _data["amount"];
+            this.remaining_balance = _data["remaining_balance"];
+            this.status = _data["status"];
+            this.created_at = _data["created_at"] ? new Date(_data["created_at"].toString()) : undefined as any;
+            this.project_stage_id = _data["project_stage_id"];
+            this.engineer_id = _data["engineer_id"];
+            this.advance_date = _data["advance_date"] ? new Date(_data["advance_date"].toString()) : undefined as any;
+            this.currency = _data["currency"];
+            this.payment_method = _data["payment_method"] ? PaymentMethod.fromJS(_data["payment_method"]) : undefined as any;
+            this.notes = _data["notes"];
+            this.reference = _data["reference"];
+            if (Array.isArray(_data["expenses"])) {
+                this.expenses = [] as any;
+                for (let item of _data["expenses"])
+                    this.expenses!.push(AdvanceExpenseDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AdvanceDetailDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AdvanceDetailDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["advance_no"] = this.advance_no;
+        data["project"] = this.project;
+        data["engineer"] = this.engineer;
+        data["amount"] = this.amount;
+        data["remaining_balance"] = this.remaining_balance;
+        data["status"] = this.status;
+        data["created_at"] = this.created_at ? this.created_at.toISOString() : undefined as any;
+        data["project_stage_id"] = this.project_stage_id;
+        data["engineer_id"] = this.engineer_id;
+        data["advance_date"] = this.advance_date ? this.advance_date.toISOString() : undefined as any;
+        data["currency"] = this.currency;
+        data["payment_method"] = this.payment_method ? this.payment_method.toJSON() : undefined as any;
+        data["notes"] = this.notes;
+        data["reference"] = this.reference;
+        if (Array.isArray(this.expenses)) {
+            data["expenses"] = [];
+            for (let item of this.expenses)
+                data["expenses"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IAdvanceDetailDto {
+    id?: number;
+    advance_no?: string | undefined;
+    project?: string | undefined;
+    engineer?: string | undefined;
+    amount?: number;
+    remaining_balance?: number;
+    status?: string | undefined;
+    created_at?: Date;
+    project_stage_id?: number;
+    engineer_id?: number;
+    advance_date?: Date;
+    currency?: string | undefined;
+    payment_method?: PaymentMethod;
+    notes?: string | undefined;
+    reference?: string | undefined;
+    expenses?: AdvanceExpenseDto[] | undefined;
+}
+
+export class AdvanceDetailDtoResponse implements IAdvanceDetailDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: AdvanceDetailDto;
+
+    constructor(data?: IAdvanceDetailDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? AdvanceDetailDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): AdvanceDetailDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AdvanceDetailDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAdvanceDetailDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: AdvanceDetailDto;
+}
+
+export class AdvanceExpense implements IAdvanceExpense {
+    id?: number;
+    isDeleted?: boolean;
+    advanceId?: number;
+    advance?: AdvancePayment;
+    expenseId?: number;
+    expense?: Expense;
+    createdAt?: Date;
+
+    constructor(data?: IAdvanceExpense) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.advanceId = _data["advanceId"];
+            this.advance = _data["advance"] ? AdvancePayment.fromJS(_data["advance"]) : undefined as any;
+            this.expenseId = _data["expenseId"];
+            this.expense = _data["expense"] ? Expense.fromJS(_data["expense"]) : undefined as any;
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): AdvanceExpense {
+        data = typeof data === 'object' ? data : {};
+        let result = new AdvanceExpense();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["advanceId"] = this.advanceId;
+        data["advance"] = this.advance ? this.advance.toJSON() : undefined as any;
+        data["expenseId"] = this.expenseId;
+        data["expense"] = this.expense ? this.expense.toJSON() : undefined as any;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAdvanceExpense {
+    id?: number;
+    isDeleted?: boolean;
+    advanceId?: number;
+    advance?: AdvancePayment;
+    expenseId?: number;
+    expense?: Expense;
+    createdAt?: Date;
+}
+
+export class AdvanceExpenseDto implements IAdvanceExpenseDto {
+    id?: number;
+    expense_no?: string | undefined;
+    type?: string | undefined;
+    amount?: number;
+    date?: Date;
+    status?: string | undefined;
+
+    constructor(data?: IAdvanceExpenseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.expense_no = _data["expense_no"];
+            this.type = _data["type"];
+            this.amount = _data["amount"];
+            this.date = _data["date"] ? new Date(_data["date"].toString()) : undefined as any;
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): AdvanceExpenseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AdvanceExpenseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["expense_no"] = this.expense_no;
+        data["type"] = this.type;
+        data["amount"] = this.amount;
+        data["date"] = this.date ? this.date.toISOString() : undefined as any;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface IAdvanceExpenseDto {
+    id?: number;
+    expense_no?: string | undefined;
+    type?: string | undefined;
+    amount?: number;
+    date?: Date;
+    status?: string | undefined;
+}
+
+export class AdvanceListItemDto implements IAdvanceListItemDto {
+    id?: number;
+    advance_no?: string | undefined;
+    project?: string | undefined;
+    engineer?: string | undefined;
+    amount?: number;
+    remaining_balance?: number;
+    status?: string | undefined;
+    created_at?: Date;
+
+    constructor(data?: IAdvanceListItemDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.advance_no = _data["advance_no"];
+            this.project = _data["project"];
+            this.engineer = _data["engineer"];
+            this.amount = _data["amount"];
+            this.remaining_balance = _data["remaining_balance"];
+            this.status = _data["status"];
+            this.created_at = _data["created_at"] ? new Date(_data["created_at"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): AdvanceListItemDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AdvanceListItemDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["advance_no"] = this.advance_no;
+        data["project"] = this.project;
+        data["engineer"] = this.engineer;
+        data["amount"] = this.amount;
+        data["remaining_balance"] = this.remaining_balance;
+        data["status"] = this.status;
+        data["created_at"] = this.created_at ? this.created_at.toISOString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAdvanceListItemDto {
+    id?: number;
+    advance_no?: string | undefined;
+    project?: string | undefined;
+    engineer?: string | undefined;
+    amount?: number;
+    remaining_balance?: number;
+    status?: string | undefined;
+    created_at?: Date;
+}
+
+export class AdvanceListResponseDto implements IAdvanceListResponseDto {
+    summary?: AdvanceSummaryDto;
+    data?: AdvanceListItemDto[] | undefined;
+
+    constructor(data?: IAdvanceListResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.summary = _data["summary"] ? AdvanceSummaryDto.fromJS(_data["summary"]) : undefined as any;
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(AdvanceListItemDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AdvanceListResponseDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AdvanceListResponseDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["summary"] = this.summary ? this.summary.toJSON() : undefined as any;
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IAdvanceListResponseDto {
+    summary?: AdvanceSummaryDto;
+    data?: AdvanceListItemDto[] | undefined;
+}
+
+export class AdvanceListResponseDtoResponse implements IAdvanceListResponseDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: AdvanceListResponseDto;
+
+    constructor(data?: IAdvanceListResponseDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? AdvanceListResponseDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): AdvanceListResponseDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AdvanceListResponseDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAdvanceListResponseDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: AdvanceListResponseDto;
+}
+
+export class AdvancePayment implements IAdvancePayment {
+    id?: number;
+    isDeleted?: boolean;
+    advanceNo?: string | undefined;
+    projectStageId?: number;
+    projectStage?: ProjectStage;
+    engineerId?: number;
+    engineer?: User;
+    advanceDate?: Date;
+    amount?: number;
+    remainingBalance?: number;
+    paymentMethodId?: number | undefined;
+    paymentMethod?: PaymentMethod;
+    reference?: string | undefined;
+    currency?: string | undefined;
+    status?: AdvancePaymentStatus;
+    notes?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    advanceExpenses?: AdvanceExpense[] | undefined;
+
+    constructor(data?: IAdvancePayment) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.advanceNo = _data["advanceNo"];
+            this.projectStageId = _data["projectStageId"];
+            this.projectStage = _data["projectStage"] ? ProjectStage.fromJS(_data["projectStage"]) : undefined as any;
+            this.engineerId = _data["engineerId"];
+            this.engineer = _data["engineer"] ? User.fromJS(_data["engineer"]) : undefined as any;
+            this.advanceDate = _data["advanceDate"] ? new Date(_data["advanceDate"].toString()) : undefined as any;
+            this.amount = _data["amount"];
+            this.remainingBalance = _data["remainingBalance"];
+            this.paymentMethodId = _data["paymentMethodId"];
+            this.paymentMethod = _data["paymentMethod"] ? PaymentMethod.fromJS(_data["paymentMethod"]) : undefined as any;
+            this.reference = _data["reference"];
+            this.currency = _data["currency"];
+            this.status = _data["status"];
+            this.notes = _data["notes"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            if (Array.isArray(_data["advanceExpenses"])) {
+                this.advanceExpenses = [] as any;
+                for (let item of _data["advanceExpenses"])
+                    this.advanceExpenses!.push(AdvanceExpense.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AdvancePayment {
+        data = typeof data === 'object' ? data : {};
+        let result = new AdvancePayment();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["advanceNo"] = this.advanceNo;
+        data["projectStageId"] = this.projectStageId;
+        data["projectStage"] = this.projectStage ? this.projectStage.toJSON() : undefined as any;
+        data["engineerId"] = this.engineerId;
+        data["engineer"] = this.engineer ? this.engineer.toJSON() : undefined as any;
+        data["advanceDate"] = this.advanceDate ? this.advanceDate.toISOString() : undefined as any;
+        data["amount"] = this.amount;
+        data["remainingBalance"] = this.remainingBalance;
+        data["paymentMethodId"] = this.paymentMethodId;
+        data["paymentMethod"] = this.paymentMethod ? this.paymentMethod.toJSON() : undefined as any;
+        data["reference"] = this.reference;
+        data["currency"] = this.currency;
+        data["status"] = this.status;
+        data["notes"] = this.notes;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        if (Array.isArray(this.advanceExpenses)) {
+            data["advanceExpenses"] = [];
+            for (let item of this.advanceExpenses)
+                data["advanceExpenses"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IAdvancePayment {
+    id?: number;
+    isDeleted?: boolean;
+    advanceNo?: string | undefined;
+    projectStageId?: number;
+    projectStage?: ProjectStage;
+    engineerId?: number;
+    engineer?: User;
+    advanceDate?: Date;
+    amount?: number;
+    remainingBalance?: number;
+    paymentMethodId?: number | undefined;
+    paymentMethod?: PaymentMethod;
+    reference?: string | undefined;
+    currency?: string | undefined;
+    status?: AdvancePaymentStatus;
+    notes?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    advanceExpenses?: AdvanceExpense[] | undefined;
+}
+
+export enum AdvancePaymentStatus {
+    Open = "open",
+    Partial = "partial",
+    Settled = "settled",
+}
+
+export class AdvanceSummaryDto implements IAdvanceSummaryDto {
+    total_advances?: number;
+    total_amount?: number;
+    total_remaining?: number;
+    open_count?: number;
+
+    constructor(data?: IAdvanceSummaryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.total_advances = _data["total_advances"];
+            this.total_amount = _data["total_amount"];
+            this.total_remaining = _data["total_remaining"];
+            this.open_count = _data["open_count"];
+        }
+    }
+
+    static fromJS(data: any): AdvanceSummaryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AdvanceSummaryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["total_advances"] = this.total_advances;
+        data["total_amount"] = this.total_amount;
+        data["total_remaining"] = this.total_remaining;
+        data["open_count"] = this.open_count;
+        return data;
+    }
+}
+
+export interface IAdvanceSummaryDto {
+    total_advances?: number;
+    total_amount?: number;
+    total_remaining?: number;
+    open_count?: number;
 }
 
 export class Agreement implements IAgreement {
     id?: number;
+    isDeleted?: boolean;
     createdById?: number | undefined;
     createdDate?: Date | undefined;
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
-    isDeleted?: boolean;
     projectNumber?: string | undefined;
     agreementDate?: Date;
     projectName?: string | undefined;
@@ -6592,11 +7718,11 @@ export class Agreement implements IAgreement {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.createdById = _data["createdById"];
             this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
             this.modifiedById = _data["modifiedById"];
             this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
-            this.isDeleted = _data["isDeleted"];
             this.projectNumber = _data["projectNumber"];
             this.agreementDate = _data["agreementDate"] ? new Date(_data["agreementDate"].toString()) : undefined as any;
             this.projectName = _data["projectName"];
@@ -6665,11 +7791,11 @@ export class Agreement implements IAgreement {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["createdById"] = this.createdById;
         data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
         data["modifiedById"] = this.modifiedById;
         data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
-        data["isDeleted"] = this.isDeleted;
         data["projectNumber"] = this.projectNumber;
         data["agreementDate"] = this.agreementDate ? formatDate(this.agreementDate) : undefined as any;
         data["projectName"] = this.projectName;
@@ -6731,11 +7857,11 @@ export class Agreement implements IAgreement {
 
 export interface IAgreement {
     id?: number;
+    isDeleted?: boolean;
     createdById?: number | undefined;
     createdDate?: Date | undefined;
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
-    isDeleted?: boolean;
     projectNumber?: string | undefined;
     agreementDate?: Date;
     projectName?: string | undefined;
@@ -7135,6 +8261,7 @@ export interface IAgreementServiceDto {
 
 export class AgreementType implements IAgreementType {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
 
     constructor(data?: IAgreementType) {
@@ -7149,6 +8276,7 @@ export class AgreementType implements IAgreementType {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
         }
     }
@@ -7163,6 +8291,7 @@ export class AgreementType implements IAgreementType {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         return data;
     }
@@ -7170,11 +8299,13 @@ export class AgreementType implements IAgreementType {
 
 export interface IAgreementType {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
 }
 
 export class Annex implements IAnnex {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
 
     constructor(data?: IAnnex) {
@@ -7189,6 +8320,7 @@ export class Annex implements IAnnex {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
         }
     }
@@ -7203,6 +8335,7 @@ export class Annex implements IAnnex {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         return data;
     }
@@ -7210,6 +8343,7 @@ export class Annex implements IAnnex {
 
 export interface IAnnex {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
 }
 
@@ -7394,15 +8528,15 @@ export interface IAttachmentDto {
 }
 
 export enum AttachmentType {
-    _1 = 1,
-    _2 = 2,
-    _3 = 3,
-    _4 = 4,
-    _5 = 5,
-    _6 = 6,
-    _7 = 7,
-    _8 = 8,
-    _9 = 9,
+    Agreement = "agreement",
+    Project = "project",
+    Milestone = "milestone",
+    Task = "task",
+    ProjectPO = "projectPO",
+    SurveyingVisit = "surveyingVisit",
+    ProjectMainContractorPayment = "projectMainContractorPayment",
+    Constructor = "constructor",
+    Supplier = "supplier",
 }
 
 export class AuthResponse implements IAuthResponse {
@@ -7529,6 +8663,118 @@ export interface IAuthResponseResponse {
     data?: AuthResponse;
 }
 
+export class AvailableAdvanceExpensesDto implements IAvailableAdvanceExpensesDto {
+    advance_no?: string | undefined;
+    remaining_balance?: number;
+    currency?: string | undefined;
+    expenses?: AdvanceExpenseDto[] | undefined;
+
+    constructor(data?: IAvailableAdvanceExpensesDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.advance_no = _data["advance_no"];
+            this.remaining_balance = _data["remaining_balance"];
+            this.currency = _data["currency"];
+            if (Array.isArray(_data["expenses"])) {
+                this.expenses = [] as any;
+                for (let item of _data["expenses"])
+                    this.expenses!.push(AdvanceExpenseDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AvailableAdvanceExpensesDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AvailableAdvanceExpensesDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["advance_no"] = this.advance_no;
+        data["remaining_balance"] = this.remaining_balance;
+        data["currency"] = this.currency;
+        if (Array.isArray(this.expenses)) {
+            data["expenses"] = [];
+            for (let item of this.expenses)
+                data["expenses"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IAvailableAdvanceExpensesDto {
+    advance_no?: string | undefined;
+    remaining_balance?: number;
+    currency?: string | undefined;
+    expenses?: AdvanceExpenseDto[] | undefined;
+}
+
+export class AvailableAdvanceExpensesDtoResponse implements IAvailableAdvanceExpensesDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: AvailableAdvanceExpensesDto;
+
+    constructor(data?: IAvailableAdvanceExpensesDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? AvailableAdvanceExpensesDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): AvailableAdvanceExpensesDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AvailableAdvanceExpensesDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAvailableAdvanceExpensesDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: AvailableAdvanceExpensesDto;
+}
+
 export class BooleanResponse implements IBooleanResponse {
     succeeded?: boolean;
     message?: string | undefined;
@@ -7631,6 +8877,7 @@ export interface IChangePasswordCommand {
 
 export class City implements ICity {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
     countryId?: number;
     country?: Country;
@@ -7647,6 +8894,7 @@ export class City implements ICity {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
             this.countryId = _data["countryId"];
             this.country = _data["country"] ? Country.fromJS(_data["country"]) : undefined as any;
@@ -7663,6 +8911,7 @@ export class City implements ICity {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         data["countryId"] = this.countryId;
         data["country"] = this.country ? this.country.toJSON() : undefined as any;
@@ -7672,14 +8921,15 @@ export class City implements ICity {
 
 export interface ICity {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
     countryId?: number;
     country?: Country;
 }
 
 export enum ClassificationProjectMainContractor {
-    _1 = 1,
-    _2 = 2,
+    MainContractor = "mainContractor",
+    SubContractor = "subContractor",
 }
 
 export class Client implements IClient {
@@ -7836,6 +9086,7 @@ export interface IClientDto {
 
 export class Constructor implements IConstructor {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
     mainContractorTypeId?: number;
     mainContractorType?: MainContractorType;
@@ -7853,6 +9104,7 @@ export class Constructor implements IConstructor {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
             this.mainContractorTypeId = _data["mainContractorTypeId"];
             this.mainContractorType = _data["mainContractorType"] ? MainContractorType.fromJS(_data["mainContractorType"]) : undefined as any;
@@ -7874,6 +9126,7 @@ export class Constructor implements IConstructor {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         data["mainContractorTypeId"] = this.mainContractorTypeId;
         data["mainContractorType"] = this.mainContractorType ? this.mainContractorType.toJSON() : undefined as any;
@@ -7888,6 +9141,7 @@ export class Constructor implements IConstructor {
 
 export interface IConstructor {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
     mainContractorTypeId?: number;
     mainContractorType?: MainContractorType;
@@ -7896,6 +9150,7 @@ export interface IConstructor {
 
 export class ContractModel implements IContractModel {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
 
     constructor(data?: IContractModel) {
@@ -7910,6 +9165,7 @@ export class ContractModel implements IContractModel {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
         }
     }
@@ -7924,6 +9180,7 @@ export class ContractModel implements IContractModel {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         return data;
     }
@@ -7931,11 +9188,13 @@ export class ContractModel implements IContractModel {
 
 export interface IContractModel {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
 }
 
 export class ContractType implements IContractType {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
 
     constructor(data?: IContractType) {
@@ -7950,6 +9209,7 @@ export class ContractType implements IContractType {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
         }
     }
@@ -7964,6 +9224,7 @@ export class ContractType implements IContractType {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         return data;
     }
@@ -7971,6 +9232,7 @@ export class ContractType implements IContractType {
 
 export interface IContractType {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
 }
 
@@ -8168,6 +9430,7 @@ export interface IContractorDutyDto {
 
 export class Country implements ICountry {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
     city?: City[] | undefined;
 
@@ -8183,6 +9446,7 @@ export class Country implements ICountry {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
             if (Array.isArray(_data["city"])) {
                 this.city = [] as any;
@@ -8202,6 +9466,7 @@ export class Country implements ICountry {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         if (Array.isArray(this.city)) {
             data["city"] = [];
@@ -8214,12 +9479,14 @@ export class Country implements ICountry {
 
 export interface ICountry {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
     city?: City[] | undefined;
 }
 
 export class CountryCode implements ICountryCode {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
     code?: string | undefined;
     contactPersonClients?: Client[] | undefined;
@@ -8237,6 +9504,7 @@ export class CountryCode implements ICountryCode {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
             this.code = _data["code"];
             if (Array.isArray(_data["contactPersonClients"])) {
@@ -8262,6 +9530,7 @@ export class CountryCode implements ICountryCode {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         data["code"] = this.code;
         if (Array.isArray(this.contactPersonClients)) {
@@ -8280,10 +9549,75 @@ export class CountryCode implements ICountryCode {
 
 export interface ICountryCode {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
     code?: string | undefined;
     contactPersonClients?: Client[] | undefined;
     representerClients?: Client[] | undefined;
+}
+
+export class CreateAdvanceCommand implements ICreateAdvanceCommand {
+    projectStageId?: number;
+    engineerId?: number;
+    advanceDate?: Date;
+    amount?: number;
+    currency?: string | undefined;
+    paymentMethod?: PaymentMethod;
+    reference?: string | undefined;
+    notes?: string | undefined;
+
+    constructor(data?: ICreateAdvanceCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.projectStageId = _data["projectStageId"];
+            this.engineerId = _data["engineerId"];
+            this.advanceDate = _data["advanceDate"] ? new Date(_data["advanceDate"].toString()) : undefined as any;
+            this.amount = _data["amount"];
+            this.currency = _data["currency"];
+            this.paymentMethod = _data["paymentMethod"] ? PaymentMethod.fromJS(_data["paymentMethod"]) : undefined as any;
+            this.reference = _data["reference"];
+            this.notes = _data["notes"];
+        }
+    }
+
+    static fromJS(data: any): CreateAdvanceCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateAdvanceCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["projectStageId"] = this.projectStageId;
+        data["engineerId"] = this.engineerId;
+        data["advanceDate"] = this.advanceDate ? this.advanceDate.toISOString() : undefined as any;
+        data["amount"] = this.amount;
+        data["currency"] = this.currency;
+        data["paymentMethod"] = this.paymentMethod ? this.paymentMethod.toJSON() : undefined as any;
+        data["reference"] = this.reference;
+        data["notes"] = this.notes;
+        return data;
+    }
+}
+
+export interface ICreateAdvanceCommand {
+    projectStageId?: number;
+    engineerId?: number;
+    advanceDate?: Date;
+    amount?: number;
+    currency?: string | undefined;
+    paymentMethod?: PaymentMethod;
+    reference?: string | undefined;
+    notes?: string | undefined;
 }
 
 export class CreateConstructorCommand implements ICreateConstructorCommand {
@@ -8384,6 +9718,7 @@ export class CreateExpenseCommand implements ICreateExpenseCommand {
     expenseNo?: string | undefined;
     totalAmount?: number;
     notes?: string | undefined;
+    status?: string | undefined;
     autoPost?: boolean;
     projectStageId?: number | undefined;
     supplierId?: number;
@@ -8407,6 +9742,7 @@ export class CreateExpenseCommand implements ICreateExpenseCommand {
             this.expenseNo = _data["expenseNo"];
             this.totalAmount = _data["totalAmount"];
             this.notes = _data["notes"];
+            this.status = _data["status"];
             this.autoPost = _data["autoPost"];
             this.projectStageId = _data["projectStageId"];
             this.supplierId = _data["supplierId"];
@@ -8434,6 +9770,7 @@ export class CreateExpenseCommand implements ICreateExpenseCommand {
         data["expenseNo"] = this.expenseNo;
         data["totalAmount"] = this.totalAmount;
         data["notes"] = this.notes;
+        data["status"] = this.status;
         data["autoPost"] = this.autoPost;
         data["projectStageId"] = this.projectStageId;
         data["supplierId"] = this.supplierId;
@@ -8454,6 +9791,7 @@ export interface ICreateExpenseCommand {
     expenseNo?: string | undefined;
     totalAmount?: number;
     notes?: string | undefined;
+    status?: string | undefined;
     autoPost?: boolean;
     projectStageId?: number | undefined;
     supplierId?: number;
@@ -9468,6 +10806,10 @@ export class CreateTaskCommand implements ICreateTaskCommand {
     excavationVolume?: number | undefined;
     excavationSoilType?: string | undefined;
     excavationEquipment?: string | undefined;
+    source?: TaskSource;
+    responsibility?: Responsibility;
+    projectMainContractorId?: number | undefined;
+    supplierId?: number | undefined;
     status?: StatusTask;
     projectStageId?: number;
     taskTypeId?: number;
@@ -9496,6 +10838,10 @@ export class CreateTaskCommand implements ICreateTaskCommand {
             this.excavationVolume = _data["excavationVolume"];
             this.excavationSoilType = _data["excavationSoilType"];
             this.excavationEquipment = _data["excavationEquipment"];
+            this.source = _data["source"];
+            this.responsibility = _data["responsibility"];
+            this.projectMainContractorId = _data["projectMainContractorId"];
+            this.supplierId = _data["supplierId"];
             this.status = _data["status"];
             this.projectStageId = _data["projectStageId"];
             this.taskTypeId = _data["taskTypeId"];
@@ -9524,6 +10870,10 @@ export class CreateTaskCommand implements ICreateTaskCommand {
         data["excavationVolume"] = this.excavationVolume;
         data["excavationSoilType"] = this.excavationSoilType;
         data["excavationEquipment"] = this.excavationEquipment;
+        data["source"] = this.source;
+        data["responsibility"] = this.responsibility;
+        data["projectMainContractorId"] = this.projectMainContractorId;
+        data["supplierId"] = this.supplierId;
         data["status"] = this.status;
         data["projectStageId"] = this.projectStageId;
         data["taskTypeId"] = this.taskTypeId;
@@ -9545,6 +10895,10 @@ export interface ICreateTaskCommand {
     excavationVolume?: number | undefined;
     excavationSoilType?: string | undefined;
     excavationEquipment?: string | undefined;
+    source?: TaskSource;
+    responsibility?: Responsibility;
+    projectMainContractorId?: number | undefined;
+    supplierId?: number | undefined;
     status?: StatusTask;
     projectStageId?: number;
     taskTypeId?: number;
@@ -9553,7 +10907,7 @@ export interface ICreateTaskCommand {
 export class Currency implements ICurrency {
     id?: number;
     isDeleted?: boolean;
-    name?: string | undefined;
+    name!: string | undefined;
     abb?: string | undefined;
     rate?: number;
     expenseDetails?: ExpenseDetail[] | undefined;
@@ -9619,7 +10973,7 @@ export class Currency implements ICurrency {
 export interface ICurrency {
     id?: number;
     isDeleted?: boolean;
-    name?: string | undefined;
+    name: string | undefined;
     abb?: string | undefined;
     rate?: number;
     expenseDetails?: ExpenseDetail[] | undefined;
@@ -9984,6 +11338,7 @@ export interface IDeleteTaskCommand {
 
 export class DutyResponsibility implements IDutyResponsibility {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
     contractsResponsibilities?: ContractorDuty[] | undefined;
 
@@ -9999,6 +11354,7 @@ export class DutyResponsibility implements IDutyResponsibility {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
             if (Array.isArray(_data["contractsResponsibilities"])) {
                 this.contractsResponsibilities = [] as any;
@@ -10018,6 +11374,7 @@ export class DutyResponsibility implements IDutyResponsibility {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         if (Array.isArray(this.contractsResponsibilities)) {
             data["contractsResponsibilities"] = [];
@@ -10030,12 +11387,14 @@ export class DutyResponsibility implements IDutyResponsibility {
 
 export interface IDutyResponsibility {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
     contractsResponsibilities?: ContractorDuty[] | undefined;
 }
 
 export class DutyType implements IDutyType {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
     contractsDuties?: ContractorDuty[] | undefined;
 
@@ -10051,6 +11410,7 @@ export class DutyType implements IDutyType {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
             if (Array.isArray(_data["contractsDuties"])) {
                 this.contractsDuties = [] as any;
@@ -10070,6 +11430,7 @@ export class DutyType implements IDutyType {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         if (Array.isArray(this.contractsDuties)) {
             data["contractsDuties"] = [];
@@ -10082,6 +11443,7 @@ export class DutyType implements IDutyType {
 
 export interface IDutyType {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
     contractsDuties?: ContractorDuty[] | undefined;
 }
@@ -10093,6 +11455,11 @@ export class Expense implements IExpense {
     expenseNo?: string | undefined;
     totalAmount?: number;
     notes?: string | undefined;
+    status?: string | undefined;
+    isLocked?: boolean;
+    lockedAt?: Date | undefined;
+    lockedByAdvancePaymentId?: number | undefined;
+    lockedByAdvancePayment?: AdvancePayment;
     autoPost?: boolean;
     projectStageId?: number | undefined;
     projectStage?: ProjectStage;
@@ -10102,6 +11469,7 @@ export class Expense implements IExpense {
     contractorDuty?: ContractorDuty;
     expenseDetails?: ExpenseDetail[] | undefined;
     attachments?: Attachment[] | undefined;
+    advanceExpenses?: AdvanceExpense[] | undefined;
 
     constructor(data?: IExpense) {
         if (data) {
@@ -10120,6 +11488,11 @@ export class Expense implements IExpense {
             this.expenseNo = _data["expenseNo"];
             this.totalAmount = _data["totalAmount"];
             this.notes = _data["notes"];
+            this.status = _data["status"];
+            this.isLocked = _data["isLocked"];
+            this.lockedAt = _data["lockedAt"] ? new Date(_data["lockedAt"].toString()) : undefined as any;
+            this.lockedByAdvancePaymentId = _data["lockedByAdvancePaymentId"];
+            this.lockedByAdvancePayment = _data["lockedByAdvancePayment"] ? AdvancePayment.fromJS(_data["lockedByAdvancePayment"]) : undefined as any;
             this.autoPost = _data["autoPost"];
             this.projectStageId = _data["projectStageId"];
             this.projectStage = _data["projectStage"] ? ProjectStage.fromJS(_data["projectStage"]) : undefined as any;
@@ -10136,6 +11509,11 @@ export class Expense implements IExpense {
                 this.attachments = [] as any;
                 for (let item of _data["attachments"])
                     this.attachments!.push(Attachment.fromJS(item));
+            }
+            if (Array.isArray(_data["advanceExpenses"])) {
+                this.advanceExpenses = [] as any;
+                for (let item of _data["advanceExpenses"])
+                    this.advanceExpenses!.push(AdvanceExpense.fromJS(item));
             }
         }
     }
@@ -10155,6 +11533,11 @@ export class Expense implements IExpense {
         data["expenseNo"] = this.expenseNo;
         data["totalAmount"] = this.totalAmount;
         data["notes"] = this.notes;
+        data["status"] = this.status;
+        data["isLocked"] = this.isLocked;
+        data["lockedAt"] = this.lockedAt ? this.lockedAt.toISOString() : undefined as any;
+        data["lockedByAdvancePaymentId"] = this.lockedByAdvancePaymentId;
+        data["lockedByAdvancePayment"] = this.lockedByAdvancePayment ? this.lockedByAdvancePayment.toJSON() : undefined as any;
         data["autoPost"] = this.autoPost;
         data["projectStageId"] = this.projectStageId;
         data["projectStage"] = this.projectStage ? this.projectStage.toJSON() : undefined as any;
@@ -10172,6 +11555,11 @@ export class Expense implements IExpense {
             for (let item of this.attachments)
                 data["attachments"].push(item ? item.toJSON() : undefined as any);
         }
+        if (Array.isArray(this.advanceExpenses)) {
+            data["advanceExpenses"] = [];
+            for (let item of this.advanceExpenses)
+                data["advanceExpenses"].push(item ? item.toJSON() : undefined as any);
+        }
         return data;
     }
 }
@@ -10183,6 +11571,11 @@ export interface IExpense {
     expenseNo?: string | undefined;
     totalAmount?: number;
     notes?: string | undefined;
+    status?: string | undefined;
+    isLocked?: boolean;
+    lockedAt?: Date | undefined;
+    lockedByAdvancePaymentId?: number | undefined;
+    lockedByAdvancePayment?: AdvancePayment;
     autoPost?: boolean;
     projectStageId?: number | undefined;
     projectStage?: ProjectStage;
@@ -10192,6 +11585,7 @@ export interface IExpense {
     contractorDuty?: ContractorDuty;
     expenseDetails?: ExpenseDetail[] | undefined;
     attachments?: Attachment[] | undefined;
+    advanceExpenses?: AdvanceExpense[] | undefined;
 }
 
 export class ExpenseDetail implements IExpenseDetail {
@@ -11220,6 +12614,10 @@ export class GetExpenseDto implements IGetExpenseDto {
     expenseNo?: string | undefined;
     totalAmount?: number;
     notes?: string | undefined;
+    status?: string | undefined;
+    isLocked?: boolean;
+    lockedAt?: Date | undefined;
+    lockedByAdvanceId?: number | undefined;
     autoPost?: boolean;
     projectStageId?: number | undefined;
     supplierId?: number;
@@ -11243,6 +12641,10 @@ export class GetExpenseDto implements IGetExpenseDto {
             this.expenseNo = _data["expenseNo"];
             this.totalAmount = _data["totalAmount"];
             this.notes = _data["notes"];
+            this.status = _data["status"];
+            this.isLocked = _data["isLocked"];
+            this.lockedAt = _data["lockedAt"] ? new Date(_data["lockedAt"].toString()) : undefined as any;
+            this.lockedByAdvanceId = _data["lockedByAdvanceId"];
             this.autoPost = _data["autoPost"];
             this.projectStageId = _data["projectStageId"];
             this.supplierId = _data["supplierId"];
@@ -11270,6 +12672,10 @@ export class GetExpenseDto implements IGetExpenseDto {
         data["expenseNo"] = this.expenseNo;
         data["totalAmount"] = this.totalAmount;
         data["notes"] = this.notes;
+        data["status"] = this.status;
+        data["isLocked"] = this.isLocked;
+        data["lockedAt"] = this.lockedAt ? this.lockedAt.toISOString() : undefined as any;
+        data["lockedByAdvanceId"] = this.lockedByAdvanceId;
         data["autoPost"] = this.autoPost;
         data["projectStageId"] = this.projectStageId;
         data["supplierId"] = this.supplierId;
@@ -11290,6 +12696,10 @@ export interface IGetExpenseDto {
     expenseNo?: string | undefined;
     totalAmount?: number;
     notes?: string | undefined;
+    status?: string | undefined;
+    isLocked?: boolean;
+    lockedAt?: Date | undefined;
+    lockedByAdvanceId?: number | undefined;
     autoPost?: boolean;
     projectStageId?: number | undefined;
     supplierId?: number;
@@ -14656,6 +16066,10 @@ export class GetProjectTaskDto implements IGetProjectTaskDto {
     excavationVolume?: number | undefined;
     excavationSoilType?: string | undefined;
     excavationEquipment?: string | undefined;
+    source?: TaskSource;
+    responsibility?: Responsibility;
+    projectMainContractorId?: number | undefined;
+    supplierId?: number | undefined;
     status?: StatusTask;
     projectStageId?: number;
     taskTypeId?: number;
@@ -14684,6 +16098,10 @@ export class GetProjectTaskDto implements IGetProjectTaskDto {
             this.excavationVolume = _data["excavationVolume"];
             this.excavationSoilType = _data["excavationSoilType"];
             this.excavationEquipment = _data["excavationEquipment"];
+            this.source = _data["source"];
+            this.responsibility = _data["responsibility"];
+            this.projectMainContractorId = _data["projectMainContractorId"];
+            this.supplierId = _data["supplierId"];
             this.status = _data["status"];
             this.projectStageId = _data["projectStageId"];
             this.taskTypeId = _data["taskTypeId"];
@@ -14712,6 +16130,10 @@ export class GetProjectTaskDto implements IGetProjectTaskDto {
         data["excavationVolume"] = this.excavationVolume;
         data["excavationSoilType"] = this.excavationSoilType;
         data["excavationEquipment"] = this.excavationEquipment;
+        data["source"] = this.source;
+        data["responsibility"] = this.responsibility;
+        data["projectMainContractorId"] = this.projectMainContractorId;
+        data["supplierId"] = this.supplierId;
         data["status"] = this.status;
         data["projectStageId"] = this.projectStageId;
         data["taskTypeId"] = this.taskTypeId;
@@ -14733,6 +16155,10 @@ export interface IGetProjectTaskDto {
     excavationVolume?: number | undefined;
     excavationSoilType?: string | undefined;
     excavationEquipment?: string | undefined;
+    source?: TaskSource;
+    responsibility?: Responsibility;
+    projectMainContractorId?: number | undefined;
+    supplierId?: number | undefined;
     status?: StatusTask;
     projectStageId?: number;
     taskTypeId?: number;
@@ -15494,13 +16920,36 @@ export interface ILookupDto {
     name?: string | undefined;
 }
 
+export enum LookupType {
+    City = "city",
+    Country = "country",
+    Constructor = "constructor",
+    ContractModel = "contractModel",
+    ContractType = "contractType",
+    DutyResponsibility = "dutyResponsibility",
+    DutyType = "dutyType",
+    MainContractType = "mainContractType",
+    Material = "material",
+    PaymentMethod = "paymentMethod",
+    Service = "service",
+    Supplier = "supplier",
+    Unit = "unit",
+    Annex = "annex",
+    AgreementType = "agreementType",
+    MileStones = "mileStones",
+    TaskType = "taskType",
+    Currency = "currency",
+    MaterialCategory = "materialCategory",
+    MaterialSubCategory = "materialSubCategory",
+}
+
 export class MainContract implements IMainContract {
     id?: number;
+    isDeleted?: boolean;
     createdById?: number | undefined;
     createdDate?: Date | undefined;
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
-    isDeleted?: boolean;
     total?: number;
     startDate?: Date;
     endDate?: Date;
@@ -15526,11 +16975,11 @@ export class MainContract implements IMainContract {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.createdById = _data["createdById"];
             this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
             this.modifiedById = _data["modifiedById"];
             this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
-            this.isDeleted = _data["isDeleted"];
             this.total = _data["total"];
             this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
             this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
@@ -15560,11 +17009,11 @@ export class MainContract implements IMainContract {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["createdById"] = this.createdById;
         data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
         data["modifiedById"] = this.modifiedById;
         data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
-        data["isDeleted"] = this.isDeleted;
         data["total"] = this.total;
         data["startDate"] = this.startDate ? formatDate(this.startDate) : undefined as any;
         data["endDate"] = this.endDate ? formatDate(this.endDate) : undefined as any;
@@ -15587,11 +17036,11 @@ export class MainContract implements IMainContract {
 
 export interface IMainContract {
     id?: number;
+    isDeleted?: boolean;
     createdById?: number | undefined;
     createdDate?: Date | undefined;
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
-    isDeleted?: boolean;
     total?: number;
     startDate?: Date;
     endDate?: Date;
@@ -15704,6 +17153,7 @@ export interface IMainContractDto {
 
 export class MainContractorType implements IMainContractorType {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
     contracts?: MainContract[] | undefined;
 
@@ -15719,6 +17169,7 @@ export class MainContractorType implements IMainContractorType {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
             if (Array.isArray(_data["contracts"])) {
                 this.contracts = [] as any;
@@ -15738,6 +17189,7 @@ export class MainContractorType implements IMainContractorType {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         if (Array.isArray(this.contracts)) {
             data["contracts"] = [];
@@ -15750,12 +17202,14 @@ export class MainContractorType implements IMainContractorType {
 
 export interface IMainContractorType {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
     contracts?: MainContract[] | undefined;
 }
 
 export class Material implements IMaterial {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
     subCategoryId?: number | undefined;
     subCategory?: MaterialSubCategory;
@@ -15772,6 +17226,7 @@ export class Material implements IMaterial {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
             this.subCategoryId = _data["subCategoryId"];
             this.subCategory = _data["subCategory"] ? MaterialSubCategory.fromJS(_data["subCategory"]) : undefined as any;
@@ -15788,6 +17243,7 @@ export class Material implements IMaterial {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         data["subCategoryId"] = this.subCategoryId;
         data["subCategory"] = this.subCategory ? this.subCategory.toJSON() : undefined as any;
@@ -15797,6 +17253,7 @@ export class Material implements IMaterial {
 
 export interface IMaterial {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
     subCategoryId?: number | undefined;
     subCategory?: MaterialSubCategory;
@@ -15804,6 +17261,7 @@ export interface IMaterial {
 
 export class MaterialCategory implements IMaterialCategory {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
     materialSubCategories?: MaterialSubCategory[] | undefined;
 
@@ -15819,6 +17277,7 @@ export class MaterialCategory implements IMaterialCategory {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
             if (Array.isArray(_data["materialSubCategories"])) {
                 this.materialSubCategories = [] as any;
@@ -15838,6 +17297,7 @@ export class MaterialCategory implements IMaterialCategory {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         if (Array.isArray(this.materialSubCategories)) {
             data["materialSubCategories"] = [];
@@ -15850,12 +17310,14 @@ export class MaterialCategory implements IMaterialCategory {
 
 export interface IMaterialCategory {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
     materialSubCategories?: MaterialSubCategory[] | undefined;
 }
 
 export class MaterialSubCategory implements IMaterialSubCategory {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
     categoryId?: number;
     category?: MaterialCategory;
@@ -15872,6 +17334,7 @@ export class MaterialSubCategory implements IMaterialSubCategory {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
             this.categoryId = _data["categoryId"];
             this.category = _data["category"] ? MaterialCategory.fromJS(_data["category"]) : undefined as any;
@@ -15888,6 +17351,7 @@ export class MaterialSubCategory implements IMaterialSubCategory {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         data["categoryId"] = this.categoryId;
         data["category"] = this.category ? this.category.toJSON() : undefined as any;
@@ -15897,6 +17361,7 @@ export class MaterialSubCategory implements IMaterialSubCategory {
 
 export interface IMaterialSubCategory {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
     categoryId?: number;
     category?: MaterialCategory;
@@ -15953,7 +17418,7 @@ export interface IMileStoneDto {
 export class MileStones implements IMileStones {
     id?: number;
     isDeleted?: boolean;
-    name?: string | undefined;
+    name!: string | undefined;
     description?: string | undefined;
     order?: number;
     agreementId?: number | undefined;
@@ -16014,7 +17479,7 @@ export class MileStones implements IMileStones {
 export interface IMileStones {
     id?: number;
     isDeleted?: boolean;
-    name?: string | undefined;
+    name: string | undefined;
     description?: string | undefined;
     order?: number;
     agreementId?: number | undefined;
@@ -16448,6 +17913,7 @@ export interface IPaymentFlow {
 
 export class PaymentMethod implements IPaymentMethod {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
     paymentFlows?: PaymentFlow[] | undefined;
 
@@ -16463,6 +17929,7 @@ export class PaymentMethod implements IPaymentMethod {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
             if (Array.isArray(_data["paymentFlows"])) {
                 this.paymentFlows = [] as any;
@@ -16482,6 +17949,7 @@ export class PaymentMethod implements IPaymentMethod {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         if (Array.isArray(this.paymentFlows)) {
             data["paymentFlows"] = [];
@@ -16494,17 +17962,18 @@ export class PaymentMethod implements IPaymentMethod {
 
 export interface IPaymentMethod {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
     paymentFlows?: PaymentFlow[] | undefined;
 }
 
 export class Project implements IProject {
     id?: number;
+    isDeleted?: boolean;
     createdById?: number | undefined;
     createdDate?: Date | undefined;
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
-    isDeleted?: boolean;
     title?: string | undefined;
     status?: ProjectStatus;
     description?: string | undefined;
@@ -16531,11 +18000,11 @@ export class Project implements IProject {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.createdById = _data["createdById"];
             this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
             this.modifiedById = _data["modifiedById"];
             this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
-            this.isDeleted = _data["isDeleted"];
             this.title = _data["title"];
             this.status = _data["status"];
             this.description = _data["description"];
@@ -16574,11 +18043,11 @@ export class Project implements IProject {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["createdById"] = this.createdById;
         data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
         data["modifiedById"] = this.modifiedById;
         data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
-        data["isDeleted"] = this.isDeleted;
         data["title"] = this.title;
         data["status"] = this.status;
         data["description"] = this.description;
@@ -16610,11 +18079,11 @@ export class Project implements IProject {
 
 export interface IProject {
     id?: number;
+    isDeleted?: boolean;
     createdById?: number | undefined;
     createdDate?: Date | undefined;
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
-    isDeleted?: boolean;
     title?: string | undefined;
     status?: ProjectStatus;
     description?: string | undefined;
@@ -16632,11 +18101,11 @@ export interface IProject {
 
 export class ProjectAreaUnit implements IProjectAreaUnit {
     id?: number;
+    isDeleted?: boolean;
     createdById?: number | undefined;
     createdDate?: Date | undefined;
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
-    isDeleted?: boolean;
     annexId!: number;
     annex?: Annex;
     amount!: number;
@@ -16657,11 +18126,11 @@ export class ProjectAreaUnit implements IProjectAreaUnit {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.createdById = _data["createdById"];
             this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
             this.modifiedById = _data["modifiedById"];
             this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
-            this.isDeleted = _data["isDeleted"];
             this.annexId = _data["annexId"];
             this.annex = _data["annex"] ? Annex.fromJS(_data["annex"]) : undefined as any;
             this.amount = _data["amount"];
@@ -16682,11 +18151,11 @@ export class ProjectAreaUnit implements IProjectAreaUnit {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["createdById"] = this.createdById;
         data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
         data["modifiedById"] = this.modifiedById;
         data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
-        data["isDeleted"] = this.isDeleted;
         data["annexId"] = this.annexId;
         data["annex"] = this.annex ? this.annex.toJSON() : undefined as any;
         data["amount"] = this.amount;
@@ -16700,11 +18169,11 @@ export class ProjectAreaUnit implements IProjectAreaUnit {
 
 export interface IProjectAreaUnit {
     id?: number;
+    isDeleted?: boolean;
     createdById?: number | undefined;
     createdDate?: Date | undefined;
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
-    isDeleted?: boolean;
     annexId: number;
     annex?: Annex;
     amount: number;
@@ -17279,6 +18748,7 @@ export class ProjectStage implements IProjectStage {
     stageType?: ProjectStageType;
     projectStageTasks?: ProjectStageTask[] | undefined;
     expenses?: Expense[] | undefined;
+    advances?: AdvancePayment[] | undefined;
     milestonesId?: number | undefined;
     milestones?: MileStones;
 
@@ -17308,6 +18778,11 @@ export class ProjectStage implements IProjectStage {
                 this.expenses = [] as any;
                 for (let item of _data["expenses"])
                     this.expenses!.push(Expense.fromJS(item));
+            }
+            if (Array.isArray(_data["advances"])) {
+                this.advances = [] as any;
+                for (let item of _data["advances"])
+                    this.advances!.push(AdvancePayment.fromJS(item));
             }
             this.milestonesId = _data["milestonesId"];
             this.milestones = _data["milestones"] ? MileStones.fromJS(_data["milestones"]) : undefined as any;
@@ -17339,6 +18814,11 @@ export class ProjectStage implements IProjectStage {
             for (let item of this.expenses)
                 data["expenses"].push(item ? item.toJSON() : undefined as any);
         }
+        if (Array.isArray(this.advances)) {
+            data["advances"] = [];
+            for (let item of this.advances)
+                data["advances"].push(item ? item.toJSON() : undefined as any);
+        }
         data["milestonesId"] = this.milestonesId;
         data["milestones"] = this.milestones ? this.milestones.toJSON() : undefined as any;
         return data;
@@ -17354,6 +18834,7 @@ export interface IProjectStage {
     stageType?: ProjectStageType;
     projectStageTasks?: ProjectStageTask[] | undefined;
     expenses?: Expense[] | undefined;
+    advances?: AdvancePayment[] | undefined;
     milestonesId?: number | undefined;
     milestones?: MileStones;
 }
@@ -17412,11 +18893,11 @@ export interface IProjectStageDto {
 
 export class ProjectStageTask implements IProjectStageTask {
     id?: number;
+    isDeleted?: boolean;
     createdById?: number | undefined;
     createdDate?: Date | undefined;
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
-    isDeleted?: boolean;
     title?: string | undefined;
     description?: string | undefined;
     assignTo?: number | undefined;
@@ -17429,6 +18910,11 @@ export class ProjectStageTask implements IProjectStageTask {
     excavationVolume?: number | undefined;
     excavationSoilType?: string | undefined;
     excavationEquipment?: string | undefined;
+    responsibility?: Responsibility;
+    projectMainContractorId?: number | undefined;
+    projectMainContractor?: ProjectMainContractor;
+    supplierId?: number | undefined;
+    supplier?: Supplier;
     status?: StatusTask;
     projectStageId?: number;
     projectStage?: ProjectStage;
@@ -17448,11 +18934,11 @@ export class ProjectStageTask implements IProjectStageTask {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.createdById = _data["createdById"];
             this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
             this.modifiedById = _data["modifiedById"];
             this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
-            this.isDeleted = _data["isDeleted"];
             this.title = _data["title"];
             this.description = _data["description"];
             this.assignTo = _data["assignTo"];
@@ -17465,6 +18951,11 @@ export class ProjectStageTask implements IProjectStageTask {
             this.excavationVolume = _data["excavationVolume"];
             this.excavationSoilType = _data["excavationSoilType"];
             this.excavationEquipment = _data["excavationEquipment"];
+            this.responsibility = _data["responsibility"];
+            this.projectMainContractorId = _data["projectMainContractorId"];
+            this.projectMainContractor = _data["projectMainContractor"] ? ProjectMainContractor.fromJS(_data["projectMainContractor"]) : undefined as any;
+            this.supplierId = _data["supplierId"];
+            this.supplier = _data["supplier"] ? Supplier.fromJS(_data["supplier"]) : undefined as any;
             this.status = _data["status"];
             this.projectStageId = _data["projectStageId"];
             this.projectStage = _data["projectStage"] ? ProjectStage.fromJS(_data["projectStage"]) : undefined as any;
@@ -17488,11 +18979,11 @@ export class ProjectStageTask implements IProjectStageTask {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["createdById"] = this.createdById;
         data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
         data["modifiedById"] = this.modifiedById;
         data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
-        data["isDeleted"] = this.isDeleted;
         data["title"] = this.title;
         data["description"] = this.description;
         data["assignTo"] = this.assignTo;
@@ -17505,6 +18996,11 @@ export class ProjectStageTask implements IProjectStageTask {
         data["excavationVolume"] = this.excavationVolume;
         data["excavationSoilType"] = this.excavationSoilType;
         data["excavationEquipment"] = this.excavationEquipment;
+        data["responsibility"] = this.responsibility;
+        data["projectMainContractorId"] = this.projectMainContractorId;
+        data["projectMainContractor"] = this.projectMainContractor ? this.projectMainContractor.toJSON() : undefined as any;
+        data["supplierId"] = this.supplierId;
+        data["supplier"] = this.supplier ? this.supplier.toJSON() : undefined as any;
         data["status"] = this.status;
         data["projectStageId"] = this.projectStageId;
         data["projectStage"] = this.projectStage ? this.projectStage.toJSON() : undefined as any;
@@ -17521,11 +19017,11 @@ export class ProjectStageTask implements IProjectStageTask {
 
 export interface IProjectStageTask {
     id?: number;
+    isDeleted?: boolean;
     createdById?: number | undefined;
     createdDate?: Date | undefined;
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
-    isDeleted?: boolean;
     title?: string | undefined;
     description?: string | undefined;
     assignTo?: number | undefined;
@@ -17538,6 +19034,11 @@ export interface IProjectStageTask {
     excavationVolume?: number | undefined;
     excavationSoilType?: string | undefined;
     excavationEquipment?: string | undefined;
+    responsibility?: Responsibility;
+    projectMainContractorId?: number | undefined;
+    projectMainContractor?: ProjectMainContractor;
+    supplierId?: number | undefined;
+    supplier?: Supplier;
     status?: StatusTask;
     projectStageId?: number;
     projectStage?: ProjectStage;
@@ -17547,9 +19048,9 @@ export interface IProjectStageTask {
 }
 
 export enum ProjectStageType {
-    _1 = 1,
-    _2 = 2,
-    _3 = 3,
+    Preparing = "preparing",
+    Excavation = "excavation",
+    Milestones = "milestones",
 }
 
 export class ProjectStagesSubTask implements IProjectStagesSubTask {
@@ -17629,15 +19130,15 @@ export interface IProjectStagesSubTask {
 }
 
 export enum ProjectStatus {
-    _0 = 0,
-    _1 = 1,
-    _2 = 2,
-    _3 = 3,
+    ToDO = "toDO",
+    InProgress = "inProgress",
+    Review = "review",
+    Completed = "completed",
 }
 
 export enum ProjectStatusSubTask {
-    _0 = 0,
-    _1 = 1,
+    Complited = "complited",
+    InProgress = "inProgress",
 }
 
 export class ProjectSubTaskDto implements IProjectSubTaskDto {
@@ -18154,11 +19655,11 @@ export interface IProjectVO {
 
 export class QuantityBill implements IQuantityBill {
     id?: number;
+    isDeleted?: boolean;
     createdById?: number | undefined;
     createdDate?: Date | undefined;
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
-    isDeleted?: boolean;
     materialId?: number;
     material?: Material;
     unitId?: number;
@@ -18186,11 +19687,11 @@ export class QuantityBill implements IQuantityBill {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.createdById = _data["createdById"];
             this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
             this.modifiedById = _data["modifiedById"];
             this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
-            this.isDeleted = _data["isDeleted"];
             this.materialId = _data["materialId"];
             this.material = _data["material"] ? Material.fromJS(_data["material"]) : undefined as any;
             this.unitId = _data["unitId"];
@@ -18218,11 +19719,11 @@ export class QuantityBill implements IQuantityBill {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["createdById"] = this.createdById;
         data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
         data["modifiedById"] = this.modifiedById;
         data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
-        data["isDeleted"] = this.isDeleted;
         data["materialId"] = this.materialId;
         data["material"] = this.material ? this.material.toJSON() : undefined as any;
         data["unitId"] = this.unitId;
@@ -18243,11 +19744,11 @@ export class QuantityBill implements IQuantityBill {
 
 export interface IQuantityBill {
     id?: number;
+    isDeleted?: boolean;
     createdById?: number | undefined;
     createdDate?: Date | undefined;
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
-    isDeleted?: boolean;
     materialId?: number;
     material?: Material;
     unitId?: number;
@@ -18334,6 +19835,86 @@ export interface IQuantityBillDto {
     isDeleted?: boolean;
     constructorId?: number;
     supplierId?: number;
+}
+
+export class RefreshToken implements IRefreshToken {
+    id?: number;
+    isDeleted?: boolean;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    userId?: number;
+    user?: User;
+    token?: string | undefined;
+    expiresAt?: Date;
+    revokedAt?: Date | undefined;
+    readonly isRevoked?: boolean;
+
+    constructor(data?: IRefreshToken) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            this.userId = _data["userId"];
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+            this.token = _data["token"];
+            this.expiresAt = _data["expiresAt"] ? new Date(_data["expiresAt"].toString()) : undefined as any;
+            this.revokedAt = _data["revokedAt"] ? new Date(_data["revokedAt"].toString()) : undefined as any;
+            (this as any).isRevoked = _data["isRevoked"];
+        }
+    }
+
+    static fromJS(data: any): RefreshToken {
+        data = typeof data === 'object' ? data : {};
+        let result = new RefreshToken();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        data["userId"] = this.userId;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        data["token"] = this.token;
+        data["expiresAt"] = this.expiresAt ? this.expiresAt.toISOString() : undefined as any;
+        data["revokedAt"] = this.revokedAt ? this.revokedAt.toISOString() : undefined as any;
+        data["isRevoked"] = this.isRevoked;
+        return data;
+    }
+}
+
+export interface IRefreshToken {
+    id?: number;
+    isDeleted?: boolean;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    userId?: number;
+    user?: User;
+    token?: string | undefined;
+    expiresAt?: Date;
+    revokedAt?: Date | undefined;
+    isRevoked?: boolean;
 }
 
 export class RefreshTokenCommand implements IRefreshTokenCommand {
@@ -18462,6 +20043,14 @@ export class RemoveRoleCommand implements IRemoveRoleCommand {
 export interface IRemoveRoleCommand {
     userId?: number;
     roleId?: number;
+}
+
+export enum Responsibility {
+    Internal = "internal",
+    Contractor = "contractor",
+    Supplier = "supplier",
+    Client = "client",
+    Consultant = "consultant",
 }
 
 export class Result implements IResult {
@@ -18648,6 +20237,86 @@ export interface IResultListPagedResponseResponse {
     data?: ResultListPagedResponse;
 }
 
+export class Role implements IRole {
+    id?: number;
+    isDeleted?: boolean;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    name?: string | undefined;
+    arabicName?: string | undefined;
+    description?: string | undefined;
+    userRoles?: UserRole[] | undefined;
+
+    constructor(data?: IRole) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            this.name = _data["name"];
+            this.arabicName = _data["arabicName"];
+            this.description = _data["description"];
+            if (Array.isArray(_data["userRoles"])) {
+                this.userRoles = [] as any;
+                for (let item of _data["userRoles"])
+                    this.userRoles!.push(UserRole.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): Role {
+        data = typeof data === 'object' ? data : {};
+        let result = new Role();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        data["name"] = this.name;
+        data["arabicName"] = this.arabicName;
+        data["description"] = this.description;
+        if (Array.isArray(this.userRoles)) {
+            data["userRoles"] = [];
+            for (let item of this.userRoles)
+                data["userRoles"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IRole {
+    id?: number;
+    isDeleted?: boolean;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    name?: string | undefined;
+    arabicName?: string | undefined;
+    description?: string | undefined;
+    userRoles?: UserRole[] | undefined;
+}
+
 export class SecondStepDto implements ISecondStepDto {
     agreementPaymentDto?: AgreementPaymentDto;
     agreementServiceDto?: AgreementServiceDto[] | undefined;
@@ -18698,6 +20367,7 @@ export interface ISecondStepDto {
 
 export class Service implements IService {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
     agreements?: AgreementService[] | undefined;
 
@@ -18713,6 +20383,7 @@ export class Service implements IService {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
             if (Array.isArray(_data["agreements"])) {
                 this.agreements = [] as any;
@@ -18732,6 +20403,7 @@ export class Service implements IService {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         if (Array.isArray(this.agreements)) {
             data["agreements"] = [];
@@ -18744,8 +20416,57 @@ export class Service implements IService {
 
 export interface IService {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
     agreements?: AgreementService[] | undefined;
+}
+
+export class SettleAdvanceCommand implements ISettleAdvanceCommand {
+    id?: number;
+    expenseIds?: number[] | undefined;
+
+    constructor(data?: ISettleAdvanceCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            if (Array.isArray(_data["expenseIds"])) {
+                this.expenseIds = [] as any;
+                for (let item of _data["expenseIds"])
+                    this.expenseIds!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): SettleAdvanceCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new SettleAdvanceCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        if (Array.isArray(this.expenseIds)) {
+            data["expenseIds"] = [];
+            for (let item of this.expenseIds)
+                data["expenseIds"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface ISettleAdvanceCommand {
+    id?: number;
+    expenseIds?: number[] | undefined;
 }
 
 export class SeventhStepDto implements ISeventhStepDto {
@@ -18841,10 +20562,10 @@ export interface ISixthStepDto {
 }
 
 export enum StatusTask {
-    _0 = 0,
-    _1 = 1,
-    _2 = 2,
-    _3 = 3,
+    ToDO = "toDO",
+    InProgress = "inProgress",
+    Review = "review",
+    Completed = "completed",
 }
 
 export class StringLookupDtoListDictionaryResponse implements IStringLookupDtoListDictionaryResponse {
@@ -18916,13 +20637,13 @@ export interface IStringLookupDtoListDictionaryResponse {
 }
 
 export enum SubTaskType {
-    _0 = 0,
+    Construction = "construction",
 }
 
 export class Supplier implements ISupplier {
     id?: number;
     isDeleted?: boolean;
-    name?: string | undefined;
+    name!: string | undefined;
     phoneNumber?: string | undefined;
     email?: string | undefined;
     expenses?: Expense[] | undefined;
@@ -18988,7 +20709,7 @@ export class Supplier implements ISupplier {
 export interface ISupplier {
     id?: number;
     isDeleted?: boolean;
-    name?: string | undefined;
+    name: string | undefined;
     phoneNumber?: string | undefined;
     email?: string | undefined;
     expenses?: Expense[] | undefined;
@@ -19197,11 +20918,11 @@ export interface ISupplierResponse {
 
 export class SupplierService implements ISupplierService {
     id?: number;
+    isDeleted?: boolean;
     createdById?: number | undefined;
     createdDate?: Date | undefined;
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
-    isDeleted?: boolean;
     representativeName!: string | undefined;
     materialId!: number;
     material?: Material;
@@ -19222,11 +20943,11 @@ export class SupplierService implements ISupplierService {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.createdById = _data["createdById"];
             this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
             this.modifiedById = _data["modifiedById"];
             this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
-            this.isDeleted = _data["isDeleted"];
             this.representativeName = _data["representativeName"];
             this.materialId = _data["materialId"];
             this.material = _data["material"] ? Material.fromJS(_data["material"]) : undefined as any;
@@ -19247,11 +20968,11 @@ export class SupplierService implements ISupplierService {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["createdById"] = this.createdById;
         data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
         data["modifiedById"] = this.modifiedById;
         data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
-        data["isDeleted"] = this.isDeleted;
         data["representativeName"] = this.representativeName;
         data["materialId"] = this.materialId;
         data["material"] = this.material ? this.material.toJSON() : undefined as any;
@@ -19265,11 +20986,11 @@ export class SupplierService implements ISupplierService {
 
 export interface ISupplierService {
     id?: number;
+    isDeleted?: boolean;
     createdById?: number | undefined;
     createdDate?: Date | undefined;
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
-    isDeleted?: boolean;
     representativeName: string | undefined;
     materialId: number;
     material?: Material;
@@ -19335,8 +21056,16 @@ export interface ISupplierServiceDto {
     isDeleted?: boolean;
 }
 
+export enum TaskSource {
+    Internal = "internal",
+    Contractor = "contractor",
+    Supplier = "supplier",
+    Client = "client",
+}
+
 export class TaskType implements ITaskType {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
     projectStageTasks?: ProjectStageTask[] | undefined;
 
@@ -19352,6 +21081,7 @@ export class TaskType implements ITaskType {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
             if (Array.isArray(_data["projectStageTasks"])) {
                 this.projectStageTasks = [] as any;
@@ -19371,6 +21101,7 @@ export class TaskType implements ITaskType {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         if (Array.isArray(this.projectStageTasks)) {
             data["projectStageTasks"] = [];
@@ -19383,6 +21114,7 @@ export class TaskType implements ITaskType {
 
 export interface ITaskType {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
     projectStageTasks?: ProjectStageTask[] | undefined;
 }
@@ -19433,6 +21165,7 @@ export interface IThirdStepDto {
 
 export class Unit implements IUnit {
     id?: number;
+    isDeleted?: boolean;
     name!: string | undefined;
 
     constructor(data?: IUnit) {
@@ -19447,6 +21180,7 @@ export class Unit implements IUnit {
     init(_data?: any) {
         if (_data) {
             this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
             this.name = _data["name"];
         }
     }
@@ -19461,6 +21195,7 @@ export class Unit implements IUnit {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {};
         data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
         data["name"] = this.name;
         return data;
     }
@@ -19468,7 +21203,76 @@ export class Unit implements IUnit {
 
 export interface IUnit {
     id?: number;
+    isDeleted?: boolean;
     name: string | undefined;
+}
+
+export class UpdateAdvanceCommand implements IUpdateAdvanceCommand {
+    id?: number;
+    projectStageId?: number;
+    engineerId?: number;
+    advanceDate?: Date;
+    amount?: number;
+    currency?: string | undefined;
+    paymentMethod?: PaymentMethod;
+    reference?: string | undefined;
+    notes?: string | undefined;
+
+    constructor(data?: IUpdateAdvanceCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.engineerId = _data["engineerId"];
+            this.advanceDate = _data["advanceDate"] ? new Date(_data["advanceDate"].toString()) : undefined as any;
+            this.amount = _data["amount"];
+            this.currency = _data["currency"];
+            this.paymentMethod = _data["paymentMethod"] ? PaymentMethod.fromJS(_data["paymentMethod"]) : undefined as any;
+            this.reference = _data["reference"];
+            this.notes = _data["notes"];
+        }
+    }
+
+    static fromJS(data: any): UpdateAdvanceCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new UpdateAdvanceCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["engineerId"] = this.engineerId;
+        data["advanceDate"] = this.advanceDate ? this.advanceDate.toISOString() : undefined as any;
+        data["amount"] = this.amount;
+        data["currency"] = this.currency;
+        data["paymentMethod"] = this.paymentMethod ? this.paymentMethod.toJSON() : undefined as any;
+        data["reference"] = this.reference;
+        data["notes"] = this.notes;
+        return data;
+    }
+}
+
+export interface IUpdateAdvanceCommand {
+    id?: number;
+    projectStageId?: number;
+    engineerId?: number;
+    advanceDate?: Date;
+    amount?: number;
+    currency?: string | undefined;
+    paymentMethod?: PaymentMethod;
+    reference?: string | undefined;
+    notes?: string | undefined;
 }
 
 export class UploadAttachmentCommand implements IUploadAttachmentCommand {
@@ -19529,6 +21333,122 @@ export interface IUploadAttachmentCommand {
     filePath?: string | undefined;
     base64Data?: string | undefined;
     contentType?: string | undefined;
+}
+
+export class User implements IUser {
+    id?: number;
+    isDeleted?: boolean;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    userName?: string | undefined;
+    email?: string | undefined;
+    passwordHash?: string | undefined;
+    fullName?: string | undefined;
+    arabicFullName?: string | undefined;
+    phoneNumber?: string | undefined;
+    isActive?: boolean;
+    profileImage?: string | undefined;
+    lastLoginDate?: Date | undefined;
+    userRoles?: UserRole[] | undefined;
+    refreshTokens?: RefreshToken[] | undefined;
+
+    constructor(data?: IUser) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            this.userName = _data["userName"];
+            this.email = _data["email"];
+            this.passwordHash = _data["passwordHash"];
+            this.fullName = _data["fullName"];
+            this.arabicFullName = _data["arabicFullName"];
+            this.phoneNumber = _data["phoneNumber"];
+            this.isActive = _data["isActive"];
+            this.profileImage = _data["profileImage"];
+            this.lastLoginDate = _data["lastLoginDate"] ? new Date(_data["lastLoginDate"].toString()) : undefined as any;
+            if (Array.isArray(_data["userRoles"])) {
+                this.userRoles = [] as any;
+                for (let item of _data["userRoles"])
+                    this.userRoles!.push(UserRole.fromJS(item));
+            }
+            if (Array.isArray(_data["refreshTokens"])) {
+                this.refreshTokens = [] as any;
+                for (let item of _data["refreshTokens"])
+                    this.refreshTokens!.push(RefreshToken.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): User {
+        data = typeof data === 'object' ? data : {};
+        let result = new User();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        data["userName"] = this.userName;
+        data["email"] = this.email;
+        data["passwordHash"] = this.passwordHash;
+        data["fullName"] = this.fullName;
+        data["arabicFullName"] = this.arabicFullName;
+        data["phoneNumber"] = this.phoneNumber;
+        data["isActive"] = this.isActive;
+        data["profileImage"] = this.profileImage;
+        data["lastLoginDate"] = this.lastLoginDate ? this.lastLoginDate.toISOString() : undefined as any;
+        if (Array.isArray(this.userRoles)) {
+            data["userRoles"] = [];
+            for (let item of this.userRoles)
+                data["userRoles"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.refreshTokens)) {
+            data["refreshTokens"] = [];
+            for (let item of this.refreshTokens)
+                data["refreshTokens"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IUser {
+    id?: number;
+    isDeleted?: boolean;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    userName?: string | undefined;
+    email?: string | undefined;
+    passwordHash?: string | undefined;
+    fullName?: string | undefined;
+    arabicFullName?: string | undefined;
+    phoneNumber?: string | undefined;
+    isActive?: boolean;
+    profileImage?: string | undefined;
+    lastLoginDate?: Date | undefined;
+    userRoles?: UserRole[] | undefined;
+    refreshTokens?: RefreshToken[] | undefined;
 }
 
 export class UserDto implements IUserDto {
@@ -19729,6 +21649,78 @@ export interface IUserDtoResponse {
     message?: string | undefined;
     errors?: string[] | undefined;
     data?: UserDto;
+}
+
+export class UserRole implements IUserRole {
+    id?: number;
+    isDeleted?: boolean;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    userId?: number;
+    user?: User;
+    roleId?: number;
+    role?: Role;
+
+    constructor(data?: IUserRole) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.isDeleted = _data["isDeleted"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            this.userId = _data["userId"];
+            this.user = _data["user"] ? User.fromJS(_data["user"]) : undefined as any;
+            this.roleId = _data["roleId"];
+            this.role = _data["role"] ? Role.fromJS(_data["role"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): UserRole {
+        data = typeof data === 'object' ? data : {};
+        let result = new UserRole();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["isDeleted"] = this.isDeleted;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        data["userId"] = this.userId;
+        data["user"] = this.user ? this.user.toJSON() : undefined as any;
+        data["roleId"] = this.roleId;
+        data["role"] = this.role ? this.role.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IUserRole {
+    id?: number;
+    isDeleted?: boolean;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    userId?: number;
+    user?: User;
+    roleId?: number;
+    role?: Role;
 }
 
 function formatDate(d: Date) {

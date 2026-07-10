@@ -22,9 +22,11 @@ import {
   CurrencyDto,
   GetPaymentFlowDto,
   LookupClient,
+  LookupType,
   PaymentFlowClient
 } from '../../../../../nswag/api-client';
 import { PrintService } from '../../../../shared';
+import { getLookupData } from '../../../../shared/utils/lookup.util';
 
 interface SelectOption<T = number> {
   label: string;
@@ -555,10 +557,10 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
   }
 
   private loadLookups(): void {
-    this.lookupClient.getAllLookups(['paymentMethod']).subscribe({
+    this.lookupClient.getAllLookups([LookupType.PaymentMethod]).subscribe({
       next: (response) => {
         const data = response.data as Record<string, { id: number; name: string }[]> | undefined;
-        const paymentMethods = data?.['paymentMethod'] ?? data?.['paymentmethod'] ?? [];
+        const paymentMethods = getLookupData(data, LookupType.PaymentMethod) ?? [];
         this.paymentTypes = paymentMethods.map((method) => ({ label: method.name, value: method.id }));
         this.paymentMethodMap = Object.fromEntries(this.paymentTypes.map((option) => [option.value, option.label]));
         this.setDefaultPaymentMethod();

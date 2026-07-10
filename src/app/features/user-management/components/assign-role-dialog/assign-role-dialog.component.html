@@ -1,0 +1,56 @@
+<div class="assign-role-dialog flex flex-column gap-3" *ngIf="user() as u">
+  <div>
+    <div class="font-semibold mb-1">{{ u.fullName || u.email }}</div>
+    <div class="flex flex-wrap gap-1">
+      <p-tag *ngFor="let role of u.roles" [value]="role" severity="info"></p-tag>
+      <span *ngIf="!u.roles?.length" class="text-color-secondary text-sm">
+        {{ 'userManagement.noRoles' | translate }}
+      </span>
+    </div>
+  </div>
+
+  <div class="flex flex-column gap-2">
+    <label for="roleId">{{ 'userManagement.rolesDialog.roleIdLabel' | translate }}</label>
+    <p-select
+      inputId="roleId"
+      [options]="roleOptions"
+      optionLabel="label"
+      optionValue="value"
+      [ngModel]="roleId()"
+      (ngModelChange)="roleId.set($event)"
+      [placeholder]="'userManagement.rolesDialog.selectRole' | translate"
+      styleClass="w-full">
+      <ng-template let-option pTemplate="item">
+        {{ option.label | translate }}
+      </ng-template>
+      <ng-template let-option pTemplate="selectedItem">
+        {{ option.label | translate }}
+      </ng-template>
+    </p-select>
+  </div>
+
+  <p-message *ngIf="errorMessage()" severity="error" [text]="errorMessage()!"></p-message>
+
+  <div class="flex justify-content-end gap-2 mt-2">
+    <p-button
+      [label]="'userManagement.rolesDialog.remove' | translate"
+      icon="pi pi-minus-circle"
+      severity="danger"
+      [outlined]="true"
+      [loading]="isRemoving()"
+      [disabled]="roleId() == null || isAssigning()"
+      (onClick)="removeRole()">
+    </p-button>
+    <p-button
+      [label]="'userManagement.rolesDialog.assign' | translate"
+      icon="pi pi-plus-circle"
+      [loading]="isAssigning()"
+      [disabled]="roleId() == null || isRemoving()"
+      (onClick)="assignRole()">
+    </p-button>
+  </div>
+
+  <div class="flex justify-content-end">
+    <p-button [label]="'common.close' | translate" [text]="true" (onClick)="close()"></p-button>
+  </div>
+</div>

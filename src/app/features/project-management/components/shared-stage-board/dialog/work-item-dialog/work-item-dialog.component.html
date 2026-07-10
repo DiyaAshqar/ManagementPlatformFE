@@ -28,14 +28,19 @@
       </div>
       <div class="col-6">
         <label for="item-assignTo" class="block text-sm font-medium mb-2">{{ 'workItemDialog.fields.assignTo' | translate }}</label>
-        <input 
+        <p-select
           id="item-assignTo"
-          type="text" 
-          pInputText 
           [ngModel]="currentFormData.assignTo"
           (ngModelChange)="updateFormField('assignTo', $event)"
+          [options]="userOptions"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+          [showClear]="true"
+          [loading]="isLoadingUsers()"
           [placeholder]="'workItemDialog.fields.assignToPlaceholder' | translate"
-          class="w-full">
+          styleClass="w-full">
+        </p-select>
       </div>
     </div>
     
