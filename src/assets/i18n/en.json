@@ -580,6 +580,18 @@
     "grandTotal": "Grand Total",
     "items": "items",
     "noData": "No data available",
+    "engineeringOfficeFees": {
+      "title": "Engineering Office Fees",
+      "feeType": "Fee Type",
+      "agreedValue": "Agreed Fee",
+      "calculationBase": "Expenses + Contractor Contracts",
+      "feeAmount": "Engineering Office Fee",
+      "types": {
+        "percentage": "Percentage",
+        "fixed": "Fixed Amount",
+        "monthly": "Monthly Fee"
+      }
+    },
     "types": {
       "boq": {
         "label": "Bill of Quantities",

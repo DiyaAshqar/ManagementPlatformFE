@@ -576,6 +576,18 @@
     "grandTotal": "المجموع الكلي",
     "items": "عنصر",
     "noData": "لا توجد بيانات",
+    "engineeringOfficeFees": {
+      "title": "رسوم المكتب الهندسي",
+      "feeType": "نوع الرسوم",
+      "agreedValue": "الرسم المتفق عليه",
+      "calculationBase": "المصاريف + عقود المقاولين",
+      "feeAmount": "قيمة رسوم المكتب الهندسي",
+      "types": {
+        "percentage": "نسبة مئوية",
+        "fixed": "مبلغ ثابت",
+        "monthly": "رسوم شهرية"
+      }
+    },
     "types": {
       "boq": {
         "label": "كشف الكميات",

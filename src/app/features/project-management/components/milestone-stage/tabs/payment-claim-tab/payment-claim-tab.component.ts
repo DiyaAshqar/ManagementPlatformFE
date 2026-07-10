@@ -16,6 +16,8 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 import { ConfirmationService } from 'primeng/api';
 import {
+  AgreementClient,
+  AgreementPaymentDto,
   ConstructorClient,
   ExpenseClient,
   GetExpenseDto,
@@ -52,6 +54,13 @@ export interface ClaimData {
   exp: GetExpenseDto[];
 }
 
+export type EngineeringOfficeFeeType = 'percentage' | 'fixed' | 'monthly';
+
+export interface EngineeringOfficeFee {
+  type: EngineeringOfficeFeeType;
+  agreedValue: number;
+}
+
 @Component({
   selector: 'app-payment-claim-tab',
   standalone: true,
@@ -75,6 +84,7 @@ export interface ClaimData {
     ProjectVOClient,
     LookupClient,
     ExpenseClient,
+    AgreementClient,
   ],
   templateUrl: './payment-claim-tab.component.html',
   styleUrls: ['./payment-claim-tab.component.scss'],
@@ -83,6 +93,7 @@ export class PaymentClaimTabComponent implements OnInit {
   readonly permissions = Permissions;
   @Input() projectStageId: number = 0;
   @Input() projectId: string = '';
+  @Input() agreementId: number = 0;
 
   step = signal<'select' | 'preview' | 'confirmed'>('select');
   selectedTypes = signal<Set<ClaimType>>(new Set());
@@ -91,6 +102,7 @@ export class PaymentClaimTabComponent implements OnInit {
   claimDate = new Date();
 
   claimData = signal<ClaimData>({ boq: [], pmc: [], sv: [], vo: [], exp: [] });
+  engineeringOfficeFee = signal<EngineeringOfficeFee | null>(null);
   materialMap: Record<number, string> = {};
   unitMap: Record<number, string> = {};
   contractorMap: Record<number, string> = {};
@@ -141,6 +153,7 @@ export class PaymentClaimTabComponent implements OnInit {
     private expClient: ExpenseClient,
     private lookupClient: LookupClient,
     private constructorClient: ConstructorClient,
+    private agreementClient: AgreementClient,
     private confirmationService: ConfirmationService,
     private translate: TranslateService,
     private authService: AuthService
@@ -224,7 +237,23 @@ export class PaymentClaimTabComponent implements OnInit {
         )
       : of([]);
 
-    forkJoin({ boq: boq$, pmc: pmc$, sv: sv$, vo: vo$, exp: exp$, lookups: lookups$, constructors: constructors$ }).subscribe({
+    const engineeringOfficeFee$ = this.agreementId > 0
+      ? this.agreementClient.getAgreementById(this.agreementId, 2).pipe(
+          map((r) => this.extractEngineeringOfficeFee(r.data?.secondStepDto?.agreementPaymentDto)),
+          catchError(() => of(null))
+        )
+      : of(null);
+
+    forkJoin({
+      boq: boq$,
+      pmc: pmc$,
+      sv: sv$,
+      vo: vo$,
+      exp: exp$,
+      lookups: lookups$,
+      constructors: constructors$,
+      engineeringOfficeFee: engineeringOfficeFee$,
+    }).subscribe({
       next: (data) => {
         this.materialMap = this.buildLookupMap(data.lookups?.['material']);
         this.unitMap = this.buildLookupMap(data.lookups?.['unit']);
@@ -240,6 +269,7 @@ export class PaymentClaimTabComponent implements OnInit {
           vo: data.vo,
           exp: data.exp,
         } as ClaimData);
+        this.engineeringOfficeFee.set(data.engineeringOfficeFee);
         this.claimDate = new Date();
         this.step.set('preview');
         this.isLoading.set(false);
@@ -271,6 +301,7 @@ export class PaymentClaimTabComponent implements OnInit {
     if (this.isConfirmed()) return;
     this.step.set('select');
     this.claimData.set({ boq: [], pmc: [], sv: [], vo: [], exp: [] });
+    this.engineeringOfficeFee.set(null);
   }
 
   printClaim(): void {
@@ -406,6 +437,27 @@ export class PaymentClaimTabComponent implements OnInit {
       });
     }
 
+    const engineeringFee = this.engineeringOfficeFee();
+    if (engineeringFee) {
+      const isPercentage = engineeringFee.type === 'percentage';
+      sections.push({
+        key: 'EOF', title: t('ownerPayment.engineeringOfficeFees.title'),
+        itemCount: 1, total: this.engineeringOfficeFeeTotal, badgeColor: '#0891b2',
+        headers: [
+          { text: t('ownerPayment.engineeringOfficeFees.feeType'), align: 'left' },
+          { text: t('ownerPayment.engineeringOfficeFees.agreedValue'), align: 'right' },
+          { text: t('ownerPayment.engineeringOfficeFees.calculationBase'), align: 'right' },
+          { text: t('ownerPayment.engineeringOfficeFees.feeAmount'), align: 'right' },
+        ],
+        rows: row(0,
+          `<td>${t(this.engineeringOfficeFeeTypeKey)}</td>
+           <td class="right bold">${isPercentage ? `${fmtN(engineeringFee.agreedValue)}%` : fmtN(engineeringFee.agreedValue)}</td>
+           <td class="right">${isPercentage ? fmtN(this.engineeringOfficeFeeBase) : '&mdash;'}</td>
+           <td class="right bold">${fmtN(this.engineeringOfficeFeeTotal)}</td>`
+        ),
+      });
+    }
+
     const html = buildClaimReport({
       lang, isRtl,
       isConfirmed: this.isConfirmed(),
@@ -459,8 +511,26 @@ export class PaymentClaimTabComponent implements OnInit {
     return this.claimData().exp.reduce((s, i) => s + (i.totalAmount ?? 0), 0);
   }
 
+  get engineeringOfficeFeeBase(): number {
+    return this.pmcTotal + this.expTotal;
+  }
+
+  get engineeringOfficeFeeTotal(): number {
+    const fee = this.engineeringOfficeFee();
+    if (!fee) return 0;
+
+    return fee.type === 'percentage'
+      ? this.engineeringOfficeFeeBase * fee.agreedValue / 100
+      : fee.agreedValue;
+  }
+
+  get engineeringOfficeFeeTypeKey(): string {
+    const type = this.engineeringOfficeFee()?.type;
+    return `ownerPayment.engineeringOfficeFees.types.${type ?? 'fixed'}`;
+  }
+
   get grandTotal(): number {
-    return this.boqTotal + this.pmcTotal + this.svTotal + this.voTotal + this.expTotal;
+    return this.boqTotal + this.pmcTotal + this.svTotal + this.voTotal + this.expTotal + this.engineeringOfficeFeeTotal;
   }
 
   // ── Helpers ─────────────────────────────────────────────────────────────────
@@ -499,6 +569,25 @@ export class PaymentClaimTabComponent implements OnInit {
 
   private buildLookupMap(items?: { id: number; name: string }[]): Record<number, string> {
     return Object.fromEntries((items ?? []).filter((item) => item.id != null && item.name).map((item) => [item.id, item.name]));
+  }
+
+  private extractEngineeringOfficeFee(payment?: AgreementPaymentDto): EngineeringOfficeFee | null {
+    const fees = payment?.monthlyPaymentDto;
+    if (!fees) return null;
+
+    const percentage = this.positiveNumber(fees.percentageFees);
+    if (percentage !== null) return { type: 'percentage', agreedValue: percentage };
+
+    const fixed = this.positiveNumber(fees.amount);
+    if (fixed !== null) return { type: 'fixed', agreedValue: fixed };
+
+    const monthly = this.positiveNumber(fees.monthlyFees);
+    return monthly !== null ? { type: 'monthly', agreedValue: monthly } : null;
+  }
+
+  private positiveNumber(value: number | null | undefined): number | null {
+    const numericValue = Number(value);
+    return Number.isFinite(numericValue) && numericValue > 0 ? numericValue : null;
   }
 
   private readStringProp(item: unknown, prop: string): string {
