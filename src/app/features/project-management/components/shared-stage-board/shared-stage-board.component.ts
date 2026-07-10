@@ -26,6 +26,9 @@ import { TaskService } from '../../services/task.service';
 import { MilestoneTaskDialogComponent } from './dialog/milestone-task-dialog/milestone-task-dialog.component';
 import { SubtaskDialogComponent } from './dialog/subtask-dialog/subtask-dialog.component';
 import { WorkItemDialogComponent } from './dialog/work-item-dialog/work-item-dialog.component';
+import { Permissions } from '../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 
 export interface SubTask {
   id: string | number;
@@ -108,13 +111,15 @@ export interface Column {
     AvatarGroupModule,
     ChipModule,
     ProgressBarModule,
-    ConfirmDialogModule
+    ConfirmDialogModule,
+    HasPermissionDirective
   ],
   templateUrl: './shared-stage-board.component.html',
   styleUrls: ['./shared-stage-board.component.scss'],
   providers: [ConfirmationService]
 })
 export class SharedStageBoardComponent implements OnInit {
+  readonly permissions = Permissions;
   @Input() projectId!: string;
   @Input() projectStageId!: number;
   @Input() stageTitle: string = 'Stage Board';
@@ -134,6 +139,7 @@ export class SharedStageBoardComponent implements OnInit {
   private confirmationService = inject(ConfirmationService);
   private dialogRef: DynamicDialogRef | undefined;
   private taskService = inject(TaskService);
+  private authService = inject(AuthService);
 
   constructor() {
     // Use effect to sync columnsInput to internal columns signal
@@ -196,6 +202,7 @@ export class SharedStageBoardComponent implements OnInit {
   }
 
   onDrop(event: CdkDragDrop<WorkItem[]>, targetColumn: Column): void {
+    if (!this.canManage()) return;
     if (event.previousContainer === event.container) {
       moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     } else {
@@ -231,6 +238,7 @@ export class SharedStageBoardComponent implements OnInit {
   }
 
   openItemDialog(item: WorkItem): void {
+    if (!this.canManage()) return;
     this.selectedItem.set(item);
 
     const workItem = {
@@ -332,6 +340,7 @@ export class SharedStageBoardComponent implements OnInit {
   }
 
   openAddDialog(columnId: TaskStatus): void {
+    if (!this.canManage()) return;
     this.selectedColumn.set(columnId);
 
     if (this.useMilestoneTaskDialog) {
@@ -493,6 +502,7 @@ export class SharedStageBoardComponent implements OnInit {
   }
 
   deleteWorkItem(item: WorkItem): void {
+    if (!this.canManage()) return;
     this.confirmationService.confirm({
       message: `Are you sure you want to delete the task "${item.title}"?`,
       header: 'Confirm Delete',
@@ -513,6 +523,10 @@ export class SharedStageBoardComponent implements OnInit {
         }
       }
     });
+  }
+
+  canManage(): boolean {
+    return this.authService.hasPermission(Permissions.ProjectWork.Manage);
   }
 
   toggleExpanded(itemId: string): void {

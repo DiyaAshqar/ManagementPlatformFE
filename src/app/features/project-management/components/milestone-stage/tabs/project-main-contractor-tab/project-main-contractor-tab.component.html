@@ -14,13 +14,13 @@
       <span class="contractor-total-label">{{ 'projectTabs.projectMainContractor.totalContractors' | translate }}: {{ contractorItems().length }}</span>
       <span class="contractor-value-label">{{ 'projectTabs.projectMainContractor.totalValue' | translate }}: {{ totalContractValue | number:'1.0-0' }}</span>
     </div>
-    <p-button
-      [label]="'projectTabs.projectMainContractor.addContractor' | translate"
-      icon="pi pi-plus"
-      (onClick)="openAddDialog()"
-      severity="contrast"
-      [raised]="true">
-    </p-button>
+      <p-button *appHasPermission="permissions.ProjectWork.Manage"
+        [label]="'projectTabs.projectMainContractor.addContractor' | translate"
+        icon="pi pi-plus"
+        (onClick)="openAddDialog()"
+        severity="contrast"
+        [raised]="true">
+      </p-button>
   </div>
 
   <!-- Table -->
@@ -60,7 +60,7 @@
         <td>{{ item.startDate | date:'yyyy-MM-dd' }}</td>
         <td>{{ item.endDate | date:'yyyy-MM-dd' }}</td>
         <td class="text-center">
-          <div class="contractor-actions">
+            <div *appHasPermission="permissions.ProjectWork.Manage" class="contractor-actions">
             <p-button
               icon="pi pi-credit-card"
               [rounded]="true"
@@ -101,7 +101,7 @@
               tooltipPosition="top"
               (onClick)="confirmDelete(item)">
             </p-button>
-          </div>
+            </div>
         </td>
       </tr>
     </ng-template>
@@ -130,7 +130,7 @@
 
 <!-- ── Dialog ─────────────────────────────────────────────────────── -->
 @if (showContractorDialog()) {
-  <app-add-contractor-dialog
+  <app-add-contractor-dialog *appHasPermission="permissions.ProjectWork.Manage"
     [visible]="showContractorDialog()"
     (visibleChange)="showContractorDialog.set($event)"
     [projectStageId]="projectStageId"
@@ -141,7 +141,7 @@
 }
 
 <ng-container *ngIf="showContractorDutiesDialog()">
-  <app-contractor-duties-dialog
+  <app-contractor-duties-dialog *appHasPermission="permissions.ProjectWork.Manage"
     [visible]="showContractorDutiesDialog()"
     [agreementId]="0"
     [mainContractId]="selectedMainContractId()"
@@ -169,7 +169,7 @@
   [maximizable]="true">
 
   @if (selectedContractor()) {
-    <app-project-main-contractor-payments
+    <app-project-main-contractor-payments *appHasPermission="permissions.ProjectWork.Manage"
       [contractor]="selectedContractor()!"
       [contractorName]="getContractorName(selectedContractor()!)">
     </app-project-main-contractor-payments>

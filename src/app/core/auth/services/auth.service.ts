@@ -11,6 +11,8 @@ import {
   LoginRequest,
   LoginResult,
   RegisterRequest,
+  getPermissionsForRoles,
+  normalizeRoleName,
 } from '../models/auth.models';
 import { AuthApiService } from './auth-api.service';
 import { JwtService } from './jwt.service';
@@ -45,8 +47,11 @@ export class AuthService {
   readonly isAuthenticated = computed(() => this.currentUserSignal() !== null);
   /** Roles of the current user. */
   readonly roles = computed(() => this.currentUserSignal()?.roles ?? []);
-  /** Permissions of the current user. */
-  readonly permissions = computed(() => this.currentUserSignal()?.permissions ?? []);
+  /** JWT permissions combined with permissions derived from the user's roles. */
+  readonly permissions = computed(() => {
+    const user = this.currentUserSignal();
+    return [...new Set([...(user?.permissions ?? []), ...getPermissionsForRoles(user?.roles ?? [])])];
+  });
   /** Flattened JWT claims of the current access token. */
   readonly claims = computed<Claim[]>(() => this.jwt.getClaims(this.accessTokenSignal()));
 
@@ -162,7 +167,8 @@ export class AuthService {
   // --- Authorization helpers ---------------------------------------------
 
   hasRole(role: string): boolean {
-    return this.roles().includes(role);
+    const normalizedRole = normalizeRoleName(role);
+    return this.roles().some((currentRole) => normalizeRoleName(currentRole) === normalizedRole);
   }
 
   hasAnyRole(roles: string[]): boolean {

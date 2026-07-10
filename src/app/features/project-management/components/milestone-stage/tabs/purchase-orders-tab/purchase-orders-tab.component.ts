@@ -21,6 +21,9 @@ import {
   SupplierClient
 } from '../../../../../../../nswag/api-client';
 import { AddPoDialogComponent } from '../../../dialog/add-po-dialog/add-po-dialog.component';
+import { Permissions } from '../../../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
 
 // PO Status enum matching the backend
 export enum POStatus {
@@ -40,13 +43,15 @@ export enum POStatus {
     TooltipModule,
     SkeletonModule,
     BadgeModule,
-    AddPoDialogComponent
+    AddPoDialogComponent,
+    HasPermissionDirective
   ],
   providers: [ProjectPOClient, LookupClient, SupplierClient],
   templateUrl: './purchase-orders-tab.component.html',
   styleUrls: ['./purchase-orders-tab.component.scss']
 })
 export class PurchaseOrdersTabComponent implements OnInit, OnDestroy {
+  readonly permissions = Permissions;
   @Input() projectStageId: number = 0;
 
   poItems = signal<IGetProjectPODto[]>([]);
@@ -82,7 +87,8 @@ export class PurchaseOrdersTabComponent implements OnInit, OnDestroy {
     private lookupClient: LookupClient,
     private supplierClient: SupplierClient,
     private confirmationService: ConfirmationService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -173,16 +179,19 @@ export class PurchaseOrdersTabComponent implements OnInit, OnDestroy {
   // ── Dialog ───────────────────────────────────────────────────────────────
 
   openAddDialog(): void {
+    if (!this.canManage()) return;
     this.editPoItem.set(null);
     this.showPoDialog.set(true);
   }
 
   openEditDialog(item: IGetProjectPODto): void {
+    if (!this.canManage()) return;
     this.editPoItem.set(item);
     this.showPoDialog.set(true);
   }
 
   onDialogSaved(command: CreateProjectPOCommand): void {
+    if (!this.canManage()) return;
     this.poClient.createOrUpdate(command).subscribe({
       next: (res) => {
         if (res.succeeded) {
@@ -197,6 +206,7 @@ export class PurchaseOrdersTabComponent implements OnInit, OnDestroy {
   }
 
   confirmDelete(item: IGetProjectPODto): void {
+    if (!this.canManage()) return;
     this.confirmationService.confirm({
       message: this.translate.instant('projectTabs.po.confirmDelete.message', { name: item.poNumber }),
       header: this.translate.instant('projectTabs.po.confirmDelete.header'),
@@ -223,6 +233,10 @@ export class PurchaseOrdersTabComponent implements OnInit, OnDestroy {
       case POStatus.Rejected: return 'danger';
       default: return 'secondary';
     }
+  }
+
+  canManage(): boolean {
+    return this.authService.hasPermission(Permissions.ProjectWork.Manage);
   }
 
   getStatusLabel(status?: number): string {

@@ -33,7 +33,11 @@ import {
 } from '../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../shared/components/documents-table/documents-table.component';
 import { MaterialSelectComponent } from '../../../../shared/components/material-select/material-select.component';
+import { AdvanceApiService } from '../../services/advance-api.service';
 import { ExpenseApiService } from '../../services/expense-api.service';
+import { Permissions } from '../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 
 // The regenerated backend AttachmentType enum has no dedicated Expense value (was numeric 6,
 // which is now SurveyingVisit) - using Milestone as the closest fit until backend adds one.
@@ -69,12 +73,14 @@ const emptyDetails = (): IExpenseDetailDto[] => [createEmptyDetail()];
     DialogModule,
     DocumentsTableComponent,
     MaterialSelectComponent,
+    HasPermissionDirective,
   ],
   providers: [ConfirmationService, LookupClient],
   templateUrl: './project-expense-management.component.html',
   styleUrls: ['./project-expense-management.component.scss'],
 })
 export class ProjectExpenseManagementComponent implements OnInit {
+  readonly permissions = Permissions;
   @Input() projectId!: string;
   @Input() projectStageId: number = 0;
 
@@ -119,10 +125,12 @@ export class ProjectExpenseManagementComponent implements OnInit {
 
   constructor(
     private expenseService: ExpenseApiService,
+    private advanceService: AdvanceApiService,
     private lookupClient: LookupClient,
     private currencyClient: CurrencyClient,
     private confirmationService: ConfirmationService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -174,13 +182,29 @@ export class ProjectExpenseManagementComponent implements OnInit {
   // -- Navigation ----------------------------------------------------------------
 
   openNewForm(): void {
+    if (!this.canCreate()) return;
     this.editingExpenseId.set(null);
     this.resetForm();
     this.currentView.set('form');
   }
 
+  /** True once this expense has been linked to an advance via settlement — locked from further edits. */
+  isLockedByAdvance(expense: GetExpenseDto): boolean {
+    return this.advanceService.isExpenseLocked(expense.id);
+  }
+
+  isLocked(expense: GetExpenseDto): boolean {
+    return !!expense.autoPost || this.isLockedByAdvance(expense);
+  }
+
+  lockTooltipKey(expense: GetExpenseDto, defaultKey: string): string {
+    if (expense.autoPost) return 'projectTabs.expenses.list.autoPostedNoEdit';
+    if (this.isLockedByAdvance(expense)) return 'projectTabs.expenses.list.lockedByAdvance';
+    return defaultKey;
+  }
+
   openEditForm(expense: GetExpenseDto): void {
-    if (expense.autoPost) {
+    if (!this.canEdit(expense)) {
       return;
     }
     this.editingExpenseId.set(expense.id ?? null);
@@ -253,6 +277,8 @@ export class ProjectExpenseManagementComponent implements OnInit {
   // -- Save / Delete -------------------------------------------------------------
 
   handleSave(): void {
+    const editingId = this.editingExpenseId();
+    if (editingId ? !this.canEditPermission() : !this.canCreate()) return;
     this.isSaving.set(true);
 
     const details: CreateExpenseDetailModel[] = [];
@@ -293,6 +319,9 @@ export class ProjectExpenseManagementComponent implements OnInit {
   }
 
   confirmDelete(expense: GetExpenseDto): void {
+    if (!this.canDelete(expense)) {
+      return;
+    }
     this.confirmationService.confirm({
       message: this.translate.instant('projectTabs.expenses.confirmDelete.message', {
         name: expense.expenseNo || expense.id,
@@ -309,6 +338,26 @@ export class ProjectExpenseManagementComponent implements OnInit {
         });
       },
     });
+  }
+
+  canCreate(): boolean {
+    return this.authService.hasPermission(Permissions.PettyCash.Create);
+  }
+
+  canEditPermission(): boolean {
+    return this.authService.hasPermission(Permissions.PettyCash.Edit);
+  }
+
+  canEdit(expense: GetExpenseDto): boolean {
+    return this.canEditPermission() && !this.isLocked(expense);
+  }
+
+  canDeletePermission(): boolean {
+    return this.authService.hasPermission(Permissions.PettyCash.Delete);
+  }
+
+  canDelete(expense: GetExpenseDto): boolean {
+    return this.canDeletePermission() && !this.isLocked(expense);
   }
 
   formatAmount(value: number): string {

@@ -14,6 +14,9 @@ import { TooltipModule } from 'primeng/tooltip';
 import { AgreementWizardService } from '../../services/agreement-wizard.service';
 import { GetAllAgreementDto } from '../../../../../nswag/api-client';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { Permissions } from '../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 
 @Component({
     selector: 'app-agreement-list',
@@ -26,11 +29,13 @@ import { ConfirmationService, MessageService } from 'primeng/api';
         CardModule,
         InputTextModule,
         TooltipModule,
+        HasPermissionDirective,
     ],
     templateUrl: './agreement-list.component.html',
     styleUrls: ['./agreement-list.component.scss']
 })
 export class AgreementListComponent {
+    readonly permissions = Permissions;
     agreements = signal<GetAllAgreementDto[]>([]);
     loading = signal<boolean>(false);
     totalRecords = signal<number>(0);
@@ -44,7 +49,8 @@ export class AgreementListComponent {
         private router: Router,
         private confirmationService: ConfirmationService,
         private messageService: MessageService,
-        private translate: TranslateService
+        private translate: TranslateService,
+        private authService: AuthService
     ) { }
 
 
@@ -82,16 +88,19 @@ export class AgreementListComponent {
     }
 
     addNewAgreement(): void {
+        if (!this.canCreate()) return;
         this.router.navigate(['/agreement-wizard/create']);
     }
 
     editAgreement(agreement: GetAllAgreementDto): void {
+        if (!this.canEdit()) return;
         if (agreement.id) {
             this.router.navigate(['/agreement-wizard/edit', agreement.id]);
         }
     }
 
     deleteAgreement(agreement: GetAllAgreementDto): void {
+        if (!this.canDelete()) return;
         this.confirmationService.confirm({
             message: this.translate.instant('agreements.confirmDelete.message', { name: agreement.projectName }),
             header: this.translate.instant('agreements.confirmDelete.header'),
@@ -112,6 +121,7 @@ export class AgreementListComponent {
     }
 
     viewAgreement(agreement: GetAllAgreementDto): void {
+        if (!this.authService.hasPermission(Permissions.Agreements.View)) return;
         if (agreement.id) {
             this.router.navigate(['/agreement-wizard/view', agreement.id]);
         }
@@ -120,5 +130,17 @@ export class AgreementListComponent {
     formatDate(date: Date | undefined): string {
         if (!date) return '-';
         return new Date(date).toLocaleDateString();
+    }
+
+    canCreate(): boolean {
+        return this.authService.hasPermission(Permissions.Agreements.Create);
+    }
+
+    canEdit(): boolean {
+        return this.authService.hasPermission(Permissions.Agreements.Edit);
+    }
+
+    canDelete(): boolean {
+        return this.authService.hasPermission(Permissions.Agreements.Delete);
     }
 }

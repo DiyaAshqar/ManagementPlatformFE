@@ -11,13 +11,13 @@
   <!-- Toolbar -->
   <div class="boq-toolbar">
     <span class="boq-total-label">{{ 'projectTabs.boq.totalItems' | translate }}: {{ boqItems().length }}</span>
-    <p-button
-      [label]="'projectTabs.boq.addItem' | translate"
-      icon="pi pi-plus"
-      (onClick)="openAddDialog()"
-      severity="contrast"
-      [raised]="true">
-    </p-button>
+      <p-button *appHasPermission="permissions.BOQ.Create"
+        [label]="'projectTabs.boq.addItem' | translate"
+        icon="pi pi-plus"
+        (onClick)="openAddDialog()"
+        severity="contrast"
+        [raised]="true">
+      </p-button>
   </div>
 
   <!-- Table -->
@@ -62,24 +62,24 @@
           <td class="text-right boq-subtotal">{{ item.subTotal | number:'1.0-0' }}</td>
           <td class="text-center">
             <div class="boq-actions">
-              <p-button
-                icon="pi pi-pencil"
-                [rounded]="true"
-                [text]="true"
-                severity="secondary"
-                [pTooltip]="'projectTabs.boq.tooltips.edit' | translate"
-                tooltipPosition="top"
-                (onClick)="openEditDialog(item)">
-              </p-button>
-              <p-button
-                icon="pi pi-trash"
-                [rounded]="true"
-                [text]="true"
-                severity="danger"
-                [pTooltip]="'projectTabs.boq.tooltips.delete' | translate"
-                tooltipPosition="top"
-                (onClick)="confirmDelete(item)">
-              </p-button>
+                <p-button *appHasPermission="permissions.BOQ.Edit"
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="secondary"
+                  [pTooltip]="'projectTabs.boq.tooltips.edit' | translate"
+                  tooltipPosition="top"
+                  (onClick)="openEditDialog(item)">
+                </p-button>
+                <p-button *appHasPermission="permissions.BOQ.Delete"
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="danger"
+                  [pTooltip]="'projectTabs.boq.tooltips.delete' | translate"
+                  tooltipPosition="top"
+                  (onClick)="confirmDelete(item)">
+                </p-button>
             </div>
           </td>
         </tr>
@@ -104,15 +104,15 @@
 </div>
 
 <!-- Add / Edit dialog -->
-<app-add-boq-dialog
-  [visible]="showBoqDialog()"
-  (visibleChange)="showBoqDialog.set($event)"
-  [projectStageId]="projectStageId"
-  [editItem]="editBoqItem()"
-  [unitOptions]="unitOptions"
-  [constructorOptions]="constructorOptions"
-  [supplierOptions]="supplierOptions"
-  [supplierLoading]="supplierLoading()"
-  (supplierFilter)="onSupplierFilter($event)"
-  (saved)="onDialogSaved($event)">
-</app-add-boq-dialog>
+  <app-add-boq-dialog *appHasPermission="[permissions.BOQ.Create, permissions.BOQ.Edit]"
+    [visible]="showBoqDialog()"
+    (visibleChange)="showBoqDialog.set($event)"
+    [projectStageId]="projectStageId"
+    [editItem]="editBoqItem()"
+    [unitOptions]="unitOptions"
+    [constructorOptions]="constructorOptions"
+    [supplierOptions]="supplierOptions"
+    [supplierLoading]="supplierLoading()"
+    (supplierFilter)="onSupplierFilter($event)"
+    (saved)="onDialogSaved($event)">
+  </app-add-boq-dialog>

@@ -11,13 +11,13 @@
         <p class="page-subtitle m-0">{{ 'projects.subtitle' | translate }}</p>
       </div>
     </div>
-    <p-button
-      [label]="'projects.createNew' | translate"
-      icon="pi pi-plus"
-      (onClick)="openCreateDialog()"
-      severity="primary"
-      [raised]="true">
-    </p-button>
+      <p-button *appHasPermission="permissions.Projects.Create"
+        [label]="'projects.createNew' | translate"
+        icon="pi pi-plus"
+        (onClick)="openCreateDialog()"
+        severity="primary"
+        [raised]="true">
+      </p-button>
   </div>
 
   <!-- Statistics Cards -->
@@ -212,12 +212,12 @@
             </div>
             <h3>{{ 'projects.noProjects' | translate }}</h3>
             <p>{{ 'projects.createFirst' | translate }}</p>
-            <p-button
-              [label]="'projects.createNew' | translate"
-              icon="pi pi-plus"
-              (onClick)="openCreateDialog()"
-              severity="primary">
-            </p-button>
+              <p-button *appHasPermission="permissions.Projects.Create"
+                [label]="'projects.createNew' | translate"
+                icon="pi pi-plus"
+                (onClick)="openCreateDialog()"
+                severity="primary">
+              </p-button>
           </div>
         </div>
       }
@@ -226,7 +226,7 @@
 </div>
 
 <!-- Create/Edit Project Dialog -->
-@if (showCreateDialog()) {
+@if (showCreateDialog() && (canCreateProject() || canEditProject())) {
   <app-create-project-dialog
     [visible]="showCreateDialog()"
     [project]="editingProject"

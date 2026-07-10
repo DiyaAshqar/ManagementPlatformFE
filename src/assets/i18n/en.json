@@ -535,6 +535,7 @@
       "milestones": "Milestones",
       "documents": "Documents",
       "expenses": "Expenses",
+      "advances": "Advances",
       "tasks": "Task",
       "ownerPayment": "Owner Payment",
       "timeframe": "Timeframe"
@@ -579,6 +580,18 @@
     "grandTotal": "Grand Total",
     "items": "items",
     "noData": "No data available",
+    "engineeringOfficeFees": {
+      "title": "Engineering Office Fees",
+      "feeType": "Fee Type",
+      "agreedValue": "Agreed Fee",
+      "calculationBase": "Expenses + Contractor Contracts",
+      "feeAmount": "Engineering Office Fee",
+      "types": {
+        "percentage": "Percentage",
+        "fixed": "Fixed Amount",
+        "monthly": "Monthly Fee"
+      }
+    },
     "types": {
       "boq": {
         "label": "Bill of Quantities",
@@ -874,7 +887,8 @@
         "totalAmount": "Total Amount",
         "empty": "No expenses recorded yet. Click \"New Expense\" to add one.",
         "pagination": "Showing {first} to {last} of {totalRecords} expenses",
-        "autoPostedNoEdit": "Auto-posted expenses cannot be edited"
+        "autoPostedNoEdit": "Auto-posted expenses cannot be edited",
+        "lockedByAdvance": "This expense is settled against an advance and cannot be edited"
       },
       "form": {
         "newTitle": "New Expense",
@@ -912,6 +926,68 @@
       "attachments": {
         "title": "Attachments",
         "saveFirst": "Save the expense first to add attachments."
+      }
+    },
+    "advances": {
+      "title": "Advances Management",
+      "subtitle": "Manage financial advances for the resident engineer",
+      "summary": {
+        "openAdvances": "Open Advances",
+        "remainingAmount": "Remaining Amount",
+        "totalAmount": "Total Amount",
+        "totalAdvances": "Total Advances"
+      },
+      "columns": {
+        "advanceNo": "Advance No",
+        "engineer": "Engineer",
+        "date": "Date",
+        "amount": "Amount",
+        "remaining": "Remaining"
+      },
+      "status": {
+        "all": "All Statuses",
+        "open": "Open",
+        "partiallySettled": "Partially Settled",
+        "settled": "Settled"
+      },
+      "list": {
+        "newAdvance": "New Advance",
+        "searchPlaceholder": "Search by number or engineer...",
+        "empty": "No advances recorded yet. Click \"New Advance\" to add one.",
+        "pagination": "Showing {first} to {last} of {totalRecords} advances",
+        "notOpenNoEdit": "Only open advances can be edited or deleted"
+      },
+      "actions": {
+        "settle": "Settle"
+      },
+      "form": {
+        "newTitle": "New Advance",
+        "editTitle": "Edit Advance",
+        "subtitle": "Fill in the advance details below",
+        "backToList": "Back to list",
+        "advanceNoPlaceholder": "Auto-generated",
+        "selectEngineer": "Select engineer",
+        "currency": "Currency",
+        "paymentMethod": "Payment Method",
+        "selectPaymentMethod": "Select payment method",
+        "reference": "Reference",
+        "referencePlaceholder": "Optional reference number...",
+        "notesPlaceholder": "Optional notes...",
+        "save": "Save Advance"
+      },
+      "confirmDelete": {
+        "header": "Delete Advance",
+        "message": "Are you sure you want to delete advance \"{{name}}\"?"
+      },
+      "settle": {
+        "title": "Settle Advance",
+        "remainingBalance": "Remaining Balance",
+        "linkedExpenses": "Already Linked Expenses",
+        "availableExpenses": "Available Expenses",
+        "selectedTotal": "Selected Total",
+        "overLimit": "Selected expenses exceed the remaining balance.",
+        "noAvailable": "No available expenses to link for this advance.",
+        "confirm": "Confirm Settlement"
       }
     }
   },

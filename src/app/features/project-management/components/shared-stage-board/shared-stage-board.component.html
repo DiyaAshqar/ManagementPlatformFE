@@ -77,14 +77,14 @@
                 <h3 class="text-base font-semibold m-0 text-color">{{ column.title }}</h3>
 
               </div>
-              <p-button 
-                icon="pi pi-plus"
-                [text]="true"
-                [rounded]="true"
-                (onClick)="openAddDialog(column.id)"
-                pTooltip="Add item"
-                tooltipPosition="top">
-              </p-button>
+                <p-button *appHasPermission="permissions.ProjectWork.Manage"
+                  icon="pi pi-plus"
+                  [text]="true"
+                  [rounded]="true"
+                  (onClick)="openAddDialog(column.id)"
+                  pTooltip="Add item"
+                  tooltipPosition="top">
+                </p-button>
             </div>
           </div>
 
@@ -92,6 +92,7 @@
           <div 
             class="column-items"
             cdkDropList
+            [cdkDropListDisabled]="!canManage()"
             [cdkDropListData]="column.items"
             [id]="column.id"
             [cdkDropListConnectedTo]="connectedDropLists"
@@ -101,6 +102,7 @@
               <div 
                 class="work-item-card"
                 cdkDrag
+                [cdkDragDisabled]="!canManage()"
                 (click)="openItemDialog(item)">
                 
                 <!-- Drag Placeholder -->
@@ -115,7 +117,7 @@
                     </div>
                     <span class="text-xs font-mono text-500">{{ item.id }}</span>
                   </div>
-                  <div class="flex align-items-center gap-1">
+                    <div *appHasPermission="permissions.ProjectWork.Manage" class="flex align-items-center gap-1">
                     <p-button 
                       icon="pi pi-trash"
                       [text]="true"
@@ -126,7 +128,7 @@
                       pTooltip="Delete task"
                       tooltipPosition="top">
                     </p-button>
-                  </div>
+                    </div>
                 </div>
 
                 <!-- Work Item Title -->

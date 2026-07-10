@@ -325,6 +325,52 @@
       </div>
     }
 
+    <!-- Engineering Office Fees Section -->
+    @if (engineeringOfficeFee(); as fee) {
+      <div class="op-section">
+        <div class="op-section-header">
+          <div class="op-section-icon bg-cyan-100">
+            <i class="pi pi-percentage text-cyan-600"></i>
+          </div>
+          <div class="flex-1">
+            <h4 class="op-section-title">{{ 'ownerPayment.engineeringOfficeFees.title' | translate }}</h4>
+            <span class="op-section-count">{{ engineeringOfficeFeeTypeKey | translate }}</span>
+          </div>
+          <span class="op-section-total">{{ formatCurrency(engineeringOfficeFeeTotal) }}</span>
+        </div>
+        <p-table [value]="[fee]" styleClass="p-datatable-sm p-datatable-striped" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'ownerPayment.engineeringOfficeFees.feeType' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.engineeringOfficeFees.agreedValue' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.engineeringOfficeFees.calculationBase' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.engineeringOfficeFees.feeAmount' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body">
+            <tr>
+              <td>{{ engineeringOfficeFeeTypeKey | translate }}</td>
+              <td class="text-right font-semibold">
+                @if (fee.type === 'percentage') {
+                  {{ fee.agreedValue | number:'1.0-2' }}%
+                } @else {
+                  {{ fee.agreedValue | number:'1.2-2' }}
+                }
+              </td>
+              <td class="text-right">
+                @if (fee.type === 'percentage') {
+                  {{ engineeringOfficeFeeBase | number:'1.2-2' }}
+                } @else {
+                  &mdash;
+                }
+              </td>
+              <td class="text-right font-semibold">{{ engineeringOfficeFeeTotal | number:'1.2-2' }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    }
+
     <!-- ── Grand Total ── -->
     <div class="op-grand-total">
       <div class="op-grand-total-label">{{ 'ownerPayment.grandTotal' | translate }}</div>
@@ -341,13 +387,20 @@
           [outlined]="true"
           (onClick)="backToSelect()">
         </p-button>
-        <p-button
-          [label]="'ownerPayment.confirmBtn' | translate"
-          icon="pi pi-check"
-          severity="success"
-          [raised]="true"
-          (onClick)="confirmClaim()">
-        </p-button>
+          <p-button *appHasPermission="permissions.PaymentClaims.Print"
+            [label]="'ownerPayment.printBtn' | translate"
+            icon="pi pi-print"
+            severity="primary"
+            [outlined]="true"
+            (onClick)="printClaim()">
+          </p-button>
+          <p-button *appHasPermission="permissions.PaymentClaims.Lock"
+            [label]="'ownerPayment.confirmBtn' | translate"
+            icon="pi pi-check"
+            severity="success"
+            [raised]="true"
+            (onClick)="confirmClaim()">
+          </p-button>
       </div>
     }
 
@@ -358,14 +411,14 @@
           <p class="font-bold text-green-700 m-0">{{ 'ownerPayment.confirm.successTitle' | translate }}</p>
           <p class="text-green-600 text-sm m-0">{{ 'ownerPayment.confirm.successMsg' | translate }}</p>
         </div>
-        <p-button
-          [label]="'ownerPayment.printBtn' | translate"
-          icon="pi pi-print"
-          severity="primary"
-          [raised]="true"
-          (onClick)="printClaim()"
-          styleClass="ml-auto">
-        </p-button>
+          <p-button *appHasPermission="permissions.PaymentClaims.Print"
+            [label]="'ownerPayment.printBtn' | translate"
+            icon="pi pi-print"
+            severity="primary"
+            [raised]="true"
+            (onClick)="printClaim()"
+            styleClass="ml-auto">
+          </p-button>
       </div>
     }
   }

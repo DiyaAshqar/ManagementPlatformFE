@@ -23,6 +23,9 @@ import { MenuItem } from 'primeng/api';
 import { ProjectService } from '../../services/project.service';
 import { Project, ProjectStatus, ProjectPriority, ProjectFilters } from '../../models';
 import { CreateProjectDialogComponent } from '../../components/dialog/create-project-dialog/create-project-dialog.component';
+import { Permissions } from '../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 
 @Component({
   selector: 'app-project-list',
@@ -44,12 +47,14 @@ import { CreateProjectDialogComponent } from '../../components/dialog/create-pro
     InputIconModule,
     SkeletonModule,
     MenuModule,
-    CreateProjectDialogComponent
+    CreateProjectDialogComponent,
+    HasPermissionDirective
   ],
   templateUrl: './project-list.component.html',
   styleUrls: ['./project-list.component.scss']
 })
 export class ProjectListComponent implements OnInit {
+  readonly permissions = Permissions;
   projects = signal<Project[]>([]);
   filteredProjects = signal<Project[]>([]);
   isLoading = signal<boolean>(false);
@@ -84,7 +89,8 @@ export class ProjectListComponent implements OnInit {
   constructor(
     private projectService: ProjectService,
     private router: Router,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private authService: AuthService
   ) {}
 
   // Stats
@@ -155,6 +161,7 @@ export class ProjectListComponent implements OnInit {
   }
 
   openCreateDialog(): void {
+    if (!this.canCreateProject()) return;
     this.editingProject = null;
     this.showCreateDialog.set(true);
   }
@@ -174,18 +181,21 @@ export class ProjectListComponent implements OnInit {
   }
 
   getProjectMenuItems(project: Project): MenuItem[] {
-    return [
+    const items: MenuItem[] = [
       {
         label: this.translate.instant('projects.menu.viewDetails'),
         icon: 'pi pi-eye',
         command: () => this.viewProject(project)
       },
-      {
+    ];
+    if (this.canEditProject()) {
+      items.push({
         label: this.translate.instant('projects.menu.editProject'),
         icon: 'pi pi-pencil',
         command: () => this.editProject(project)
-      }
-    ];
+      });
+    }
+    return items;
   }
 
   onMenuToggle(event: Event, menu: any, project: Project): void {
@@ -196,11 +206,13 @@ export class ProjectListComponent implements OnInit {
   }
 
   editProject(project: Project): void {
+    if (!this.canEditProject()) return;
     this.editingProject = project;
     this.showCreateDialog.set(true);
   }
 
   deleteProject(project: Project): void {
+    if (!this.authService.hasPermission(Permissions.Projects.Delete)) return;
     // TODO: Implement delete with confirmation
     if (confirm(`Are you sure you want to delete "${project.name}"?`)) {
       this.projectService.deleteProject(project.id).subscribe({
@@ -212,6 +224,14 @@ export class ProjectListComponent implements OnInit {
         }
       });
     }
+  }
+
+  canCreateProject(): boolean {
+    return this.authService.hasPermission(Permissions.Projects.Create);
+  }
+
+  canEditProject(): boolean {
+    return this.authService.hasPermission(Permissions.Projects.Edit);
   }
 
   getStatusSeverity(status: ProjectStatus): 'success' | 'info' | 'warn' | 'danger' | 'secondary' {

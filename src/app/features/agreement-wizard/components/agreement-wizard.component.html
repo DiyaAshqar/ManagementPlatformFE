@@ -1,13 +1,13 @@
 <div class="card flex justify-center p-2">
   <p-stepper [value]="currentStep()" class="w-full" [linear]="!isViewMode()">
     <p-step-list>
-      @for (label of stepLabels; track $index) {
+      @for (step of visibleSteps(); track step.value) {
         <p-step 
-          [value]="$index + 1"
-          (click)="isViewMode() && goToStep($index + 1)"
+          [value]="step.value"
+          (click)="isViewMode() && goToStep(step.value)"
           [style.cursor]="isViewMode() ? 'pointer' : 'default'"
         >
-          {{ label | translate }}
+          {{ step.label | translate }}
         </p-step>
       }
     </p-step-list>
@@ -42,37 +42,37 @@
       </p-step-panel>
 
       <!-- Step 2: Payment & Services -->
-      <p-step-panel [value]="2">
-        <ng-template #content let-activateCallback="activateCallback">
-          <div class="gap-2">
-            <app-step2
-              #step2Component
-              [currentStep]="currentStep()"
-              [agreementId]="agreementId()"
-              [isViewMode]="isViewMode()"
-              (stepData)="onStep2Data($event)"
-            ></app-step2>
-            
-            @if (!isViewMode()) {
-              <div class="flex pt-4 justify-between gap-2">
-                <p-button 
-                  [label]="'wizard.back' | translate" 
-                  severity="secondary" 
-                  [icon]="isRTL() ? 'pi pi-arrow-right' : 'pi pi-arrow-left'"
-                  (onClick)="goToStep(1)"
-                />
-                <p-button 
-                  [label]="'wizard.next' | translate" 
-                  [icon]="isRTL() ? 'pi pi-arrow-left' : 'pi pi-arrow-right'" 
-                  iconPos="right"
-                  [disabled]="!step2Component.isFormValid()"
-                  (onClick)="step2Component.onSubmit()"
-                />
-              </div>
-            }
-          </div>
-        </ng-template>
-      </p-step-panel>
+        <p-step-panel *appHasPermission="permissions.Agreements.ViewPaymentDetails" [value]="2">
+          <ng-template #content let-activateCallback="activateCallback">
+            <div class="gap-2">
+              <app-step2
+                #step2Component
+                [currentStep]="currentStep()"
+                [agreementId]="agreementId()"
+                [isViewMode]="isViewMode()"
+                (stepData)="onStep2Data($event)"
+              ></app-step2>
+
+              @if (!isViewMode()) {
+                <div class="flex pt-4 justify-between gap-2">
+                  <p-button
+                    [label]="'wizard.back' | translate"
+                    severity="secondary"
+                    [icon]="isRTL() ? 'pi pi-arrow-right' : 'pi pi-arrow-left'"
+                    (onClick)="goToStep(1)"
+                  />
+                  <p-button
+                    [label]="'wizard.next' | translate"
+                    [icon]="isRTL() ? 'pi pi-arrow-left' : 'pi pi-arrow-right'"
+                    iconPos="right"
+                    [disabled]="!step2Component.isFormValid()"
+                    (onClick)="step2Component.onSubmit()"
+                  />
+                </div>
+              }
+            </div>
+          </ng-template>
+        </p-step-panel>
 
       <!-- Step 3: Milestones -->
       <p-step-panel [value]="3">
@@ -92,7 +92,7 @@
                   [label]="'wizard.back' | translate" 
                   severity="secondary" 
                   [icon]="isRTL() ? 'pi pi-arrow-right' : 'pi pi-arrow-left'"
-                  (onClick)="goToStep(2)"
+                  (onClick)="goToStep(previousStep(3))"
                 />
                 <p-button 
                   [label]="'wizard.next' | translate" 

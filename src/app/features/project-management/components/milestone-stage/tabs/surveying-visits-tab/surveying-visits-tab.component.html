@@ -11,13 +11,13 @@
   <!-- Toolbar -->
   <div class="sv-toolbar">
     <span class="sv-total-label">{{ 'projectTabs.surveyingVisits.totalLabel' | translate }}: {{ visitItems().length }}</span>
-    <p-button
-      [label]="'projectTabs.surveyingVisits.scheduleButton' | translate"
-      icon="pi pi-plus"
-      (onClick)="openAddDialog()"
-      severity="contrast"
-      [raised]="true">
-    </p-button>
+      <p-button *appHasPermission="permissions.ProjectWork.Manage"
+        [label]="'projectTabs.surveyingVisits.scheduleButton' | translate"
+        icon="pi pi-plus"
+        (onClick)="openAddDialog()"
+        severity="contrast"
+        [raised]="true">
+      </p-button>
   </div>
 
   <!-- Table -->
@@ -59,7 +59,7 @@
           </p-badge>
         </td>
         <td class="text-center">
-          <div class="sv-actions">
+            <div *appHasPermission="permissions.ProjectWork.Manage" class="sv-actions">
             <p-button
               icon="pi pi-pencil"
               [rounded]="true"
@@ -78,7 +78,7 @@
               tooltipPosition="top"
               (onClick)="confirmDelete(item)">
             </p-button>
-          </div>
+            </div>
         </td>
       </tr>
     </ng-template>
@@ -122,7 +122,7 @@
 
 <!-- Add / Edit Dialog -->
 @if (showDialog()) {
-  <app-add-surveying-visit-dialog
+  <app-add-surveying-visit-dialog *appHasPermission="permissions.ProjectWork.Manage"
     [visible]="showDialog()"
     (visibleChange)="showDialog.set($event)"
     [projectStageId]="projectStageId"

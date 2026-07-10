@@ -24,123 +24,136 @@
             @if (isPanelLoaded(stage.id!)) {
               <p-tabs [(value)]="activeTabs[stage.id!]" (valueChange)="onTabChange(stage.id!, $event)">
                 <p-tablist>
-                  <p-tab value="0">
-                    <div class="flex align-items-center gap-2">
-                      <i class="pi pi-table" style="color: #3B82F6"></i>
-                      <span>{{ 'projectTabs.boq.title' | translate }}</span>
-                    </div>
-                  </p-tab>
-                  <p-tab value="1">
-                    <div class="flex align-items-center gap-2">
-                      <i class="pi pi-building" style="color: #10B981"></i>
-                      <span>{{ 'projectTabs.projectMainContractor.title' | translate }}</span>
-                    </div>
-                  </p-tab>
-                  <p-tab value="2">
-                    <div class="flex align-items-center gap-2">
-                      <i class="pi pi-shopping-cart" style="color: #F59E0B"></i>
-                      <span>{{ 'projectTabs.purchaseOrders.title' | translate }}</span>
-                    </div>
-                  </p-tab>
-                  <p-tab value="3">
-                    <div class="flex align-items-center gap-2">
-                      <i class="pi pi-map-marker" style="color: #EF4444"></i>
-                      <span>{{ 'projectTabs.surveyingVisits.title' | translate }}</span>
-                    </div>
-                  </p-tab>
-                  <p-tab value="4">
-                    <div class="flex align-items-center gap-2">
-                      <i class="pi pi-file-edit" style="color: #8B5CF6"></i>
-                      <span>{{ 'projectTabs.voucherOrders.title' | translate }}</span>
-                    </div>
-                  </p-tab>
-                  <p-tab value="5">
-                    <div class="flex align-items-center gap-2">
-                      <i class="pi pi-folder-open" style="color: #F97316"></i>
-                      <span>{{ 'projectTabs.milestoneDocuments.title' | translate }}</span>
-                    </div>
-                  </p-tab>
-                  <p-tab value="6">
-                    <div class="flex align-items-center gap-2">
-                      <i class="pi pi-wallet" style="color: #06B6D4"></i>
-                      <span>{{ 'projectDetail.tabs.expenses' | translate }}</span>
-                    </div>
-                  </p-tab>
-                  <p-tab value="7">
-                    <div class="flex align-items-center gap-2">
-                      <i class="pi pi-check-square" style="color: #22C55E"></i>
-                      <span>{{ 'projectDetail.tabs.tasks' | translate }}</span>
-                    </div>
-                  </p-tab>
-                  <p-tab value="8">
-                    <div class="flex align-items-center gap-2">
-                      <i class="pi pi-file-check" style="color: #84CC16"></i>
-                      <span>{{ 'ownerPayment.tabTitle' | translate }}</span>
-                    </div>
-                  </p-tab>
+                    <p-tab *appHasPermission="permissions.MilestoneTabs.BOQ" value="0">
+                      <div class="flex align-items-center gap-2">
+                        <i class="pi pi-table" style="color: #3B82F6"></i>
+                        <span>{{ 'projectTabs.boq.title' | translate }}</span>
+                      </div>
+                    </p-tab>
+                    <p-tab *appHasPermission="permissions.MilestoneTabs.ProjectMainContractor" value="1">
+                      <div class="flex align-items-center gap-2">
+                        <i class="pi pi-building" style="color: #10B981"></i>
+                        <span>{{ 'projectTabs.projectMainContractor.title' | translate }}</span>
+                      </div>
+                    </p-tab>
+                    <p-tab *appHasPermission="permissions.MilestoneTabs.PurchaseOrders" value="2">
+                      <div class="flex align-items-center gap-2">
+                        <i class="pi pi-shopping-cart" style="color: #F59E0B"></i>
+                        <span>{{ 'projectTabs.purchaseOrders.title' | translate }}</span>
+                      </div>
+                    </p-tab>
+                    <p-tab *appHasPermission="permissions.MilestoneTabs.SurveyingVisits" value="3">
+                      <div class="flex align-items-center gap-2">
+                        <i class="pi pi-map-marker" style="color: #EF4444"></i>
+                        <span>{{ 'projectTabs.surveyingVisits.title' | translate }}</span>
+                      </div>
+                    </p-tab>
+                    <p-tab *appHasPermission="permissions.MilestoneTabs.VoucherOrders" value="4">
+                      <div class="flex align-items-center gap-2">
+                        <i class="pi pi-file-edit" style="color: #8B5CF6"></i>
+                        <span>{{ 'projectTabs.voucherOrders.title' | translate }}</span>
+                      </div>
+                    </p-tab>
+                    <p-tab *appHasPermission="permissions.MilestoneTabs.Documents" value="5">
+                      <div class="flex align-items-center gap-2">
+                        <i class="pi pi-folder-open" style="color: #F97316"></i>
+                        <span>{{ 'projectTabs.milestoneDocuments.title' | translate }}</span>
+                      </div>
+                    </p-tab>
+                    <p-tab *appHasPermission="permissions.MilestoneTabs.PettyCash" value="6">
+                      <div class="flex align-items-center gap-2">
+                        <i class="pi pi-wallet" style="color: #06B6D4"></i>
+                        <span>{{ 'projectDetail.tabs.expenses' | translate }}</span>
+                      </div>
+                    </p-tab>
+                    <p-tab *appHasPermission="permissions.MilestoneTabs.Advances" value="7">
+                      <div class="flex align-items-center gap-2">
+                        <i class="pi pi-money-bill" style="color: #EAB308"></i>
+                        <span>{{ 'projectDetail.tabs.advances' | translate }}</span>
+                      </div>
+                    </p-tab>
+                    <p-tab *appHasPermission="permissions.MilestoneTabs.Tasks" value="8">
+                      <div class="flex align-items-center gap-2">
+                        <i class="pi pi-check-square" style="color: #22C55E"></i>
+                        <span>{{ 'projectDetail.tabs.tasks' | translate }}</span>
+                      </div>
+                    </p-tab>
+                    <p-tab *appHasPermission="permissions.MilestoneTabs.PaymentClaims" value="9">
+                      <div class="flex align-items-center gap-2">
+                        <i class="pi pi-file-check" style="color: #84CC16"></i>
+                        <span>{{ 'ownerPayment.tabTitle' | translate }}</span>
+                      </div>
+                    </p-tab>
                 </p-tablist>
 
                 <p-tabpanels>
-                  <p-tabpanel value="0">
-                    @if (shouldLoadTab(stage.id!, '0')) {
-                      <app-boq-tab [projectStageId]="stage.id!" class="block mt-3"></app-boq-tab>
-                    }
-                  </p-tabpanel>
+                    <p-tabpanel *appHasPermission="permissions.MilestoneTabs.BOQ" value="0">
+                      @if (shouldLoadTab(stage.id!, '0')) {
+                        <app-boq-tab [projectStageId]="stage.id!" class="block mt-3"></app-boq-tab>
+                      }
+                    </p-tabpanel>
 
-                  <p-tabpanel value="1">
-                    @if (shouldLoadTab(stage.id!, '1')) {
-                      <app-project-main-contractor-tab [projectStageId]="stage.id!"></app-project-main-contractor-tab>
-                    }
-                  </p-tabpanel>
+                    <p-tabpanel *appHasPermission="permissions.MilestoneTabs.ProjectMainContractor" value="1">
+                      @if (shouldLoadTab(stage.id!, '1')) {
+                        <app-project-main-contractor-tab [projectStageId]="stage.id!"></app-project-main-contractor-tab>
+                      }
+                    </p-tabpanel>
 
-                  <p-tabpanel value="2">
-                    @if (shouldLoadTab(stage.id!, '2')) {
-                      <app-purchase-orders-tab [projectStageId]="stage.id!"></app-purchase-orders-tab>
-                    }
-                  </p-tabpanel>
+                    <p-tabpanel *appHasPermission="permissions.MilestoneTabs.PurchaseOrders" value="2">
+                      @if (shouldLoadTab(stage.id!, '2')) {
+                        <app-purchase-orders-tab [projectStageId]="stage.id!"></app-purchase-orders-tab>
+                      }
+                    </p-tabpanel>
 
-                  <p-tabpanel value="3">
-                    @if (shouldLoadTab(stage.id!, '3')) {
-                      <app-surveying-visits-tab [projectStageId]="stage.id!"></app-surveying-visits-tab>
-                    }
-                  </p-tabpanel>
+                    <p-tabpanel *appHasPermission="permissions.MilestoneTabs.SurveyingVisits" value="3">
+                      @if (shouldLoadTab(stage.id!, '3')) {
+                        <app-surveying-visits-tab [projectStageId]="stage.id!"></app-surveying-visits-tab>
+                      }
+                    </p-tabpanel>
 
-                  <p-tabpanel value="4">
-                    @if (shouldLoadTab(stage.id!, '4')) {
-                      <app-voucher-orders-tab [projectStageId]="stage.id!"></app-voucher-orders-tab>
-                    }
-                  </p-tabpanel>
+                    <p-tabpanel *appHasPermission="permissions.MilestoneTabs.VoucherOrders" value="4">
+                      @if (shouldLoadTab(stage.id!, '4')) {
+                        <app-voucher-orders-tab [projectStageId]="stage.id!"></app-voucher-orders-tab>
+                      }
+                    </p-tabpanel>
 
-                  <p-tabpanel value="5">
-                    @if (shouldLoadTab(stage.id!, '5')) {
-                      <app-milestone-documents-tab [projectStageId]="stage.id!"></app-milestone-documents-tab>
-                    }
-                  </p-tabpanel>
+                    <p-tabpanel *appHasPermission="permissions.MilestoneTabs.Documents" value="5">
+                      @if (shouldLoadTab(stage.id!, '5')) {
+                        <app-milestone-documents-tab [projectStageId]="stage.id!"></app-milestone-documents-tab>
+                      }
+                    </p-tabpanel>
 
-                  <p-tabpanel value="6">
-                    @if (shouldLoadTab(stage.id!, '6')) {
-                      <app-project-expense-management [projectId]="projectId" [projectStageId]="stage.id!" class="block mt-3"></app-project-expense-management>
-                    }
-                  </p-tabpanel>
+                    <p-tabpanel *appHasPermission="permissions.MilestoneTabs.PettyCash" value="6">
+                      @if (shouldLoadTab(stage.id!, '6')) {
+                        <app-project-expense-management [projectId]="projectId" [projectStageId]="stage.id!" class="block mt-3"></app-project-expense-management>
+                      }
+                    </p-tabpanel>
 
-                  <p-tabpanel value="7">
-                    @if (shouldLoadTab(stage.id!, '7')) {
-                      <app-preparing-stage
-                        [projectId]="projectId"
-                        [projectStageId]="stage.id!"
-                        [useMilestoneTaskDialog]="true">
-                      </app-preparing-stage>
-                    }
-                  </p-tabpanel>
+                    <p-tabpanel *appHasPermission="permissions.MilestoneTabs.Advances" value="7">
+                      @if (shouldLoadTab(stage.id!, '7')) {
+                        <app-project-advance-management [projectId]="projectId" [projectStageId]="stage.id!" class="block mt-3"></app-project-advance-management>
+                      }
+                    </p-tabpanel>
 
-                  <p-tabpanel value="8">
-                    @if (shouldLoadTab(stage.id!, '8')) {
-                      <app-payment-claim-tab
-                        [projectStageId]="stage.id!"
-                        [projectId]="projectId">
-                      </app-payment-claim-tab>
-                    }
-                  </p-tabpanel>
+                    <p-tabpanel *appHasPermission="permissions.MilestoneTabs.Tasks" value="8">
+                      @if (shouldLoadTab(stage.id!, '8')) {
+                        <app-preparing-stage
+                          [projectId]="projectId"
+                          [projectStageId]="stage.id!"
+                          [useMilestoneTaskDialog]="true">
+                        </app-preparing-stage>
+                      }
+                    </p-tabpanel>
+
+                    <p-tabpanel *appHasPermission="permissions.MilestoneTabs.PaymentClaims" value="9">
+                      @if (shouldLoadTab(stage.id!, '9')) {
+                        <app-payment-claim-tab
+                          [projectStageId]="stage.id!"
+                          [projectId]="projectId"
+                          [agreementId]="agreementId">
+                        </app-payment-claim-tab>
+                      }
+                    </p-tabpanel>
                 </p-tabpanels>
               </p-tabs>
             }

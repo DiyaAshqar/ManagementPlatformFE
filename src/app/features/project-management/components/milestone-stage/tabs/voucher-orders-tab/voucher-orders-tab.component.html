@@ -11,13 +11,13 @@
   <!-- Toolbar -->
   <div class="vo-toolbar">
     <span class="vo-total-label">{{ 'projectTabs.voucherOrders.totalLabel' | translate }}: {{ voItems().length }}</span>
-    <p-button
-      [label]="'projectTabs.voucherOrders.createButton' | translate"
-      icon="pi pi-plus"
-      (onClick)="openAddDialog()"
-      severity="contrast"
-      [raised]="true">
-    </p-button>
+      <p-button *appHasPermission="permissions.ProjectWork.Manage"
+        [label]="'projectTabs.voucherOrders.createButton' | translate"
+        icon="pi pi-plus"
+        (onClick)="openAddDialog()"
+        severity="contrast"
+        [raised]="true">
+      </p-button>
   </div>
 
   <!-- Table -->
@@ -80,7 +80,7 @@
           </p-badge>
         </td>
         <td class="text-center">
-          <div class="vo-actions">
+            <div *appHasPermission="permissions.ProjectWork.Manage" class="vo-actions">
             <p-button
               icon="pi pi-pencil"
               [rounded]="true"
@@ -101,7 +101,7 @@
               tooltipPosition="top"
               (onClick)="confirmDelete(item)">
             </p-button>
-          </div>
+            </div>
         </td>
       </tr>
     </ng-template>
@@ -145,7 +145,7 @@
 
 <!-- Add/Edit Dialog -->
 @if (showVoDialog()) {
-  <app-add-vo-dialog
+  <app-add-vo-dialog *appHasPermission="permissions.ProjectWork.Manage"
     [visible]="showVoDialog()"
     (visibleChange)="showVoDialog.set($event)"
     [projectStageId]="projectStageId"

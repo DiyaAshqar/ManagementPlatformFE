@@ -15,6 +15,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { SidebarService } from '../../../core/services/sidebar.service';
 import { ThemeService } from '../../../core/services/theme.service';
 import { AuthService } from '../../../core/auth/services/auth.service';
+import { Permissions } from '../../../core/auth/models/auth.models';
 
 interface NavItem {
   label: string;
@@ -29,6 +30,7 @@ interface NavItem {
    * may not issue yet.
    */
   roles?: string[];
+  permissions?: string[];
 }
 
 interface NavSection {
@@ -59,12 +61,42 @@ export class SidebarComponent implements OnInit {
       title: 'sidebar.sections.overview',
       items: [
         { label: 'sidebar.items.dashboard', icon: 'pi pi-home', route: '/dashboard' },
-        // { label: 'sidebar.items.agreementWizard', icon: 'pi pi-briefcase', route: '/agreement-wizard' },
-        { label: 'sidebar.items.projectManagement', icon: 'pi pi-th-large', route: '/projects' },
-        { label: 'sidebar.items.constructors', icon: 'pi pi-users', route: '/constructor' },
-        { label: 'sidebar.items.suppliers', icon: 'pi pi-building', route: '/supplier' },
-        { label: 'sidebar.items.materials', icon: 'pi pi-box', route: '/materials' },
-        { label: 'sidebar.items.users', icon: 'pi pi-user-edit', route: '/users' },
+        {
+          label: 'sidebar.items.agreementWizard',
+          icon: 'pi pi-briefcase',
+          route: '/agreement-wizard',
+          permissions: [Permissions.Agreements.View],
+        },
+        {
+          label: 'sidebar.items.projectManagement',
+          icon: 'pi pi-th-large',
+          route: '/projects',
+          permissions: [Permissions.Projects.View, Permissions.Projects.ViewAssigned],
+        },
+        {
+          label: 'sidebar.items.constructors',
+          icon: 'pi pi-users',
+          route: '/constructor',
+          permissions: [Permissions.Constructors.View, Permissions.Constructors.Manage],
+        },
+        {
+          label: 'sidebar.items.suppliers',
+          icon: 'pi pi-building',
+          route: '/supplier',
+          permissions: [Permissions.Suppliers.View, Permissions.Suppliers.Manage],
+        },
+        {
+          label: 'sidebar.items.materials',
+          icon: 'pi pi-box',
+          route: '/materials',
+          permissions: [Permissions.Materials.View, Permissions.Materials.Manage],
+        },
+        {
+          label: 'sidebar.items.users',
+          icon: 'pi pi-user-edit',
+          route: '/users',
+          permissions: [Permissions.Users.View, Permissions.Users.Manage],
+        },
       ]
     }
   ];
@@ -84,7 +116,10 @@ export class SidebarComponent implements OnInit {
   ngOnInit(): void {}
 
   canShow(item: NavItem): boolean {
-    return !item.roles?.length || this.authService.hasAnyRole(item.roles);
+    const hasRequiredRole = !item.roles?.length || this.authService.hasAnyRole(item.roles);
+    const hasRequiredPermission =
+      !item.permissions?.length || this.authService.hasAnyPermission(item.permissions);
+    return hasRequiredRole && hasRequiredPermission;
   }
 
   get logoPath(): string {

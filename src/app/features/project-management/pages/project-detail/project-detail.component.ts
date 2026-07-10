@@ -27,6 +27,9 @@ import { TimeframeComponent } from '../../components/timeframe/timeframe.compone
 import { Project, ProjectStatus, Stage, TaskStatus } from '../../models';
 import { GetProjectTaskDto } from '../../../../../nswag/api-client';
 import { ProjectService } from '../../services/project.service';
+import { Permissions } from '../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 
 interface ReportType {
   label: string;
@@ -56,12 +59,14 @@ interface ReportType {
     StageKanbanComponent,
     TimeframeComponent,
     DocumentsStageComponent,
+    HasPermissionDirective,
     // StagingBoardComponent
   ],
   templateUrl: './project-detail.component.html',
   styleUrls: ['./project-detail.component.scss']
 })
 export class ProjectDetailComponent implements OnInit, OnDestroy {
+  readonly permissions = Permissions;
   project = signal<Project | null>(null);
   projectData = signal<GetProjectDto | null>(null);
   isLoading = signal<boolean>(true);
@@ -103,16 +108,35 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
     private route: ActivatedRoute,
     private router: Router,
     private projectService: ProjectService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
+    this.activeTabIndex = this.firstAccessibleTab();
     this.buildReportTypes();
     this.langSub = this.translate.onLangChange.subscribe(() => this.buildReportTypes());
     const projectId = this.route.snapshot.paramMap.get('id');
     if (projectId) {
       this.loadProject(projectId);
     }
+  }
+
+  canViewTab(permission: string): boolean {
+    return this.authService.hasPermission(permission);
+  }
+
+  private firstAccessibleTab(): string {
+    const tabs = [
+      ['0', Permissions.ProjectTabs.Overview],
+      ['1', Permissions.ProjectTabs.Preparing],
+      ['2', Permissions.ProjectTabs.Excavation],
+      ['4', Permissions.ProjectTabs.Milestones],
+      ['5', Permissions.ProjectTabs.Documents],
+      ['6', Permissions.ProjectTabs.OwnerPayments],
+      ['7', Permissions.ProjectTabs.Timeframe],
+    ] as const;
+    return tabs.find(([, permission]) => this.canViewTab(permission))?.[0] ?? '0';
   }
 
   ngOnDestroy(): void {
