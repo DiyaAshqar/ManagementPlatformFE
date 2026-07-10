@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { delay, map, Observable, of, throwError } from 'rxjs';
 
@@ -17,7 +18,6 @@ import { ExpenseApiService } from './expense-api.service';
 import {
   MOCK_ENGINEERS,
   advanceStatusSeverity,
-  createAdvance,
   deleteAdvance,
   getAdvanceDetail,
   getAdvancesForStage,
@@ -40,9 +40,10 @@ import {
 export class AdvanceApiService {
   private readonly mockLatency = 300;
 
-  // When the real backend is ready, inject the generated client here, e.g.:
-  // constructor(private advanceClient: AdvanceClient, private expenseService: ExpenseApiService) {}
-  constructor(private expenseService: ExpenseApiService) {}
+  constructor(
+    private http: HttpClient,
+    private expenseService: ExpenseApiService
+  ) {}
 
   getByProjectStageId(projectStageId: number): Observable<ApiEnvelope<AdvanceListResponseDto>> {
     if (environment.advances.useMock) {
@@ -73,14 +74,7 @@ export class AdvanceApiService {
   }
 
   create(command: CreateAdvanceCommand): Observable<ApiEnvelope<boolean>> {
-    if (environment.advances.useMock) {
-      createAdvance(command);
-      return of<ApiEnvelope<boolean>>({ succeeded: true, data: true }).pipe(delay(this.mockLatency));
-    }
-
-    // REAL API:
-    //   return this.advanceClient.create(new CreateAdvanceCommand({ ... }));
-    return this.notImplemented('create');
+    return this.http.post<ApiEnvelope<boolean>>(`${environment.apiUrl}/advances`, command);
   }
 
   update(command: UpdateAdvanceCommand): Observable<ApiEnvelope<boolean>> {

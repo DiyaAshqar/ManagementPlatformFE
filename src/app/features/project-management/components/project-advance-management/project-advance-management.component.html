@@ -371,7 +371,7 @@
               <label class="text-sm font-medium text-color">{{ 'projectTabs.advances.form.paymentMethod' | translate }} *</label>
               <p-select
                 [ngModel]="formPaymentMethodId()" (ngModelChange)="formPaymentMethodId.set($event)"
-                [options]="paymentMethods()" optionLabel="name" optionValue="id"
+                [options]="paymentMethods()" optionLabel="label" optionValue="value"
                 [placeholder]="'projectTabs.advances.form.selectPaymentMethod' | translate"
                 [loading]="isLoadingPaymentMethods()" styleClass="w-full">
               </p-select>

@@ -22,6 +22,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
 
 import { CurrencyClient, CurrencyDto, LookupClient, LookupType } from '../../../../../nswag/api-client';
+import { getLookupData } from '../../../../shared/utils/lookup.util';
 import {
   AdvanceDetailDto,
   AdvanceExpenseDto,
@@ -101,7 +102,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
   currencies = signal<CurrencyDto[]>([]);
   isLoadingCurrencies = signal<boolean>(false);
 
-  paymentMethods = signal<{ id: number; name: string }[]>([]);
+  paymentMethods = signal<{ label: string; value: number }[]>([]);
   isLoadingPaymentMethods = signal<boolean>(false);
 
   // -- Settle dialog ---------------------------------------------------------
@@ -199,8 +200,8 @@ export class ProjectAdvanceManagementComponent implements OnInit {
     this.isLoadingPaymentMethods.set(true);
     this.lookupClient.getAllLookups([LookupType.PaymentMethod]).subscribe({
       next: (response) => {
-        const data = response.data as Record<string, { id: number; name: string }[]>;
-        this.paymentMethods.set(data?.['paymentMethod'] ?? []);
+        const methods = getLookupData(response.data as Record<string, { id: number; name: string }[]>, LookupType.PaymentMethod);
+        this.paymentMethods.set((methods ?? []).map((method) => ({ label: method.name, value: method.id })));
         this.isLoadingPaymentMethods.set(false);
       },
       error: () => this.isLoadingPaymentMethods.set(false),
@@ -213,12 +214,14 @@ export class ProjectAdvanceManagementComponent implements OnInit {
     this.editingAdvanceId.set(null);
     this.resetForm();
     this.currentView.set('form');
+    this.loadPaymentMethods();
   }
 
   openEditForm(advance: AdvanceListItemDto): void {
     if (advance.status !== 'Open') {
       return;
     }
+    this.loadPaymentMethods();
     this.advanceService.getById(advance.id).subscribe({
       next: (response) => {
         if (!response.succeeded || !response.data) return;
