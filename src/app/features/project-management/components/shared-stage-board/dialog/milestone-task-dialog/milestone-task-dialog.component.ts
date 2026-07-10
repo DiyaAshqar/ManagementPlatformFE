@@ -18,10 +18,10 @@ import {
   ICreateTaskCommand,
   ProjectMainContractorClient,
   Responsibility,
-  SupplierClient,
-  UsersClient
+  SupplierClient
 } from '../../../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../../../shared/components/documents-table/documents-table.component';
+import { UsersApiService } from '../../../../../user-management/services/users-api.service';
 import { TaskService } from '../../../../services/task.service';
 
 export interface MilestoneTaskFormData extends ICreateTaskCommand {
@@ -44,7 +44,7 @@ export interface MilestoneTaskFormData extends ICreateTaskCommand {
     DatePickerModule,
     DocumentsTableComponent
   ],
-  providers: [ConstructorClient, ProjectMainContractorClient, SupplierClient, UsersClient],
+  providers: [ConstructorClient, ProjectMainContractorClient, SupplierClient],
   templateUrl: './milestone-task-dialog.component.html',
   styleUrls: ['./milestone-task-dialog.component.scss']
 })
@@ -55,7 +55,7 @@ export class MilestoneTaskDialogComponent implements OnInit, OnDestroy {
   private constructorClient = inject(ConstructorClient);
   private projectMainContractorClient = inject(ProjectMainContractorClient);
   private supplierClient = inject(SupplierClient);
-  private usersClient = inject(UsersClient);
+  private usersApi = inject(UsersApiService);
 
   readonly taskAttachmentType = AttachmentType.Task;
 
@@ -182,7 +182,7 @@ export class MilestoneTaskDialogComponent implements OnInit, OnDestroy {
 
   private loadUsers(): void {
     this.isLoadingUsers.set(true);
-    this.usersClient.getAllUsers().subscribe({
+    this.usersApi.getAllUsers().subscribe({
       next: (response) => {
         this.userOptions = (response.data ?? [])
           .filter(user => user.id != null)

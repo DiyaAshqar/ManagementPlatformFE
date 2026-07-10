@@ -14,12 +14,21 @@ import { TooltipModule } from 'primeng/tooltip';
 // Services
 import { SidebarService } from '../../../core/services/sidebar.service';
 import { ThemeService } from '../../../core/services/theme.service';
+import { AuthService } from '../../../core/auth/services/auth.service';
 
 interface NavItem {
   label: string;
   icon: string;
   route?: string;
   command?: () => void;
+  /**
+   * When set, the item is only shown if the current user has one of these
+   * roles. Gated by role (not permission) because roles come straight off
+   * the login response body — reliable across mock and real backends —
+   * whereas fine-grained permissions depend on JWT claims the real backend
+   * may not issue yet.
+   */
+  roles?: string[];
 }
 
 interface NavSection {
@@ -55,6 +64,7 @@ export class SidebarComponent implements OnInit {
         { label: 'sidebar.items.constructors', icon: 'pi pi-users', route: '/constructor' },
         { label: 'sidebar.items.suppliers', icon: 'pi pi-building', route: '/supplier' },
         { label: 'sidebar.items.materials', icon: 'pi pi-box', route: '/materials' },
+        { label: 'sidebar.items.users', icon: 'pi pi-user-edit', route: '/users' },
       ]
     }
   ];
@@ -67,10 +77,15 @@ export class SidebarComponent implements OnInit {
   constructor(
     private router: Router,
     public sidebarService: SidebarService,
-    public themeService: ThemeService
+    public themeService: ThemeService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {}
+
+  canShow(item: NavItem): boolean {
+    return !item.roles?.length || this.authService.hasAnyRole(item.roles);
+  }
 
   get logoPath(): string {
     return this.themeService.isDarkTheme() 

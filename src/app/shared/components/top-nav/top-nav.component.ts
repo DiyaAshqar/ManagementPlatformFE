@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
@@ -9,6 +9,7 @@ import { AvatarModule } from 'primeng/avatar';
 import { MenuModule } from 'primeng/menu';
 import { BadgeModule } from 'primeng/badge';
 import { MenuItem } from 'primeng/api';
+import { DialogService } from 'primeng/dynamicdialog';
 import { OverlayPanelModule } from 'primeng/overlaypanel';
 
 // Services
@@ -19,6 +20,7 @@ import { SidebarService } from '../../../core/services/sidebar.service';
 
 // Components
 import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
+import { ChangePasswordDialogComponent } from '../change-password-dialog/change-password-dialog.component';
 
 @Component({
   selector: 'app-top-nav',
@@ -38,6 +40,9 @@ import { BreadcrumbComponent } from '../breadcrumb/breadcrumb.component';
   styleUrls: ['./top-nav.component.scss']
 })
 export class TopNavComponent implements OnInit {
+  private readonly translate = inject(TranslateService);
+  private readonly dialogService = inject(DialogService);
+
   profileMenuItems: MenuItem[] = [];
   notificationsCount = 3;
 
@@ -46,7 +51,13 @@ export class TopNavComponent implements OnInit {
     public languageService: LanguageService,
     public authService: AuthService,
     public sidebarService: SidebarService
-  ) {}
+  ) {
+    // Rebuild the menu labels whenever the active language changes.
+    effect(() => {
+      this.languageService.currentLanguage();
+      this.initializeProfileMenu();
+    });
+  }
 
   ngOnInit(): void {
     this.initializeProfileMenu();
@@ -55,12 +66,17 @@ export class TopNavComponent implements OnInit {
   initializeProfileMenu(): void {
     this.profileMenuItems = [
       {
-        label: 'Profile',
+        label: this.translate.instant('topNav.profileMenu.profile'),
         icon: 'pi pi-user',
         command: () => this.navigateToProfile()
       },
       {
-        label: 'Settings',
+        label: this.translate.instant('topNav.profileMenu.changePassword'),
+        icon: 'pi pi-key',
+        command: () => this.openChangePassword()
+      },
+      {
+        label: this.translate.instant('topNav.profileMenu.settings'),
         icon: 'pi pi-cog',
         command: () => this.navigateToSettings()
       },
@@ -68,11 +84,20 @@ export class TopNavComponent implements OnInit {
         separator: true
       },
       {
-        label: 'Logout',
+        label: this.translate.instant('topNav.profileMenu.logout'),
         icon: 'pi pi-sign-out',
         command: () => this.logout()
       }
     ];
+  }
+
+  openChangePassword(): void {
+    this.dialogService.open(ChangePasswordDialogComponent, {
+      header: this.translate.instant('changePassword.title'),
+      width: '28rem',
+      modal: true,
+      closable: true
+    });
   }
 
   toggleTheme(): void {

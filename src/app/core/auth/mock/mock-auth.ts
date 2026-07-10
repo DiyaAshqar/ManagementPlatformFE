@@ -15,6 +15,7 @@ import {
   ClaimTypes,
   LoginResult,
   Permissions,
+  RegisterRequest,
   Roles,
 } from '../models/auth.models';
 
@@ -92,6 +93,50 @@ export function findMockUser(email: string, password: string): MockUser | undefi
 
 export function findMockUserById(id: string): MockUser | undefined {
   return MOCK_USERS.find((u) => u.id === id);
+}
+
+/** Register a new mock account. Returns `null` if the email is already taken. */
+export function registerMockUser(request: RegisterRequest): MockUser | null {
+  const identifier = request.email.trim().toLowerCase();
+  const taken = MOCK_USERS.some((u) => u.email.toLowerCase() === identifier);
+  if (taken) {
+    return null;
+  }
+
+  const user: MockUser = {
+    id: (MOCK_USERS.length + 1).toString(),
+    userName: request.email,
+    email: request.email,
+    password: request.password,
+    fullName: request.fullName,
+    roles: [Roles.Viewer],
+    permissions: [
+      Permissions.Dashboard.View,
+      Permissions.Projects.View,
+      Permissions.Agreements.View,
+      Permissions.Constructors.View,
+      Permissions.Suppliers.View,
+      Permissions.Materials.View,
+    ],
+    preferredLanguage: 'en',
+  };
+
+  MOCK_USERS.push(user);
+  return user;
+}
+
+/** Change a mock user's password after verifying the current one. Returns whether it succeeded. */
+export function changeMockUserPassword(
+  userId: string,
+  currentPassword: string,
+  newPassword: string
+): boolean {
+  const user = findMockUserById(userId);
+  if (!user || user.password !== currentPassword) {
+    return false;
+  }
+  user.password = newPassword;
+  return true;
 }
 
 /** Strip the password before exposing a user to the app. */

@@ -18,6 +18,7 @@ import {
   ApiResponse,
   AuthUser,
   ChangePasswordRequest,
+  ClaimTypes,
   LoginRequest,
   LoginResult,
   RefreshTokenRequest,
@@ -25,11 +26,15 @@ import {
 } from '../models/auth.models';
 import {
   buildMockLoginResult,
+  changeMockUserPassword,
   findMockUser,
   findMockUserById,
+  registerMockUser,
+  toAuthUser,
   userIdFromRefreshToken,
 } from '../mock/mock-auth';
 import { JwtService } from './jwt.service';
+import { StorageService } from '../../services/storage.service';
 
 /**
  * The single seam between the application and the authentication backend.
@@ -45,7 +50,8 @@ export class AuthApiService {
 
   constructor(
     private readonly authClient: AuthClient,
-    private readonly jwt: JwtService
+    private readonly jwt: JwtService,
+    private readonly storage: StorageService
   ) {}
 
   /** Authenticate with email/username + password. */
@@ -65,7 +71,7 @@ export class AuthApiService {
   /** Create a new account. The backend logs the account in immediately. */
   register(request: RegisterRequest): Observable<ApiResponse<LoginResult>> {
     if (environment.auth.useMock) {
-      return this.notImplemented('register');
+      return this.mockRegister(request);
     }
 
     return this.authClient
@@ -115,7 +121,7 @@ export class AuthApiService {
   /** Change the current user's password. */
   changePassword(request: ChangePasswordRequest): Observable<ApiResponse<boolean>> {
     if (environment.auth.useMock) {
-      return this.notImplemented('changePassword');
+      return this.mockChangePassword(request);
     }
 
     return this.authClient
@@ -135,7 +141,7 @@ export class AuthApiService {
   /** Fetch the profile of the currently authenticated user. */
   getCurrentUser(): Observable<ApiResponse<AuthUser>> {
     if (environment.auth.useMock) {
-      return this.notImplemented('getCurrentUser');
+      return this.mockGetCurrentUser();
     }
 
     return this.authClient.getCurrentUser().pipe(
@@ -293,6 +299,70 @@ export class AuthApiService {
       succeeded: true,
       data: buildMockLoginResult(user),
     }).pipe(delay(this.mockLatency));
+  }
+
+  private mockRegister(request: RegisterRequest): Observable<ApiResponse<LoginResult>> {
+    const user = registerMockUser(request);
+
+    if (!user) {
+      return of<ApiResponse<LoginResult>>({
+        succeeded: false,
+        message: 'An account with this email already exists.',
+        errors: ['Email already registered'],
+      }).pipe(delay(this.mockLatency));
+    }
+
+    return of<ApiResponse<LoginResult>>({
+      succeeded: true,
+      message: 'Registration successful.',
+      data: buildMockLoginResult(user),
+    }).pipe(delay(this.mockLatency));
+  }
+
+  private mockChangePassword(request: ChangePasswordRequest): Observable<ApiResponse<boolean>> {
+    const userId = this.currentMockUserId();
+    const changed = userId
+      ? changeMockUserPassword(userId, request.currentPassword, request.newPassword)
+      : false;
+
+    if (!changed) {
+      return of<ApiResponse<boolean>>({
+        succeeded: false,
+        message: 'Current password is incorrect.',
+        errors: ['Invalid current password'],
+      }).pipe(delay(this.mockLatency));
+    }
+
+    return of<ApiResponse<boolean>>({
+      succeeded: true,
+      data: true,
+      message: 'Password changed successfully.',
+    }).pipe(delay(this.mockLatency));
+  }
+
+  private mockGetCurrentUser(): Observable<ApiResponse<AuthUser>> {
+    const userId = this.currentMockUserId();
+    const user = userId ? findMockUserById(userId) : undefined;
+
+    if (!user) {
+      return of<ApiResponse<AuthUser>>({
+        succeeded: false,
+        message: 'Not authenticated.',
+      }).pipe(delay(this.mockLatency));
+    }
+
+    return of<ApiResponse<AuthUser>>({
+      succeeded: true,
+      data: toAuthUser(user),
+    }).pipe(delay(this.mockLatency));
+  }
+
+  /** The id of the currently signed-in mock user, derived from the stored access token. */
+  private currentMockUserId(): string | null {
+    const token = this.storage.getItem<string>(environment.auth.tokenStorageKey);
+    const payload = this.jwt.decode(token);
+    const id = payload?.[ClaimTypes.NameIdentifier] ?? payload?.sub;
+    return id != null ? String(id) : null;
   }
 
   private notImplemented<T>(operation: string): Observable<ApiResponse<T>> {

@@ -1,0 +1,96 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="create-user-dialog flex flex-column gap-3">
+  @if (errorMessage()) {
+    <p-message severity="error" [text]="errorMessage()!" styleClass="w-full"></p-message>
+  }
+
+  <div class="field">
+    <label for="fullName">{{ 'userManagement.createDialog.fullName' | translate }}</label>
+    <input
+      pInputText
+      id="fullName"
+      formControlName="fullName"
+      class="w-full"
+      [placeholder]="'userManagement.createDialog.fullNamePlaceholder' | translate" />
+    @if (fullName.invalid && fullName.touched) {
+      <small class="p-error block mt-1">{{ 'userManagement.createDialog.fullNameRequired' | translate }}</small>
+    }
+  </div>
+
+  <div class="field">
+    <label for="arabicFullName">{{ 'userManagement.createDialog.arabicFullName' | translate }}</label>
+    <input
+      pInputText
+      id="arabicFullName"
+      formControlName="arabicFullName"
+      class="w-full"
+      [placeholder]="'userManagement.createDialog.arabicFullNamePlaceholder' | translate" />
+  </div>
+
+  <div class="field">
+    <label for="email">{{ 'userManagement.createDialog.email' | translate }}</label>
+    <input
+      pInputText
+      id="email"
+      type="email"
+      formControlName="email"
+      class="w-full"
+      autocomplete="off"
+      [placeholder]="'userManagement.createDialog.emailPlaceholder' | translate" />
+    @if (email.invalid && email.touched) {
+      <small class="p-error block mt-1">
+        @if (email.errors?.['required']) {
+          {{ 'userManagement.createDialog.emailRequired' | translate }}
+        } @else if (email.errors?.['email']) {
+          {{ 'userManagement.createDialog.emailInvalid' | translate }}
+        }
+      </small>
+    }
+  </div>
+
+  <div class="field">
+    <label for="phoneNumber">{{ 'userManagement.createDialog.phoneNumber' | translate }}</label>
+    <input
+      pInputText
+      id="phoneNumber"
+      formControlName="phoneNumber"
+      class="w-full"
+      [placeholder]="'userManagement.createDialog.phoneNumberPlaceholder' | translate" />
+  </div>
+
+  <div class="field">
+    <label for="password">{{ 'userManagement.createDialog.password' | translate }}</label>
+    <p-password
+      inputId="password"
+      formControlName="password"
+      [toggleMask]="true"
+      autocomplete="new-password"
+      styleClass="w-full"
+      [inputStyleClass]="'w-full'">
+    </p-password>
+    @if (password.invalid && password.touched) {
+      <small class="p-error block mt-1">
+        @if (password.errors?.['required']) {
+          {{ 'userManagement.createDialog.passwordRequired' | translate }}
+        } @else if (password.errors?.['minlength']) {
+          {{ 'userManagement.createDialog.passwordMinLength' | translate }}
+        }
+      </small>
+    }
+  </div>
+
+  <div class="flex justify-content-end gap-2 mt-2">
+    <p-button
+      type="button"
+      [label]="'common.cancel' | translate"
+      [text]="true"
+      (onClick)="onCancel()">
+    </p-button>
+    <p-button
+      type="submit"
+      [label]="'userManagement.createDialog.submit' | translate"
+      icon="pi pi-check"
+      [loading]="loading()"
+      [disabled]="loading()">
+    </p-button>
+  </div>
+</form>
