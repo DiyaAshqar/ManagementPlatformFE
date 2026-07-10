@@ -21,7 +21,7 @@ import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { CurrencyClient, CurrencyDto, LookupClient } from '../../../../../nswag/api-client';
+import { CurrencyClient, CurrencyDto, LookupClient, LookupType } from '../../../../../nswag/api-client';
 import {
   AdvanceDetailDto,
   AdvanceExpenseDto,
@@ -197,7 +197,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
 
   private loadPaymentMethods(): void {
     this.isLoadingPaymentMethods.set(true);
-    this.lookupClient.getAllLookups(['paymentMethod']).subscribe({
+    this.lookupClient.getAllLookups([LookupType.PaymentMethod]).subscribe({
       next: (response) => {
         const data = response.data as Record<string, { id: number; name: string }[]>;
         this.paymentMethods.set(data?.['paymentMethod'] ?? []);
@@ -328,7 +328,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
       },
     });
 
-    this.advanceService.getAvailableExpenses(advance.id).subscribe({
+    this.advanceService.getAvailableExpenses(advance.id, Number(this.projectId)).subscribe({
       next: (response) => {
         this.availableExpenses.set(response.succeeded && response.data ? response.data.expenses : []);
         this.isLoadingAvailableExpenses.set(false);

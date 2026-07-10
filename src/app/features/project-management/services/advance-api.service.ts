@@ -116,7 +116,7 @@ export class AdvanceApiService {
    * the same by reading `project_stage_id` off the mock record, then reusing
    * the *real, already-deployed* Expense API as the source of candidates.
    */
-  getAvailableExpenses(advanceId: number): Observable<ApiEnvelope<AvailableAdvanceExpensesDto>> {
+  getAvailableExpenses(advanceId: number, projectId: number): Observable<ApiEnvelope<AvailableAdvanceExpensesDto>> {
     if (environment.advances.useMock) {
       const record = getAdvanceDetail(advanceId);
       if (!record) {
@@ -127,7 +127,7 @@ export class AdvanceApiService {
       }
 
       const locked = getLockedExpenseIds();
-      return this.expenseService.getByProjectStageId(record.project_stage_id).pipe(
+      return this.expenseService.getByProjectStageId(record.project_stage_id, projectId).pipe(
         map((res) => {
           const all = res.succeeded && res.data?.data ? res.data.data : [];
           const available = all.filter((e) => (e.id ?? 0) > 0 && !locked.has(e.id!));
