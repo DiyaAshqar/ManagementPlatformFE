@@ -20,9 +20,6 @@
       "passwordRequired": "Password is required",
       "passwordMinLength": "Password must be at least 6 characters",
       "invalidCredentials": "Invalid email or password"
-    },
-    "demo": {
-      "title": "Demo accounts (mock mode) — click to fill"
     }
   },
   "common": {

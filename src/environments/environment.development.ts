@@ -7,9 +7,6 @@ export const environment = {
   enableLogging: true,
   debugMode: true,
   auth: {
-    // Toggle the in-memory mock auth backend. The backend now exposes real
-    // auth endpoints and AuthClient is wired in AuthApiService.
-    useMock: false,
     tokenStorageKey: 'auth_token',
     refreshTokenStorageKey: 'refresh_token',
     userStorageKey: 'current_user',

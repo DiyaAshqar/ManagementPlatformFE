@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, catchError, delay, map, of, throwError } from 'rxjs';
+import { Observable, catchError, map, of, throwError } from 'rxjs';
 
-import { environment } from '../../../../environments/environment';
 import {
   ApiException,
   AuthClient,
@@ -18,48 +17,25 @@ import {
   ApiResponse,
   AuthUser,
   ChangePasswordRequest,
-  ClaimTypes,
   LoginRequest,
   LoginResult,
   RefreshTokenRequest,
   RegisterRequest,
 } from '../models/auth.models';
-import {
-  buildMockLoginResult,
-  changeMockUserPassword,
-  findMockUser,
-  findMockUserById,
-  registerMockUser,
-  toAuthUser,
-  userIdFromRefreshToken,
-} from '../mock/mock-auth';
 import { JwtService } from './jwt.service';
-import { StorageService } from '../../services/storage.service';
 
 /**
- * The single seam between the application and the authentication backend.
- *
- * Everything above this service (AuthService, guards, components) is unaware of
- * whether requests are served by the in-memory mock or the real HTTP API. Flip
- * `environment.auth.useMock` to switch.
+ * The application's authentication gateway to the generated backend client.
  */
 @Injectable({ providedIn: 'root' })
 export class AuthApiService {
-  /** Simulated network latency for the mock (ms). */
-  private readonly mockLatency = 600;
-
   constructor(
     private readonly authClient: AuthClient,
-    private readonly jwt: JwtService,
-    private readonly storage: StorageService
+    private readonly jwt: JwtService
   ) {}
 
   /** Authenticate with email/username + password. */
   login(request: LoginRequest): Observable<ApiResponse<LoginResult>> {
-    if (environment.auth.useMock) {
-      return this.mockLogin(request);
-    }
-
     return this.authClient
       .login(new LoginCommand({ email: request.email, password: request.password }))
       .pipe(
@@ -70,10 +46,6 @@ export class AuthApiService {
 
   /** Create a new account. The backend logs the account in immediately. */
   register(request: RegisterRequest): Observable<ApiResponse<LoginResult>> {
-    if (environment.auth.useMock) {
-      return this.mockRegister(request);
-    }
-
     return this.authClient
       .register(
         new RegisterCommand({
@@ -92,10 +64,6 @@ export class AuthApiService {
 
   /** Exchange a refresh token for a fresh access token. */
   refreshToken(request: RefreshTokenRequest): Observable<ApiResponse<LoginResult>> {
-    if (environment.auth.useMock) {
-      return this.mockRefresh(request);
-    }
-
     return this.authClient
       .refreshToken(new RefreshTokenCommand({ refreshToken: request.refreshToken }))
       .pipe(
@@ -106,12 +74,6 @@ export class AuthApiService {
 
   /** Invalidate the session server-side (best-effort). */
   logout(refreshToken: string | null): Observable<ApiResponse<boolean>> {
-    if (environment.auth.useMock) {
-      return of<ApiResponse<boolean>>({ succeeded: true, data: true }).pipe(
-        delay(this.mockLatency)
-      );
-    }
-
     return this.authClient.logout(refreshToken ?? undefined).pipe(
       map((response) => this.toBooleanApiResponse(response)),
       catchError((error) => this.recoverError<boolean>(error))
@@ -120,10 +82,6 @@ export class AuthApiService {
 
   /** Change the current user's password. */
   changePassword(request: ChangePasswordRequest): Observable<ApiResponse<boolean>> {
-    if (environment.auth.useMock) {
-      return this.mockChangePassword(request);
-    }
-
     return this.authClient
       .changePassword(
         new ChangePasswordCommand({
@@ -140,10 +98,6 @@ export class AuthApiService {
 
   /** Fetch the profile of the currently authenticated user. */
   getCurrentUser(): Observable<ApiResponse<AuthUser>> {
-    if (environment.auth.useMock) {
-      return this.mockGetCurrentUser();
-    }
-
     return this.authClient.getCurrentUser().pipe(
       map((response) => ({
         succeeded: response.succeeded ?? false,
@@ -157,16 +111,10 @@ export class AuthApiService {
 
   /** Begin a password-reset flow. */
   forgotPassword(email: string): Observable<ApiResponse<boolean>> {
-    if (environment.auth.useMock) {
-      return of<ApiResponse<boolean>>({
-        succeeded: true,
-        data: true,
-        message: 'If the account exists, a reset link has been sent.',
-      }).pipe(delay(this.mockLatency));
-    }
-
     // The backend does not yet expose a forgot-password endpoint.
-    return this.notImplemented('forgotPassword');
+    return throwError(
+      () => new Error(`AuthApiService.forgotPassword is not supported by the backend (${email}).`)
+    );
   }
 
   // ----------------------------------------------------------------------
@@ -261,117 +209,4 @@ export class AuthApiService {
     return Math.max(0, Math.round((expiration.getTime() - Date.now()) / 1000));
   }
 
-  // ----------------------------------------------------------------------
-  // Mock implementations
-  // ----------------------------------------------------------------------
-
-  private mockLogin(request: LoginRequest): Observable<ApiResponse<LoginResult>> {
-    const user = findMockUser(request.email, request.password);
-
-    if (!user) {
-      return of<ApiResponse<LoginResult>>({
-        succeeded: false,
-        message: 'Invalid email or password.',
-        errors: ['Invalid credentials'],
-      }).pipe(delay(this.mockLatency));
-    }
-
-    return of<ApiResponse<LoginResult>>({
-      succeeded: true,
-      message: 'Login successful.',
-      data: buildMockLoginResult(user),
-    }).pipe(delay(this.mockLatency));
-  }
-
-  private mockRefresh(request: RefreshTokenRequest): Observable<ApiResponse<LoginResult>> {
-    const userId = userIdFromRefreshToken(request.refreshToken);
-    const user = userId ? findMockUserById(userId) : undefined;
-
-    if (!user) {
-      return of<ApiResponse<LoginResult>>({
-        succeeded: false,
-        message: 'Invalid or expired refresh token.',
-        errors: ['Invalid refresh token'],
-      }).pipe(delay(this.mockLatency));
-    }
-
-    return of<ApiResponse<LoginResult>>({
-      succeeded: true,
-      data: buildMockLoginResult(user),
-    }).pipe(delay(this.mockLatency));
-  }
-
-  private mockRegister(request: RegisterRequest): Observable<ApiResponse<LoginResult>> {
-    const user = registerMockUser(request);
-
-    if (!user) {
-      return of<ApiResponse<LoginResult>>({
-        succeeded: false,
-        message: 'An account with this email already exists.',
-        errors: ['Email already registered'],
-      }).pipe(delay(this.mockLatency));
-    }
-
-    return of<ApiResponse<LoginResult>>({
-      succeeded: true,
-      message: 'Registration successful.',
-      data: buildMockLoginResult(user),
-    }).pipe(delay(this.mockLatency));
-  }
-
-  private mockChangePassword(request: ChangePasswordRequest): Observable<ApiResponse<boolean>> {
-    const userId = this.currentMockUserId();
-    const changed = userId
-      ? changeMockUserPassword(userId, request.currentPassword, request.newPassword)
-      : false;
-
-    if (!changed) {
-      return of<ApiResponse<boolean>>({
-        succeeded: false,
-        message: 'Current password is incorrect.',
-        errors: ['Invalid current password'],
-      }).pipe(delay(this.mockLatency));
-    }
-
-    return of<ApiResponse<boolean>>({
-      succeeded: true,
-      data: true,
-      message: 'Password changed successfully.',
-    }).pipe(delay(this.mockLatency));
-  }
-
-  private mockGetCurrentUser(): Observable<ApiResponse<AuthUser>> {
-    const userId = this.currentMockUserId();
-    const user = userId ? findMockUserById(userId) : undefined;
-
-    if (!user) {
-      return of<ApiResponse<AuthUser>>({
-        succeeded: false,
-        message: 'Not authenticated.',
-      }).pipe(delay(this.mockLatency));
-    }
-
-    return of<ApiResponse<AuthUser>>({
-      succeeded: true,
-      data: toAuthUser(user),
-    }).pipe(delay(this.mockLatency));
-  }
-
-  /** The id of the currently signed-in mock user, derived from the stored access token. */
-  private currentMockUserId(): string | null {
-    const token = this.storage.getItem<string>(environment.auth.tokenStorageKey);
-    const payload = this.jwt.decode(token);
-    const id = payload?.[ClaimTypes.NameIdentifier] ?? payload?.sub;
-    return id != null ? String(id) : null;
-  }
-
-  private notImplemented<T>(operation: string): Observable<ApiResponse<T>> {
-    return throwError(
-      () =>
-        new Error(
-          `AuthApiService.${operation}: not available while environment.auth.useMock is true ` +
-            `(no mock implementation for this operation). Set useMock = false to hit the real API.`
-        )
-    );
-  }
 }
