@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, inject, OnDestroy, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
@@ -117,9 +117,16 @@ export class MilestoneTaskDialogComponent implements OnInit, OnDestroy {
     const data = this.config.data;
 
     if (data?.workItem) {
+      const workItem = data.workItem;
+
       this.formData.update(current => ({
         ...current,
-        ...data.workItem
+        ...workItem,
+        // Board items keep display-friendly strings, but PrimeNG controls need
+        // numeric option values and actual Date instances.
+        assignTo: this.normalizeOptionalNumber(workItem.assignTo),
+        startDate: this.normalizeDate(workItem.startDate),
+        endDate: this.normalizeDate(workItem.endDate)
       }));
     }
 
@@ -277,6 +284,25 @@ export class MilestoneTaskDialogComponent implements OnInit, OnDestroy {
 
   onCancel(): void {
     this.dialogRef.close();
+  }
+
+  private normalizeOptionalNumber(value: unknown): number | undefined {
+    if (value === null || value === undefined || value === '') return undefined;
+
+    const numberValue = Number(value);
+    return Number.isFinite(numberValue) ? numberValue : undefined;
+  }
+
+  private normalizeDate(value: unknown): Date | undefined {
+    if (!value) return undefined;
+
+    const date = value instanceof Date
+      ? value
+      : typeof value === 'string'
+        ? parseISO(value)
+        : undefined;
+
+    return date && !isNaN(date.getTime()) ? date : undefined;
   }
 
   /**
