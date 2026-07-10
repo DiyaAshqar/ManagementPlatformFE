@@ -19,6 +19,9 @@ import {
   ProjectVOClient
 } from '../../../../../../../nswag/api-client';
 import { AddVoDialogComponent } from '../../../dialog/add-vo-dialog/add-vo-dialog.component';
+import { Permissions } from '../../../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
 
 // VO Status enum matching the backend
 export enum VOStatus {
@@ -38,13 +41,15 @@ export enum VOStatus {
     TooltipModule,
     SkeletonModule,
     BadgeModule,
-    AddVoDialogComponent
+    AddVoDialogComponent,
+    HasPermissionDirective
   ],
   providers: [ProjectVOClient, LookupClient],
   templateUrl: './voucher-orders-tab.component.html',
   styleUrls: ['./voucher-orders-tab.component.scss']
 })
 export class VoucherOrdersTabComponent implements OnInit {
+  readonly permissions = Permissions;
   @Input() projectStageId: number = 0;
 
   voItems = signal<IGetProjectVODto[]>([]);
@@ -70,7 +75,8 @@ export class VoucherOrdersTabComponent implements OnInit {
     private voClient: ProjectVOClient,
     private lookupClient: LookupClient,
     private confirmationService: ConfirmationService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -118,16 +124,19 @@ export class VoucherOrdersTabComponent implements OnInit {
   // ── Dialog ───────────────────────────────────────────────────────────────
 
   openAddDialog(): void {
+    if (!this.canManage()) return;
     this.editVoItem.set(null);
     this.showVoDialog.set(true);
   }
 
   openEditDialog(item: IGetProjectVODto): void {
+    if (!this.canManage()) return;
     this.editVoItem.set(item);
     this.showVoDialog.set(true);
   }
 
   onDialogSaved(command: CreateProjectVOCommand): void {
+    if (!this.canManage()) return;
     this.voClient.createOrUpdate(command).subscribe({
       next: (res) => {
         if (res.succeeded) {
@@ -142,6 +151,7 @@ export class VoucherOrdersTabComponent implements OnInit {
   }
 
   confirmDelete(item: IGetProjectVODto): void {
+    if (!this.canManage()) return;
     this.confirmationService.confirm({
       message: this.translate.instant('projectTabs.vo.confirmDelete.message', { name: item.voNumber }),
       header: this.translate.instant('projectTabs.vo.confirmDelete.header'),
@@ -168,6 +178,10 @@ export class VoucherOrdersTabComponent implements OnInit {
       case 3: return 'danger';  // Rejected
       default: return 'secondary';
     }
+  }
+
+  canManage(): boolean {
+    return this.authService.hasPermission(Permissions.ProjectWork.Manage);
   }
 
   getStatusLabel(status?: number): string {

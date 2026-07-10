@@ -11,13 +11,13 @@
   <!-- Toolbar -->
   <div class="po-toolbar">
     <span class="po-total-label">{{ 'projectTabs.purchaseOrders.totalPO' | translate }}: {{ poItems().length }}</span>
-    <p-button
-      [label]="'projectTabs.purchaseOrders.createPO' | translate"
-      icon="pi pi-plus"
-      (onClick)="openAddDialog()"
-      severity="contrast"
-      [raised]="true">
-    </p-button>
+      <p-button *appHasPermission="permissions.ProjectWork.Manage"
+        [label]="'projectTabs.purchaseOrders.createPO' | translate"
+        icon="pi pi-plus"
+        (onClick)="openAddDialog()"
+        severity="contrast"
+        [raised]="true">
+      </p-button>
   </div>
 
   <!-- Table -->
@@ -57,7 +57,7 @@
           </p-badge>
         </td>
         <td class="text-center">
-          <div class="po-actions">
+            <div *appHasPermission="permissions.ProjectWork.Manage" class="po-actions">
             <p-button
               icon="pi pi-eye"
               [rounded]="true"
@@ -88,7 +88,7 @@
               tooltipPosition="top"
               (onClick)="confirmDelete(item)">
             </p-button>
-          </div>
+            </div>
         </td>
       </tr>
     </ng-template>
@@ -132,7 +132,7 @@
 
 <!-- Add/Edit Dialog -->
 @if (showPoDialog()) {
-  <app-add-po-dialog
+  <app-add-po-dialog *appHasPermission="permissions.ProjectWork.Manage"
     [visible]="showPoDialog()"
     (visibleChange)="showPoDialog.set($event)"
     [projectStageId]="projectStageId"

@@ -117,117 +117,117 @@
       <p-card>
         <p-tabs [(value)]="activeTabIndex" styleClass="tabview-custom">
           <p-tablist>
-            <p-tab value="0">
-              <div class="flex align-items-center gap-2">
-                <i class="pi pi-chart-bar"></i>
-                <span>{{ 'projectDetail.tabs.overview' | translate }}</span>
-              </div>
-            </p-tab>
-            <p-tab value="1">
-              <div class="flex align-items-center gap-2">
-                <i class="pi pi-wrench"></i>
-                <span>{{ 'projectDetail.tabs.preparing' | translate }}</span>
-              </div>
-            </p-tab>
-            <p-tab value="2">
-              <div class="flex align-items-center gap-2">
-                <i class="pi pi-shield"></i>
-                <span>{{ 'projectDetail.tabs.excavation' | translate }}</span>
-              </div>
-            </p-tab>
+              <p-tab *appHasPermission="permissions.ProjectTabs.Overview" value="0">
+                <div class="flex align-items-center gap-2">
+                  <i class="pi pi-chart-bar"></i>
+                  <span>{{ 'projectDetail.tabs.overview' | translate }}</span>
+                </div>
+              </p-tab>
+              <p-tab *appHasPermission="permissions.ProjectTabs.Preparing" value="1">
+                <div class="flex align-items-center gap-2">
+                  <i class="pi pi-wrench"></i>
+                  <span>{{ 'projectDetail.tabs.preparing' | translate }}</span>
+                </div>
+              </p-tab>
+              <p-tab *appHasPermission="permissions.ProjectTabs.Excavation" value="2">
+                <div class="flex align-items-center gap-2">
+                  <i class="pi pi-shield"></i>
+                  <span>{{ 'projectDetail.tabs.excavation' | translate }}</span>
+                </div>
+              </p-tab>
             <!-- <p-tab value="3">
               <div class="flex align-items-center gap-2">
                 <i class="pi pi-sitemap"></i>
                 <span>Staging</span>
               </div>
             </p-tab> -->
-            <p-tab value="4">
-              <div class="flex align-items-center gap-2">
-                <i class="pi pi-flag"></i>
-                <span>{{ 'projectDetail.tabs.milestones' | translate }}</span>
-              </div>
-            </p-tab>
-            <p-tab value="5">
-              <div class="flex align-items-center gap-2">
-                <i class="pi pi-file"></i>
-                <span>{{ 'projectDetail.tabs.documents' | translate }}</span>
-              </div>
-            </p-tab>
-            <p-tab value="6">
-              <div class="flex align-items-center gap-2">
-                <i class="pi pi-credit-card"></i>
-                <span>{{ 'projectDetail.tabs.ownerPayment' | translate }}</span>
-              </div>
-            </p-tab>
-            <p-tab value="7">
-              <div class="flex align-items-center gap-2">
-                <i class="pi pi-chart-bar"></i>
-                <span>{{ 'projectDetail.tabs.timeframe' | translate }}</span>
-              </div>
-            </p-tab>
+              <p-tab *appHasPermission="permissions.ProjectTabs.Milestones" value="4">
+                <div class="flex align-items-center gap-2">
+                  <i class="pi pi-flag"></i>
+                  <span>{{ 'projectDetail.tabs.milestones' | translate }}</span>
+                </div>
+              </p-tab>
+              <p-tab *appHasPermission="permissions.ProjectTabs.Documents" value="5">
+                <div class="flex align-items-center gap-2">
+                  <i class="pi pi-file"></i>
+                  <span>{{ 'projectDetail.tabs.documents' | translate }}</span>
+                </div>
+              </p-tab>
+              <p-tab *appHasPermission="permissions.ProjectTabs.OwnerPayments" value="6">
+                <div class="flex align-items-center gap-2">
+                  <i class="pi pi-credit-card"></i>
+                  <span>{{ 'projectDetail.tabs.ownerPayment' | translate }}</span>
+                </div>
+              </p-tab>
+              <p-tab *appHasPermission="permissions.ProjectTabs.Timeframe" value="7">
+                <div class="flex align-items-center gap-2">
+                  <i class="pi pi-chart-bar"></i>
+                  <span>{{ 'projectDetail.tabs.timeframe' | translate }}</span>
+                </div>
+              </p-tab>
           </p-tablist>
           
           <p-tabpanels>
-            <p-tabpanel value="0">
-              <div class="py-4">
-                @if (activeTabIndex === '0') {
-                  <app-stage-kanban [projectId]="project()!.id"></app-stage-kanban>
-                }
-              </div>
-            </p-tabpanel>
-            <p-tabpanel value="1">
-              <div class="py-4">
-                @if (activeTabIndex === '1') {
-                  <app-preparing-stage 
-                    [projectId]="project()!.id" 
-                    [projectStageId]="preparingStageId()">
-                  </app-preparing-stage>
-                }
-              </div>
-            </p-tabpanel>
-            <p-tabpanel value="2">
-              <div class="py-4">
-                @if (activeTabIndex === '2') {
-                  <app-excavation-stage 
-                    [projectId]="project()!.id"
-                    [projectStageId]="excavationStageId()">
-                  </app-excavation-stage>
-                }
-              </div>
-            </p-tabpanel>
+              <p-tabpanel *appHasPermission="permissions.ProjectTabs.Overview" value="0">
+                <div class="py-4">
+                  @if (activeTabIndex === '0') {
+                    <app-stage-kanban [projectId]="project()!.id"></app-stage-kanban>
+                  }
+                </div>
+              </p-tabpanel>
+              <p-tabpanel *appHasPermission="permissions.ProjectTabs.Preparing" value="1">
+                <div class="py-4">
+                  @if (activeTabIndex === '1') {
+                    <app-preparing-stage
+                      [projectId]="project()!.id"
+                      [projectStageId]="preparingStageId()">
+                    </app-preparing-stage>
+                  }
+                </div>
+              </p-tabpanel>
+              <p-tabpanel *appHasPermission="permissions.ProjectTabs.Excavation" value="2">
+                <div class="py-4">
+                  @if (activeTabIndex === '2') {
+                    <app-excavation-stage
+                      [projectId]="project()!.id"
+                      [projectStageId]="excavationStageId()">
+                    </app-excavation-stage>
+                  }
+                </div>
+              </p-tabpanel>
             <!-- <p-tabpanel value="3">
               <div class="py-4">
                 <app-staging-board [projectId]="project()!.id"></app-staging-board>
               </div>
             </p-tabpanel> -->
-            <p-tabpanel value="4">
-              <div class="py-4">
-                <app-milestone-stage 
-                  [projectId]="project()!.id"
-                  [milestoneStages]="milestoneStages()"
-                  [agreementId]="project()!.agreementId || 0">
-                </app-milestone-stage>
-              </div>
-            </p-tabpanel>
-            <p-tabpanel value="5">
-              <div class="py-4">
-                <app-documents-stage [projectId]="project()!.id"></app-documents-stage>
-              </div>
-            </p-tabpanel>
-            <p-tabpanel value="6">
-              <div class="py-4">
-                @if (activeTabIndex === '6') {
-                  <app-owner-payment-tab [project]="project()"></app-owner-payment-tab>
-                }
-              </div>
-            </p-tabpanel>
-            <p-tabpanel value="7">
-              <div class="py-4">
-                @if (activeTabIndex === '7') {
-                  <app-timeframe [projectId]="project()!.id"></app-timeframe>
-                }
-              </div>
-            </p-tabpanel>
+              <p-tabpanel *appHasPermission="permissions.ProjectTabs.Milestones" value="4">
+                <div class="py-4">
+                  <app-milestone-stage
+                    [projectId]="project()!.id"
+                    [milestoneStages]="milestoneStages()"
+                    [agreementId]="project()!.agreementId || 0">
+                  </app-milestone-stage>
+                </div>
+              </p-tabpanel>
+              <p-tabpanel *appHasPermission="permissions.ProjectTabs.Documents" value="5">
+                <div class="py-4">
+                  <app-documents-stage [projectId]="project()!.id"></app-documents-stage>
+                </div>
+              </p-tabpanel>
+              <p-tabpanel *appHasPermission="permissions.ProjectTabs.OwnerPayments" value="6">
+                <div class="py-4">
+                  @if (activeTabIndex === '6') {
+                    <app-owner-payment-tab [project]="project()"></app-owner-payment-tab>
+                  }
+                </div>
+              </p-tabpanel>
+              <p-tabpanel *appHasPermission="permissions.ProjectTabs.Timeframe" value="7">
+                <div class="py-4">
+                  @if (activeTabIndex === '7') {
+                    <app-timeframe [projectId]="project()!.id"></app-timeframe>
+                  }
+                </div>
+              </p-tabpanel>
           </p-tabpanels>
         </p-tabs>
       </p-card>

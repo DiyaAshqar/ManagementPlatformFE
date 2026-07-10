@@ -30,6 +30,9 @@ import {
   ProjectSurveyingVisitClient,
   ProjectVOClient,
 } from '../../../../../../../nswag/api-client';
+import { Permissions } from '../../../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
 
 export type ClaimType = 'BOQ' | 'PMC' | 'SV' | 'VO' | 'EXP';
 
@@ -61,6 +64,7 @@ export interface ClaimData {
     TagModule,
     TooltipModule,
     ConfirmDialogModule,
+    HasPermissionDirective,
   ],
   providers: [
     ConfirmationService,
@@ -76,6 +80,7 @@ export interface ClaimData {
   styleUrls: ['./payment-claim-tab.component.scss'],
 })
 export class PaymentClaimTabComponent implements OnInit {
+  readonly permissions = Permissions;
   @Input() projectStageId: number = 0;
   @Input() projectId: string = '';
 
@@ -137,7 +142,8 @@ export class PaymentClaimTabComponent implements OnInit {
     private lookupClient: LookupClient,
     private constructorClient: ConstructorClient,
     private confirmationService: ConfirmationService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {}
@@ -247,6 +253,7 @@ export class PaymentClaimTabComponent implements OnInit {
   // ── Confirm Step ────────────────────────────────────────────────────────────
 
   confirmClaim(): void {
+    if (!this.canLock()) return;
     this.confirmationService.confirm({
       message: this.translate.instant('ownerPayment.confirm.message'),
       header: this.translate.instant('ownerPayment.confirm.header'),
@@ -267,6 +274,7 @@ export class PaymentClaimTabComponent implements OnInit {
   }
 
   printClaim(): void {
+    if (!this.canPrint()) return;
     const t    = (key: string) => this.translate.instant(key);
     const lang = this.translate.currentLang || 'en';
     const isRtl = lang === 'ar';
@@ -419,6 +427,14 @@ export class PaymentClaimTabComponent implements OnInit {
     win.document.write(html);
     win.document.close();
     win.addEventListener('load', () => setTimeout(() => win.print(), 400));
+  }
+
+  canLock(): boolean {
+    return this.authService.hasPermission(Permissions.PaymentClaims.Lock);
+  }
+
+  canPrint(): boolean {
+    return this.authService.hasPermission(Permissions.PaymentClaims.Print);
   }
 
   // ── Totals ──────────────────────────────────────────────────────────────────

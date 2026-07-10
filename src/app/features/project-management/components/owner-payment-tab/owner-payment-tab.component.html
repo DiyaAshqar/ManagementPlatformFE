@@ -12,7 +12,7 @@
   </div>
 
   <div class="entry-grid">
-    <section class="entry-form">
+      <section *appHasPermission="[permissions.OwnerPayments.Create, permissions.OwnerPayments.Edit]" class="entry-form">
       <div class="form-section-title">
         <h3>{{ 'ownerPaymentEntry.formTitle' | translate }}</h3>
         <span>{{ project?.name }}</span>
@@ -121,7 +121,7 @@
           (onClick)="savePayment()">
         </p-button>
       </div>
-    </section>
+      </section>
 
     <aside class="entry-summary">
       <div class="summary-card">
@@ -174,27 +174,27 @@
               tooltipPosition="top"
               (onClick)="printReceipt(record)">
             </p-button>
-            <p-button
-              icon="pi pi-pencil"
-              severity="secondary"
-              [text]="true"
-              [rounded]="true"
-              [disabled]="isSaving()"
-              [ariaLabel]="'common.edit' | translate"
-              [pTooltip]="'common.edit' | translate"
-              tooltipPosition="top"
-              (onClick)="editPayment(record)">
-            </p-button>
-            <p-button
-              icon="pi pi-trash"
-              severity="danger"
-              [text]="true"
-              [rounded]="true"
-              [loading]="isDeleting(record)"
-              [disabled]="isDeleting(record) || isEditing(record)"
-              [ariaLabel]="'common.delete' | translate"
-              (onClick)="deletePayment(record)">
-            </p-button>
+              <p-button *appHasPermission="permissions.OwnerPayments.Edit"
+                icon="pi pi-pencil"
+                severity="secondary"
+                [text]="true"
+                [rounded]="true"
+                [disabled]="isSaving()"
+                [ariaLabel]="'common.edit' | translate"
+                [pTooltip]="'common.edit' | translate"
+                tooltipPosition="top"
+                (onClick)="editPayment(record)">
+              </p-button>
+              <p-button *appHasPermission="permissions.OwnerPayments.Delete"
+                icon="pi pi-trash"
+                severity="danger"
+                [text]="true"
+                [rounded]="true"
+                [loading]="isDeleting(record)"
+                [disabled]="isDeleting(record) || isEditing(record)"
+                [ariaLabel]="'common.delete' | translate"
+                (onClick)="deletePayment(record)">
+              </p-button>
           </td>
         </tr>
       </ng-template>

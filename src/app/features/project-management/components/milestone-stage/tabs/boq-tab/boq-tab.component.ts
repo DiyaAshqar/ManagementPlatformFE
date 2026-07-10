@@ -23,6 +23,9 @@ import {
 } from '../../../../../../../nswag/api-client';
 import { AddBoqDialogComponent } from '../../../dialog/add-boq-dialog/add-boq-dialog.component';
 import { MaterialCatalogService } from '../../../../../../shared/services/material-catalog.service';
+import { Permissions } from '../../../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
 
 @Component({
   selector: 'app-boq-tab',
@@ -34,13 +37,15 @@ import { MaterialCatalogService } from '../../../../../../shared/services/materi
     ButtonModule,
     TooltipModule,
     SkeletonModule,
-    AddBoqDialogComponent
+    AddBoqDialogComponent,
+    HasPermissionDirective
   ],
   providers: [ProjectBOQClient, LookupClient, ConstructorClient, SupplierClient],
   templateUrl: './boq-tab.component.html',
   styleUrls: ['./boq-tab.component.scss']
 })
 export class BoqTabComponent implements OnInit, OnDestroy {
+  readonly permissions = Permissions;
   @Input() projectStageId: number = 0;
 
   boqItems = signal<IGetProjectBOQDto[]>([]);
@@ -78,7 +83,8 @@ export class BoqTabComponent implements OnInit, OnDestroy {
     private supplierClient: SupplierClient,
     private materialCatalog: MaterialCatalogService,
     private confirmationService: ConfirmationService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -183,16 +189,19 @@ export class BoqTabComponent implements OnInit, OnDestroy {
   // ── Dialog ───────────────────────────────────────────────────────────────
 
   openAddDialog(): void {
+    if (!this.canCreate()) return;
     this.editBoqItem.set(null);
     this.showBoqDialog.set(true);
   }
 
   openEditDialog(item: IGetProjectBOQDto): void {
+    if (!this.canEdit()) return;
     this.editBoqItem.set(item);
     this.showBoqDialog.set(true);
   }
 
   onDialogSaved(command: CreateProjectBOQCommand): void {
+    if (this.editBoqItem() ? !this.canEdit() : !this.canCreate()) return;
     this.boqClient.createOrUpdate(command).subscribe({
       next: (res) => {
         if (res.succeeded) {
@@ -207,6 +216,7 @@ export class BoqTabComponent implements OnInit, OnDestroy {
   }
 
   confirmDelete(item: IGetProjectBOQDto): void {
+    if (!this.canDelete()) return;
     this.confirmationService.confirm({
       message: this.translate.instant('projectTabs.boq.confirmDelete.message', { name: item.description }),
       header: this.translate.instant('projectTabs.boq.confirmDelete.header'),
@@ -224,5 +234,17 @@ export class BoqTabComponent implements OnInit, OnDestroy {
         });
       }
     });
+  }
+
+  canCreate(): boolean {
+    return this.authService.hasPermission(Permissions.BOQ.Create);
+  }
+
+  canEdit(): boolean {
+    return this.authService.hasPermission(Permissions.BOQ.Edit);
+  }
+
+  canDelete(): boolean {
+    return this.authService.hasPermission(Permissions.BOQ.Delete);
   }
 }

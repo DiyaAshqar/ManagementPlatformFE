@@ -18,6 +18,9 @@ import {
   ProjectSurveyingVisitClient
 } from '../../../../../../../nswag/api-client';
 import { AddSurveyingVisitDialogComponent } from '../../../dialog/add-surveying-visit-dialog/add-surveying-visit-dialog.component';
+import { Permissions } from '../../../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
 
 export enum VisitStatus {
   InProgress = 0,
@@ -36,13 +39,15 @@ export enum VisitStatus {
     TooltipModule,
     SkeletonModule,
     BadgeModule,
-    AddSurveyingVisitDialogComponent
+    AddSurveyingVisitDialogComponent,
+    HasPermissionDirective
   ],
   providers: [ProjectSurveyingVisitClient, LookupClient],
   templateUrl: './surveying-visits-tab.component.html',
   styleUrls: ['./surveying-visits-tab.component.scss']
 })
 export class SurveyingVisitsTabComponent implements OnInit {
+  readonly permissions = Permissions;
   @Input() projectStageId: number = 0;
 
   visitItems  = signal<GetProjectSurveyingVisitDto[]>([]);
@@ -71,7 +76,8 @@ export class SurveyingVisitsTabComponent implements OnInit {
     private svClient: ProjectSurveyingVisitClient,
     private lookupClient: LookupClient,
     private confirmationService: ConfirmationService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -117,16 +123,19 @@ export class SurveyingVisitsTabComponent implements OnInit {
   // ── Dialog ───────────────────────────────────────────────────────────────
 
   openAddDialog(): void {
+    if (!this.canManage()) return;
     this.editItem.set(null);
     this.showDialog.set(true);
   }
 
   openEditDialog(item: GetProjectSurveyingVisitDto): void {
+    if (!this.canManage()) return;
     this.editItem.set(item);
     this.showDialog.set(true);
   }
 
   onDialogSaved(command: CreateProjectSurveyingVisitCommand): void {
+    if (!this.canManage()) return;
     this.svClient.createOrUpdate(command).subscribe({
       next: (res) => {
         if (res.succeeded) {
@@ -140,6 +149,7 @@ export class SurveyingVisitsTabComponent implements OnInit {
   }
 
   confirmDelete(item: GetProjectSurveyingVisitDto): void {
+    if (!this.canManage()) return;
     const visitDate = item.visitDate ? new Date(item.visitDate).toLocaleDateString() : 'this visit';
     this.confirmationService.confirm({
       message: this.translate.instant('projectTabs.surveyingVisit.confirmDelete.message', { name: visitDate }),
@@ -166,6 +176,10 @@ export class SurveyingVisitsTabComponent implements OnInit {
       case VisitStatus.Scheduled:  return 'secondary';
       default:                      return 'secondary';
     }
+  }
+
+  canManage(): boolean {
+    return this.authService.hasPermission(Permissions.ProjectWork.Manage);
   }
 
   getStatusLabel(status?: number): string {

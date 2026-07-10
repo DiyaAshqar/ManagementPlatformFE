@@ -79,11 +79,11 @@
             class="w-15rem" />
         </p-iconfield>
       </div>
-      <p-button
-        [label]="'projectTabs.advances.list.newAdvance' | translate"
-        icon="pi pi-plus"
-        (onClick)="openNewForm()">
-      </p-button>
+        <p-button *appHasPermission="permissions.Advances.Create"
+          [label]="'projectTabs.advances.list.newAdvance' | translate"
+          icon="pi pi-plus"
+          (onClick)="openNewForm()">
+        </p-button>
     </div>
 
     <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
@@ -124,39 +124,39 @@
           </td>
           <td class="text-center">
             <div class="flex align-items-center justify-content-center gap-1">
-              <p-button
-                icon="pi pi-pencil"
-                [rounded]="true"
-                [text]="true"
-                severity="secondary"
-                size="small"
-                [disabled]="!canEdit(advance)"
-                [pTooltip]="(!canEdit(advance) ? 'projectTabs.advances.list.notOpenNoEdit' : 'common.edit') | translate"
-                tooltipPosition="top"
-                (onClick)="openEditForm(advance)">
-              </p-button>
-              <p-button
-                icon="pi pi-money-bill"
-                [rounded]="true"
-                [text]="true"
-                severity="success"
-                size="small"
-                [disabled]="!canSettle(advance)"
-                [pTooltip]="'projectTabs.advances.actions.settle' | translate"
-                tooltipPosition="top"
-                (onClick)="openSettleDialog(advance)">
-              </p-button>
-              <p-button
-                icon="pi pi-trash"
-                [rounded]="true"
-                [text]="true"
-                severity="danger"
-                size="small"
-                [disabled]="!canEdit(advance)"
-                [pTooltip]="(!canEdit(advance) ? 'projectTabs.advances.list.notOpenNoEdit' : 'common.delete') | translate"
-                tooltipPosition="top"
-                (onClick)="confirmDelete(advance)">
-              </p-button>
+                <p-button *appHasPermission="permissions.Advances.Edit"
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="secondary"
+                  size="small"
+                  [disabled]="!canEdit(advance)"
+                  [pTooltip]="(!canEdit(advance) ? 'projectTabs.advances.list.notOpenNoEdit' : 'common.edit') | translate"
+                  tooltipPosition="top"
+                  (onClick)="openEditForm(advance)">
+                </p-button>
+                <p-button *appHasPermission="permissions.Advances.Settle"
+                  icon="pi pi-money-bill"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="success"
+                  size="small"
+                  [disabled]="!canSettle(advance)"
+                  [pTooltip]="'projectTabs.advances.actions.settle' | translate"
+                  tooltipPosition="top"
+                  (onClick)="openSettleDialog(advance)">
+                </p-button>
+                <p-button *appHasPermission="permissions.Advances.Delete"
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="danger"
+                  size="small"
+                  [disabled]="!canDelete(advance)"
+                  [pTooltip]="'common.delete' | translate"
+                  tooltipPosition="top"
+                  (onClick)="confirmDelete(advance)">
+                </p-button>
             </div>
           </td>
         </tr>
@@ -171,13 +171,13 @@
                 <i class="pi pi-money-bill text-primary text-2xl"></i>
               </div>
               <p class="text-500 m-0 font-medium">{{ 'projectTabs.advances.list.empty' | translate }}</p>
-              <p-button
-                [label]="'projectTabs.advances.list.newAdvance' | translate"
-                icon="pi pi-plus"
-                size="small"
-                [outlined]="true"
-                (onClick)="openNewForm()">
-              </p-button>
+                <p-button *appHasPermission="permissions.Advances.Create"
+                  [label]="'projectTabs.advances.list.newAdvance' | translate"
+                  icon="pi pi-plus"
+                  size="small"
+                  [outlined]="true"
+                  (onClick)="openNewForm()">
+                </p-button>
             </div>
           </td>
         </tr>
@@ -290,7 +290,7 @@
 </p-dialog>
 
 @if (currentView() === 'form') {
-  <p-card>
+  <p-card *appHasPermission="[permissions.Advances.Create, permissions.Advances.Edit]">
     <ng-template pTemplate="header">
       <div class="px-4 pt-4 pb-0">
         <div class="flex align-items-center gap-3">

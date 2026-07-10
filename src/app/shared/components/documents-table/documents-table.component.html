@@ -1,7 +1,7 @@
 <!-- Header Row: count + upload button -->
 <div class="flex align-items-center justify-content-between mb-2">
   <span class="text-primary font-medium">{{ 'documentsTable.totalDocuments' | translate }}: {{ documents().length }}</span>
-  <p-button [label]="'documentsTable.uploadDocument' | translate" icon="pi pi-upload" (onClick)="openUploadDialog()"></p-button>
+    <p-button *appHasPermission="permissions.Documents.Manage" [label]="'documentsTable.uploadDocument' | translate" icon="pi pi-upload" (onClick)="openUploadDialog()"></p-button>
 </div>
 
 @if (isLoading()) {
@@ -55,10 +55,10 @@
               icon="pi pi-download" [text]="true" [rounded]="true" severity="secondary"
               (onClick)="downloadDocument(doc)" [pTooltip]="'documentsTable.download' | translate" tooltipPosition="bottom">
             </p-button>
-            <p-button
-              icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger"
-              (onClick)="confirmDelete(doc)" [pTooltip]="'documentsTable.delete' | translate" tooltipPosition="bottom">
-            </p-button>
+              <p-button *appHasPermission="permissions.Documents.Manage"
+                icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger"
+                (onClick)="confirmDelete(doc)" [pTooltip]="'documentsTable.delete' | translate" tooltipPosition="bottom">
+              </p-button>
           </div>
         </td>
       </tr>

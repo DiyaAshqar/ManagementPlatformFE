@@ -27,6 +27,9 @@ import {
 } from '../../../../../nswag/api-client';
 import { PrintService } from '../../../../shared';
 import { getLookupData } from '../../../../shared/utils/lookup.util';
+import { Permissions } from '../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 
 interface SelectOption<T = number> {
   label: string;
@@ -50,12 +53,14 @@ interface SelectOption<T = number> {
     TableModule,
     TextareaModule,
     TooltipModule,
+    HasPermissionDirective,
   ],
   providers: [ConfirmationService, PaymentFlowClient, LookupClient, CurrencyClient],
   templateUrl: './owner-payment-tab.component.html',
   styleUrls: ['./owner-payment-tab.component.scss'],
 })
 export class OwnerPaymentTabComponent implements OnInit, OnChanges {
+  readonly permissions = Permissions;
   @Input() project: Project | null = null;
 
   createdAt = signal<Date>(new Date());
@@ -86,7 +91,8 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
     private paymentFlowClient: PaymentFlowClient,
     private lookupClient: LookupClient,
     private currencyClient: CurrencyClient,
-    private printService: PrintService
+    private printService: PrintService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -130,6 +136,8 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
   }
 
   savePayment(): void {
+    const editing = this.editingPaymentId() != null;
+    if (editing ? !this.canEdit() : !this.canCreate()) return;
     this.submitted.set(true);
 
     const projectId = this.projectId;
@@ -163,7 +171,7 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
   }
 
   deletePayment(record: GetPaymentFlowDto): void {
-    if (!record.id) {
+    if (!this.canDelete() || !record.id) {
       return;
     }
 
@@ -196,7 +204,7 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
   }
 
   editPayment(record: GetPaymentFlowDto): void {
-    if (!record.id) {
+    if (!this.canEdit() || !record.id) {
       return;
     }
 
@@ -221,6 +229,18 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
     this.setDefaultPaymentMethod();
     this.referenceNumber.set('');
     this.notes.set('');
+  }
+
+  canCreate(): boolean {
+    return this.authService.hasPermission(Permissions.OwnerPayments.Create);
+  }
+
+  canEdit(): boolean {
+    return this.authService.hasPermission(Permissions.OwnerPayments.Edit);
+  }
+
+  canDelete(): boolean {
+    return this.authService.hasPermission(Permissions.OwnerPayments.Delete);
   }
 
   getPaymentTypeLabel(value?: number): string {

@@ -34,6 +34,9 @@ import {
   UpdateAdvanceCommand,
 } from '../../models/advance.model';
 import { AdvanceApiService } from '../../services/advance-api.service';
+import { Permissions } from '../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 
 const emptySummary = (): AdvanceSummaryDto => ({
   total_advances: 0,
@@ -64,11 +67,13 @@ const emptySummary = (): AdvanceSummaryDto => ({
     DialogModule,
     IconFieldModule,
     InputIconModule,
+    HasPermissionDirective,
   ],
   templateUrl: './project-advance-management.component.html',
   styleUrls: ['./project-advance-management.component.scss'],
 })
 export class ProjectAdvanceManagementComponent implements OnInit {
+  readonly permissions = Permissions;
   @Input() projectId!: string;
   @Input() projectStageId: number = 0;
 
@@ -146,7 +151,8 @@ export class ProjectAdvanceManagementComponent implements OnInit {
     private lookupClient: LookupClient,
     private currencyClient: CurrencyClient,
     private confirmationService: ConfirmationService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private authService: AuthService
   ) {}
 
   ngOnInit(): void {
@@ -211,6 +217,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
   // -- Navigation ----------------------------------------------------------------
 
   openNewForm(): void {
+    if (!this.canCreate()) return;
     this.editingAdvanceId.set(null);
     this.resetForm();
     this.currentView.set('form');
@@ -218,7 +225,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
   }
 
   openEditForm(advance: AdvanceListItemDto): void {
-    if (advance.status !== 'Open') {
+    if (!this.canEdit(advance)) {
       return;
     }
     this.loadPaymentMethods();
@@ -260,13 +267,14 @@ export class ProjectAdvanceManagementComponent implements OnInit {
   // -- Save / Delete -------------------------------------------------------------
 
   handleSave(): void {
+    const editingId = this.editingAdvanceId();
+    if (editingId ? !this.canEditPermission() : !this.canCreate()) return;
     if (!this.formEngineerId() || !this.formAmount() || !this.formPaymentMethodId()) {
       return;
     }
 
     this.isSaving.set(true);
 
-    const editingId = this.editingAdvanceId();
     const base: CreateAdvanceCommand = {
       projectStageId: this.projectStageId,
       engineerId: this.formEngineerId()!,
@@ -295,6 +303,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
   }
 
   confirmDelete(advance: AdvanceListItemDto): void {
+    if (!this.canDelete(advance)) return;
     this.confirmationService.confirm({
       message: this.translate.instant('projectTabs.advances.confirmDelete.message', {
         name: advance.advance_no,
@@ -318,7 +327,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
   // -- Settle dialog ---------------------------------------------------------
 
   openSettleDialog(advance: AdvanceListItemDto): void {
-    if (advance.status === 'Settled') return;
+    if (!this.canSettle(advance)) return;
 
     this.selectedExpenses.set([]);
     this.isLoadingAvailableExpenses.set(true);
@@ -347,6 +356,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
   }
 
   confirmSettle(): void {
+    if (!this.authService.hasPermission(Permissions.Advances.Settle)) return;
     const advance = this.settlingAdvance();
     const selected = this.selectedExpenses();
     if (!advance || selected.length === 0 || this.isOverRemainingBalance()) return;
@@ -386,10 +396,22 @@ export class ProjectAdvanceManagementComponent implements OnInit {
   }
 
   canEdit(advance: AdvanceListItemDto): boolean {
-    return advance.status === 'Open';
+    return this.canEditPermission() && advance.status === 'Open';
   }
 
   canSettle(advance: AdvanceListItemDto): boolean {
-    return advance.status !== 'Settled';
+    return this.authService.hasPermission(Permissions.Advances.Settle) && advance.status !== 'Settled';
+  }
+
+  canCreate(): boolean {
+    return this.authService.hasPermission(Permissions.Advances.Create);
+  }
+
+  canEditPermission(): boolean {
+    return this.authService.hasPermission(Permissions.Advances.Edit);
+  }
+
+  canDelete(advance: AdvanceListItemDto): boolean {
+    return this.authService.hasPermission(Permissions.Advances.Delete) && advance.status === 'Open';
   }
 }

@@ -341,13 +341,20 @@
           [outlined]="true"
           (onClick)="backToSelect()">
         </p-button>
-        <p-button
-          [label]="'ownerPayment.confirmBtn' | translate"
-          icon="pi pi-check"
-          severity="success"
-          [raised]="true"
-          (onClick)="confirmClaim()">
-        </p-button>
+          <p-button *appHasPermission="permissions.PaymentClaims.Print"
+            [label]="'ownerPayment.printBtn' | translate"
+            icon="pi pi-print"
+            severity="primary"
+            [outlined]="true"
+            (onClick)="printClaim()">
+          </p-button>
+          <p-button *appHasPermission="permissions.PaymentClaims.Lock"
+            [label]="'ownerPayment.confirmBtn' | translate"
+            icon="pi pi-check"
+            severity="success"
+            [raised]="true"
+            (onClick)="confirmClaim()">
+          </p-button>
       </div>
     }
 
@@ -358,14 +365,14 @@
           <p class="font-bold text-green-700 m-0">{{ 'ownerPayment.confirm.successTitle' | translate }}</p>
           <p class="text-green-600 text-sm m-0">{{ 'ownerPayment.confirm.successMsg' | translate }}</p>
         </div>
-        <p-button
-          [label]="'ownerPayment.printBtn' | translate"
-          icon="pi pi-print"
-          severity="primary"
-          [raised]="true"
-          (onClick)="printClaim()"
-          styleClass="ml-auto">
-        </p-button>
+          <p-button *appHasPermission="permissions.PaymentClaims.Print"
+            [label]="'ownerPayment.printBtn' | translate"
+            icon="pi pi-print"
+            severity="primary"
+            [raised]="true"
+            (onClick)="printClaim()"
+            styleClass="ml-auto">
+          </p-button>
       </div>
     }
   }

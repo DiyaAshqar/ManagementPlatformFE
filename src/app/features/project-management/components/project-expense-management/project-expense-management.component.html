@@ -28,11 +28,11 @@
           <span class="font-bold text-primary">{{ formatAmount(totalExpensesAmount()) }}</span>
         </div>
       </div>
-      <p-button
-        [label]="'projectTabs.expenses.list.newExpense' | translate"
-        icon="pi pi-plus"
-        (onClick)="openNewForm()">
-      </p-button>
+        <p-button *appHasPermission="permissions.PettyCash.Create"
+          [label]="'projectTabs.expenses.list.newExpense' | translate"
+          icon="pi pi-plus"
+          (onClick)="openNewForm()">
+        </p-button>
     </div>
 
     <div style="overflow-x: auto; -webkit-overflow-scrolling: touch;">
@@ -69,17 +69,17 @@
           <td><span class="text-500 text-sm">{{ expense.notes || '—' }}</span></td>
           <td class="text-center">
             <div class="flex align-items-center justify-content-center gap-1">
-              <p-button
-                icon="pi pi-pencil"
-                [rounded]="true"
-                [text]="true"
-                severity="secondary"
-                size="small"
-                [disabled]="isLocked(expense)"
-                [pTooltip]="lockTooltipKey(expense, 'common.edit') | translate"
-                tooltipPosition="top"
-                (onClick)="openEditForm(expense)">
-              </p-button>
+                <p-button *appHasPermission="permissions.PettyCash.Edit"
+                  icon="pi pi-pencil"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="secondary"
+                  size="small"
+                  [disabled]="!canEdit(expense)"
+                  [pTooltip]="lockTooltipKey(expense, 'common.edit') | translate"
+                  tooltipPosition="top"
+                  (onClick)="openEditForm(expense)">
+                </p-button>
               <p-button
                 icon="pi pi-paperclip"
                 [rounded]="true"
@@ -90,17 +90,17 @@
                 tooltipPosition="top"
                 (onClick)="openAttachments(expense)">
               </p-button>
-              <p-button
-                icon="pi pi-trash"
-                [rounded]="true"
-                [text]="true"
-                severity="danger"
-                size="small"
-                [disabled]="isLocked(expense)"
-                [pTooltip]="lockTooltipKey(expense, 'common.delete') | translate"
-                tooltipPosition="top"
-                (onClick)="confirmDelete(expense)">
-              </p-button>
+                <p-button *appHasPermission="permissions.PettyCash.Delete"
+                  icon="pi pi-trash"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="danger"
+                  size="small"
+                  [disabled]="!canDelete(expense)"
+                  [pTooltip]="lockTooltipKey(expense, 'common.delete') | translate"
+                  tooltipPosition="top"
+                  (onClick)="confirmDelete(expense)">
+                </p-button>
             </div>
           </td>
         </tr>
@@ -115,13 +115,13 @@
                 <i class="pi pi-receipt text-primary text-2xl"></i>
               </div>
               <p class="text-500 m-0 font-medium">{{ 'projectTabs.expenses.list.empty' | translate }}</p>
-              <p-button
-                [label]="'projectTabs.expenses.list.newExpense' | translate"
-                icon="pi pi-plus"
-                size="small"
-                [outlined]="true"
-                (onClick)="openNewForm()">
-              </p-button>
+                <p-button *appHasPermission="permissions.PettyCash.Create"
+                  [label]="'projectTabs.expenses.list.newExpense' | translate"
+                  icon="pi pi-plus"
+                  size="small"
+                  [outlined]="true"
+                  (onClick)="openNewForm()">
+                </p-button>
             </div>
           </td>
         </tr>
@@ -153,7 +153,7 @@
 </p-dialog>
 
 @if (currentView() === 'form') {
-  <p-card>
+  <p-card *appHasPermission="[permissions.PettyCash.Create, permissions.PettyCash.Edit]">
     <ng-template pTemplate="header">
       <div class="px-4 pt-4 pb-0">
         <div class="flex align-items-center gap-3">

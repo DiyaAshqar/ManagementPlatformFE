@@ -9,12 +9,12 @@
             <p class="subtitle">{{ 'agreements.subtitle' | translate }}</p>
           </div>
         </div>
-        <p-button 
-          [label]="'agreements.addNew' | translate"
-          icon="pi pi-plus" 
-          severity="primary"
-          (onClick)="addNewAgreement()"
-        />
+          <p-button *appHasPermission="permissions.Agreements.Create"
+            [label]="'agreements.addNew' | translate"
+            icon="pi pi-plus"
+            severity="primary"
+            (onClick)="addNewAgreement()"
+          />
       </div>
     </ng-template>
 
@@ -95,24 +95,24 @@
                   tooltipPosition="top"
                   (onClick)="viewAgreement(agreement)"
                 />
-                <p-button 
-                  icon="pi pi-pencil" 
-                  [rounded]="true"
-                  [text]="true"
-                  severity="success"
-                  [pTooltip]="'agreements.actions.edit' | translate"
-                  tooltipPosition="top"
-                  (onClick)="editAgreement(agreement)"
-                />
-                <p-button 
-                  icon="pi pi-trash" 
-                  [rounded]="true"
-                  [text]="true"
-                  severity="danger"
-                  [pTooltip]="'agreements.actions.delete' | translate"
-                  tooltipPosition="top"
-                  (onClick)="deleteAgreement(agreement)"
-                />
+                  <p-button *appHasPermission="permissions.Agreements.Edit"
+                    icon="pi pi-pencil"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="success"
+                    [pTooltip]="'agreements.actions.edit' | translate"
+                    tooltipPosition="top"
+                    (onClick)="editAgreement(agreement)"
+                  />
+                  <p-button *appHasPermission="permissions.Agreements.Delete"
+                    icon="pi pi-trash"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="danger"
+                    [pTooltip]="'agreements.actions.delete' | translate"
+                    tooltipPosition="top"
+                    (onClick)="deleteAgreement(agreement)"
+                  />
               </div>
             </td>
           </tr>
@@ -124,13 +124,13 @@
               <div class="empty-state">
                 <i class="pi pi-inbox"></i>
                 <p>{{ 'agreements.noData' | translate }}</p>
-                <p-button 
-                  [label]="'agreements.addFirst' | translate"
-                  icon="pi pi-plus" 
-                  severity="primary"
-                  [text]="true"
-                  (onClick)="addNewAgreement()"
-                />
+                  <p-button *appHasPermission="permissions.Agreements.Create"
+                    [label]="'agreements.addFirst' | translate"
+                    icon="pi pi-plus"
+                    severity="primary"
+                    [text]="true"
+                    (onClick)="addNewAgreement()"
+                  />
               </div>
             </td>
           </tr>

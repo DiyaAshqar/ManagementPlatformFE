@@ -29,6 +29,9 @@ import { getLookupData } from '../../../../../../shared/utils/lookup.util';
 import { AddContractorDialogComponent } from '../../../dialog/add-contractor-dialog/add-contractor-dialog.component';
 import { ContractorDutiesDialogComponent } from '../../../../../agreement-wizard/components/steps/step4/contractor-duties-dialog/contractor-duties-dialog.component';
 import { ProjectMainContractorPaymentsComponent } from '../../../../components/project-main-contractor/project-main-contractor-payments/project-main-contractor-payments.component';
+import { Permissions } from '../../../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
 
 @Component({
   selector: 'app-project-main-contractor-tab',
@@ -44,13 +47,15 @@ import { ProjectMainContractorPaymentsComponent } from '../../../../components/p
     BadgeModule,
     AddContractorDialogComponent,
     ContractorDutiesDialogComponent,
-    ProjectMainContractorPaymentsComponent
+    ProjectMainContractorPaymentsComponent,
+    HasPermissionDirective
   ],
   providers: [ProjectMainContractorClient, ProjectMainContractorDutyClient, ConstructorClient, LookupClient],
   templateUrl: './project-main-contractor-tab.component.html',
   styleUrl: './project-main-contractor-tab.component.scss'
 })
 export class ProjectMainContractorTabComponent implements OnInit {
+  readonly permissions = Permissions;
   @Input() projectStageId!: number;
 
   contractorItems = signal<IGetProjectMainContractorDto[]>([]);
@@ -81,7 +86,8 @@ export class ProjectMainContractorTabComponent implements OnInit {
     private constructorClient: ConstructorClient,
     private lookupClient: LookupClient,
     private confirmationService: ConfirmationService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private authService: AuthService
   ) { }
 
   ngOnInit(): void {
@@ -137,11 +143,13 @@ export class ProjectMainContractorTabComponent implements OnInit {
   // ── Dialog ───────────────────────────────────────────────────────────────
 
   openAddDialog(): void {
+    if (!this.canManage()) return;
     this.editContractorItem.set(null);
     this.showContractorDialog.set(true);
   }
 
   selectContractorForPayments(item: IGetProjectMainContractorDto): void {
+    if (!this.canManage()) return;
     this.selectedContractor.set(item);
   }
 
@@ -167,11 +175,13 @@ export class ProjectMainContractorTabComponent implements OnInit {
   }
 
   openEditDialog(item: IGetProjectMainContractorDto): void {
+    if (!this.canManage()) return;
     this.editContractorItem.set(item);
     this.showContractorDialog.set(true);
   }
 
   openContractorDutiesDialog(item: IGetProjectMainContractorDto): void {
+    if (!this.canManage()) return;
     if (!item.id) {
       return;
     }
@@ -194,6 +204,7 @@ export class ProjectMainContractorTabComponent implements OnInit {
   }
 
   onDialogSaved(command: CreateProjectMainContractorCommand): void {
+    if (!this.canManage()) return;
     this.contractorClient.createOrUpdate(command).subscribe({
       next: (res) => {
         if (res.succeeded) {
@@ -226,6 +237,7 @@ export class ProjectMainContractorTabComponent implements OnInit {
   }
 
   onContractorDutyDataReceived(contractorDuties: ContractorDutyDto[]): void {
+    if (!this.canManage()) return;
     const contractId = this.selectedMainContractId();
 
     if (!contractId) {
@@ -311,6 +323,7 @@ export class ProjectMainContractorTabComponent implements OnInit {
   }
 
   confirmDelete(item: IGetProjectMainContractorDto): void {
+    if (!this.canManage()) return;
     const contractorName = this.contractorMap[item.constructorId ?? 0] || 'this contractor';
     this.confirmationService.confirm({
       message: this.translate.instant('projectTabs.mainContractor.confirmDelete.message', { name: contractorName }),
@@ -329,5 +342,9 @@ export class ProjectMainContractorTabComponent implements OnInit {
         });
       }
     });
+  }
+
+  canManage(): boolean {
+    return this.authService.hasPermission(Permissions.ProjectWork.Manage);
   }
 }
