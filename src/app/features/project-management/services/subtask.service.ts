@@ -61,24 +61,24 @@ export class SubtaskService {
 
   private mapStatusToEnum(status: string): ProjectStatusSubTask {
     switch (status) {
-      case 'completed': return ProjectStatusSubTask._1;
-      case 'in-progress': return ProjectStatusSubTask._0;
+      case 'completed': return ProjectStatusSubTask.InProgress;
+      case 'in-progress': return ProjectStatusSubTask.Complited;
       case 'pending':
-      default: return ProjectStatusSubTask._0;
+      default: return ProjectStatusSubTask.Complited;
     }
   }
 
   private mapEnumToStatus(status?: ProjectStatusSubTask): string {
     switch (status) {
-      case ProjectStatusSubTask._1: return 'completed';
-      case ProjectStatusSubTask._0: return 'in-progress';
+      case ProjectStatusSubTask.InProgress: return 'completed';
+      case ProjectStatusSubTask.Complited: return 'in-progress';
       default: return 'pending';
     }
   }
 
   private mapTypeToEnum(type: string): SubTaskType {
     // Map string to SubTaskType enum - adjust based on your actual enum values
-    return SubTaskType._0;
+    return SubTaskType.Construction;
   }
 
   private mapEnumToType(type?: SubTaskType): string {

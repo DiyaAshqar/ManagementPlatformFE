@@ -49,10 +49,10 @@ export class CreateProjectDialogComponent implements OnInit {
   agreements = signal<GetAllAgreementDto[]>([]);
 
   statusOptions = [
-    { label: 'To Do', value: ProjectStatus._0 },
-    { label: 'In Progress', value: ProjectStatus._1 },
-    { label: 'Review', value: ProjectStatus._2 },
-    { label: 'Completed', value: ProjectStatus._3 }
+    { label: 'To Do', value: ProjectStatus.ToDO },
+    { label: 'In Progress', value: ProjectStatus.InProgress },
+    { label: 'Review', value: ProjectStatus.Review },
+    { label: 'Completed', value: ProjectStatus.Completed }
   ];
 
   agreementOptions = signal<{ label: string, value: number }[]>([]);
@@ -85,7 +85,7 @@ export class CreateProjectDialogComponent implements OnInit {
       agreementId: [null, [Validators.required]],
       startDate: [new Date(), Validators.required],
       endDate: [null, Validators.required],
-      status: [ProjectStatus._0]
+      status: [ProjectStatus.ToDO]
     });
     
     if (this.project) {
@@ -108,10 +108,10 @@ export class CreateProjectDialogComponent implements OnInit {
 
   mapProjectStatus(status: any): ProjectStatus {
     // Map from the local ProjectStatus enum to API ProjectStatus enum
-    if (status === 'planning') return ProjectStatus._0;
-    if (status === 'in_progress') return ProjectStatus._1;
-    if (status === 'completed') return ProjectStatus._3;
-    return ProjectStatus._0;
+    if (status === 'planning') return ProjectStatus.ToDO;
+    if (status === 'in_progress') return ProjectStatus.InProgress;
+    if (status === 'completed') return ProjectStatus.Completed;
+    return ProjectStatus.ToDO;
   }
 
   loadAgreements(): void {

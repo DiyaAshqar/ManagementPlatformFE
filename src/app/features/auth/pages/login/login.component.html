@@ -1,8 +1,11 @@
 <div class="login-card">
-  <p-card>
-    <div class="text-center mb-4">
-      <h2>{{ 'app.title' | translate }}</h2>
-      <p class="text-secondary">{{ 'auth.signInSubtitle' | translate }}</p>
+  <div class="auth-card">
+    <div class="auth-brand">
+      <div class="auth-logo">
+        <img src="assets/logo/icon.svg" alt="" />
+      </div>
+      <h1>{{ 'app.title' | translate }}</h1>
+      <p class="auth-subtitle">{{ 'auth.signInSubtitle' | translate }}</p>
     </div>
 
     @if (errorMessage()) {
@@ -16,14 +19,17 @@
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="field">
         <label for="email">{{ 'auth.email' | translate }}</label>
-        <input
-          pInputText
-          id="email"
-          type="email"
-          formControlName="email"
-          class="w-full"
-          autocomplete="username"
-          [placeholder]="'auth.emailPlaceholder' | translate" />
+        <p-iconfield>
+          <p-inputicon styleClass="pi pi-envelope" />
+          <input
+            pInputText
+            id="email"
+            type="email"
+            formControlName="email"
+            class="w-full"
+            autocomplete="username"
+            [placeholder]="'auth.emailPlaceholder' | translate" />
+        </p-iconfield>
         @if (email.invalid && email.touched) {
           <small class="p-error block mt-1">
             @if (email.errors?.['required']) {
@@ -37,16 +43,19 @@
 
       <div class="field">
         <label for="password">{{ 'auth.password' | translate }}</label>
-        <p-password
-          inputId="password"
-          formControlName="password"
-          [toggleMask]="true"
-          [feedback]="false"
-          autocomplete="current-password"
-          [placeholder]="'auth.passwordPlaceholder' | translate"
-          styleClass="w-full"
-          [inputStyleClass]="'w-full'">
-        </p-password>
+        <p-iconfield>
+          <p-inputicon styleClass="pi pi-lock" />
+          <p-password
+            inputId="password"
+            formControlName="password"
+            [toggleMask]="true"
+            [feedback]="false"
+            autocomplete="current-password"
+            [placeholder]="'auth.passwordPlaceholder' | translate"
+            styleClass="w-full"
+            [inputStyleClass]="'w-full'">
+          </p-password>
+        </p-iconfield>
         @if (password.invalid && password.touched) {
           <small class="p-error block mt-1">
             @if (password.errors?.['required']) {
@@ -58,7 +67,7 @@
         }
       </div>
 
-      <div class="flex align-items-center justify-content-between mb-3">
+      <div class="flex align-items-center justify-content-between mb-4">
         <div class="field-checkbox m-0">
           <p-checkbox
             formControlName="rememberMe"
@@ -73,28 +82,14 @@
       <p-button
         type="submit"
         [label]="'auth.login' | translate"
-        styleClass="w-full"
+        icon="pi pi-arrow-right"
+        iconPos="right"
+        styleClass="w-full auth-submit"
         size="large"
         [loading]="loading()"
         [disabled]="loading()">
       </p-button>
     </form>
 
-    @if (isMock) {
-      <div class="demo-hint mt-4">
-        <p class="demo-hint-title">{{ 'auth.demo.title' | translate }}</p>
-        <div class="demo-accounts">
-          @for (account of demoAccounts; track account.email) {
-            <button
-              type="button"
-              class="demo-account"
-              (click)="useDemoAccount(account)">
-              <span class="demo-account-role">{{ account.label }}</span>
-              <span class="demo-account-email">{{ account.email }}</span>
-            </button>
-          }
-        </div>
-      </div>
-    }
-  </p-card>
+  </div>
 </div>

@@ -6,9 +6,11 @@ import { environment } from '../../../../environments/environment';
 import { StorageService } from '../../services/storage.service';
 import {
   AuthUser,
+  ChangePasswordRequest,
   Claim,
   LoginRequest,
   LoginResult,
+  RegisterRequest,
 } from '../models/auth.models';
 import { AuthApiService } from './auth-api.service';
 import { JwtService } from './jwt.service';
@@ -104,6 +106,57 @@ export class AuthService {
       next: () => this.completeLogout(),
       error: () => this.completeLogout(),
     });
+  }
+
+  /**
+   * Create a new account. The backend signs the account in immediately, so this
+   * persists the session exactly like {@link login}.
+   */
+  register(request: RegisterRequest): Observable<AuthUser> {
+    return this.authApi.register(request).pipe(
+      map((response) => {
+        if (!response.succeeded || !response.data) {
+          throw new Error(response.message || 'Registration failed. Please try again.');
+        }
+        this.persistSession(response.data);
+        return response.data.user;
+      })
+    );
+  }
+
+  /** Change the current user's password. */
+  changePassword(request: ChangePasswordRequest): Observable<boolean> {
+    return this.authApi.changePassword(request).pipe(
+      map((response) => {
+        if (!response.succeeded) {
+          throw new Error(response.message || 'Failed to change password.');
+        }
+        return response.data ?? true;
+      })
+    );
+  }
+
+  /**
+   * Refresh the current user's profile from the backend and sync local/session
+   * state. Permissions are preserved from the current session since the
+   * backend does not return them on this endpoint (they live in the JWT).
+   */
+  getCurrentUser(): Observable<AuthUser> {
+    return this.authApi.getCurrentUser().pipe(
+      map((response) => {
+        if (!response.succeeded || !response.data) {
+          throw new Error(response.message || 'Failed to load the current user.');
+        }
+
+        const merged: AuthUser = {
+          ...response.data,
+          permissions: this.currentUserSignal()?.permissions ?? response.data.permissions,
+        };
+        this.storage.setItem(this.keys.userStorageKey, merged);
+        this.currentUserSignal.set(merged);
+        return merged;
+      })
+    );
   }
 
   // --- Authorization helpers ---------------------------------------------

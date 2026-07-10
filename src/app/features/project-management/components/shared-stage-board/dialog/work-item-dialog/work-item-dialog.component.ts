@@ -14,6 +14,7 @@ import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
 import { AttachmentType, ICreateTaskCommand, ProjectStatusSubTask, ProjectSubTaskDto } from '../../../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../../../shared/components/documents-table/documents-table.component';
+import { UsersApiService } from '../../../../../user-management/services/users-api.service';
 import { SubtaskApiService } from '../../../../services/subtask-api.service';
 import { TaskService } from '../../../../services/task.service';
 import { SubtaskDialogComponent } from '../subtask-dialog/subtask-dialog.component';
@@ -44,11 +45,13 @@ export class WorkItemDialogComponent implements OnInit {
   private dialogService = inject(DialogService);
   private taskService = inject(TaskService);
   private subtaskApiService = inject(SubtaskApiService);
+  private usersApi = inject(UsersApiService);
 
-  readonly taskAttachmentType = AttachmentType._4;
+  readonly taskAttachmentType = AttachmentType.Task;
 
   subtasks = signal<ProjectSubTaskDto[]>([]);
   isLoadingTaskTypes = signal(false);
+  isLoadingUsers = signal(false);
   isLoadingSubtasks = signal(false);
   projectStageId = signal<number | undefined>(undefined);
   
@@ -81,6 +84,7 @@ export class WorkItemDialogComponent implements OnInit {
   });
 
   workItemTypes: { label: string; value: string }[] = [];
+  userOptions: { label: string; value: number }[] = [];
 
   priorityOptions = [
     { label: 'Low', value: 'low' },
@@ -100,6 +104,7 @@ export class WorkItemDialogComponent implements OnInit {
       if (workItemData.endDate && typeof workItemData.endDate === 'string') {
         workItemData.endDate = new Date(workItemData.endDate);
       }
+      workItemData.assignTo = this.normalizeOptionalNumber(workItemData.assignTo);
       
       // Map taskPoints (plural from WorkItem) to taskPoint (singular for ICreateTaskCommand)
       if (workItemData.taskPoints !== undefined) {
@@ -131,6 +136,7 @@ export class WorkItemDialogComponent implements OnInit {
     
     // Load task types from API
     this.loadTaskTypes();
+    this.loadUsers();
   }
 
   /**
@@ -204,6 +210,30 @@ export class WorkItemDialogComponent implements OnInit {
         this.isLoadingTaskTypes.set(false);
       }
     });
+  }
+
+  private loadUsers(): void {
+    this.isLoadingUsers.set(true);
+
+    this.usersApi.getAllUsers().subscribe({
+      next: (response) => {
+        this.userOptions = (response.data ?? [])
+          .filter(user => user.id != null)
+          .map(user => ({
+            label: user.fullName || user.arabicFullName || user.email || `User ${user.id}`,
+            value: user.id!
+          }));
+        this.isLoadingUsers.set(false);
+      },
+      error: () => this.isLoadingUsers.set(false)
+    });
+  }
+
+  private normalizeOptionalNumber(value: unknown): number | undefined {
+    if (value === null || value === undefined || value === '') return undefined;
+
+    const numberValue = Number(value);
+    return Number.isFinite(numberValue) ? numberValue : undefined;
   }
 
   /**
@@ -345,9 +375,9 @@ export class WorkItemDialogComponent implements OnInit {
   getStatusSeverity(status: ProjectStatusSubTask | undefined): 'success' | 'info' | 'warning' | 'danger' | 'secondary' | 'contrast' {
     // 0 = pending, 1 = in-progress, 2 = completed
     switch (status) {
-      case ProjectStatusSubTask._0:
+      case ProjectStatusSubTask.Complited:
         return 'warning';
-      case ProjectStatusSubTask._1:
+      case ProjectStatusSubTask.InProgress:
         return 'info';
       default:
         return 'secondary';
@@ -357,9 +387,9 @@ export class WorkItemDialogComponent implements OnInit {
   getStatusLabel(status: ProjectStatusSubTask | undefined): string {
     // 0 = pending, 1 = in-progress, 2 = completed
     switch (status) {
-      case ProjectStatusSubTask._0:
+      case ProjectStatusSubTask.Complited:
         return 'Pending';
-      case ProjectStatusSubTask._1:
+      case ProjectStatusSubTask.InProgress:
         return 'In Progress';
       default:
         return 'Unknown';

@@ -21,7 +21,7 @@ import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
 
-import { CreateTaskCommand, StatusTask } from '../../../../../nswag/api-client';
+import { CreateTaskCommand, Responsibility, StatusTask, TaskSource } from '../../../../../nswag/api-client';
 import { TaskService } from '../../services/task.service';
 import { MilestoneTaskDialogComponent } from './dialog/milestone-task-dialog/milestone-task-dialog.component';
 import { SubtaskDialogComponent } from './dialog/subtask-dialog/subtask-dialog.component';
@@ -43,6 +43,10 @@ export interface WorkItem {
   taskId?: number; // Backend task ID for API operations
   projectStageId?: number; // Stage ID that this task belongs to (needed for subtask creation)
   taskTypeId?: number; // Task type ID from API
+  source?: TaskSource;
+  responsibility?: Responsibility;
+  projectMainContractorId?: number;
+  supplierId?: number;
   title: string;
   type: WorkItemType;
   priority: 'low' | 'medium' | 'high' | 'critical';
@@ -207,7 +211,14 @@ export class SharedStageBoardComponent implements OnInit {
       // Call API to update task status only
       if (item.taskId) {
         const apiStatus = this.mapTaskStatusToApiStatus(targetColumn.id);
-        this.taskService.updateTaskStatus(item.taskId, apiStatus).subscribe({
+        this.taskService.updateTaskStatus(
+          item.taskId,
+          apiStatus,
+          item.source,
+          item.responsibility,
+          item.projectMainContractorId,
+          item.supplierId
+        ).subscribe({
           next: (response) => {
             if (response.succeeded) {
               // Emit event for parent to reload all tasks
@@ -221,40 +232,65 @@ export class SharedStageBoardComponent implements OnInit {
 
   openItemDialog(item: WorkItem): void {
     this.selectedItem.set(item);
-    
-    this.dialogRef = this.dialogService.open(WorkItemDialogComponent, {
-      header: 'Edit Work Item',
-      width: '1200px',
-      height: '900px',
-      modal: true,
-      closable: true,
-      data: {
-        mode: 'edit',
-        showExcavationFields: this.showExcavationFields,
-        workItem: {
-          id: item.id,
-          backendTaskId: item.taskId, // Pass the backend task ID for updates
-          projectStageId: item.projectStageId, // Pass the stage ID
-          taskTypeId: item.taskTypeId, // Pass the task type ID
-          title: item.title,
-          type: item.type,
-          priority: item.priority,
-          assignTo: item.assignTo,
-          taskPoints: item.taskPoints,
-          tags: item.tags,
-          description: item.description,
-          startDate: item.startDate,
-          endDate: item.endDate,
-          location: item.location,
-          depth: item.depth,
-          volume: item.volume,
-          soilType: item.soilType,
-          equipment: item.equipment,
-          status: item.status,
-          subtasks: item.subtasks
-        }
-      }
-    });
+
+    const workItem = {
+      id: item.id,
+      backendTaskId: item.taskId,
+      projectStageId: item.projectStageId,
+      taskTypeId: item.taskTypeId,
+      source: item.source,
+      responsibility: item.responsibility,
+      projectMainContractorId: item.projectMainContractorId,
+      supplierId: item.supplierId,
+      title: item.title,
+      type: item.type,
+      priority: item.priority,
+      assignTo: item.assignTo === 'Unassigned' ? undefined : item.assignTo,
+      taskPoint: item.taskPoints,
+      taskPoints: item.taskPoints,
+      tags: item.tags,
+      description: item.description,
+      startDate: item.startDate,
+      endDate: item.endDate,
+      excavationLocation: item.location,
+      excavationDepth: item.depth,
+      excavationVolume: item.volume,
+      excavationSoilType: item.soilType,
+      excavationEquipment: item.equipment,
+      location: item.location,
+      depth: item.depth,
+      volume: item.volume,
+      soilType: item.soilType,
+      equipment: item.equipment,
+      status: item.status,
+      subtasks: item.subtasks
+    };
+
+    this.dialogRef = this.useMilestoneTaskDialog
+      ? this.dialogService.open(MilestoneTaskDialogComponent, {
+          header: 'Edit Task',
+          width: '800px',
+          modal: true,
+          closable: true,
+          data: {
+            mode: 'edit',
+            projectStageId: item.projectStageId ?? this.projectStageId,
+            showExcavationFields: this.showExcavationFields,
+            workItem
+          }
+        })
+      : this.dialogService.open(WorkItemDialogComponent, {
+          header: 'Edit Work Item',
+          width: '1200px',
+          height: '900px',
+          modal: true,
+          closable: true,
+          data: {
+            mode: 'edit',
+            showExcavationFields: this.showExcavationFields,
+            workItem
+          }
+        });
     
     this.dialogRef.onClose.subscribe((result: any) => {
       if (result) {
@@ -263,9 +299,9 @@ export class SharedStageBoardComponent implements OnInit {
           id: result.backendTaskId || item.taskId, // Include the backend task ID for update
           title: result.title,
           description: result.description,
-          assignTo: result.assignTo ? parseInt(result.assignTo) : 0,
+          assignTo: this.toOptionalNumber(result.assignTo),
           priority: this.mapPriorityToNumber(result.priority),
-          taskPoint: result.taskPoint ? parseInt(result.taskPoint) : 0,
+          taskPoint: this.toOptionalNumber(result.taskPoint),
           startDate: result.startDate ? this.parseDateString(result.startDate) : undefined,
           endDate: result.endDate ? this.parseDateString(result.endDate) : undefined,
           excavationLocation: result.excavationLocation || undefined,
@@ -273,6 +309,10 @@ export class SharedStageBoardComponent implements OnInit {
           excavationVolume: result.excavationVolume ? parseFloat(result.excavationVolume) : undefined,
           excavationSoilType: result.excavationSoilType || undefined,
           excavationEquipment: result.excavationEquipment || undefined,
+          source: result.source,
+          responsibility: result.responsibility,
+          projectMainContractorId: this.toOptionalNumber(result.projectMainContractorId),
+          supplierId: this.toOptionalNumber(result.supplierId),
           taskTypeId: result.taskTypeId || 1,
           projectStageId: item.projectStageId,
           status: this.mapTaskStatusToApiStatus(result.status || item.status)
@@ -341,14 +381,12 @@ export class SharedStageBoardComponent implements OnInit {
     this.dialogRef.onClose.subscribe((result: any) => {
       if (result) {
         // Prepare the CreateTaskCommand for API using the proper constructor
-        // Note: when using the milestone task dialog, the Responsibility/Main Contractor/Supplier
-        // selections are captured in the UI but not yet sent to the API until the backend supports these fields.
         const createCommand = new CreateTaskCommand({
           title: result.title,
           description: result.description,
-          assignTo: result.assignTo ? parseInt(result.assignTo) : 0,
+          assignTo: this.toOptionalNumber(result.assignTo),
           priority: this.mapPriorityToNumber(result.priority),
-          taskPoint: result.taskPoint ? parseInt(result.taskPoint) : 0,
+          taskPoint: this.toOptionalNumber(result.taskPoint),
           startDate: result.startDate ? this.parseDateString(result.startDate) : undefined,
           endDate: result.endDate ? this.parseDateString(result.endDate) : undefined,
           excavationLocation: result.excavationLocation || undefined,
@@ -356,6 +394,10 @@ export class SharedStageBoardComponent implements OnInit {
           excavationVolume: result.excavationVolume ? parseFloat(result.excavationVolume) : undefined,
           excavationSoilType: result.excavationSoilType || undefined,
           excavationEquipment: result.excavationEquipment || undefined,
+          source: result.source,
+          responsibility: result.responsibility,
+          projectMainContractorId: this.toOptionalNumber(result.projectMainContractorId),
+          supplierId: this.toOptionalNumber(result.supplierId),
           taskTypeId: result.taskTypeId || 1,
           projectStageId: this.getStageIdFromProjectId(),
           status: this.mapTaskStatusToApiStatus(columnId)
@@ -538,15 +580,15 @@ export class SharedStageBoardComponent implements OnInit {
     switch (status) {
       case TaskStatus.TODO:
       case TaskStatus.BACKLOG:
-        return StatusTask._0; // TODO
+        return StatusTask.ToDO; // TODO
       case TaskStatus.IN_PROGRESS:
-        return StatusTask._1; // In Progress
+        return StatusTask.InProgress; // In Progress
       case TaskStatus.REVIEW:
-        return StatusTask._2; // Review
+        return StatusTask.Review; // Review
       case TaskStatus.DONE:
-        return StatusTask._3; // Done
+        return StatusTask.Completed; // Done
       default:
-        return StatusTask._0; // Default to TODO
+        return StatusTask.ToDO; // Default to TODO
     }
   }
 
@@ -587,6 +629,12 @@ export class SharedStageBoardComponent implements OnInit {
       case 'critical': return 3;
       default: return 1; // Default to medium
     }
+  }
+
+  private toOptionalNumber(value: unknown): number | undefined {
+    if (value === null || value === undefined || value === '') return undefined;
+    const numberValue = Number(value);
+    return Number.isFinite(numberValue) ? numberValue : undefined;
   }
 
   /**

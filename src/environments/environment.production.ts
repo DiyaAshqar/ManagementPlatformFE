@@ -7,9 +7,6 @@ export const environment = {
   enableLogging: false,
   debugMode: false,
   auth: {
-    // Mock auth is enabled until the backend exposes real auth endpoints.
-    // Flip to `false` (and wire the generated AuthClient) when they are ready.
-    useMock: true,
     tokenStorageKey: 'auth_token',
     refreshTokenStorageKey: 'refresh_token',
     userStorageKey: 'current_user',

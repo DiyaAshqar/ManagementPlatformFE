@@ -15,21 +15,14 @@ import { Inject, Optional } from '@angular/core';
 
 /**
  * Enum mapping for AttachmentType with human-readable names
- * AttachmentType enum values:
- * - Agreement = 1
- * - Project = 2
- * - Milestone = 3
- * - Task = 4
- * - ProjectPO = 5
- * - SurveyingVisit = 6
  */
 export const AttachmentTypeMap = {
-  Agreement: AttachmentType._1,
-  Project: AttachmentType._2,
-  Milestone: AttachmentType._3,
-  Task: AttachmentType._4,
-  ProjectPO: AttachmentType._5,
-  SurveyingVisit: AttachmentType._6
+  Agreement: AttachmentType.Agreement,
+  Project: AttachmentType.Project,
+  Milestone: AttachmentType.Milestone,
+  Task: AttachmentType.Task,
+  ProjectPO: AttachmentType.ProjectPO,
+  SurveyingVisit: AttachmentType.SurveyingVisit
 } as const;
 
 export interface AttachmentUploadParams {

@@ -2,6 +2,67 @@
   width: 100%;
 }
 
+.auth-card {
+  width: 100%;
+  background: var(--surface-card);
+  border-radius: 20px;
+  padding: 2.5rem 2.25rem;
+  box-shadow:
+    0 20px 50px -12px rgba(0, 30, 80, 0.35),
+    0 0 0 1px rgba(255, 255, 255, 0.06);
+  animation: auth-card-in 0.4s ease-out;
+}
+
+@keyframes auth-card-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.auth-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.auth-logo {
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 16px;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-600, #0052cc) 100%);
+  box-shadow: 0 8px 20px -6px rgba(10, 132, 255, 0.55);
+
+  img {
+    width: 32px;
+    height: 32px;
+    filter: brightness(0) invert(1);
+  }
+}
+
+.auth-brand h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0 0 0.35rem;
+}
+
+.auth-subtitle {
+  color: var(--text-color-secondary);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
 .field {
   margin-bottom: 1.5rem;
 }
@@ -10,16 +71,24 @@ label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
+  font-size: 0.875rem;
   color: var(--text-color);
 }
 
-.text-secondary {
-  color: var(--text-color-secondary);
+p-iconfield {
+  display: block;
 }
 
-h2 {
-  color: var(--primary-color);
-  margin: 0;
+// p-password renders its <input> inside its own wrapper, so the iconfield's
+// `:not(:first-child)` padding rule never matches it — pad it manually.
+// p-password is also an inline-flex host, which paints its flex-item input
+// above the icon field's absolutely-positioned icon — lift the icon above it.
+:host ::ng-deep .field p-iconfield .p-password-input {
+  padding-inline-start: calc((var(--p-form-field-padding-x, 0.75rem) * 2) + var(--p-icon-size, 1rem));
+}
+
+:host ::ng-deep .field p-iconfield .p-inputicon {
+  z-index: 1;
 }
 
 .field-checkbox {
@@ -30,6 +99,7 @@ h2 {
 .forgot-link {
   color: var(--primary-color);
   text-decoration: none;
+  font-weight: 500;
 
   &:hover {
     text-decoration: underline;
@@ -40,52 +110,15 @@ h2 {
   display: block;
 }
 
-// --- Mock-mode demo account helper ---------------------------------------
-.demo-hint {
-  border-top: 1px dashed var(--surface-border);
-  padding-top: 1rem;
-}
-
-.demo-hint-title {
-  font-size: 0.8rem;
+:host ::ng-deep .auth-submit {
+  border-radius: 10px;
   font-weight: 600;
-  color: var(--text-color-secondary);
-  margin: 0 0 0.5rem;
-  text-transform: uppercase;
-  letter-spacing: 0.03em;
+  padding-block: 0.85rem;
 }
 
-.demo-accounts {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-
-.demo-account {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--surface-border);
-  border-radius: var(--border-radius, 6px);
-  background: var(--surface-50);
-  cursor: pointer;
-  transition: background-color 0.15s ease, border-color 0.15s ease;
-
-  &:hover {
-    background: var(--surface-100);
-    border-color: var(--primary-color);
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 2rem 1.5rem;
+    border-radius: 16px;
   }
-}
-
-.demo-account-role {
-  font-weight: 600;
-  font-size: 0.85rem;
-  color: var(--text-color);
-}
-
-.demo-account-email {
-  font-size: 0.75rem;
-  color: var(--text-color-secondary);
 }

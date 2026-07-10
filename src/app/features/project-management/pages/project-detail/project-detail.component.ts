@@ -73,18 +73,18 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
   // Computed signals for stage IDs
   preparingStageId = computed(() => {
     const stages = this.projectData()?.projectStages;
-    return stages?.find((s: ProjectStageDto) => s.stageType === ProjectStageType._1)?.id || 0;
+    return stages?.find((s: ProjectStageDto) => s.stageType === ProjectStageType.Preparing)?.id || 0;
   });
 
   excavationStageId = computed(() => {
     const stages = this.projectData()?.projectStages;
-    return stages?.find((s: ProjectStageDto) => s.stageType === ProjectStageType._2)?.id || 0;
+    return stages?.find((s: ProjectStageDto) => s.stageType === ProjectStageType.Excavation)?.id || 0;
   });
 
   // Get all milestone stages (stageType = 3) for accordion
   milestoneStages = computed(() => {
     const stages = this.projectData()?.projectStages;
-    return stages?.filter((s: ProjectStageDto) => s.stageType === ProjectStageType._3) || [];
+    return stages?.filter((s: ProjectStageDto) => s.stageType === ProjectStageType.Milestones) || [];
   });
   
   reportTypes: ReportType[] = [];

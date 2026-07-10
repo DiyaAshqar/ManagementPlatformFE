@@ -17,6 +17,7 @@ import {
   CreateProjectBOQCommand,
   IGetProjectBOQDto,
   LookupClient,
+  LookupType,
   ProjectBOQClient,
   SupplierClient
 } from '../../../../../../../nswag/api-client';
@@ -95,7 +96,7 @@ export class BoqTabComponent implements OnInit, OnDestroy {
 
   loadLookups(): void {
     forkJoin({
-      lookups: this.lookupClient.getAllLookups(['unit']),
+      lookups: this.lookupClient.getAllLookups([LookupType.Unit]),
       constructors: this.constructorClient.getAll(1, 200, undefined)
     }).subscribe({
       next: ({ lookups, constructors }) => {

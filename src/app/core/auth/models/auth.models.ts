@@ -1,15 +1,13 @@
 /**
  * Authentication / authorization domain models.
  *
- * These types are intentionally backend-agnostic. They describe the contract
- * the rest of the app depends on. The mock backend and (later) the generated
- * `AuthClient` both map onto these shapes inside `AuthApiService`.
+ * These types describe the authentication contract used by the rest of the
+ * app. The generated `AuthClient` maps onto these shapes in `AuthApiService`.
  */
 
 /**
  * Standard API response envelope used by the backend.
- * Mirrors the generated `*Response` DTOs (e.g. `Int32Response`) so a mock
- * response is a drop-in replacement for the real one.
+ * Mirrors the generated `*Response` DTOs (e.g. `Int32Response`).
  */
 export interface ApiResponse<T> {
   succeeded: boolean;
@@ -31,6 +29,22 @@ export interface LoginRequest {
 export interface RefreshTokenRequest {
   accessToken: string;
   refreshToken: string;
+}
+
+/** Payload to create a new account. */
+export interface RegisterRequest {
+  email: string;
+  password: string;
+  fullName: string;
+  arabicFullName?: string;
+  phoneNumber?: string;
+}
+
+/** Payload to change the current user's password. */
+export interface ChangePasswordRequest {
+  currentPassword: string;
+  newPassword: string;
+  confirmNewPassword: string;
 }
 
 /**

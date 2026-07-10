@@ -29,14 +29,16 @@ import {
   IExpenseDetailDto,
   LookupClient,
   LookupDto,
+  LookupType,
 } from '../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../shared/components/documents-table/documents-table.component';
 import { MaterialSelectComponent } from '../../../../shared/components/material-select/material-select.component';
 import { AdvanceApiService } from '../../services/advance-api.service';
 import { ExpenseApiService } from '../../services/expense-api.service';
 
-// Expense attachment type used by the backend and existing expense documents.
-const EXPENSE_ATTACHMENT_TYPE = AttachmentType._6;
+// The regenerated backend AttachmentType enum has no dedicated Expense value (was numeric 6,
+// which is now SurveyingVisit) - using Milestone as the closest fit until backend adds one.
+const EXPENSE_ATTACHMENT_TYPE = AttachmentType.Milestone;
 
 let _rowSeq = 0;
 const tempId = (): number => --_rowSeq; // negative IDs for unsaved rows
@@ -135,7 +137,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
 
   loadExpenses(): void {
     this.isLoadingList.set(true);
-    this.expenseService.getByProjectStageId(this.projectStageId).subscribe({
+    this.expenseService.getByProjectStageId(this.projectStageId, Number(this.projectId)).subscribe({
       next: (response) => {
         if (response.succeeded && response.data?.data) {
           this.expenses.set(response.data.data);
@@ -148,10 +150,10 @@ export class ProjectExpenseManagementComponent implements OnInit {
 
   private loadLookups(): void {
     this.isLoadingLookups.set(true);
-    this.lookupClient.getAllLookups(['supplier']).subscribe({
+    this.lookupClient.getAllLookups([LookupType.Supplier]).subscribe({
       next: (response) => {
         const data = response.data as Record<string, LookupDto[]>;
-        this.suppliers.set(data?.['supplier'] ?? []);
+        this.suppliers.set(data?.[LookupType.Supplier] ?? []);
         this.isLoadingLookups.set(false);
       },
       error: () => this.isLoadingLookups.set(false),
@@ -321,10 +323,8 @@ export class ProjectExpenseManagementComponent implements OnInit {
       rejectButtonProps: { severity: 'secondary', outlined: true, label: this.translate.instant('common.cancel') },
       accept: () => {
         this.expenseService.delete(expense.id!).subscribe({
-          next: (response) => {
-            if (response.succeeded) {
-              this.expenses.update((prev) => prev.filter((e) => e.id !== expense.id));
-            }
+          next: () => {
+            this.expenses.update((prev) => prev.filter((e) => e.id !== expense.id));
           },
         });
       },

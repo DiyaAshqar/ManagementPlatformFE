@@ -20,9 +20,6 @@
       "passwordRequired": "كلمة المرور مطلوبة",
       "passwordMinLength": "يجب ألا تقل كلمة المرور عن 6 أحرف",
       "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
-    },
-    "demo": {
-      "title": "حسابات تجريبية (وضع المحاكاة) — اضغط للتعبئة"
     }
   },
   "common": {
@@ -47,7 +44,8 @@
     "status": "الحالة",
     "clearFilters": "مسح الفلاتر",
     "attachments": "المرفقات",
-    "total": "الإجمالي"
+    "total": "الإجمالي",
+    "close": "إغلاق"
   },
   "breadcrumb": {
     "home": "الرئيسية",
@@ -267,6 +265,7 @@
       "constructors": "المقاولون",
       "suppliers": "الموردون",
       "materials": "المواد",
+      "users": "المستخدمون",
       "feature1": "ميزة 1",
       "feature2": "ميزة 2"
     },
@@ -1316,6 +1315,90 @@
     "empty": {
       "title": "لا توجد بيانات لعرضها",
       "subtitle": "لم يتم العثور على مقاولين بتواريخ صالحة لهذا المشروع"
+    }
+  },
+  "topNav": {
+    "profileMenu": {
+      "profile": "الملف الشخصي",
+      "changePassword": "تغيير كلمة المرور",
+      "settings": "الإعدادات",
+      "logout": "تسجيل الخروج"
+    }
+  },
+  "changePassword": {
+    "title": "تغيير كلمة المرور",
+    "currentPassword": "كلمة المرور الحالية",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmNewPassword": "تأكيد كلمة المرور الجديدة",
+    "submit": "تغيير كلمة المرور",
+    "errors": {
+      "currentPasswordRequired": "كلمة المرور الحالية مطلوبة",
+      "newPasswordRequired": "كلمة المرور الجديدة مطلوبة",
+      "newPasswordMinLength": "يجب ألا تقل كلمة المرور الجديدة عن 6 أحرف",
+      "confirmPasswordRequired": "يرجى تأكيد كلمة المرور الجديدة",
+      "passwordMismatch": "كلمتا المرور غير متطابقتين"
+    }
+  },
+  "userManagement": {
+    "title": "المستخدمون",
+    "subtitle": "إدارة حسابات المستخدمين والأدوار وصلاحيات الوصول",
+    "searchPlaceholder": "بحث في المستخدمين...",
+    "pagination": "عرض {first} إلى {last} من {totalRecords} مستخدم",
+    "columns": {
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phoneNumber": "رقم الهاتف",
+      "roles": "الأدوار",
+      "status": "الحالة",
+      "actions": "الإجراءات"
+    },
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "noData": "لم يتم العثور على مستخدمين",
+    "noRoles": "لا توجد أدوار مسندة",
+    "tooltips": {
+      "manageRoles": "إدارة الأدوار",
+      "activate": "تفعيل",
+      "deactivate": "إلغاء التفعيل",
+      "delete": "حذف"
+    },
+    "confirm": {
+      "header": "يرجى التأكيد",
+      "activateMessage": "تفعيل حساب \"{name}\"؟",
+      "deactivateMessage": "إلغاء تفعيل حساب \"{name}\"؟",
+      "deleteMessage": "حذف حساب \"{name}\"؟ يمكن التراجع عن هذا الإجراء من قبل المسؤول."
+    },
+    "rolesDialog": {
+      "title": "إدارة الأدوار",
+      "roleIdLabel": "الدور",
+      "selectRole": "اختر دوراً",
+      "assign": "إسناد",
+      "remove": "إزالة"
+    },
+    "roles": {
+      "admin": "مسؤول",
+      "user": "مستخدم"
+    },
+    "create": "إضافة مستخدم",
+    "createDialog": {
+      "title": "إضافة مستخدم",
+      "fullName": "الاسم الكامل",
+      "fullNamePlaceholder": "أدخل الاسم الكامل",
+      "fullNameRequired": "الاسم الكامل مطلوب",
+      "arabicFullName": "الاسم الكامل (عربي)",
+      "arabicFullNamePlaceholder": "أدخل الاسم الكامل بالعربية",
+      "email": "البريد الإلكتروني",
+      "emailPlaceholder": "أدخل البريد الإلكتروني",
+      "emailRequired": "البريد الإلكتروني مطلوب",
+      "emailInvalid": "يرجى إدخال بريد إلكتروني صالح",
+      "phoneNumber": "رقم الهاتف",
+      "phoneNumberPlaceholder": "أدخل رقم الهاتف",
+      "password": "كلمة المرور",
+      "passwordRequired": "كلمة المرور مطلوبة",
+      "passwordMinLength": "يجب ألا تقل كلمة المرور عن 6 أحرف",
+      "submit": "إنشاء المستخدم"
     }
   }
 }

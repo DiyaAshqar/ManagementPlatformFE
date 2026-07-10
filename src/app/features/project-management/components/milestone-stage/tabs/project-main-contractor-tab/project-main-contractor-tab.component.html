@@ -148,7 +148,9 @@
     [existingContractorDuties]="selectedContractorDuties()"
     [isViewMode]="false"
     [allowEmpty]="true"
+    [persistImmediately]="true"
     (closeDialog)="onContractorDutiesDialogClose()"
+    (contractorDutiesChanged)="onContractorDutiesChanged()"
     (contractorDutyData)="onContractorDutyDataReceived($event)">
   </app-contractor-duties-dialog>
 </ng-container>

@@ -20,9 +20,6 @@
       "passwordRequired": "Password is required",
       "passwordMinLength": "Password must be at least 6 characters",
       "invalidCredentials": "Invalid email or password"
-    },
-    "demo": {
-      "title": "Demo accounts (mock mode) — click to fill"
     }
   },
   "common": {
@@ -47,7 +44,8 @@
     "status": "Status",
     "clearFilters": "Clear Filters",
     "attachments": "Attachments",
-    "total": "Total"
+    "total": "Total",
+    "close": "Close"
   },
   "breadcrumb": {
     "home": "Home",
@@ -271,6 +269,7 @@
       "constructors": "Constructors",
       "suppliers": "Suppliers",
       "materials": "Materials",
+      "users": "Users",
       "feature1": "Feature 1",
       "feature2": "Feature 2"
     },
@@ -1322,6 +1321,90 @@
     "empty": {
       "title": "No timeline data to display",
       "subtitle": "No contractors with valid dates were found for this project"
+    }
+  },
+  "topNav": {
+    "profileMenu": {
+      "profile": "Profile",
+      "changePassword": "Change Password",
+      "settings": "Settings",
+      "logout": "Logout"
+    }
+  },
+  "changePassword": {
+    "title": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "submit": "Change Password",
+    "errors": {
+      "currentPasswordRequired": "Current password is required",
+      "newPasswordRequired": "New password is required",
+      "newPasswordMinLength": "New password must be at least 6 characters",
+      "confirmPasswordRequired": "Please confirm your new password",
+      "passwordMismatch": "Passwords do not match"
+    }
+  },
+  "userManagement": {
+    "title": "Users",
+    "subtitle": "Manage user accounts, roles and access",
+    "searchPlaceholder": "Search users...",
+    "pagination": "Showing {first} to {last} of {totalRecords} users",
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "phoneNumber": "Phone Number",
+      "roles": "Roles",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "noData": "No users found",
+    "noRoles": "No roles assigned",
+    "tooltips": {
+      "manageRoles": "Manage roles",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "delete": "Delete"
+    },
+    "confirm": {
+      "header": "Please confirm",
+      "activateMessage": "Activate the account for \"{name}\"?",
+      "deactivateMessage": "Deactivate the account for \"{name}\"?",
+      "deleteMessage": "Delete the account for \"{name}\"? This can be reversed by an administrator."
+    },
+    "rolesDialog": {
+      "title": "Manage Roles",
+      "roleIdLabel": "Role",
+      "selectRole": "Select a role",
+      "assign": "Assign",
+      "remove": "Remove"
+    },
+    "roles": {
+      "admin": "Admin",
+      "user": "User"
+    },
+    "create": "Add User",
+    "createDialog": {
+      "title": "Add User",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Enter full name",
+      "fullNameRequired": "Full name is required",
+      "arabicFullName": "Full Name (Arabic)",
+      "arabicFullNamePlaceholder": "Enter Arabic full name",
+      "email": "Email",
+      "emailPlaceholder": "Enter email address",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email",
+      "phoneNumber": "Phone Number",
+      "phoneNumberPlaceholder": "Enter phone number",
+      "password": "Password",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "submit": "Create User"
     }
   }
 }
