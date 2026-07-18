@@ -37,7 +37,9 @@ export class AuthApiService {
   /** Authenticate with email/username + password. */
   login(request: LoginRequest): Observable<ApiResponse<LoginResult>> {
     return this.authClient
-      .login(new LoginCommand({ email: request.email, password: request.password }))
+      // The generated backend contract names this identifier `email`, but it
+      // accepts the user's email address or regular username in that field.
+      .login(new LoginCommand({ email: request.username, password: request.password }))
       .pipe(
         map((response) => this.toLoginApiResponse(response)),
         catchError((error) => this.recoverError<LoginResult>(error))

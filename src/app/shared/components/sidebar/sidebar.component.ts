@@ -97,6 +97,12 @@ export class SidebarComponent implements OnInit {
           route: '/users',
           permissions: [Permissions.Users.View, Permissions.Users.Manage],
         },
+        {
+          label: 'sidebar.items.rolesPermissions',
+          icon: 'pi pi-shield',
+          route: '/roles-permissions',
+          permissions: [Permissions.RolesPermissions.View, Permissions.RolesPermissions.Manage],
+        },
       ]
     }
   ];

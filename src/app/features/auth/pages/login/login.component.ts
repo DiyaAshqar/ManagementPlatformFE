@@ -48,13 +48,13 @@ export class LoginComponent {
   readonly errorMessage = signal<string | null>(null);
 
   readonly form = this.fb.nonNullable.group({
-    email: ['', [Validators.required, Validators.email]],
+    username: ['', [Validators.required]],
     password: ['', [Validators.required, Validators.minLength(6)]],
     rememberMe: [false],
   });
 
-  get email() {
-    return this.form.controls.email;
+  get username() {
+    return this.form.controls.username;
   }
 
   get password() {
@@ -70,9 +70,9 @@ export class LoginComponent {
     }
 
     this.loading.set(true);
-    const { email, password, rememberMe } = this.form.getRawValue();
+    const { username, password, rememberMe } = this.form.getRawValue();
 
-    this.authService.login({ email, password, rememberMe }).subscribe({
+    this.authService.login({ username, password, rememberMe }).subscribe({
       next: () => {
         this.loading.set(false);
         this.router.navigateByUrl(this.resolveReturnUrl());

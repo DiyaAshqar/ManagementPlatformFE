@@ -1,0 +1,60 @@
+.roles-permissions-container {
+  margin: 0 auto;
+
+  h1 {
+    color: var(--text-color);
+  }
+
+  :host ::ng-deep {
+    .p-datatable {
+      .p-datatable-tbody > tr {
+        &:hover {
+          background-color: var(--surface-hover);
+        }
+
+        > td {
+          border-bottom: 1px solid var(--surface-border);
+        }
+      }
+    }
+
+    .p-button.p-button-text {
+      &:hover {
+        background-color: var(--surface-hover);
+      }
+    }
+  }
+}
+
+.matrix-table-wrapper {
+  overflow-x: auto;
+}
+
+.matrix-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th,
+  td {
+    padding: 0.75rem;
+    border-bottom: 1px solid var(--surface-border);
+    white-space: nowrap;
+  }
+
+  th {
+    text-align: center;
+    color: var(--text-color-secondary);
+    font-weight: 600;
+  }
+
+  .feature-col {
+    text-align: start;
+    position: sticky;
+    inset-inline-start: 0;
+    background-color: var(--surface-card);
+  }
+
+  tbody tr:hover {
+    background-color: var(--surface-hover);
+  }
+}

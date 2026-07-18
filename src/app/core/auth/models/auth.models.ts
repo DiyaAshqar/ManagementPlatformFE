@@ -18,8 +18,8 @@ export interface ApiResponse<T> {
 
 /** Credentials submitted from the login form. */
 export interface LoginRequest {
-  /** Email or username depending on backend configuration. */
-  email: string;
+  /** Email address or username used to identify the account. */
+  username: string;
   password: string;
   /** When true, the session is persisted across browser restarts. */
   rememberMe?: boolean;
@@ -133,6 +133,16 @@ export const Roles = {
 export type Role = (typeof Roles)[keyof typeof Roles];
 
 /**
+ * Backend role directory, confirmed manually (no `GET /api/Roles` endpoint
+ * exists to fetch this). Keep in sync with the backend's Role table if it
+ * ever changes.
+ */
+export const BACKEND_ROLES: { label: string; value: number }[] = [
+  { label: 'userManagement.roles.admin', value: 1 },
+  { label: 'userManagement.roles.user', value: 2 },
+];
+
+/**
  * Application permissions (fine-grained). Reference these constants from
  * guards, directives and templates rather than hardcoding strings.
  *
@@ -233,6 +243,10 @@ export const Permissions = {
   Users: {
     View: 'users.view',
     Manage: 'users.manage',
+  },
+  RolesPermissions: {
+    View: 'roles-permissions.view',
+    Manage: 'roles-permissions.manage',
   },
 } as const;
 

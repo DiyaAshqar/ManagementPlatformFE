@@ -7,16 +7,15 @@
     "login": "تسجيل الدخول",
     "logout": "تسجيل الخروج",
     "register": "التسجيل",
-    "email": "البريد الإلكتروني",
+    "username": "البريد الإلكتروني أو اسم المستخدم",
     "password": "كلمة المرور",
     "forgotPassword": "نسيت كلمة المرور؟",
     "rememberMe": "تذكرني",
     "signInSubtitle": "سجّل الدخول إلى حسابك",
-    "emailPlaceholder": "أدخل بريدك الإلكتروني",
+    "usernamePlaceholder": "أدخل بريدك الإلكتروني أو اسم المستخدم",
     "passwordPlaceholder": "أدخل كلمة المرور",
     "errors": {
-      "emailRequired": "البريد الإلكتروني مطلوب",
-      "emailInvalid": "يرجى إدخال بريد إلكتروني صالح",
+      "usernameRequired": "البريد الإلكتروني أو اسم المستخدم مطلوب",
       "passwordRequired": "كلمة المرور مطلوبة",
       "passwordMinLength": "يجب ألا تقل كلمة المرور عن 6 أحرف",
       "invalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة"
@@ -266,6 +265,7 @@
       "suppliers": "الموردون",
       "materials": "المواد",
       "users": "المستخدمون",
+      "rolesPermissions": "الأدوار والصلاحيات",
       "feature1": "ميزة 1",
       "feature2": "ميزة 2"
     },
@@ -1411,6 +1411,70 @@
       "passwordRequired": "كلمة المرور مطلوبة",
       "passwordMinLength": "يجب ألا تقل كلمة المرور عن 6 أحرف",
       "submit": "إنشاء المستخدم"
+    }
+  },
+  "rolesPermissions": {
+    "title": "الأدوار والصلاحيات",
+    "subtitle": "إدارة الميزات والصلاحيات وأدوار الوصول",
+    "confirmHeader": "يرجى التأكيد",
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "tabs": {
+      "features": "الميزات",
+      "permissions": "الصلاحيات",
+      "rolePermissions": "صلاحيات الأدوار"
+    },
+    "features": {
+      "create": "إضافة ميزة",
+      "createDialogTitle": "إضافة ميزة",
+      "editDialogTitle": "تعديل الميزة",
+      "noData": "لم يتم العثور على ميزات",
+      "confirmDelete": "حذف الميزة \"{{name}}\"؟",
+      "columns": {
+        "name": "الاسم",
+        "code": "الرمز",
+        "description": "الوصف",
+        "status": "الحالة"
+      },
+      "dialog": {
+        "name": "الاسم",
+        "namePlaceholder": "أدخل اسم الميزة",
+        "nameRequired": "الاسم مطلوب",
+        "code": "الرمز",
+        "codePlaceholder": "أدخل رمز الميزة",
+        "codeRequired": "الرمز مطلوب",
+        "description": "الوصف",
+        "descriptionPlaceholder": "أدخل وصفاً مختصراً",
+        "isActive": "نشط"
+      }
+    },
+    "permissions": {
+      "create": "إضافة صلاحية",
+      "createDialogTitle": "إضافة صلاحية",
+      "editDialogTitle": "تعديل الصلاحية",
+      "noData": "لم يتم العثور على صلاحيات",
+      "confirmDelete": "حذف الصلاحية \"{{name}}\"؟",
+      "columns": {
+        "name": "الاسم",
+        "code": "الرمز"
+      },
+      "dialog": {
+        "name": "الاسم",
+        "namePlaceholder": "أدخل اسم الصلاحية",
+        "nameRequired": "الاسم مطلوب",
+        "code": "الرمز",
+        "codePlaceholder": "أدخل رمز الصلاحية",
+        "codeRequired": "الرمز مطلوب"
+      }
+    },
+    "rolePermissions": {
+      "roleLabel": "الدور",
+      "selectRole": "اختر دوراً",
+      "selectRoleHint": "اختر دوراً لعرض وتعديل صلاحياته",
+      "featureColumn": "الميزة",
+      "noData": "لا توجد ميزات أو صلاحيات متاحة بعد"
     }
   }
 }

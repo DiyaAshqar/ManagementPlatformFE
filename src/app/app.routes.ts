@@ -160,6 +160,12 @@ export const routes: Routes = [
         canActivate: [permissionGuard([Permissions.Users.View, Permissions.Users.Manage])],
         loadComponent: () => import('./features/user-management/pages/user-list/user-list.component')
           .then(m => m.UserListComponent)
+      },
+      {
+        path: 'roles-permissions',
+        canActivate: [permissionGuard([Permissions.RolesPermissions.View, Permissions.RolesPermissions.Manage])],
+        loadComponent: () => import('./features/roles-permissions/pages/roles-permissions/roles-permissions.component')
+          .then(m => m.RolesPermissionsComponent)
       }
     ]
   },

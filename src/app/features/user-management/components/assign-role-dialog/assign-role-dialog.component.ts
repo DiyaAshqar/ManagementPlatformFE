@@ -11,17 +11,8 @@ import { SelectModule } from 'primeng/select';
 import { TagModule } from 'primeng/tag';
 
 import { BooleanResponse, UserDto } from '../../../../../nswag/api-client';
+import { BACKEND_ROLES } from '../../../../core/auth/models/auth.models';
 import { UsersApiService } from '../../services/users-api.service';
-
-/**
- * Backend role directory, confirmed manually (no `GET /api/Roles` endpoint
- * exists to fetch this). Keep in sync with the backend's Role table if it
- * ever changes.
- */
-export const BACKEND_ROLES: { label: string; value: number }[] = [
-  { label: 'userManagement.roles.admin', value: 1 },
-  { label: 'userManagement.roles.user', value: 2 },
-];
 
 @Component({
   selector: 'app-assign-role-dialog',

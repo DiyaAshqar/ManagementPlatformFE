@@ -18,24 +18,22 @@
 
     <form [formGroup]="form" (ngSubmit)="onSubmit()">
       <div class="field">
-        <label for="email">{{ 'auth.email' | translate }}</label>
+        <label for="username">{{ 'auth.username' | translate }}</label>
         <p-iconfield>
           <p-inputicon styleClass="pi pi-envelope" />
           <input
             pInputText
-            id="email"
-            type="email"
-            formControlName="email"
+            id="username"
+            type="text"
+            formControlName="username"
             class="w-full"
             autocomplete="username"
-            [placeholder]="'auth.emailPlaceholder' | translate" />
+            [placeholder]="'auth.usernamePlaceholder' | translate" />
         </p-iconfield>
-        @if (email.invalid && email.touched) {
+        @if (username.invalid && username.touched) {
           <small class="p-error block mt-1">
-            @if (email.errors?.['required']) {
-              {{ 'auth.errors.emailRequired' | translate }}
-            } @else if (email.errors?.['email']) {
-              {{ 'auth.errors.emailInvalid' | translate }}
+            @if (username.errors?.['required']) {
+              {{ 'auth.errors.usernameRequired' | translate }}
             }
           </small>
         }

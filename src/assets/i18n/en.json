@@ -7,16 +7,15 @@
     "login": "Login",
     "logout": "Logout",
     "register": "Register",
-    "email": "Email",
+    "username": "Email or Username",
     "password": "Password",
     "forgotPassword": "Forgot Password?",
     "rememberMe": "Remember Me",
     "signInSubtitle": "Sign in to your account",
-    "emailPlaceholder": "Enter your email",
+    "usernamePlaceholder": "Enter your email or username",
     "passwordPlaceholder": "Enter your password",
     "errors": {
-      "emailRequired": "Email is required",
-      "emailInvalid": "Please enter a valid email",
+      "usernameRequired": "Email or username is required",
       "passwordRequired": "Password is required",
       "passwordMinLength": "Password must be at least 6 characters",
       "invalidCredentials": "Invalid email or password"
@@ -270,6 +269,7 @@
       "suppliers": "Suppliers",
       "materials": "Materials",
       "users": "Users",
+      "rolesPermissions": "Roles & Permissions",
       "feature1": "Feature 1",
       "feature2": "Feature 2"
     },
@@ -1417,6 +1417,70 @@
       "passwordRequired": "Password is required",
       "passwordMinLength": "Password must be at least 6 characters",
       "submit": "Create User"
+    }
+  },
+  "rolesPermissions": {
+    "title": "Roles & Permissions",
+    "subtitle": "Manage features, permissions and role access",
+    "confirmHeader": "Please confirm",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "tabs": {
+      "features": "Features",
+      "permissions": "Permissions",
+      "rolePermissions": "Role Permissions"
+    },
+    "features": {
+      "create": "Add Feature",
+      "createDialogTitle": "Add Feature",
+      "editDialogTitle": "Edit Feature",
+      "noData": "No features found",
+      "confirmDelete": "Delete the feature \"{{name}}\"?",
+      "columns": {
+        "name": "Name",
+        "code": "Code",
+        "description": "Description",
+        "status": "Status"
+      },
+      "dialog": {
+        "name": "Name",
+        "namePlaceholder": "Enter feature name",
+        "nameRequired": "Name is required",
+        "code": "Code",
+        "codePlaceholder": "Enter feature code",
+        "codeRequired": "Code is required",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter a short description",
+        "isActive": "Active"
+      }
+    },
+    "permissions": {
+      "create": "Add Permission",
+      "createDialogTitle": "Add Permission",
+      "editDialogTitle": "Edit Permission",
+      "noData": "No permissions found",
+      "confirmDelete": "Delete the permission \"{{name}}\"?",
+      "columns": {
+        "name": "Name",
+        "code": "Code"
+      },
+      "dialog": {
+        "name": "Name",
+        "namePlaceholder": "Enter permission name",
+        "nameRequired": "Name is required",
+        "code": "Code",
+        "codePlaceholder": "Enter permission code",
+        "codeRequired": "Code is required"
+      }
+    },
+    "rolePermissions": {
+      "roleLabel": "Role",
+      "selectRole": "Select a role",
+      "selectRoleHint": "Select a role to view and edit its permissions",
+      "featureColumn": "Feature",
+      "noData": "No features or permissions available yet"
     }
   }
 }
