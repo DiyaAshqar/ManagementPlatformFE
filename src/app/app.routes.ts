@@ -52,6 +52,11 @@ export const routes: Routes = [
           .then(m => m.ThemeShowcaseComponent)
       },
       {
+        path: 'profile',
+        loadComponent: () => import('./features/profile/profile.component')
+          .then(m => m.ProfileComponent)
+      },
+      {
         path: 'agreement-wizard',
         children: [
           {

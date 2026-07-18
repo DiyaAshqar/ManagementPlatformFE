@@ -43,8 +43,16 @@
       </button>
 
       <!-- User Profile -->
-      <button pButton type="button" icon="pi pi-user" class="p-button-rounded p-button-text"
+      <button pButton type="button" class="p-button-rounded p-button-text profile-button"
         (click)="profileMenu.toggle($event)" [attr.aria-label]="'USER_MENU' | translate">
+        <p-avatar
+          [image]="authService.currentUser()?.avatarUrl"
+          [label]="!authService.currentUser()?.avatarUrl ? userInitials() : undefined"
+          icon="pi pi-user"
+          shape="circle"
+          size="normal">
+        </p-avatar>
+        <span class="profile-name hidden md:inline">{{ authService.currentUser()?.fullName }}</span>
       </button>
 
       <!-- Profile Menu -->

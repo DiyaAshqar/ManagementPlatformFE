@@ -68,6 +68,23 @@
   }
 }
 
+.profile-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline: 0.5rem;
+
+  .profile-name {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--text-color);
+    max-width: 10rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
 ::ng-deep {
   .profile-menu {
     margin-top: 0.5rem;

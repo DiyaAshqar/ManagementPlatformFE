@@ -1482,5 +1482,20 @@
       "featureColumn": "Feature",
       "noData": "No features or permissions available yet"
     }
+  },
+  "profile": {
+    "title": "My Profile",
+    "subtitle": "View your account information",
+    "changePassword": "Change Password",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "fields": {
+      "phoneNumber": "Phone Number",
+      "username": "Username",
+      "memberSince": "Member Since",
+      "lastLogin": "Last Login"
+    }
   }
 }

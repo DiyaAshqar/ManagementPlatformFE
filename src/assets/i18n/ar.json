@@ -1476,5 +1476,20 @@
       "featureColumn": "الميزة",
       "noData": "لا توجد ميزات أو صلاحيات متاحة بعد"
     }
+  },
+  "profile": {
+    "title": "ملفي الشخصي",
+    "subtitle": "عرض معلومات حسابك",
+    "changePassword": "تغيير كلمة المرور",
+    "status": {
+      "active": "نشط",
+      "inactive": "غير نشط"
+    },
+    "fields": {
+      "phoneNumber": "رقم الهاتف",
+      "username": "اسم المستخدم",
+      "memberSince": "عضو منذ",
+      "lastLogin": "آخر تسجيل دخول"
+    }
   }
 }

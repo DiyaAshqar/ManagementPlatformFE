@@ -1,6 +1,6 @@
-import { Component, OnInit, effect, inject } from '@angular/core';
+import { Component, OnInit, computed, effect, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 // PrimeNG Imports
@@ -46,7 +46,22 @@ export class TopNavComponent implements OnInit {
   profileMenuItems: MenuItem[] = [];
   notificationsCount = 3;
 
+  /** Initials fallback for the avatar when the user has no `avatarUrl`. */
+  readonly userInitials = computed<string | undefined>(() => {
+    const name = this.authService.currentUser()?.fullName?.trim();
+    if (!name) {
+      return undefined;
+    }
+    return name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((part) => part[0]?.toUpperCase() ?? '')
+      .join('');
+  });
+
   constructor(
+    private router: Router,
     public themeService: ThemeService,
     public languageService: LanguageService,
     public authService: AuthService,
@@ -117,7 +132,7 @@ export class TopNavComponent implements OnInit {
   }
 
   navigateToProfile(): void {
-    console.log('Navigate to profile');
+    this.router.navigate(['/profile']);
   }
 
   navigateToSettings(): void {

@@ -208,6 +208,11 @@ export class AuthApiService {
       permissions: [],
       featurePermissions: {},
       avatarUrl: data.profileImage,
+      arabicFullName: data.arabicFullName,
+      phoneNumber: data.phoneNumber,
+      isActive: data.isActive,
+      lastLoginDate: data.lastLoginDate,
+      createdDate: data.createdDate,
     };
   }
 

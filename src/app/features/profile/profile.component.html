@@ -1,0 +1,67 @@
+<div class="profile-container p-2">
+  <div class="mb-2">
+    <h1 class="text-3xl font-bold m-0">{{ 'profile.title' | translate }}</h1>
+    <p class="text-color-secondary mt-2">{{ 'profile.subtitle' | translate }}</p>
+  </div>
+
+  @if (user(); as u) {
+    <p-card>
+      <div class="profile-header flex flex-column md:flex-row align-items-center md:align-items-start gap-4">
+        <p-avatar
+          [image]="u.avatarUrl"
+          [label]="!u.avatarUrl ? initials() : undefined"
+          icon="pi pi-user"
+          shape="circle"
+          size="xlarge"
+          styleClass="profile-avatar">
+        </p-avatar>
+
+        <div class="flex-1 flex flex-column gap-2 text-center md:text-left">
+          <div class="text-2xl font-bold">{{ u.fullName || 'N/A' }}</div>
+          @if (u.arabicFullName) {
+            <div class="text-lg text-color-secondary">{{ u.arabicFullName }}</div>
+          }
+          <div class="text-color-secondary">{{ u.email }}</div>
+
+          <div class="flex flex-wrap justify-content-center md:justify-content-start gap-2 mt-2">
+            @for (role of u.roles; track role) {
+              <p-tag [value]="role" severity="info"></p-tag>
+            }
+            @if (u.isActive != null) {
+              <p-tag
+                [value]="(u.isActive ? 'profile.status.active' : 'profile.status.inactive') | translate"
+                [severity]="u.isActive ? 'success' : 'danger'">
+              </p-tag>
+            }
+          </div>
+        </div>
+
+        <p-button
+          [label]="'profile.changePassword' | translate"
+          icon="pi pi-key"
+          [outlined]="true"
+          (onClick)="changePassword()">
+        </p-button>
+      </div>
+
+      <div class="profile-details grid mt-4">
+        <div class="col-12 md:col-6">
+          <div class="detail-label">{{ 'profile.fields.phoneNumber' | translate }}</div>
+          <div class="detail-value">{{ u.phoneNumber || 'N/A' }}</div>
+        </div>
+        <div class="col-12 md:col-6">
+          <div class="detail-label">{{ 'profile.fields.username' | translate }}</div>
+          <div class="detail-value">{{ u.userName || 'N/A' }}</div>
+        </div>
+        <div class="col-12 md:col-6">
+          <div class="detail-label">{{ 'profile.fields.memberSince' | translate }}</div>
+          <div class="detail-value">{{ (u.createdDate | date: 'mediumDate') || 'N/A' }}</div>
+        </div>
+        <div class="col-12 md:col-6">
+          <div class="detail-label">{{ 'profile.fields.lastLogin' | translate }}</div>
+          <div class="detail-value">{{ (u.lastLoginDate | date: 'medium') || 'N/A' }}</div>
+        </div>
+      </div>
+    </p-card>
+  }
+</div>

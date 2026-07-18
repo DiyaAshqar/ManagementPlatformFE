@@ -79,6 +79,16 @@ export interface AuthUser {
   /** Optional extras: avatar, language, tenant, etc. */
   avatarUrl?: string;
   preferredLanguage?: string;
+  /**
+   * Populated from `/api/Auth/me` (not present on the login response) — see
+   * `AuthApiService.mapUserDto`. Undefined until that background refresh
+   * completes.
+   */
+  arabicFullName?: string;
+  phoneNumber?: string;
+  isActive?: boolean;
+  lastLoginDate?: Date;
+  createdDate?: Date;
 }
 
 /**

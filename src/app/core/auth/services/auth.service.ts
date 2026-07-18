@@ -88,6 +88,11 @@ export class AuthService {
           throw new Error(response.message || 'Login failed. Please try again.');
         }
         this.persistSession(response.data);
+        // The login response only carries id/email/fullName/roles — the full
+        // profile (avatar, arabic name, phone) lives on `/api/Auth/me`.
+        // Fetch it in the background so the UI (top nav, etc.) reflects it
+        // without blocking the login flow.
+        this.getCurrentUser().subscribe({ error: () => {} });
         return response.data.user;
       })
     );
@@ -286,10 +291,18 @@ export class AuthService {
     // no usable refresh token, drop the stale session.
     if (this.jwt.isExpired(token, 0)) {
       if (this.getRefreshToken()) {
-        this.refreshToken().subscribe({ error: () => this.clearSession() });
+        this.refreshToken().subscribe({
+          next: () => this.getCurrentUser().subscribe({ error: () => {} }),
+          error: () => this.clearSession(),
+        });
       } else {
         this.clearSession();
       }
+    } else {
+      // Refresh the full profile (avatar, arabic name, phone) in the
+      // background — the persisted session may only have the minimal fields
+      // the login response carries.
+      this.getCurrentUser().subscribe({ error: () => {} });
     }
   }
 

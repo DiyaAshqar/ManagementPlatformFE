@@ -1,0 +1,27 @@
+.profile-container {
+  max-width: 48rem;
+  margin: 0 auto;
+
+  h1 {
+    color: var(--text-color);
+  }
+}
+
+:host ::ng-deep .profile-avatar {
+  width: 6rem;
+  height: 6rem;
+  font-size: 2rem;
+}
+
+.profile-details {
+  .detail-label {
+    font-size: 0.8125rem;
+    color: var(--text-color-secondary);
+    margin-bottom: 0.25rem;
+  }
+
+  .detail-value {
+    font-weight: 600;
+    color: var(--text-color);
+  }
+}
