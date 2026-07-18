@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
@@ -117,7 +117,23 @@ export class SidebarComponent implements OnInit {
     public sidebarService: SidebarService,
     public themeService: ThemeService,
     private authService: AuthService
-  ) {}
+  ) {
+    // Re-runs whenever roles/permissions change (login, refresh, logout) —
+    // shows exactly why each nav item is/isn't visible.
+    effect(() => {
+      const roles = this.authService.roles();
+      const permissions = this.authService.permissions();
+      const allItems = [...this.navSections.flatMap((section) => section.items), ...this.footerItems];
+      const visibility = allItems.map((item) => ({
+        label: item.label,
+        requiredRoles: item.roles,
+        requiredPermissions: item.permissions,
+        visible: this.canShow(item),
+      }));
+      // eslint-disable-next-line no-console
+      console.log('[AuthDebug] Sidebar visibility snapshot', { roles, permissions, visibility });
+    });
+  }
 
   ngOnInit(): void {}
 

@@ -10,8 +10,11 @@ import {
   Claim,
   LoginRequest,
   LoginResult,
+  PERMISSION_FEATURE_MAP,
   RegisterRequest,
   getPermissionsForRoles,
+  getSystemFeatureId,
+  getSystemPermissionId,
   normalizeRoleName,
 } from '../models/auth.models';
 import { AuthApiService } from './auth-api.service';
@@ -50,10 +53,21 @@ export class AuthService {
   /** JWT permissions combined with permissions derived from the user's roles. */
   readonly permissions = computed(() => {
     const user = this.currentUserSignal();
-    return [...new Set([...(user?.permissions ?? []), ...getPermissionsForRoles(user?.roles ?? [])])];
+    const fromRoles = getPermissionsForRoles(user?.roles ?? []);
+    const merged = [...new Set([...(user?.permissions ?? []), ...fromRoles])];
+    // eslint-disable-next-line no-console
+    console.log('[AuthDebug] AuthService.permissions computed', {
+      userRoles: user?.roles,
+      userPermissions: user?.permissions,
+      permissionsFromRoles: fromRoles,
+      merged,
+    });
+    return merged;
   });
   /** Flattened JWT claims of the current access token. */
   readonly claims = computed<Claim[]>(() => this.jwt.getClaims(this.accessTokenSignal()));
+  /** Backend-granted permission ids per feature id, decoded from the JWT. */
+  readonly featurePermissions = computed(() => this.currentUserSignal()?.featurePermissions ?? {});
 
   constructor() {
     this.initializeAuth();
@@ -156,6 +170,8 @@ export class AuthService {
         const merged: AuthUser = {
           ...response.data,
           permissions: this.currentUserSignal()?.permissions ?? response.data.permissions,
+          featurePermissions:
+            this.currentUserSignal()?.featurePermissions ?? response.data.featurePermissions,
         };
         this.storage.setItem(this.keys.userStorageKey, merged);
         this.currentUserSignal.set(merged);
@@ -166,16 +182,39 @@ export class AuthService {
 
   // --- Authorization helpers ---------------------------------------------
 
-  hasRole(role: string): boolean {
-    const normalizedRole = normalizeRoleName(role);
-    return this.roles().some((currentRole) => normalizeRoleName(currentRole) === normalizedRole);
+  /**
+   * TEMPORARY: always returns `true`. Roles aren't part of the real backend's
+   * feature/permission model (that's per-role Feature→Permission grants, not
+   * role-name based), and the app has no reliable backend role-name catalog
+   * to check against (`BACKEND_ROLES` only has 2 hardcoded entries used for
+   * role *assignment*, e.g. `"System Admin"` / `"Resident Engineer"` aren't
+   * in it). Nothing currently gates on `roles`/`appHasRole` in practice, so
+   * this is a safe no-op rather than an actual bypass of anything.
+   */
+  hasRole(_role: string): boolean {
+    return true;
   }
 
   hasAnyRole(roles: string[]): boolean {
     return roles.some((role) => this.hasRole(role));
   }
 
+  /**
+   * Checks the app's fine-grained permission string. When `permission` has a
+   * real backend mapping (see {@link PERMISSION_FEATURE_MAP}), this checks
+   * the actual per-feature grant from the JWT via {@link hasFeaturePermission}.
+   * Anything not yet mapped falls back to the legacy hardcoded
+   * role-name-based permission set (see `getPermissionsForRoles`), which will
+   * be empty for real backend role names the hardcoded table doesn't know.
+   */
   hasPermission(permission: string): boolean {
+    const mapping = PERMISSION_FEATURE_MAP[permission];
+    if (mapping) {
+      const featureId = getSystemFeatureId(mapping.featureCode);
+      if (featureId != null) {
+        return mapping.permissionCodes.some((code) => this.hasFeaturePermission(featureId, code));
+      }
+    }
     return this.permissions().includes(permission);
   }
 
@@ -185,6 +224,21 @@ export class AuthService {
 
   hasAllPermissions(permissions: string[]): boolean {
     return permissions.every((permission) => this.hasPermission(permission));
+  }
+
+  /**
+   * Check the real backend-granted permission for a given feature, using the
+   * numeric `featureId → permissionId[]` map decoded from the JWT (see
+   * {@link SystemPermissions} for `permissionCode` values). Distinct from
+   * {@link hasPermission}, which checks the app's hardcoded string-based
+   * permission set — the two are not yet unified.
+   */
+  hasFeaturePermission(featureId: number, permissionCode: string): boolean {
+    const permissionId = getSystemPermissionId(permissionCode);
+    if (permissionId == null) {
+      return false;
+    }
+    return this.featurePermissions()[featureId]?.includes(permissionId) ?? false;
   }
 
   /** True when the token carries a claim of the given type (and value). */

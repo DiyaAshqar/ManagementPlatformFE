@@ -173,20 +173,28 @@ export class AuthApiService {
   /** Map the backend's auth payload to the app's backend-agnostic `LoginResult`. */
   private mapAuthResponse(data: AuthResponse): LoginResult {
     const accessToken = data.accessToken ?? '';
+    const user: AuthUser = {
+      id: data.id?.toString() ?? '',
+      userName: data.email ?? '',
+      email: data.email ?? '',
+      fullName: data.fullName ?? '',
+      roles: data.roles ?? [],
+      // The backend does not return permissions in the envelope; they are
+      // embedded as claims in the access token itself.
+      permissions: this.jwt.getPermissions(accessToken),
+      featurePermissions: this.jwt.getFeaturePermissions(accessToken),
+    };
+    // eslint-disable-next-line no-console
+    console.log('[AuthDebug] AuthApiService.mapAuthResponse', {
+      backendResponseRoles: data.roles,
+      jwtRoleClaim: this.jwt.getRoles(accessToken),
+      mappedUser: user,
+    });
     return {
       accessToken,
       refreshToken: data.refreshToken ?? '',
       expiresIn: this.expiresInSeconds(accessToken),
-      user: {
-        id: data.id?.toString() ?? '',
-        userName: data.email ?? '',
-        email: data.email ?? '',
-        fullName: data.fullName ?? '',
-        roles: data.roles ?? [],
-        // The backend does not return permissions in the envelope; they are
-        // embedded as claims in the access token itself.
-        permissions: this.jwt.getPermissions(accessToken),
-      },
+      user,
     };
   }
 
@@ -198,6 +206,7 @@ export class AuthApiService {
       fullName: data.fullName ?? '',
       roles: data.roles ?? [],
       permissions: [],
+      featurePermissions: {},
       avatarUrl: data.profileImage,
     };
   }

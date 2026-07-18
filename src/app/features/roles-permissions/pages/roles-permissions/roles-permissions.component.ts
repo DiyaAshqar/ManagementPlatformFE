@@ -20,7 +20,9 @@ import {
   FeaturePermissionsDto,
   PermissionDto,
 } from '../../../../../nswag/api-client';
-import { BACKEND_ROLES } from '../../../../core/auth/models/auth.models';
+import { BACKEND_ROLES, Permissions } from '../../../../core/auth/models/auth.models';
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
+import { AuthService } from '../../../../core/auth/services/auth.service';
 import { FeatureDialogComponent } from '../../components/feature-dialog/feature-dialog.component';
 import { PermissionDialogComponent } from '../../components/permission-dialog/permission-dialog.component';
 import { FeaturesApiService } from '../../services/features-api.service';
@@ -42,6 +44,7 @@ import { RolePermissionsApiService } from '../../services/role-permissions-api.s
     TabsModule,
     TagModule,
     TooltipModule,
+    HasPermissionDirective,
   ],
   templateUrl: './roles-permissions.component.html',
   styleUrls: ['./roles-permissions.component.scss'],
@@ -53,6 +56,10 @@ export class RolesPermissionsComponent implements OnInit {
   private readonly dialogService = inject(DialogService);
   private readonly confirmationService = inject(ConfirmationService);
   private readonly translate = inject(TranslateService);
+  private readonly authService = inject(AuthService);
+
+  /** Auth permission constants, exposed for `*appHasPermission` in the template (named to avoid colliding with the `permissions` PermissionDto[] signal below). */
+  readonly appPermissions = Permissions;
 
   readonly roleOptions = BACKEND_ROLES;
 
@@ -74,6 +81,10 @@ export class RolesPermissionsComponent implements OnInit {
   ngOnInit(): void {
     this.loadFeatures();
     this.loadPermissions();
+  }
+
+  canManage(): boolean {
+    return this.authService.hasPermission(Permissions.RolesPermissions.Manage);
   }
 
   // --- Features tab ---

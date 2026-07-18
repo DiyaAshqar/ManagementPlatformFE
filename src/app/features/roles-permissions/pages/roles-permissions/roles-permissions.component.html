@@ -31,6 +31,7 @@
       <p-tabpanel value="0">
         <div class="flex justify-content-end mb-2">
           <p-button
+            *appHasPermission="appPermissions.RolesPermissions.Manage"
             [label]="'rolesPermissions.features.create' | translate"
             icon="pi pi-plus"
             (onClick)="createFeature()"
@@ -66,7 +67,7 @@
                 </p-tag>
               </td>
               <td>
-                <div class="flex gap-2">
+                <div class="flex gap-2" *appHasPermission="appPermissions.RolesPermissions.Manage">
                   <p-button
                     icon="pi pi-pencil"
                     (onClick)="editFeature(feature)"
@@ -107,6 +108,7 @@
       <p-tabpanel value="1">
         <div class="flex justify-content-end mb-2">
           <p-button
+            *appHasPermission="appPermissions.RolesPermissions.Manage"
             [label]="'rolesPermissions.permissions.create' | translate"
             icon="pi pi-plus"
             (onClick)="createPermission()"
@@ -133,7 +135,7 @@
               <td>{{ permission.name || 'N/A' }}</td>
               <td>{{ permission.code || 'N/A' }}</td>
               <td>
-                <div class="flex gap-2">
+                <div class="flex gap-2" *appHasPermission="appPermissions.RolesPermissions.Manage">
                   <p-button
                     icon="pi pi-pencil"
                     (onClick)="editPermission(permission)"
@@ -194,6 +196,7 @@
           </div>
 
           <p-button
+            *appHasPermission="appPermissions.RolesPermissions.Manage"
             [label]="'common.save' | translate"
             icon="pi pi-check"
             [loading]="isSavingMatrix()"
@@ -232,6 +235,7 @@
                       <td class="text-center">
                         <p-checkbox
                           [binary]="true"
+                          [disabled]="!canManage()"
                           [ngModel]="isCellChecked(feature.id!, permission.id!)"
                           [ngModelOptions]="{ standalone: true }"
                           (onChange)="toggleCell(feature.id!, permission.id!)">

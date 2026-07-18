@@ -88,6 +88,15 @@ export const permissionGuard = (
         ? authService.hasAllPermissions(permissions)
         : authService.hasAnyPermission(permissions);
 
+    // eslint-disable-next-line no-console
+    console.log('[AuthDebug] permissionGuard', {
+      route: state.url,
+      requiredPermissions: permissions,
+      mode,
+      userPermissions: authService.permissions(),
+      allowed,
+    });
+
     return allowed ? true : router.createUrlTree(['/dashboard']);
   };
 };

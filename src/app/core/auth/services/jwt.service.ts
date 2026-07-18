@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Claim, ClaimTypes, JwtPayload } from '../models/auth.models';
+import { Claim, ClaimTypes, FeaturePermissionsMap, JwtPayload } from '../models/auth.models';
 
 /**
  * Decodes and inspects JWT access tokens without any external dependency.
@@ -75,16 +75,63 @@ export class JwtService {
     if (!payload) {
       return [];
     }
-    return this.normalizeClaim(payload[ClaimTypes.Role] ?? payload['roles']);
+    const raw = payload[ClaimTypes.Role] ?? payload['roles'];
+    const roles = this.normalizeClaim(raw);
+    // eslint-disable-next-line no-console
+    console.log('[AuthDebug] JwtService.getRoles', { raw, roles });
+    return roles;
   }
 
-  /** Permissions from the token, normalized to a string[]. */
+  /**
+   * Permissions from the token, normalized to a string[]. The real backend's
+   * `permissions` claim is a JSON-encoded feature→permission-id map rather
+   * than a flat list — that shape is skipped here (use
+   * {@link getFeaturePermissions} for it) so it doesn't leak into this list
+   * as a single unusable JSON-blob "permission".
+   */
   getPermissions(token: string | null | undefined): string[] {
     const payload = this.decode(token);
     if (!payload) {
       return [];
     }
-    return this.normalizeClaim(payload[ClaimTypes.Permission] ?? payload['permissions']);
+    const raw = payload[ClaimTypes.Permission] ?? payload['permissions'];
+    if (typeof raw === 'string' && raw.trim().startsWith('{')) {
+      // eslint-disable-next-line no-console
+      console.log('[AuthDebug] JwtService.getPermissions: claim is a feature-permission JSON map, not a flat list — returning []', { raw });
+      return [];
+    }
+    const permissions = this.normalizeClaim(raw);
+    // eslint-disable-next-line no-console
+    console.log('[AuthDebug] JwtService.getPermissions', { raw, permissions });
+    return permissions;
+  }
+
+  /**
+   * Decode the `permissions` claim's JSON object
+   * (`{"<featureId>": [<permissionId>, ...]}`) into a `featureId → permissionId[]`
+   * map. Returns `{}` if the claim is missing or not in that shape.
+   */
+  getFeaturePermissions(token: string | null | undefined): FeaturePermissionsMap {
+    const payload = this.decode(token);
+    const raw = payload?.[ClaimTypes.Permission] ?? payload?.['permissions'];
+    if (typeof raw !== 'string') {
+      return {};
+    }
+
+    try {
+      const parsed = JSON.parse(raw) as Record<string, number[]>;
+      const result: FeaturePermissionsMap = {};
+      for (const [featureId, permissionIds] of Object.entries(parsed)) {
+        result[Number(featureId)] = permissionIds;
+      }
+      // eslint-disable-next-line no-console
+      console.log('[AuthDebug] JwtService.getFeaturePermissions', { raw, result });
+      return result;
+    } catch (e) {
+      // eslint-disable-next-line no-console
+      console.log('[AuthDebug] JwtService.getFeaturePermissions: failed to parse claim', { raw, error: e });
+      return {};
+    }
   }
 
   private normalizeClaim(value: unknown): string[] {
