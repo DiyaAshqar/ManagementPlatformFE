@@ -181,7 +181,7 @@ export class VoucherOrdersTabComponent implements OnInit {
   }
 
   canManage(): boolean {
-    return this.authService.hasPermission(Permissions.ProjectWork.Manage);
+    return this.authService.hasPermission(Permissions.VoucherOrders.Manage);
   }
 
   getStatusLabel(status?: number): string {

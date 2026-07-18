@@ -11,7 +11,7 @@
   <!-- Toolbar -->
   <div class="vo-toolbar">
     <span class="vo-total-label">{{ 'projectTabs.voucherOrders.totalLabel' | translate }}: {{ voItems().length }}</span>
-      <p-button *appHasPermission="permissions.ProjectWork.Manage"
+      <p-button *appHasPermission="permissions.VoucherOrders.Manage"
         [label]="'projectTabs.voucherOrders.createButton' | translate"
         icon="pi pi-plus"
         (onClick)="openAddDialog()"
@@ -80,7 +80,7 @@
           </p-badge>
         </td>
         <td class="text-center">
-            <div *appHasPermission="permissions.ProjectWork.Manage" class="vo-actions">
+            <div *appHasPermission="permissions.VoucherOrders.Manage" class="vo-actions">
             <p-button
               icon="pi pi-pencil"
               [rounded]="true"
@@ -145,7 +145,7 @@
 
 <!-- Add/Edit Dialog -->
 @if (showVoDialog()) {
-  <app-add-vo-dialog *appHasPermission="permissions.ProjectWork.Manage"
+  <app-add-vo-dialog *appHasPermission="permissions.VoucherOrders.Manage"
     [visible]="showVoDialog()"
     (visibleChange)="showVoDialog.set($event)"
     [projectStageId]="projectStageId"

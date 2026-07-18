@@ -236,7 +236,7 @@ export class PurchaseOrdersTabComponent implements OnInit, OnDestroy {
   }
 
   canManage(): boolean {
-    return this.authService.hasPermission(Permissions.ProjectWork.Manage);
+    return this.authService.hasPermission(Permissions.PurchaseOrders.Manage);
   }
 
   getStatusLabel(status?: number): string {

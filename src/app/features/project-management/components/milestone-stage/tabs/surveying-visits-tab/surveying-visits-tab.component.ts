@@ -179,7 +179,7 @@ export class SurveyingVisitsTabComponent implements OnInit {
   }
 
   canManage(): boolean {
-    return this.authService.hasPermission(Permissions.ProjectWork.Manage);
+    return this.authService.hasPermission(Permissions.SurveyingVisits.Manage);
   }
 
   getStatusLabel(status?: number): string {

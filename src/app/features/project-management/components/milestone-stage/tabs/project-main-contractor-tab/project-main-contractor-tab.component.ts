@@ -345,6 +345,6 @@ export class ProjectMainContractorTabComponent implements OnInit {
   }
 
   canManage(): boolean {
-    return this.authService.hasPermission(Permissions.ProjectWork.Manage);
+    return this.authService.hasPermission(Permissions.MainContractor.Manage);
   }
 }

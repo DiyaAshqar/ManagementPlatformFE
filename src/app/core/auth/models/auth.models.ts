@@ -316,6 +316,18 @@ export const Permissions = {
   ProjectWork: {
     Manage: 'project-work.manage',
   },
+  MainContractor: {
+    Manage: 'main-contractor.manage',
+  },
+  VoucherOrders: {
+    Manage: 'voucher-orders.manage',
+  },
+  SurveyingVisits: {
+    Manage: 'surveying-visits.manage',
+  },
+  PurchaseOrders: {
+    Manage: 'purchase-orders.manage',
+  },
   Constructors: {
     View: 'constructors.view',
     Manage: 'constructors.manage',
@@ -458,8 +470,15 @@ interface FeaturePermissionMapping {
  * and `Permissions.ProjectWork.Manage` are deliberately left unmapped: they
  * either have no corresponding backend feature, or (for `Documents`/
  * `ProjectWork`) are reused across multiple distinct milestone tabs by the
- * same shared component, so a single feature code can't be inferred from the
- * permission string alone. Those fall back to {@link ROLE_PERMISSIONS}.
+ * same shared component (e.g. `SharedStageBoardComponent`, used for both the
+ * Preparing and Excavation stages), so a single feature code can't be
+ * inferred from the permission string alone. Those fall back to
+ * {@link ROLE_PERMISSIONS}.
+ *
+ * `Permissions.MainContractor.Manage`/`VoucherOrders.Manage`/
+ * `SurveyingVisits.Manage`/`PurchaseOrders.Manage` look similar but are each
+ * used by exactly one dedicated milestone-tab component, so — unlike
+ * `ProjectWork.Manage` — they *are* mapped below to their own feature.
  */
 export const PERMISSION_FEATURE_MAP: Record<string, FeaturePermissionMapping> = {
   [Permissions.Projects.View]: { featureCode: 'PROJECTS', permissionCodes: ['READ'] },
@@ -486,6 +505,11 @@ export const PERMISSION_FEATURE_MAP: Record<string, FeaturePermissionMapping> = 
   [Permissions.MilestoneTabs.Advances]: { featureCode: 'PROJECT_MILESTONE_ADVANCE_PAYMENTS', permissionCodes: ['READ'] },
   [Permissions.MilestoneTabs.Tasks]: { featureCode: 'PROJECT_MILESTONE_TASKS', permissionCodes: ['READ'] },
   [Permissions.MilestoneTabs.PaymentClaims]: { featureCode: 'PROJECT_MILESTONE_PAYMENT_CLAIM', permissionCodes: ['READ'] },
+
+  [Permissions.MainContractor.Manage]: { featureCode: 'PROJECT_MILESTONE_MC', permissionCodes: ['CREATE', 'UPDATE', 'DELETE'] },
+  [Permissions.VoucherOrders.Manage]: { featureCode: 'PROJECT_MILESTONE_VO', permissionCodes: ['CREATE', 'UPDATE', 'DELETE'] },
+  [Permissions.SurveyingVisits.Manage]: { featureCode: 'PROJECT_MILESTONE_SURVEYING', permissionCodes: ['CREATE', 'UPDATE', 'DELETE'] },
+  [Permissions.PurchaseOrders.Manage]: { featureCode: 'PROJECT_MILESTONE_PURCHASE_ORDERS', permissionCodes: ['CREATE', 'UPDATE', 'DELETE'] },
 
   [Permissions.Agreements.View]: { featureCode: 'AGREEMENTS', permissionCodes: ['READ'] },
   [Permissions.Agreements.Create]: { featureCode: 'AGREEMENTS', permissionCodes: ['CREATE'] },
