@@ -46,6 +46,7 @@ import { HasPermissionDirective } from '../../../../core/auth/directives/has-per
 export class MilestoneStageComponent implements OnInit {
   readonly permissions = Permissions;
   @Input() projectId!: string;
+  @Input() projectName: string = '';
   @Input() milestoneStages: ProjectStageDto[] = [];
   @Input() agreementId: number = 0;
 

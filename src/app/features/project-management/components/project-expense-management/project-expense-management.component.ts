@@ -33,7 +33,6 @@ import {
 } from '../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../shared/components/documents-table/documents-table.component';
 import { MaterialSelectComponent } from '../../../../shared/components/material-select/material-select.component';
-import { AdvanceApiService } from '../../services/advance-api.service';
 import { ExpenseApiService } from '../../services/expense-api.service';
 import { Permissions } from '../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../core/auth/services/auth.service';
@@ -125,7 +124,6 @@ export class ProjectExpenseManagementComponent implements OnInit {
 
   constructor(
     private expenseService: ExpenseApiService,
-    private advanceService: AdvanceApiService,
     private lookupClient: LookupClient,
     private currencyClient: CurrencyClient,
     private confirmationService: ConfirmationService,
@@ -190,7 +188,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
 
   /** True once this expense has been linked to an advance via settlement — locked from further edits. */
   isLockedByAdvance(expense: GetExpenseDto): boolean {
-    return this.advanceService.isExpenseLocked(expense.id);
+    return !!expense.isLocked;
   }
 
   isLocked(expense: GetExpenseDto): boolean {

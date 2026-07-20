@@ -76,6 +76,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
   readonly permissions = Permissions;
   @Input() projectId!: string;
   @Input() projectStageId: number = 0;
+  @Input() projectName: string = '';
 
   // -- View state --------------------------------------------------------------
   currentView = signal<'list' | 'form'>('list');
@@ -166,7 +167,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
 
   loadAdvances(): void {
     this.isLoadingList.set(true);
-    this.advanceService.getByProjectStageId(this.projectStageId).subscribe({
+    this.advanceService.getByProjectStageId(this.projectStageId, this.projectName).subscribe({
       next: (response) => {
         if (response.succeeded && response.data) {
           this.advances.set(response.data.data);
@@ -340,7 +341,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
       },
     });
 
-    this.advanceService.getAvailableExpenses(advance.id, Number(this.projectId)).subscribe({
+    this.advanceService.getAvailableExpenses(advance.id).subscribe({
       next: (response) => {
         this.availableExpenses.set(response.succeeded && response.data ? response.data.expenses : []);
         this.isLoadingAvailableExpenses.set(false);
@@ -363,10 +364,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
 
     this.isSettling.set(true);
     this.advanceService
-      .settle(
-        { id: advance.id, expenseIds: selected.map((e) => e.id) },
-        selected.map((e) => ({ id: e.id, expenseNo: e.expense_no, amount: e.amount, date: e.date }))
-      )
+      .settle({ id: advance.id, expenseIds: selected.map((e) => e.id) })
       .subscribe({
         next: (response) => {
           this.isSettling.set(false);

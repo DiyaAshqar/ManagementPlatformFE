@@ -1,16 +1,16 @@
 /**
- * Hand-written mirror of the not-yet-deployed `AdvancesController` API.
+ * App-facing shapes for the Advances feature, kept separate from the
+ * generated `nswag/api-client` types so components never depend on the
+ * generated client directly (see AdvanceApiService, the mapping layer
+ * between the two).
  *
  * The backend DTOs (`AdvanceListItemDto`, `AdvanceDetailDto`, etc.) decorate
  * every property with `[JsonPropertyName("snake_case")]`, so the response
- * shapes below use snake_case to match the JSON the real API will send.
+ * shapes below use snake_case to match the JSON the real API sends.
  * The command DTOs (`CreateAdvanceCommand`, etc.) have no such attributes,
- * so they follow this app's normal camelCase convention instead.
- *
- * Once the backend ships and `npm run generate-api` produces a real
- * `AdvanceClient`, these types — and AdvanceApiService's mock branch — go
- * away; the property names here were chosen to match the generated client
- * as closely as possible so call sites barely change.
+ * so they follow this app's normal camelCase convention instead — note the
+ * real backend command uses `paymentMethodId`, mapped from `paymentMethod`
+ * here in AdvanceApiService.
  */
 
 export interface ApiEnvelope<T> {

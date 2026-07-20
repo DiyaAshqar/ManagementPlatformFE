@@ -12,12 +12,6 @@ export const environment = {
     userStorageKey: 'current_user',
     tokenExpirationWarningMinutes: 5
   },
-  advances: {
-    // The AdvancesController/AdvanceClient backend is written but not deployed
-    // yet. Keep `true` until `npm run generate-api` produces an AdvanceClient
-    // and AdvanceApiService's `// REAL API` blocks are wired in.
-    useMock: true
-  },
   api: {
     timeout: 30000, // 30 seconds
     retryAttempts: 3,

@@ -12,7 +12,7 @@ import { providePrimeNG } from 'primeng/config';
 import { DialogService } from 'primeng/dynamicdialog';
 
 import { environment } from '../environments/environment';
-import { AgreementClient, AttachmentClient, AuthClient, LookupClient, ProjectClient, TaskClient, SubTaskClient, ConstructorClient, SupplierClient, ExpenseClient, CurrencyClient, MaterialClient, MaterialCategoryClient, MaterialSubCategoryClient, UsersClient, FeaturesClient, PermissionsClient, RolesClient, API_BASE_URL } from '../nswag/api-client';
+import { AdvancesClient, AgreementClient, AttachmentClient, AuthClient, LookupClient, ProjectClient, TaskClient, SubTaskClient, ConstructorClient, SupplierClient, ExpenseClient, CurrencyClient, MaterialClient, MaterialCategoryClient, MaterialSubCategoryClient, UsersClient, FeaturesClient, PermissionsClient, RolesClient, API_BASE_URL } from '../nswag/api-client';
 import { routes } from './app.routes';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { ErrorInterceptor } from './core/interceptors/error.interceptor';
@@ -69,6 +69,7 @@ export const appConfig: ApplicationConfig = {
     MessageService,
     DialogService,
     DatePipe,
+    AdvancesClient,
     AgreementClient,
     AttachmentClient,
     AuthClient,

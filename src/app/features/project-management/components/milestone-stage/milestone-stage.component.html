@@ -131,7 +131,7 @@
 
                     <p-tabpanel *appHasPermission="permissions.MilestoneTabs.Advances" value="7">
                       @if (shouldLoadTab(stage.id!, '7')) {
-                        <app-project-advance-management [projectId]="projectId" [projectStageId]="stage.id!" class="block mt-3"></app-project-advance-management>
+                        <app-project-advance-management [projectId]="projectId" [projectStageId]="stage.id!" [projectName]="projectName" class="block mt-3"></app-project-advance-management>
                       }
                     </p-tabpanel>
 
