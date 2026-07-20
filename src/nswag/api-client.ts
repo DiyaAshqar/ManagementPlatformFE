@@ -10303,7 +10303,7 @@ export class CreateAdvanceCommand implements ICreateAdvanceCommand {
     advanceDate?: Date;
     amount?: number;
     currency?: string | undefined;
-    paymentMethod?: PaymentMethod;
+    paymentMethodId?: number;
     reference?: string | undefined;
     notes?: string | undefined;
 
@@ -10323,7 +10323,7 @@ export class CreateAdvanceCommand implements ICreateAdvanceCommand {
             this.advanceDate = _data["advanceDate"] ? new Date(_data["advanceDate"].toString()) : undefined as any;
             this.amount = _data["amount"];
             this.currency = _data["currency"];
-            this.paymentMethod = _data["paymentMethod"] ? PaymentMethod.fromJS(_data["paymentMethod"]) : undefined as any;
+            this.paymentMethodId = _data["paymentMethodId"];
             this.reference = _data["reference"];
             this.notes = _data["notes"];
         }
@@ -10343,7 +10343,7 @@ export class CreateAdvanceCommand implements ICreateAdvanceCommand {
         data["advanceDate"] = this.advanceDate ? this.advanceDate.toISOString() : undefined as any;
         data["amount"] = this.amount;
         data["currency"] = this.currency;
-        data["paymentMethod"] = this.paymentMethod ? this.paymentMethod.toJSON() : undefined as any;
+        data["paymentMethodId"] = this.paymentMethodId;
         data["reference"] = this.reference;
         data["notes"] = this.notes;
         return data;
@@ -10356,7 +10356,7 @@ export interface ICreateAdvanceCommand {
     advanceDate?: Date;
     amount?: number;
     currency?: string | undefined;
-    paymentMethod?: PaymentMethod;
+    paymentMethodId?: number;
     reference?: string | undefined;
     notes?: string | undefined;
 }
@@ -22803,7 +22803,7 @@ export class UpdateAdvanceCommand implements IUpdateAdvanceCommand {
     advanceDate?: Date;
     amount?: number;
     currency?: string | undefined;
-    paymentMethod?: PaymentMethod;
+    paymentMethodId?: number;
     reference?: string | undefined;
     notes?: string | undefined;
 
@@ -22824,7 +22824,7 @@ export class UpdateAdvanceCommand implements IUpdateAdvanceCommand {
             this.advanceDate = _data["advanceDate"] ? new Date(_data["advanceDate"].toString()) : undefined as any;
             this.amount = _data["amount"];
             this.currency = _data["currency"];
-            this.paymentMethod = _data["paymentMethod"] ? PaymentMethod.fromJS(_data["paymentMethod"]) : undefined as any;
+            this.paymentMethodId = _data["paymentMethodId"];
             this.reference = _data["reference"];
             this.notes = _data["notes"];
         }
@@ -22845,7 +22845,7 @@ export class UpdateAdvanceCommand implements IUpdateAdvanceCommand {
         data["advanceDate"] = this.advanceDate ? this.advanceDate.toISOString() : undefined as any;
         data["amount"] = this.amount;
         data["currency"] = this.currency;
-        data["paymentMethod"] = this.paymentMethod ? this.paymentMethod.toJSON() : undefined as any;
+        data["paymentMethodId"] = this.paymentMethodId;
         data["reference"] = this.reference;
         data["notes"] = this.notes;
         return data;
@@ -22859,7 +22859,7 @@ export interface IUpdateAdvanceCommand {
     advanceDate?: Date;
     amount?: number;
     currency?: string | undefined;
-    paymentMethod?: PaymentMethod;
+    paymentMethodId?: number;
     reference?: string | undefined;
     notes?: string | undefined;
 }
