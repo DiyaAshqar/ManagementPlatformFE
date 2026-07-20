@@ -1,26 +1,19 @@
-import {
-  HttpErrorResponse,
-  HttpHandlerFn,
-  HttpInterceptorFn,
-  HttpRequest,
-} from '@angular/common/http';
+import { HttpErrorResponse, HttpInterceptorFn, HttpRequest } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { BehaviorSubject, Observable, catchError, filter, switchMap, take, throwError } from 'rxjs';
+import { catchError, switchMap, throwError } from 'rxjs';
 import { AuthService } from '../auth/services/auth.service';
 
 /**
  * Attaches the bearer token to outgoing requests and transparently refreshes an
- * expired token on a `401`, retrying the original request once. Concurrent
- * requests that hit `401` during a refresh wait for the single in-flight
- * refresh instead of each triggering their own.
+ * expired token on a `401`, retrying the original request once.
+ *
+ * Refresh coordination itself lives in `AuthService.refreshToken()` (a shared,
+ * `shareReplay`'d observable) — concurrent requests that hit `401` either
+ * reuse that single in-flight call, or, if it already resolved with a newer
+ * token by the time they get here, just retry with that token directly.
  *
  * Requests to the auth endpoints themselves are never decorated or retried.
  */
-
-// Module-level refresh coordination (shared across all requests).
-let isRefreshing = false;
-const refreshedToken$ = new BehaviorSubject<string | null>(null);
-
 export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
 
@@ -37,49 +30,35 @@ export const AuthInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(authReq).pipe(
     catchError((error: unknown) => {
-      if (
-        error instanceof HttpErrorResponse &&
-        error.status === 401 &&
-        authService.getRefreshToken()
-      ) {
-        return handle401(req, next, authService);
+      if (!(error instanceof HttpErrorResponse) || error.status !== 401) {
+        return throwError(() => error);
       }
-      return throwError(() => error);
+
+      if (!authService.getRefreshToken()) {
+        // No refresh token to try — the session is unrecoverable, force it now.
+        authService.forceLogout();
+        return throwError(() => error);
+      }
+
+      // Another concurrent request may already have completed the refresh.
+      const latestToken = authService.getToken();
+      if (latestToken && latestToken !== token) {
+        return next(addToken(req, latestToken));
+      }
+
+      return authService.refreshToken().pipe(
+        switchMap(() => {
+          const newToken = authService.getToken();
+          return next(newToken ? addToken(req, newToken) : req);
+        }),
+        catchError((refreshError: unknown) => {
+          authService.forceLogout();
+          return throwError(() => refreshError);
+        })
+      );
     })
   );
 };
-
-function handle401(
-  req: HttpRequest<unknown>,
-  next: HttpHandlerFn,
-  authService: AuthService
-): Observable<any> {
-  // A refresh is already running — queue this request until it completes.
-  if (isRefreshing) {
-    return refreshedToken$.pipe(
-      filter((token): token is string => token !== null),
-      take(1),
-      switchMap((token) => next(addToken(req, token)))
-    );
-  }
-
-  isRefreshing = true;
-  refreshedToken$.next(null);
-
-  return authService.refreshToken().pipe(
-    switchMap(() => {
-      const newToken = authService.getToken();
-      isRefreshing = false;
-      refreshedToken$.next(newToken);
-      return next(newToken ? addToken(req, newToken) : req);
-    }),
-    catchError((error: unknown) => {
-      isRefreshing = false;
-      authService.logout();
-      return throwError(() => error);
-    })
-  );
-}
 
 function addToken(req: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
   return req.clone({

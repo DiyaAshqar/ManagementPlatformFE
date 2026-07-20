@@ -1,6 +1,6 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
-import { Observable, map, tap, throwError } from 'rxjs';
+import { Observable, catchError, finalize, map, shareReplay, throwError } from 'rxjs';
 
 import { environment } from '../../../../environments/environment';
 import { StorageService } from '../../services/storage.service';
@@ -12,6 +12,8 @@ import {
   LoginResult,
   PERMISSION_FEATURE_MAP,
   RegisterRequest,
+  SystemFeatures,
+  SystemPermissions,
   getPermissionsForRoles,
   getSystemFeatureId,
   getSystemPermissionId,
@@ -40,6 +42,11 @@ export class AuthService {
   // --- Reactive state -----------------------------------------------------
   private readonly currentUserSignal = signal<AuthUser | null>(null);
   private readonly accessTokenSignal = signal<string | null>(null);
+
+  /** Shared in-flight refresh call — concurrent 401s all await this one request. */
+  private refreshRequest$: Observable<AuthUser> | null = null;
+  /** Bumped on every persist/clear so a late refresh response can't resurrect a stale session. */
+  private sessionRevision = 0;
 
   /** The authenticated user, or `null`. */
   readonly currentUser = this.currentUserSignal.asReadonly();
@@ -88,6 +95,7 @@ export class AuthService {
           throw new Error(response.message || 'Login failed. Please try again.');
         }
         this.persistSession(response.data);
+        this.logUserPermissions(response.data.user);
         // The login response only carries id/email/fullName/roles — the full
         // profile (avatar, arabic name, phone) lives on `/api/Auth/me`.
         // Fetch it in the background so the UI (top nav, etc.) reflects it
@@ -100,9 +108,16 @@ export class AuthService {
 
   /**
    * Exchange the stored refresh token for a fresh access token. Used by the
-   * auth interceptor on `401`. Clears the session if refresh is not possible.
+   * auth interceptor on `401`. Concurrent callers (e.g. several requests
+   * hitting `401` at once) share this single in-flight call instead of each
+   * triggering their own refresh. Clears the session if refresh is not
+   * possible or fails.
    */
   refreshToken(): Observable<AuthUser> {
+    if (this.refreshRequest$) {
+      return this.refreshRequest$;
+    }
+
     const accessToken = this.getToken();
     const refreshToken = this.getRefreshToken();
 
@@ -111,16 +126,31 @@ export class AuthService {
       return throwError(() => new Error('No refresh token available.'));
     }
 
-    return this.authApi.refreshToken({ accessToken, refreshToken }).pipe(
+    const revision = this.sessionRevision;
+    this.refreshRequest$ = this.authApi.refreshToken({ accessToken, refreshToken }).pipe(
       map((response) => {
         if (!response.succeeded || !response.data) {
           throw new Error(response.message || 'Session refresh failed.');
         }
+        // Don't let a late refresh response resurrect a session that was
+        // logged out (or replaced by a new login) while it was in flight.
+        if (this.sessionRevision !== revision) {
+          throw new Error('Authentication session changed during token refresh.');
+        }
         this.persistSession(response.data);
         return response.data.user;
       }),
-      tap({ error: () => this.clearSession() })
+      catchError((error: unknown) => {
+        if (this.sessionRevision === revision) {
+          this.clearSession();
+        }
+        return throwError(() => error);
+      }),
+      finalize(() => (this.refreshRequest$ = null)),
+      shareReplay({ bufferSize: 1, refCount: false })
     );
+
+    return this.refreshRequest$;
   }
 
   /** Log out: notify the backend (best-effort), clear state, go to login. */
@@ -130,6 +160,17 @@ export class AuthService {
       next: () => this.completeLogout(),
       error: () => this.completeLogout(),
     });
+  }
+
+  /**
+   * Force-end an unrecoverable session (no refresh token available, or the
+   * refresh call itself failed) purely locally — no backend round-trip.
+   * Used by the auth interceptor: at this point the access token is already
+   * invalid/cleared, so a `/Auth/logout` call would go out with no bearer
+   * token and just 401 again instead of redirecting.
+   */
+  forceLogout(): void {
+    this.completeLogout();
   }
 
   /**
@@ -286,24 +327,17 @@ export class AuthService {
     // Restore optimistically so the UI is not blocked on a refresh round-trip.
     this.currentUserSignal.set(user);
     this.accessTokenSignal.set(token);
+    this.logUserPermissions(user);
 
-    // If the access token is already expired, try a silent refresh; if there is
-    // no usable refresh token, drop the stale session.
-    if (this.jwt.isExpired(token, 0)) {
-      if (this.getRefreshToken()) {
-        this.refreshToken().subscribe({
-          next: () => this.getCurrentUser().subscribe({ error: () => {} }),
-          error: () => this.clearSession(),
-        });
-      } else {
-        this.clearSession();
-      }
-    } else {
-      // Refresh the full profile (avatar, arabic name, phone) in the
-      // background — the persisted session may only have the minimal fields
-      // the login response carries.
-      this.getCurrentUser().subscribe({ error: () => {} });
-    }
+    // Keep the persisted session on startup, just as we do during SPA
+    // navigation. The first protected request (`/Auth/me` below) goes through
+    // AuthInterceptor: if the access token expired, it transparently exchanges
+    // the refresh token and retries the request. This avoids logging out solely
+    // because the browser restarted while the access token was stale.
+    //
+    // The interceptor is the single owner of refresh/retry behavior, including
+    // the final logout when the backend actually rejects a refresh token.
+    this.getCurrentUser().subscribe({ error: () => {} });
   }
 
   /** Save tokens + user to storage and update signals. */
@@ -314,6 +348,7 @@ export class AuthService {
 
     this.accessTokenSignal.set(result.accessToken);
     this.currentUserSignal.set(result.user);
+    this.sessionRevision += 1;
   }
 
   /** Wipe all session state from storage and signals. */
@@ -324,10 +359,37 @@ export class AuthService {
 
     this.accessTokenSignal.set(null);
     this.currentUserSignal.set(null);
+    this.sessionRevision += 1;
   }
 
   private completeLogout(): void {
     this.clearSession();
     this.router.navigate(['/auth/login']);
+  }
+
+  /** Log the current user's roles + real backend permissions by name (feature code -> permission codes), not raw ids. */
+  private logUserPermissions(user: AuthUser): void {
+    const featureNameById = new Map<number, string>(
+      Object.values(SystemFeatures).map((f) => [f.id, f.code])
+    );
+    const permissionNameById = new Map<number, string>(
+      Object.values(SystemPermissions).map((p) => [p.id, p.code])
+    );
+
+    const byFeature: Record<string, string[]> = {};
+    for (const [featureId, permissionIds] of Object.entries(user.featurePermissions)) {
+      const featureName = featureNameById.get(Number(featureId)) ?? `Feature#${featureId}`;
+      byFeature[featureName] = permissionIds.map(
+        (id) => permissionNameById.get(id) ?? `Permission#${id}`
+      );
+    }
+
+    // eslint-disable-next-line no-console
+    console.log('[AuthDebug] Current user permissions', {
+      user: user.userName,
+      roles: user.roles,
+      appPermissions: user.permissions,
+      featurePermissionsByName: byFeature,
+    });
   }
 }
