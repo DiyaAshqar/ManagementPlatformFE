@@ -26,9 +26,8 @@ import { TaskService } from '../../services/task.service';
 import { MilestoneTaskDialogComponent } from './dialog/milestone-task-dialog/milestone-task-dialog.component';
 import { SubtaskDialogComponent } from './dialog/subtask-dialog/subtask-dialog.component';
 import { WorkItemDialogComponent } from './dialog/work-item-dialog/work-item-dialog.component';
-import { Permissions } from '../../../../core/auth/models/auth.models';
+import { getSystemFeatureId, Permissions } from '../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../core/auth/services/auth.service';
-import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 
 export interface SubTask {
   id: string | number;
@@ -111,21 +110,23 @@ export interface Column {
     AvatarGroupModule,
     ChipModule,
     ProgressBarModule,
-    ConfirmDialogModule,
-    HasPermissionDirective
+    ConfirmDialogModule
   ],
   templateUrl: './shared-stage-board.component.html',
   styleUrls: ['./shared-stage-board.component.scss'],
   providers: [ConfirmationService]
 })
 export class SharedStageBoardComponent implements OnInit {
-  readonly permissions = Permissions;
   @Input() projectId!: string;
   @Input() projectStageId!: number;
   @Input() stageTitle: string = 'Stage Board';
   @Input() stageDescription: string = 'Manage tasks and activities';
   @Input() showExcavationFields: boolean = false; // Controls visibility of excavation-specific fields
   @Input() useMilestoneTaskDialog: boolean = false; // Use the extended milestone task dialog (Responsibility/Main Contractor/Suppliers) for "Add Task"
+  // Real backend feature code (e.g. 'PROJECT_PREPARING', 'PROJECT_EXCAVATION', 'PROJECT_MILESTONE_TASKS') this
+  // board instance represents, used to check the actual CREATE/UPDATE/DELETE grant from the JWT. This component
+  // is reused across three distinct features, so the feature can't be inferred from a single permission string.
+  @Input() featureCode: string = '';
   @Input({ required: true }) columnsInput!: Signal<Column[]>;
   @Output() taskCreated = new EventEmitter<void>();
   @Output() taskUpdated = new EventEmitter<void>();
@@ -526,6 +527,12 @@ export class SharedStageBoardComponent implements OnInit {
   }
 
   canManage(): boolean {
+    const featureId = this.featureCode ? getSystemFeatureId(this.featureCode) : undefined;
+    if (featureId != null) {
+      return ['CREATE', 'UPDATE', 'DELETE'].some((code) =>
+        this.authService.hasFeaturePermission(featureId, code)
+      );
+    }
     return this.authService.hasPermission(Permissions.ProjectWork.Manage);
   }
 

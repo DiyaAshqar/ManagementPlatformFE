@@ -24,6 +24,12 @@ export class PreparingStageComponent implements OnInit {
   @Input() projectStageId!: number; // The projectStageId for Preparing stage (stageType: 1)
   @Input() useMilestoneTaskDialog: boolean = false; // Use the extended milestone task dialog (Responsibility/Main Contractor/Suppliers) for "Add Task"
 
+  // This component is reused for both the project-level Preparing stage and the
+  // Milestone "Tasks" tab (via useMilestoneTaskDialog), which are backed by different features.
+  get featureCode(): string {
+    return this.useMilestoneTaskDialog ? 'PROJECT_MILESTONE_TASKS' : 'PROJECT_PREPARING';
+  }
+
   private tasks = signal<GetProjectTaskDto[]>([]);
   private isLoading = signal<boolean>(true);
 
