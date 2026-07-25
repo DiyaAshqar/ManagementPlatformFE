@@ -14,9 +14,6 @@ import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
 import { AttachmentType } from '../../../../nswag/api-client';
 import { AttachmentMetaData, AttachmentService } from '../../services/attachment.service';
-import { Permissions } from '../../../core/auth/models/auth.models';
-import { AuthService } from '../../../core/auth/services/auth.service';
-import { HasPermissionDirective } from '../../../core/auth/directives/has-permission.directive';
 
 export interface UploadedFile {
   name: string;
@@ -39,14 +36,12 @@ export interface UploadedFile {
     TableModule,
     TagModule,
     TooltipModule,
-    HasPermissionDirective,
   ],
   providers: [ConfirmationService],
   templateUrl: './documents-table.component.html',
   styleUrls: ['./documents-table.component.scss'],
 })
 export class DocumentsTableComponent implements OnInit, OnDestroy {
-  readonly permissions = Permissions;
   /** The entity type (Project=2, Milestone=3, Task=4 …) */
   @Input({ required: true }) attachmentType!: AttachmentType;
   /** The ID of the owning entity */
@@ -58,7 +53,6 @@ export class DocumentsTableComponent implements OnInit, OnDestroy {
   private messageService = inject(MessageService);
   private confirmationService = inject(ConfirmationService);
   private sanitizer = inject(DomSanitizer);
-  private authService = inject(AuthService);
 
   documents = signal<AttachmentMetaData[]>([]);
   selectedFiles = signal<UploadedFile[]>([]);
@@ -103,7 +97,6 @@ export class DocumentsTableComponent implements OnInit, OnDestroy {
   }
 
   openUploadDialog(): void {
-    if (!this.canManage()) return;
     this.showUploadDialog = true;
     this.selectedFiles.set([]);
   }
@@ -115,7 +108,6 @@ export class DocumentsTableComponent implements OnInit, OnDestroy {
   }
 
   onFileSelect(event: Event): void {
-    if (!this.canManage()) return;
     const input = event.target as HTMLInputElement;
     if (input.files) this.addFiles(Array.from(input.files));
     input.value = '';
@@ -137,7 +129,6 @@ export class DocumentsTableComponent implements OnInit, OnDestroy {
     event.preventDefault();
     event.stopPropagation();
     this.isDragging = false;
-    if (!this.canManage()) return;
     if (event.dataTransfer?.files) this.addFiles(Array.from(event.dataTransfer.files));
   }
 
@@ -152,12 +143,10 @@ export class DocumentsTableComponent implements OnInit, OnDestroy {
   }
 
   removeFile(index: number): void {
-    if (!this.canManage()) return;
     this.selectedFiles.set(this.selectedFiles().filter((_, i) => i !== index));
   }
 
   uploadFiles(): void {
-    if (!this.canManage()) return;
     const files = this.selectedFiles();
     if (!files.length) return;
     this.isUploading.set(true);
@@ -263,7 +252,6 @@ export class DocumentsTableComponent implements OnInit, OnDestroy {
   }
 
   confirmDelete(doc: AttachmentMetaData): void {
-    if (!this.canManage()) return;
     this.confirmationService.confirm({
       message: `Are you sure you want to delete "${doc.fileName}"?`,
       header: 'Delete Document',
@@ -350,9 +338,5 @@ export class DocumentsTableComponent implements OnInit, OnDestroy {
 
   getDocumentCountByType(type: string): number {
     return this.documents().filter((d) => d.fileType === type).length;
-  }
-
-  canManage(): boolean {
-    return this.authService.hasPermission(Permissions.Documents.Manage);
   }
 }
