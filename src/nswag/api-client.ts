@@ -7818,7 +7818,7 @@ export class AdvanceDetailDto implements IAdvanceDetailDto {
     engineer_id?: number;
     advance_date?: Date;
     currency?: string | undefined;
-    payment_method?: PaymentMethod;
+    payment_method?: number | undefined;
     notes?: string | undefined;
     reference?: string | undefined;
     expenses?: AdvanceExpenseDto[] | undefined;
@@ -7846,7 +7846,7 @@ export class AdvanceDetailDto implements IAdvanceDetailDto {
             this.engineer_id = _data["engineer_id"];
             this.advance_date = _data["advance_date"] ? new Date(_data["advance_date"].toString()) : undefined as any;
             this.currency = _data["currency"];
-            this.payment_method = _data["payment_method"] ? PaymentMethod.fromJS(_data["payment_method"]) : undefined as any;
+            this.payment_method = _data["payment_method"];
             this.notes = _data["notes"];
             this.reference = _data["reference"];
             if (Array.isArray(_data["expenses"])) {
@@ -7878,7 +7878,7 @@ export class AdvanceDetailDto implements IAdvanceDetailDto {
         data["engineer_id"] = this.engineer_id;
         data["advance_date"] = this.advance_date ? this.advance_date.toISOString() : undefined as any;
         data["currency"] = this.currency;
-        data["payment_method"] = this.payment_method ? this.payment_method.toJSON() : undefined as any;
+        data["payment_method"] = this.payment_method;
         data["notes"] = this.notes;
         data["reference"] = this.reference;
         if (Array.isArray(this.expenses)) {
@@ -7903,7 +7903,7 @@ export interface IAdvanceDetailDto {
     engineer_id?: number;
     advance_date?: Date;
     currency?: string | undefined;
-    payment_method?: PaymentMethod;
+    payment_method?: number | undefined;
     notes?: string | undefined;
     reference?: string | undefined;
     expenses?: AdvanceExpenseDto[] | undefined;
@@ -8090,6 +8090,7 @@ export class AdvanceListItemDto implements IAdvanceListItemDto {
     remaining_balance?: number;
     status?: string | undefined;
     created_at?: Date;
+    advance_date?: Date;
 
     constructor(data?: IAdvanceListItemDto) {
         if (data) {
@@ -8110,6 +8111,7 @@ export class AdvanceListItemDto implements IAdvanceListItemDto {
             this.remaining_balance = _data["remaining_balance"];
             this.status = _data["status"];
             this.created_at = _data["created_at"] ? new Date(_data["created_at"].toString()) : undefined as any;
+            this.advance_date = _data["advance_date"] ? new Date(_data["advance_date"].toString()) : undefined as any;
         }
     }
 
@@ -8130,6 +8132,7 @@ export class AdvanceListItemDto implements IAdvanceListItemDto {
         data["remaining_balance"] = this.remaining_balance;
         data["status"] = this.status;
         data["created_at"] = this.created_at ? this.created_at.toISOString() : undefined as any;
+        data["advance_date"] = this.advance_date ? this.advance_date.toISOString() : undefined as any;
         return data;
     }
 }
@@ -8143,6 +8146,7 @@ export interface IAdvanceListItemDto {
     remaining_balance?: number;
     status?: string | undefined;
     created_at?: Date;
+    advance_date?: Date;
 }
 
 export class AdvanceListResponseDto implements IAdvanceListResponseDto {

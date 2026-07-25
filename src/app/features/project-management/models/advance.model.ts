@@ -38,7 +38,7 @@ export interface AdvanceListItemDto {
   amount: number;
   remaining_balance: number;
   status: AdvanceStatus;
-  created_at: string;
+  advance_date: string;
 }
 
 export interface AdvanceListResponseDto {
@@ -58,7 +58,6 @@ export interface AdvanceExpenseDto {
 export interface AdvanceDetailDto extends AdvanceListItemDto {
   project_stage_id: number;
   engineer_id: number;
-  advance_date: string;
   currency: string;
   payment_method?: number;
   notes?: string;

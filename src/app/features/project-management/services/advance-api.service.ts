@@ -77,7 +77,7 @@ export class AdvanceApiService {
         new ApiCreateAdvanceCommand({
           projectStageId: command.projectStageId,
           engineerId: command.engineerId,
-          advanceDate: command.advanceDate,
+          advanceDate: this.toDateOnlyUtc(command.advanceDate),
           amount: command.amount,
           currency: command.currency,
           paymentMethodId: command.paymentMethod,
@@ -96,7 +96,7 @@ export class AdvanceApiService {
           id: command.id,
           projectStageId: command.projectStageId,
           engineerId: command.engineerId,
-          advanceDate: command.advanceDate,
+          advanceDate: this.toDateOnlyUtc(command.advanceDate),
           amount: command.amount,
           currency: command.currency,
           paymentMethodId: command.paymentMethod,
@@ -162,8 +162,17 @@ export class AdvanceApiService {
       amount: a.amount ?? 0,
       remaining_balance: a.remaining_balance ?? 0,
       status: this.normalizeStatus(a.status),
-      created_at: a.created_at ? new Date(a.created_at).toISOString() : new Date().toISOString(),
+      advance_date: a.advance_date ? new Date(a.advance_date).toISOString() : new Date().toISOString(),
     };
+  }
+
+  /**
+   * The datepicker gives a Date at local midnight; the generated client serializes
+   * it with `.toISOString()`, which shifts it to the previous day in UTC+ zones.
+   * Re-anchor to UTC midnight of the same calendar day before it's serialized.
+   */
+  private toDateOnlyUtc(date: Date): Date {
+    return new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
   }
 
   /** Backend sends lowercase status strings ("open" | "partial" | "settled"); normalize to AdvanceStatus. */
@@ -186,9 +195,8 @@ export class AdvanceApiService {
       ...this.toListItemDto(a),
       project_stage_id: a.project_stage_id ?? 0,
       engineer_id: a.engineer_id ?? 0,
-      advance_date: a.advance_date ? new Date(a.advance_date).toISOString() : new Date().toISOString(),
       currency: a.currency ?? 'JOD',
-      payment_method: a.payment_method?.id,
+      payment_method: a.payment_method,
       notes: a.notes,
       reference: a.reference,
       expenses: (a.expenses ?? []).map((e) => this.toExpenseDto(e)),

@@ -116,7 +116,7 @@
           <td class="text-center text-500 font-medium">{{ i + 1 }}</td>
           <td><span class="font-semibold text-color">{{ advance.advance_no }}</span></td>
           <td>{{ advance.engineer || '—' }}</td>
-          <td>{{ advance.created_at | date: 'yyyy-MM-dd' }}</td>
+          <td>{{ advance.advance_date | date: 'yyyy-MM-dd' }}</td>
           <td class="text-right font-semibold text-color">{{ formatAmount(advance.amount) }}</td>
           <td class="text-right font-semibold text-primary">{{ formatAmount(advance.remaining_balance) }}</td>
           <td class="text-center">
