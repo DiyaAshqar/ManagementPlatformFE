@@ -1,0 +1,98 @@
+<div class="report-viewer" [class.report-viewer--fullscreen]="fullscreen()">
+  <app-report-toolbar
+    [title]="reportTitle"
+    [description]="reportDescription"
+    [lastUpdated]="lastUpdated()"
+    [totalRecords]="totalRecords()"
+    [searchTerm]="searchTerm()"
+    [features]="feat()"
+    [exportFlags]="exportFlags()"
+    [activeFilterCount]="activeFilterCount"
+    [filtersVisible]="filtersVisible()"
+    [columnToggles]="columnToggles()"
+    [isFullscreen]="fullscreen()"
+    [locale]="locale"
+    (searchChange)="onSearch($event)"
+    (toggleFilters)="onToggleFilters()"
+    (refresh)="onRefresh()"
+    (exportRequested)="onExportRequested($event)"
+    (print)="onPrint()"
+    (resetSettings)="onResetSettings()"
+    (toggleFullscreen)="onToggleFullscreen()"
+    (columnsChange)="onColumnsChange($event)"
+    (columnsReset)="onColumnsReset()">
+  </app-report-toolbar>
+
+  @if (filtersVisible() && feat().filters && (config.filters?.length ?? 0) > 0) {
+    <app-report-filter-panel
+      [filters]="config.filters ?? []"
+      [values]="committedFilters()"
+      [filterTemplates]="filterTemplates"
+      (apply)="onApplyFilters($event)"
+      (resetFilters)="onResetFilters()">
+    </app-report-filter-panel>
+  }
+
+  @if (feat().summaries && cardSummaries().length > 0) {
+    <app-report-summary [summaries]="cardSummaries()" [scope]="summaryScope()"></app-report-summary>
+  }
+
+  @if (showGroupBy) {
+    <div class="report-viewer__groupby">
+      <label for="report-groupby">{{ 'reporting.grouping.groupBy' | translate }}</label>
+      <p-select
+        inputId="report-groupby"
+        [options]="groupOptions()"
+        optionLabel="label"
+        optionValue="value"
+        [ngModel]="activeGroup"
+        (ngModelChange)="onGroupByChange($event)"
+        appendTo="body"
+        styleClass="report-viewer__groupby-select">
+      </p-select>
+    </div>
+  }
+
+  <app-report-table
+    [columns]="visibleColumns()"
+    [rows]="viewRows()"
+    [groups]="groupViews()"
+    [grouped]="grouped()"
+    [loading]="loadingState()"
+    [error]="errorState()"
+    [errorMessage]="errorMessage"
+    [emptyMessage]="emptyMessage"
+    [totalRecords]="totalRecords()"
+    [first]="first()"
+    [pageSize]="pageSize()"
+    [pageSizeOptions]="pageSizeOptions()"
+    [paginator]="feat().pagination && !grouped()"
+    [sortState]="sortState()"
+    [features]="feat()"
+    [selectionEnabled]="feat().rowSelection"
+    [selectedIds]="selectedIds()"
+    [allPageSelected]="allPageSelected()"
+    [columnFooters]="columnFooters()"
+    [locale]="locale"
+    [currencyCode]="currencyCode"
+    [cellTemplates]="cellTemplates"
+    [rowActionsTemplate]="rowActionsTemplate"
+    [rowId]="rowId"
+    (lazyLoad)="onTableLazy($event)"
+    (sortChange)="onGroupedSort($event)"
+    (selectionToggle)="onSelectionToggle($event)"
+    (selectAllToggle)="onSelectAll($event)"
+    (retry)="onRefresh()">
+  </app-report-table>
+</div>
+
+<app-report-export-dialog
+  [visible]="exportDialogVisible()"
+  (visibleChange)="exportDialogVisible.set($event)"
+  [config]="config"
+  [columns]="exportColumnOptions()"
+  [format]="exportFormat()"
+  [hasSelection]="hasSelection()"
+  [defaultFileName]="exportFileNameBase"
+  (confirmExport)="onExportConfirm($event)">
+</app-report-export-dialog>

@@ -1,0 +1,111 @@
+<p-dialog
+  [visible]="visible"
+  (visibleChange)="visible = $event; visibleChange.emit($event)"
+  [modal]="true"
+  [draggable]="false"
+  [dismissableMask]="true"
+  [style]="{ width: '32rem' }"
+  [header]="'reporting.export.dialogTitle' | translate">
+
+  <div class="export-dialog">
+    <div class="field">
+      <label for="export-format">{{ 'reporting.export.formatLabel' | translate }}</label>
+      <p-select
+        inputId="export-format"
+        [options]="formatOptions"
+        optionLabel="label"
+        optionValue="value"
+        [(ngModel)]="selectedFormat"
+        appendTo="body"
+        styleClass="w-full">
+      </p-select>
+    </div>
+
+    <div class="field">
+      <label for="export-scope">{{ 'reporting.export.scopeLabel' | translate }}</label>
+      <p-select
+        inputId="export-scope"
+        [options]="scopeOptions"
+        optionLabel="label"
+        optionValue="value"
+        [(ngModel)]="selectedScope"
+        appendTo="body"
+        styleClass="w-full">
+      </p-select>
+    </div>
+
+    <div class="field">
+      <label for="export-columns">{{ 'reporting.export.columnsLabel' | translate }}</label>
+      <p-multiSelect
+        inputId="export-columns"
+        [options]="columns"
+        optionLabel="header"
+        optionValue="key"
+        [(ngModel)]="selectedColumns"
+        [filter]="true"
+        appendTo="body"
+        [placeholder]="'reporting.export.columnsPlaceholder' | translate"
+        styleClass="w-full">
+      </p-multiSelect>
+    </div>
+
+    <div class="field">
+      <label for="export-filename">{{ 'reporting.export.fileNameLabel' | translate }}</label>
+      <input
+        id="export-filename"
+        type="text"
+        pInputText
+        [(ngModel)]="fileName"
+        class="w-full" />
+    </div>
+
+    @if (showOrientation) {
+      <div class="field">
+        <label for="export-orientation">{{ 'reporting.export.orientationLabel' | translate }}</label>
+        <p-select
+          inputId="export-orientation"
+          [options]="orientationOptions"
+          optionLabel="label"
+          optionValue="value"
+          [(ngModel)]="orientation"
+          appendTo="body"
+          styleClass="w-full">
+        </p-select>
+      </div>
+    }
+
+    <div class="export-dialog__toggles">
+      <div class="toggle">
+        <p-checkbox [binary]="true" [(ngModel)]="includeFilters" inputId="inc-filters"></p-checkbox>
+        <label for="inc-filters">{{ 'reporting.export.includeFilters' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-checkbox [binary]="true" [(ngModel)]="includeSummaries" inputId="inc-summaries"></p-checkbox>
+        <label for="inc-summaries">{{ 'reporting.export.includeSummaries' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-checkbox [binary]="true" [(ngModel)]="includeCompanyHeader" inputId="inc-company"></p-checkbox>
+        <label for="inc-company">{{ 'reporting.export.includeCompany' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-checkbox [binary]="true" [(ngModel)]="includeGeneratedDate" inputId="inc-date"></p-checkbox>
+        <label for="inc-date">{{ 'reporting.export.includeDate' | translate }}</label>
+      </div>
+    </div>
+  </div>
+
+  <ng-template pTemplate="footer">
+    <p-button
+      [label]="'reporting.actions.cancel' | translate"
+      severity="secondary"
+      [text]="true"
+      (onClick)="close()">
+    </p-button>
+    <p-button
+      [label]="'reporting.export.confirm' | translate"
+      icon="pi pi-download"
+      [disabled]="!selectedFormat"
+      (onClick)="submit()">
+    </p-button>
+  </ng-template>
+</p-dialog>

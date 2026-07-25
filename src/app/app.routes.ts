@@ -52,6 +52,11 @@ export const routes: Routes = [
           .then(m => m.ThemeShowcaseComponent)
       },
       {
+        path: 'reporting-demo',
+        loadComponent: () => import('./features/reporting/demo/reporting-demo-page/reporting-demo-page.component')
+          .then(m => m.ReportingDemoPageComponent)
+      },
+      {
         path: 'profile',
         loadComponent: () => import('./features/profile/profile.component')
           .then(m => m.ProfileComponent)

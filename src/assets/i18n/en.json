@@ -270,6 +270,7 @@
       "materials": "Materials",
       "users": "Users",
       "rolesPermissions": "Roles & Permissions",
+      "reportingDemo": "Reporting Demo",
       "feature1": "Feature 1",
       "feature2": "Feature 2"
     },
@@ -1496,6 +1497,196 @@
       "username": "Username",
       "memberSince": "Member Since",
       "lastLogin": "Last Login"
+    }
+  },
+  "reporting": {
+    "common": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "actions": {
+      "retry": "Retry",
+      "cancel": "Cancel"
+    },
+    "empty": {
+      "noData": "No records to display.",
+      "error": "Something went wrong while loading this report."
+    },
+    "summary": {
+      "title": "Summary",
+      "scopePage": "Current page totals",
+      "scopeFiltered": "Filtered totals",
+      "scopeAll": "All filtered totals"
+    },
+    "columns": {
+      "title": "Columns",
+      "required": "required",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "selectAll": "Select all",
+      "reset": "Restore defaults"
+    },
+    "filters": {
+      "title": "Filters",
+      "advanced": "Advanced filters",
+      "active": "Active filters: {{count}}",
+      "reset": "Reset",
+      "apply": "Apply",
+      "min": "Min",
+      "max": "Max",
+      "any": "Any",
+      "clearField": "Clear",
+      "invalidRange": "The start value must not be after the end value.",
+      "requiredField": "This filter is required."
+    },
+    "toolbar": {
+      "records": "{{count}} records",
+      "lastUpdated": "Last updated",
+      "searchPlaceholder": "Search…",
+      "filters": "Filters",
+      "export": "Export",
+      "print": "Print",
+      "refresh": "Refresh",
+      "fullscreen": "Fullscreen",
+      "resetSettings": "Reset report settings"
+    },
+    "table": {
+      "actions": "Actions",
+      "pageReport": "Showing {first} to {last} of {totalRecords}",
+      "selectAll": "Select all rows",
+      "selectRow": "Select row",
+      "toggleGroup": "Toggle group"
+    },
+    "grouping": {
+      "none": "None",
+      "groupBy": "Group by"
+    },
+    "export": {
+      "dialogTitle": "Export report",
+      "formatLabel": "Format",
+      "scopeLabel": "Records",
+      "columnsLabel": "Columns",
+      "columnsPlaceholder": "All exportable columns",
+      "fileNameLabel": "File name",
+      "orientationLabel": "Orientation",
+      "includeFilters": "Include applied filters",
+      "includeSummaries": "Include summary totals",
+      "includeCompany": "Include company header",
+      "includeDate": "Include generated date",
+      "confirm": "Export",
+      "emptyTitle": "Nothing to export",
+      "emptyDetail": "There are no records matching the current filters.",
+      "errorTitle": "Export failed",
+      "errorDetail": "The report could not be generated. Please try again.",
+      "successTitle": "Export ready",
+      "successDetail": "Your {{format}} file has been downloaded.",
+      "format": {
+        "excel": "Excel (.xlsx)",
+        "csv": "CSV (.csv)",
+        "pdf": "PDF",
+        "print": "Print"
+      },
+      "scope": {
+        "currentPage": "Current page",
+        "filtered": "All filtered records",
+        "selected": "Selected rows"
+      },
+      "orientation": {
+        "portrait": "Portrait",
+        "landscape": "Landscape"
+      }
+    },
+    "demo": {
+      "pageTitle": "Reporting Module Demo",
+      "pageSubtitle": "A configurable, reusable reporting component — toggle options below to explore every feature.",
+      "title": "Invoice Report",
+      "description": "A detailed report of customer invoices and payments.",
+      "empty": "No invoices match the selected filters.",
+      "columns": {
+        "invoiceNumber": "Invoice #",
+        "customer": "Customer",
+        "customerType": "Type",
+        "branch": "Branch",
+        "invoiceDate": "Invoice Date",
+        "dueDate": "Due Date",
+        "subtotal": "Subtotal",
+        "discount": "Discount",
+        "tax": "Tax",
+        "total": "Total",
+        "paid": "Paid",
+        "remaining": "Remaining",
+        "currency": "Currency",
+        "paymentMethod": "Payment",
+        "status": "Status",
+        "createdBy": "Created By",
+        "notes": "Notes"
+      },
+      "filters": {
+        "invoiceNumber": "Invoice #",
+        "customer": "Customer",
+        "customerType": "Customer Type",
+        "branch": "Branch",
+        "invoiceDate": "Invoice Date",
+        "dueDate": "Due Date",
+        "amount": "Amount",
+        "paymentMethod": "Payment Method",
+        "status": "Status",
+        "fullyPaid": "Fully Paid"
+      },
+      "status": {
+        "draft": "Draft",
+        "pending": "Pending",
+        "paid": "Paid",
+        "partiallyPaid": "Partially Paid",
+        "overdue": "Overdue",
+        "cancelled": "Cancelled"
+      },
+      "customerType": {
+        "individual": "Individual",
+        "company": "Company"
+      },
+      "paymentMethod": {
+        "cash": "Cash",
+        "card": "Card",
+        "bankTransfer": "Bank Transfer"
+      },
+      "summary": {
+        "count": "Total Invoices",
+        "total": "Total Amount",
+        "paid": "Paid Amount",
+        "remaining": "Remaining Amount",
+        "average": "Average Invoice"
+      },
+      "groups": {
+        "customer": "Customer",
+        "status": "Status",
+        "month": "Month"
+      },
+      "controls": {
+        "mode": "Data mode",
+        "client": "Client-side",
+        "server": "Server-side (simulated)",
+        "currency": "Currency",
+        "pageSize": "Page size",
+        "orientation": "PDF orientation",
+        "search": "Search",
+        "filters": "Filters",
+        "pagination": "Pagination",
+        "grouping": "Grouping",
+        "summaries": "Summaries",
+        "rowSelection": "Row selection",
+        "columnSelection": "Column selector",
+        "excel": "Excel export",
+        "csv": "CSV export",
+        "pdf": "PDF export",
+        "print": "Print",
+        "persist": "Persist preferences",
+        "simulate": "Simulate",
+        "loading": "Loading",
+        "empty": "Empty data",
+        "error": "API error",
+        "clearPrefs": "Clear saved preferences"
+      }
     }
   }
 }
