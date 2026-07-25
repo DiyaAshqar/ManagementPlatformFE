@@ -17,6 +17,10 @@ export class UsersApiService {
     return this.usersClient.getAllUsers();
   }
 
+  getAllUserDropdown(): Observable<UserDtoListResponse> {
+    return this.usersClient.getAllUserDropdown();
+  }
+
   getUserById(id: number): Observable<UserDtoResponse> {
     return this.usersClient.getUserById(id);
   }

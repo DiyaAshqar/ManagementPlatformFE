@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 import {
   AdvanceDetailDto as ApiAdvanceDetailDto,
@@ -23,7 +23,8 @@ import {
   SettleAdvanceCommand,
   UpdateAdvanceCommand,
 } from '../models/advance.model';
-import { MOCK_ENGINEERS, advanceStatusSeverity, summarizeAdvances } from './mock-advances.data';
+import { advanceStatusSeverity, summarizeAdvances } from './mock-advances.data';
+import { UsersApiService } from '../../user-management/services/users-api.service';
 
 /**
  * The single seam between the application and the Advances backend
@@ -38,7 +39,10 @@ import { MOCK_ENGINEERS, advanceStatusSeverity, summarizeAdvances } from './mock
  */
 @Injectable({ providedIn: 'root' })
 export class AdvanceApiService {
-  constructor(private advancesClient: AdvancesClient) {}
+  constructor(
+    private advancesClient: AdvancesClient,
+    private usersApiService: UsersApiService
+  ) {}
 
   getByProjectStageId(projectStageId: number, projectName?: string): Observable<ApiEnvelope<AdvanceListResponseDto>> {
     return this.advancesClient.getAll(undefined, undefined, 1, 100, undefined).pipe(
@@ -130,9 +134,19 @@ export class AdvanceApiService {
       .pipe(map(() => ({ succeeded: true, data: true })));
   }
 
-  /** No "engineer" lookup exists on the backend yet — see mock-advances.data.ts. */
   getEngineers(): Observable<ApiEnvelope<EngineerLookupDto[]>> {
-    return of({ succeeded: true, data: MOCK_ENGINEERS });
+    return this.usersApiService.getAllUserDropdown().pipe(
+      map((response) => ({
+        succeeded: response.succeeded ?? false,
+        message: response.message,
+        data: (response.data ?? [])
+          .filter((user) => user.id != null)
+          .map((user) => ({
+            id: user.id!,
+            name: user.fullName || user.arabicFullName || user.email || `User ${user.id}`,
+          })),
+      }))
+    );
   }
 
   statusSeverity(status: AdvanceDetailDto['status']) {
@@ -147,9 +161,24 @@ export class AdvanceApiService {
       engineer: a.engineer ?? '—',
       amount: a.amount ?? 0,
       remaining_balance: a.remaining_balance ?? 0,
-      status: (a.status as AdvanceStatus) ?? 'Open',
+      status: this.normalizeStatus(a.status),
       created_at: a.created_at ? new Date(a.created_at).toISOString() : new Date().toISOString(),
     };
+  }
+
+  /** Backend sends lowercase status strings ("open" | "partial" | "settled"); normalize to AdvanceStatus. */
+  private normalizeStatus(raw: string | undefined): AdvanceStatus {
+    switch ((raw ?? '').trim().toLowerCase()) {
+      case 'open':
+        return 'Open';
+      case 'partial':
+      case 'partiallysettled':
+        return 'PartiallySettled';
+      case 'settled':
+        return 'Settled';
+      default:
+        return 'Open';
+    }
   }
 
   private toDetailDto(a: ApiAdvanceDetailDto): AdvanceDetailDto {

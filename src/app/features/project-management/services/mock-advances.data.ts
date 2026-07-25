@@ -1,26 +1,11 @@
 // ─────────────────────────────────────────────────────────────────────────────
-// What's left here has no real backend equivalent yet:
-//  - MOCK_ENGINEERS: no "engineer" LookupType exists on the backend LookupClient.
-//  - advanceStatusSeverity / summarizeAdvances: pure client-side helpers, not
-//    fake data — kept because the real GET /api/advances list endpoint has no
-//    project/stage filter yet, so AdvanceApiService recomputes the summary
-//    client-side after narrowing results by project name (see
-//    advance-api.service.ts).
+// Pure client-side helpers, not fake data — kept because the real
+// GET /api/advances list endpoint has no project/stage filter yet, so
+// AdvanceApiService recomputes the summary client-side after narrowing
+// results by project name (see advance-api.service.ts).
 // ─────────────────────────────────────────────────────────────────────────────
 
-import { AdvanceListItemDto, AdvanceStatus, AdvanceSummaryDto, EngineerLookupDto } from '../models/advance.model';
-
-/**
- * No backend lookup key exists for "engineer" yet (the generic `LookupClient`
- * doesn't expose one). Seeded here until the backend decides how resident
- * engineers are surfaced (new lookup key vs. dedicated endpoint).
- */
-export const MOCK_ENGINEERS: EngineerLookupDto[] = [
-  { id: 1, name: 'م. أحمد الخطيب' },
-  { id: 2, name: 'م. محمد العمري' },
-  { id: 3, name: 'م. سارة الحسن' },
-  { id: 4, name: 'م. ليلى المصري' },
-];
+import { AdvanceListItemDto, AdvanceStatus, AdvanceSummaryDto } from '../models/advance.model';
 
 export function summarizeAdvances(items: AdvanceListItemDto[]): AdvanceSummaryDto {
   return {
