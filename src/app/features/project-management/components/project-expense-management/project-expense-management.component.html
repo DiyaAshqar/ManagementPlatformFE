@@ -140,8 +140,10 @@
   [closable]="true"
   [dismissableMask]="true"
   appendTo="body"
-  [style]="{ width: '90vw', 'max-width': '1400px' }"
-  [breakpoints]="{ '1160px': '90vw', '640px': '96vw' }">
+  [style]="{ width: '98vw', 'max-width': '1600px', height: '90vh' }"
+  [breakpoints]="{ '960px': '98vw' }"
+  [contentStyle]="{ overflow: 'auto', height: 'calc(90vh - 60px)' }"
+  [maximizable]="true">
 
   @if (selectedExpenseForAttachments && (selectedExpenseForAttachments.id ?? 0) > 0) {
     <app-documents-table

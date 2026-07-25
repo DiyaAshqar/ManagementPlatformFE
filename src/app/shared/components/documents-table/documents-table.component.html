@@ -167,18 +167,20 @@
 <p-dialog
   [(visible)]="showPreviewDialog"
   [modal]="true"
-  [style]="{ width: '80vw', maxWidth: '1000px' }"
+  [style]="{ width: '98vw', height: '95vh', maxWidth: 'none' }"
+  [contentStyle]="{ overflow: 'auto', height: 'calc(95vh - 60px)' }"
   [header]="previewFileName"
   [draggable]="false"
   [resizable]="false"
+  [maximizable]="true"
   (onHide)="closePreviewDialog()">
 
   @if (previewType === 'image' && previewUrl) {
-    <div class="flex justify-content-center">
-      <img [src]="previewUrl" [alt]="previewFileName" style="max-width: 100%; max-height: 70vh; object-fit: contain;" />
+    <div class="flex justify-content-center align-items-center h-full">
+      <img [src]="previewUrl" [alt]="previewFileName" style="max-width: 100%; max-height: 88vh; object-fit: contain;" />
     </div>
   } @else if (previewType === 'pdf' && previewSafeUrl) {
-    <iframe [src]="previewSafeUrl" style="width: 100%; height: 70vh; border: none;"></iframe>
+    <iframe [src]="previewSafeUrl" style="width: 100%; height: 88vh; border: none;"></iframe>
   } @else {
     <div class="flex flex-column align-items-center justify-content-center py-6 text-center">
       <i class="pi pi-eye-slash text-5xl text-400 mb-3"></i>
