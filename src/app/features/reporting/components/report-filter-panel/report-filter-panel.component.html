@@ -1,0 +1,203 @@
+<section class="filter-panel" [attr.aria-label]="'reporting.filters.title' | translate">
+  <div class="filter-panel__grid">
+    @for (filter of basicFilters; track filter.key) {
+      <ng-container [ngTemplateOutlet]="filterField" [ngTemplateOutletContext]="{ $implicit: filter }"></ng-container>
+    }
+  </div>
+
+  @if (advancedFilters.length > 0) {
+    <button type="button" class="filter-panel__advanced-toggle" (click)="toggleAdvanced()">
+      <i class="pi" [ngClass]="showAdvanced ? 'pi-chevron-down' : 'pi-chevron-right'" aria-hidden="true"></i>
+      {{ 'reporting.filters.advanced' | translate }}
+    </button>
+    @if (showAdvanced) {
+      <div class="filter-panel__grid filter-panel__grid--advanced">
+        @for (filter of advancedFilters; track filter.key) {
+          <ng-container [ngTemplateOutlet]="filterField" [ngTemplateOutletContext]="{ $implicit: filter }"></ng-container>
+        }
+      </div>
+    }
+  }
+
+  <div class="filter-panel__actions">
+    <span class="filter-panel__count">
+      {{ 'reporting.filters.active' | translate: { count: activeCount } }}
+    </span>
+    <span class="spacer"></span>
+    <p-button
+      [label]="'reporting.filters.reset' | translate"
+      severity="secondary"
+      [text]="true"
+      icon="pi pi-filter-slash"
+      (onClick)="onReset()">
+    </p-button>
+    <p-button
+      [label]="'reporting.filters.apply' | translate"
+      icon="pi pi-check"
+      [disabled]="!canApply"
+      (onClick)="onApply()">
+    </p-button>
+  </div>
+</section>
+
+<ng-template #filterField let-filter>
+  <div class="filter-field">
+    <label class="filter-field__label" [for]="'flt-' + filter.key">
+      {{ label(filter) }}
+      @if (filter.required) {
+        <span class="filter-field__required" aria-hidden="true">*</span>
+      }
+      @if (value(filter.key) !== null && value(filter.key) !== undefined && value(filter.key) !== '') {
+        <button
+          type="button"
+          class="filter-field__clear"
+          [attr.aria-label]="'reporting.filters.clearField' | translate"
+          (click)="clearField(filter)">
+          <i class="pi pi-times" aria-hidden="true"></i>
+        </button>
+      }
+    </label>
+
+    @switch (filter.type) {
+      @case ('text') {
+        <input
+          [id]="'flt-' + filter.key"
+          type="text"
+          pInputText
+          [ngModel]="value(filter.key)"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="setValue(filter.key, $event)"
+          [placeholder]="placeholder(filter)"
+          class="w-full" />
+      }
+      @case ('number') {
+        <p-inputNumber
+          [inputId]="'flt-' + filter.key"
+          [ngModel]="value(filter.key)"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="setValue(filter.key, $event)"
+          [placeholder]="placeholder(filter)"
+          styleClass="w-full">
+        </p-inputNumber>
+      }
+      @case ('numberRange') {
+        <div class="filter-field__range">
+          <p-inputNumber
+            [inputId]="'flt-' + filter.key + '-from'"
+            [ngModel]="range(filter.key).from"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="setRangePart(filter.key, 'from', $event)"
+            [placeholder]="'reporting.filters.min' | translate"
+            styleClass="w-full">
+          </p-inputNumber>
+          <span class="filter-field__range-sep">–</span>
+          <p-inputNumber
+            [inputId]="'flt-' + filter.key + '-to'"
+            [ngModel]="range(filter.key).to"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="setRangePart(filter.key, 'to', $event)"
+            [placeholder]="'reporting.filters.max' | translate"
+            styleClass="w-full">
+          </p-inputNumber>
+        </div>
+      }
+      @case ('date') {
+        <p-datepicker
+          [inputId]="'flt-' + filter.key"
+          [ngModel]="value(filter.key)"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="setValue(filter.key, $event)"
+          dateFormat="yy-mm-dd"
+          appendTo="body"
+          [showButtonBar]="true"
+          styleClass="w-full">
+        </p-datepicker>
+      }
+      @case ('dateRange') {
+        <p-datepicker
+          [inputId]="'flt-' + filter.key"
+          [ngModel]="value(filter.key)"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="setValue(filter.key, $event)"
+          selectionMode="range"
+          dateFormat="yy-mm-dd"
+          appendTo="body"
+          [showButtonBar]="true"
+          styleClass="w-full">
+        </p-datepicker>
+      }
+      @case ('select') {
+        <p-select
+          [inputId]="'flt-' + filter.key"
+          [options]="optionsFor(filter)"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="value(filter.key)"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="setValue(filter.key, $event)"
+          [showClear]="true"
+          [placeholder]="placeholder(filter)"
+          appendTo="body"
+          styleClass="w-full">
+        </p-select>
+      }
+      @case ('autocomplete') {
+        <p-select
+          [inputId]="'flt-' + filter.key"
+          [options]="optionsFor(filter)"
+          optionLabel="label"
+          optionValue="value"
+          [filter]="true"
+          [ngModel]="value(filter.key)"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="setValue(filter.key, $event)"
+          [showClear]="true"
+          [placeholder]="placeholder(filter)"
+          appendTo="body"
+          styleClass="w-full">
+        </p-select>
+      }
+      @case ('boolean') {
+        <p-select
+          [inputId]="'flt-' + filter.key"
+          [options]="booleanOpts"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="value(filter.key)"
+          [ngModelOptions]="{ standalone: true }"
+          (ngModelChange)="setValue(filter.key, $event)"
+          appendTo="body"
+          styleClass="w-full">
+        </p-select>
+      }
+      @default {
+        @if (hasTemplate(filter)) {
+          <ng-container
+            [ngTemplateOutlet]="templateFor(filter)"
+            [ngTemplateOutletContext]="{ $implicit: value(filter.key), filter: filter, setValue: setValue.bind(this) }">
+          </ng-container>
+        } @else {
+          <p-multiSelect
+            [inputId]="'flt-' + filter.key"
+            [options]="optionsFor(filter)"
+            optionLabel="label"
+            optionValue="value"
+            [ngModel]="value(filter.key)"
+            [ngModelOptions]="{ standalone: true }"
+            (ngModelChange)="setValue(filter.key, $event)"
+            [placeholder]="placeholder(filter)"
+            appendTo="body"
+            styleClass="w-full">
+          </p-multiSelect>
+        }
+      }
+    }
+
+    @if (rangeInvalid(filter)) {
+      <small class="filter-field__error">{{ 'reporting.filters.invalidRange' | translate }}</small>
+    }
+    @if (requiredMissing(filter)) {
+      <small class="filter-field__error">{{ 'reporting.filters.requiredField' | translate }}</small>
+    }
+  </div>
+</ng-template>

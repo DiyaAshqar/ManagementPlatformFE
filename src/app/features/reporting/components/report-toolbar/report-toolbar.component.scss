@@ -1,0 +1,60 @@
+.report-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+}
+
+.report-toolbar__titles {
+  min-width: 12rem;
+}
+
+.report-toolbar__title {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+}
+
+.report-toolbar__desc {
+  margin: 0.15rem 0 0;
+  color: var(--text-color-secondary, #64748b);
+  font-size: 0.9rem;
+}
+
+.report-toolbar__meta {
+  margin-top: 0.3rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.78rem;
+  color: var(--text-color-secondary, #64748b);
+
+  .dot {
+    opacity: 0.5;
+  }
+}
+
+.report-toolbar__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.report-toolbar__search {
+  min-width: 14rem;
+}
+
+.report-toolbar__filter-btn {
+  position: relative;
+}
+
+.report-toolbar__filter-badge {
+  position: absolute;
+  top: -4px;
+  inset-inline-end: -4px;
+  pointer-events: none;
+}

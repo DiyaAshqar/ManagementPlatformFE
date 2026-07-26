@@ -266,6 +266,7 @@
       "materials": "المواد",
       "users": "المستخدمون",
       "rolesPermissions": "الأدوار والصلاحيات",
+      "reportingDemo": "عرض التقارير",
       "feature1": "ميزة 1",
       "feature2": "ميزة 2"
     },
@@ -1490,6 +1491,196 @@
       "username": "اسم المستخدم",
       "memberSince": "عضو منذ",
       "lastLogin": "آخر تسجيل دخول"
+    }
+  },
+  "reporting": {
+    "common": {
+      "yes": "نعم",
+      "no": "لا"
+    },
+    "actions": {
+      "retry": "إعادة المحاولة",
+      "cancel": "إلغاء"
+    },
+    "empty": {
+      "noData": "لا توجد سجلات للعرض.",
+      "error": "حدث خطأ أثناء تحميل هذا التقرير."
+    },
+    "summary": {
+      "title": "الملخص",
+      "scopePage": "إجماليات الصفحة الحالية",
+      "scopeFiltered": "إجماليات النتائج المصفّاة",
+      "scopeAll": "إجماليات جميع النتائج المصفّاة"
+    },
+    "columns": {
+      "title": "الأعمدة",
+      "required": "مطلوب",
+      "moveUp": "تحريك لأعلى",
+      "moveDown": "تحريك لأسفل",
+      "selectAll": "تحديد الكل",
+      "reset": "استعادة الافتراضي"
+    },
+    "filters": {
+      "title": "عوامل التصفية",
+      "advanced": "تصفية متقدمة",
+      "active": "عوامل التصفية النشطة: {{count}}",
+      "reset": "إعادة تعيين",
+      "apply": "تطبيق",
+      "min": "الحد الأدنى",
+      "max": "الحد الأقصى",
+      "any": "الكل",
+      "clearField": "مسح",
+      "invalidRange": "يجب ألا تكون قيمة البداية بعد قيمة النهاية.",
+      "requiredField": "هذا الحقل مطلوب."
+    },
+    "toolbar": {
+      "records": "{{count}} سجل",
+      "lastUpdated": "آخر تحديث",
+      "searchPlaceholder": "بحث…",
+      "filters": "التصفية",
+      "export": "تصدير",
+      "print": "طباعة",
+      "refresh": "تحديث",
+      "fullscreen": "ملء الشاشة",
+      "resetSettings": "إعادة تعيين إعدادات التقرير"
+    },
+    "table": {
+      "actions": "إجراءات",
+      "pageReport": "عرض {first} إلى {last} من {totalRecords}",
+      "selectAll": "تحديد كل الصفوف",
+      "selectRow": "تحديد الصف",
+      "toggleGroup": "طي/توسيع المجموعة"
+    },
+    "grouping": {
+      "none": "بدون",
+      "groupBy": "تجميع حسب"
+    },
+    "export": {
+      "dialogTitle": "تصدير التقرير",
+      "formatLabel": "الصيغة",
+      "scopeLabel": "السجلات",
+      "columnsLabel": "الأعمدة",
+      "columnsPlaceholder": "كل الأعمدة القابلة للتصدير",
+      "fileNameLabel": "اسم الملف",
+      "orientationLabel": "الاتجاه",
+      "includeFilters": "تضمين عوامل التصفية المطبقة",
+      "includeSummaries": "تضمين إجماليات الملخص",
+      "includeCompany": "تضمين ترويسة الشركة",
+      "includeDate": "تضمين تاريخ الإنشاء",
+      "confirm": "تصدير",
+      "emptyTitle": "لا يوجد ما يمكن تصديره",
+      "emptyDetail": "لا توجد سجلات مطابقة لعوامل التصفية الحالية.",
+      "errorTitle": "فشل التصدير",
+      "errorDetail": "تعذّر إنشاء التقرير. يرجى المحاولة مرة أخرى.",
+      "successTitle": "التصدير جاهز",
+      "successDetail": "تم تنزيل ملف {{format}} الخاص بك.",
+      "format": {
+        "excel": "إكسل (.xlsx)",
+        "csv": "CSV (.csv)",
+        "pdf": "PDF",
+        "print": "طباعة"
+      },
+      "scope": {
+        "currentPage": "الصفحة الحالية",
+        "filtered": "كل السجلات المصفّاة",
+        "selected": "الصفوف المحددة"
+      },
+      "orientation": {
+        "portrait": "عمودي",
+        "landscape": "أفقي"
+      }
+    },
+    "demo": {
+      "pageTitle": "عرض وحدة التقارير",
+      "pageSubtitle": "مكوّن تقارير قابل لإعادة الاستخدام والتهيئة — بدّل الخيارات أدناه لاستكشاف كل ميزة.",
+      "title": "تقرير الفواتير",
+      "description": "تقرير مفصّل بفواتير العملاء والمدفوعات.",
+      "empty": "لا توجد فواتير مطابقة لعوامل التصفية المحددة.",
+      "columns": {
+        "invoiceNumber": "رقم الفاتورة",
+        "customer": "العميل",
+        "customerType": "النوع",
+        "branch": "الفرع",
+        "invoiceDate": "تاريخ الفاتورة",
+        "dueDate": "تاريخ الاستحقاق",
+        "subtotal": "المجموع الفرعي",
+        "discount": "الخصم",
+        "tax": "الضريبة",
+        "total": "الإجمالي",
+        "paid": "المدفوع",
+        "remaining": "المتبقي",
+        "currency": "العملة",
+        "paymentMethod": "طريقة الدفع",
+        "status": "الحالة",
+        "createdBy": "أنشئ بواسطة",
+        "notes": "ملاحظات"
+      },
+      "filters": {
+        "invoiceNumber": "رقم الفاتورة",
+        "customer": "العميل",
+        "customerType": "نوع العميل",
+        "branch": "الفرع",
+        "invoiceDate": "تاريخ الفاتورة",
+        "dueDate": "تاريخ الاستحقاق",
+        "amount": "المبلغ",
+        "paymentMethod": "طريقة الدفع",
+        "status": "الحالة",
+        "fullyPaid": "مدفوع بالكامل"
+      },
+      "status": {
+        "draft": "مسودة",
+        "pending": "قيد الانتظار",
+        "paid": "مدفوع",
+        "partiallyPaid": "مدفوع جزئياً",
+        "overdue": "متأخر",
+        "cancelled": "ملغى"
+      },
+      "customerType": {
+        "individual": "فرد",
+        "company": "شركة"
+      },
+      "paymentMethod": {
+        "cash": "نقداً",
+        "card": "بطاقة",
+        "bankTransfer": "تحويل بنكي"
+      },
+      "summary": {
+        "count": "إجمالي الفواتير",
+        "total": "المبلغ الإجمالي",
+        "paid": "المبلغ المدفوع",
+        "remaining": "المبلغ المتبقي",
+        "average": "متوسط الفاتورة"
+      },
+      "groups": {
+        "customer": "العميل",
+        "status": "الحالة",
+        "month": "الشهر"
+      },
+      "controls": {
+        "mode": "وضع البيانات",
+        "client": "من جهة العميل",
+        "server": "من جهة الخادم (محاكاة)",
+        "currency": "العملة",
+        "pageSize": "حجم الصفحة",
+        "orientation": "اتجاه PDF",
+        "search": "البحث",
+        "filters": "التصفية",
+        "pagination": "ترقيم الصفحات",
+        "grouping": "التجميع",
+        "summaries": "الملخصات",
+        "rowSelection": "تحديد الصفوف",
+        "columnSelection": "محدد الأعمدة",
+        "excel": "تصدير إكسل",
+        "csv": "تصدير CSV",
+        "pdf": "تصدير PDF",
+        "print": "طباعة",
+        "persist": "حفظ التفضيلات",
+        "simulate": "محاكاة",
+        "loading": "التحميل",
+        "empty": "بيانات فارغة",
+        "error": "خطأ في الواجهة",
+        "clearPrefs": "مسح التفضيلات المحفوظة"
+      }
     }
   }
 }

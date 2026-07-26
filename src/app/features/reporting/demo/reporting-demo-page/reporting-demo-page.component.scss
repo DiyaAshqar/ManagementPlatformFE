@@ -1,0 +1,83 @@
+.demo-page {
+  padding: 1rem 1.25rem;
+}
+
+.demo-page__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.demo-page__title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+}
+
+.demo-page__subtitle {
+  margin: 0.25rem 0 0;
+  color: var(--text-color-secondary, #64748b);
+}
+
+.demo-page__lang {
+  display: flex;
+  gap: 0.35rem;
+}
+
+:host ::ng-deep .demo-controls {
+  margin-bottom: 1.25rem;
+}
+
+.demo-controls__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.75rem 1rem;
+  margin-bottom: 1rem;
+
+  .control {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+
+    label {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-color-secondary, #64748b);
+    }
+  }
+}
+
+.demo-controls__toggles {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.5rem 1rem;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--surface-border, #e2e8f0);
+}
+
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.85rem;
+  }
+}
+
+.demo-controls__sim {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.75rem 1rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--surface-border, #e2e8f0);
+
+  &-title {
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+}

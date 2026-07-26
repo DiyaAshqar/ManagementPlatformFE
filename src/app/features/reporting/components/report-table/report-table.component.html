@@ -1,0 +1,230 @@
+@if (error) {
+  <app-report-empty-state [isError]="true" [message]="errorMessage" (retry)="retry.emit()"></app-report-empty-state>
+} @else if (loading && grouped) {
+  <div class="report-skeleton">
+    @for (r of skeletonRows(); track r) {
+      <p-skeleton height="2.25rem" styleClass="report-skeleton__row"></p-skeleton>
+    }
+  </div>
+} @else if (grouped) {
+  <div class="report-grid-wrap">
+    <table class="report-grid" [class.report-grid--sticky]="features.stickyHeader">
+      <thead>
+        <tr>
+          @if (features.rowNumbers) {
+            <th class="col-num">#</th>
+          }
+          @if (selectionEnabled) {
+            <th class="col-select"></th>
+          }
+          @for (col of columns; track col.key) {
+            <th
+              [style.text-align]="alignment(col)"
+              [class.sortable]="isSortable(col)"
+              [attr.aria-sort]="ariaSort(col)"
+              (click)="onGroupedHeaderSort(col)">
+              <span class="th-content">
+                {{ header(col) }}
+                @if (isSortable(col)) {
+                  <i class="pi sort-ico" [ngClass]="sortIcon(col)" aria-hidden="true"></i>
+                }
+              </span>
+            </th>
+          }
+          @if (rowActionsTemplate) {
+            <th class="col-actions">{{ 'reporting.table.actions' | translate }}</th>
+          }
+        </tr>
+      </thead>
+      <tbody>
+        @for (group of (groups ?? []); track group.key) {
+          <tr class="report-grid__group-header">
+            <td [attr.colspan]="colspan">
+              <button
+                type="button"
+                class="group-toggle"
+                [attr.aria-expanded]="!isCollapsed(group.key)"
+                [attr.aria-label]="'reporting.table.toggleGroup' | translate"
+                (click)="toggleGroup(group.key)">
+                <i class="pi" [ngClass]="isCollapsed(group.key) ? 'pi-chevron-right' : 'pi-chevron-down'" aria-hidden="true"></i>
+              </button>
+              <span class="group-title">{{ group.title }}</span>
+              <span class="group-count">({{ group.count }})</span>
+              @if (group.summaries.length > 0) {
+                <span class="group-summaries">
+                  @for (s of group.summaries; track s.key) {
+                    <span class="group-summary">
+                      {{ s.labelKey ? (s.labelKey | translate) : s.label }}:
+                      <strong>{{ s.display }}</strong>
+                    </span>
+                  }
+                </span>
+              }
+            </td>
+          </tr>
+          @if (!isCollapsed(group.key)) {
+            @for (row of group.rows; track rowId(row); let ri = $index) {
+              <ng-container [ngTemplateOutlet]="dataRow" [ngTemplateOutletContext]="{ $implicit: row, num: ri + 1 }"></ng-container>
+            }
+          }
+        }
+        @if ((groups ?? []).length === 0) {
+          <tr>
+            <td [attr.colspan]="colspan">
+              <app-report-empty-state [message]="emptyMessage" icon="pi pi-inbox"></app-report-empty-state>
+            </td>
+          </tr>
+        }
+      </tbody>
+      @if (hasFooter) {
+        <tfoot>
+          <tr class="report-footer">
+            @if (features.rowNumbers) {
+              <td></td>
+            }
+            @if (selectionEnabled) {
+              <td></td>
+            }
+            @for (col of columns; track col.key) {
+              <td [style.text-align]="alignment(col)"><strong>{{ footerFor(col) }}</strong></td>
+            }
+            @if (rowActionsTemplate) {
+              <td></td>
+            }
+          </tr>
+        </tfoot>
+      }
+    </table>
+  </div>
+} @else {
+  <p-table
+    [value]="rows"
+    [lazy]="true"
+    [loading]="loading"
+    [paginator]="paginator"
+    [rows]="pageSize"
+    [first]="first"
+    [totalRecords]="totalRecords"
+    [rowsPerPageOptions]="pageSizeOptions"
+    [showCurrentPageReport]="true"
+    [currentPageReportTemplate]="'reporting.table.pageReport' | translate"
+    [sortMode]="sortMode"
+    [sortField]="singleSortField"
+    [sortOrder]="singleSortOrder"
+    [multiSortMeta]="multiSortMeta"
+    [scrollable]="true"
+    [resizableColumns]="features.columnResizing ?? false"
+    columnResizeMode="expand"
+    styleClass="p-datatable-sm p-datatable-striped report-table"
+    [tableStyle]="{ 'min-width': '100%' }"
+    (onLazyLoad)="onLazy($event)">
+    <ng-template pTemplate="header">
+      <tr>
+        @if (features.rowNumbers) {
+          <th class="col-num">#</th>
+        }
+        @if (selectionEnabled) {
+          <th class="col-select">
+            <p-checkbox
+              [binary]="true"
+              [ngModel]="allPageSelected"
+              (ngModelChange)="onSelectAll($event)"
+              [attr.aria-label]="'reporting.table.selectAll' | translate">
+            </p-checkbox>
+          </th>
+        }
+        @for (col of columns; track col.key) {
+          <th
+            pResizableColumn
+            [pSortableColumn]="col.key"
+            [pSortableColumnDisabled]="!isSortable(col)"
+            [style.width]="col.width"
+            [style.min-width]="col.minWidth"
+            [style.text-align]="alignment(col)"
+            [class.sticky-col]="!!col.sticky">
+            <span class="th-content">
+              {{ header(col) }}
+              @if (isSortable(col)) {
+                <p-sortIcon [field]="col.key" />
+              }
+            </span>
+          </th>
+        }
+        @if (rowActionsTemplate) {
+          <th class="col-actions">{{ 'reporting.table.actions' | translate }}</th>
+        }
+      </tr>
+    </ng-template>
+    <ng-template pTemplate="body" let-row let-rowIndex="rowIndex">
+      <ng-container [ngTemplateOutlet]="dataRow" [ngTemplateOutletContext]="{ $implicit: row, num: first + rowIndex + 1 }"></ng-container>
+    </ng-template>
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td [attr.colspan]="colspan">
+          <app-report-empty-state [message]="emptyMessage" icon="pi pi-inbox"></app-report-empty-state>
+        </td>
+      </tr>
+    </ng-template>
+    @if (hasFooter) {
+      <ng-template pTemplate="footer">
+        <tr class="report-footer">
+          @if (features.rowNumbers) {
+            <td></td>
+          }
+          @if (selectionEnabled) {
+            <td></td>
+          }
+          @for (col of columns; track col.key) {
+            <td [style.text-align]="alignment(col)"><strong>{{ footerFor(col) }}</strong></td>
+          }
+          @if (rowActionsTemplate) {
+            <td></td>
+          }
+        </tr>
+      </ng-template>
+    }
+  </p-table>
+}
+
+<ng-template #dataRow let-row let-num="num">
+  <tr class="report-row" [class.report-row--selected]="isSelected(row)">
+    @if (features.rowNumbers) {
+      <td class="col-num">{{ num }}</td>
+    }
+    @if (selectionEnabled) {
+      <td class="col-select">
+        <p-checkbox
+          [binary]="true"
+          [ngModel]="isSelected(row)"
+          (ngModelChange)="toggleRow(row, $event)"
+          [attr.aria-label]="'reporting.table.selectRow' | translate">
+        </p-checkbox>
+      </td>
+    }
+    @for (col of columns; track col.key) {
+      <td
+        [style.text-align]="alignment(col)"
+        [ngClass]="cellClass(row, col)"
+        [ngStyle]="cellStyle(row, col)"
+        [class.sticky-col]="!!col.sticky">
+        @if (cellTemplate(col)) {
+          <ng-container [ngTemplateOutlet]="cellTemplate(col)!" [ngTemplateOutletContext]="cellContext(row, col)"></ng-container>
+        } @else if (col.type === 'status') {
+          <p-tag [value]="statusLabel(row, col)" [severity]="statusSeverity(row, col)" [icon]="statusIcon(row, col)"></p-tag>
+        } @else if (col.type === 'boolean') {
+          <span class="bool-cell" [class.bool-cell--true]="boolValue(row, col)">
+            <i class="pi" [ngClass]="boolValue(row, col) ? 'pi-check-circle' : 'pi-times-circle'" aria-hidden="true"></i>
+            <span class="sr-text">{{ cellText(row, col) }}</span>
+          </span>
+        } @else {
+          {{ cellText(row, col) }}
+        }
+      </td>
+    }
+    @if (rowActionsTemplate) {
+      <td class="col-actions">
+        <ng-container [ngTemplateOutlet]="rowActionsTemplate" [ngTemplateOutletContext]="{ $implicit: row }"></ng-container>
+      </td>
+    }
+  </tr>
+</ng-template>
