@@ -44,18 +44,24 @@ export class AdvanceApiService {
     private usersApiService: UsersApiService
   ) {}
 
-  getByProjectStageId(projectStageId: number, projectName?: string): Observable<ApiEnvelope<AdvanceListResponseDto>> {
-    return this.advancesClient.getAll(undefined, undefined, 1, 100, undefined).pipe(
+  getByProjectStageId(projectStageId: number): Observable<ApiEnvelope<AdvanceListResponseDto>> {
+    return this.advancesClient.getByProjectStageId(projectStageId).pipe(
       map((response) => {
-        const all = response.data?.data ?? [];
-        const scoped = projectName
-          ? all.filter((a) => (a.project ?? '').trim().toLowerCase() === projectName.trim().toLowerCase())
-          : all;
-        const items = scoped.map((a) => this.toListItemDto(a));
+        const items = (response.data?.data ?? []).map((a) => this.toListItemDto(a));
         return {
           succeeded: response.succeeded ?? true,
           message: response.message,
-          data: { summary: summarizeAdvances(items), data: items },
+          data: {
+            summary: response.data?.summary
+              ? {
+                  total_advances: response.data.summary.total_advances ?? 0,
+                  total_amount: response.data.summary.total_amount ?? 0,
+                  total_remaining: response.data.summary.total_remaining ?? 0,
+                  open_count: response.data.summary.open_count ?? 0,
+                }
+              : summarizeAdvances(items),
+            data: items,
+          },
         };
       })
     );

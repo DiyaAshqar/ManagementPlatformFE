@@ -167,7 +167,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
 
   loadAdvances(): void {
     this.isLoadingList.set(true);
-    this.advanceService.getByProjectStageId(this.projectStageId, this.projectName).subscribe({
+    this.advanceService.getByProjectStageId(this.projectStageId).subscribe({
       next: (response) => {
         if (response.succeeded && response.data) {
           this.advances.set(response.data.data);

@@ -209,7 +209,7 @@ export class MilestoneTaskDialogComponent implements OnInit, OnDestroy {
 
     this.isLoadingMainContractors.set(true);
     forkJoin({
-      projectContractors: this.projectMainContractorClient.getByStageId(stageId, 1, 200, undefined),
+      projectContractors: this.projectMainContractorClient.getByStageId(stageId, undefined, undefined, 1, 200, undefined),
       constructors: this.constructorClient.getAll(1, 1000, undefined)
     }).subscribe({
       next: ({ projectContractors, constructors }) => {

@@ -196,7 +196,7 @@ export class PaymentClaimTabComponent implements OnInit {
       : of([]);
 
     const pmc$ = selected.has('PMC')
-      ? this.pmcClient.getByStageId(this.projectStageId, 1, 500, undefined).pipe(
+      ? this.pmcClient.getByStageId(this.projectStageId, undefined, undefined, 1, 500, undefined).pipe(
           map((r) => r.data?.data ?? []),
           catchError(() => of([]))
         )

@@ -103,11 +103,11 @@ export class SidebarComponent implements OnInit {
           route: '/roles-permissions',
           permissions: [Permissions.RolesPermissions.View, Permissions.RolesPermissions.Manage],
         },
-        {
-          label: 'sidebar.items.reportingDemo',
-          icon: 'pi pi-chart-bar',
-          route: '/reporting-demo',
-        },
+        // {
+        //   label: 'sidebar.items.reportingDemo',
+        //   icon: 'pi pi-chart-bar',
+        //   route: '/reporting-demo',
+        // },
       ]
     }
   ];

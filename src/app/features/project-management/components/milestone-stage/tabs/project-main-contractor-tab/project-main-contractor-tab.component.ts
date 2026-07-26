@@ -124,7 +124,7 @@ export class ProjectMainContractorTabComponent implements OnInit {
   loadContractorData(): void {
     this.isLoading.set(true);
 
-    this.contractorClient.getByStageId(this.projectStageId, 1, 100, undefined).subscribe({
+    this.contractorClient.getByStageId(this.projectStageId, undefined, undefined, 1, 100, undefined).subscribe({
       next: (res) => {
         if (res.succeeded && res.data?.data) {
           this.contractorItems.set(res.data.data);
