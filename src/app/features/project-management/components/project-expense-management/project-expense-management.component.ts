@@ -141,7 +141,7 @@ export class ProjectExpenseManagementComponent implements OnInit {
 
   loadExpenses(): void {
     this.isLoadingList.set(true);
-    this.expenseService.getByProjectStageId(this.projectStageId, Number(this.projectId)).subscribe({
+    this.expenseService.getByProjectStageId(this.projectStageId).subscribe({
       next: (response) => {
         if (response.succeeded && response.data?.data) {
           this.expenses.set(response.data.data);

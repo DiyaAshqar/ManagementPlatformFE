@@ -24,11 +24,10 @@ export class ExpenseApiService {
 
   getByProjectStageId(
     projectStageId: number,
-    projectId: number,
     pageNumber: number = 1,
     pageSize: number = 100
   ): Observable<GetExpenseDtoListPagedResponseResponse> {
-    return this.expenseClient.getByProjectId(projectStageId, projectId, pageNumber, pageSize, undefined);
+    return this.expenseClient.getByProjectId(projectStageId, undefined, pageNumber, pageSize, undefined);
   }
 
   getById(id: number): Observable<GetExpenseDtoResponse> {
