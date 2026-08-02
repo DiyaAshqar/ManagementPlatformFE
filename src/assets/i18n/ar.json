@@ -268,7 +268,8 @@
       "rolesPermissions": "الأدوار والصلاحيات",
       "reportingDemo": "عرض التقارير",
       "feature1": "ميزة 1",
-      "feature2": "ميزة 2"
+      "feature2": "ميزة 2",
+      "projectReportDemo": "عرض تجريبي للتقرير"
     },
     "footer": {
       "settings": "الإعدادات",
@@ -551,7 +552,22 @@
         "progress": "تقرير التقدم",
         "financial": "التقرير المالي",
         "custom": "تقرير مخصص"
-      }
+      },
+      "asOfDate": "حتى تاريخ",
+      "language": "لغة التقرير",
+      "languageEnglish": "الإنجليزية",
+      "languageArabic": "العربية",
+      "includeCompanyHeader": "تضمين ترويسة الشركة والشعار",
+      "includeFinancial": "تضمين المعلومات المالية",
+      "includeDocuments": "تضمين المستندات",
+      "includePhotos": "تضمين صور سير العمل",
+      "includeSignatures": "تضمين التوقيعات",
+      "confidential": "تصنيف كوثيقة سرية",
+      "customSections": "الأقسام المطلوب تضمينها",
+      "generating": "جارٍ إعداد التقرير…",
+      "loadFailed": "تعذّر إنشاء التقرير. الرجاء المحاولة مرة أخرى.",
+      "partialDataWarning": "تعذّر تحميل بعض البيانات وتم استبعادها من التقرير.",
+      "pdfHint": "يفتح نافذة الطباعة — اختر \"حفظ كـ PDF\" كوجهة الطباعة."
     },
     "milestoneStages": {
       "title": "المراحل الرئيسية",
@@ -1159,7 +1175,8 @@
       "subtotal": "المجموع الفرعي",
       "statusRequired": "الحالة مطلوبة.",
       "createOrder": "إنشاء أمر"
-    },    "contractorPayment": {
+    },
+    "contractorPayment": {
       "addTitle": "تسجيل دفعة",
       "editTitle": "تعديل الدفعة",
       "paymentDate": "تاريخ الدفع",
@@ -1174,7 +1191,8 @@
       "notes": "ملاحظات",
       "add": "تسجيل دفعة",
       "update": "تحديث"
-    },    "contractor": {
+    },
+    "contractor": {
       "addTitle": "إضافة مقاول الرئيسي",
       "editTitle": "تعديل المقاول الرئيسي",
       "contractorType": "نوع المقاول",
@@ -1681,6 +1699,290 @@
         "error": "خطأ في الواجهة",
         "clearPrefs": "مسح التفضيلات المحفوظة"
       }
+    }
+  },
+  "projectReport": {
+    "sections": {
+      "cover": "صفحة الغلاف",
+      "executiveSummary": "الملخص التنفيذي",
+      "agreement": "معلومات الاتفاقية والعقد",
+      "scope": "النطاق والمناطق والمراحل",
+      "contractors": "المقاولون",
+      "suppliers": "الموردون والمواد والمشتريات",
+      "financial": "التقرير المالي",
+      "schedule": "الجدول الزمني والتقدم",
+      "siteActivities": "أنشطة الموقع والمعاينات",
+      "documents": "المستندات وصور سير العمل",
+      "risks": "المخاطر والمشكلات والمعلومات الناقصة",
+      "signatures": "الملخص الختامي والتوقيعات"
+    },
+    "cover": {
+      "title": "تقرير المشروع",
+      "companyName": "منصة إدارة المشاريع الإنشائية",
+      "projectNumber": "رقم المشروع",
+      "client": "العميل / المالك",
+      "location": "موقع المشروع",
+      "asOf": "الفترة المشمولة بالتقرير (حتى تاريخ)",
+      "generatedAt": "تاريخ الإصدار",
+      "generatedBy": "أُعد بواسطة",
+      "confidential": "سري"
+    },
+    "reportTypes": {
+      "full": "تقرير كامل",
+      "summary": "تقرير ملخص",
+      "progress": "تقرير التقدم",
+      "financial": "تقرير مالي",
+      "custom": "تقرير مخصص"
+    },
+    "summary": {
+      "status": "الحالة",
+      "progress": "نسبة الإنجاز الكلية",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "daysElapsed": "الأيام المنقضية",
+      "daysRemaining": "الأيام المتبقية",
+      "budget": "الميزانية",
+      "contractValue": "قيمة العقد",
+      "actualExpenditure": "المصروفات الفعلية",
+      "committedAmount": "المبالغ الملتزم بها",
+      "milestonesTotal": "إجمالي عدد المراحل",
+      "milestonesCompleted": "المراحل المكتملة",
+      "keyMilestones": "أهم المراحل الرئيسية",
+      "milestoneOrder": "#",
+      "milestoneName": "المرحلة",
+      "milestoneStatus": "الحالة",
+      "risksAndNotes": "المخاطر والمعوقات والبيانات الناقصة",
+      "noRisks": "لا توجد مخاطر أو ملاحظات ناقصة مسجلة."
+    },
+    "agreement": {
+      "number": "رقم الاتفاقية",
+      "date": "تاريخ الاتفاقية",
+      "type": "نوع الاتفاقية",
+      "projectName": "اسم المشروع",
+      "businessSector": "القطاع",
+      "estimatedStart": "تاريخ البدء المتوقع",
+      "estimatedEnd": "تاريخ الانتهاء المتوقع",
+      "contractType": "نوع العقد",
+      "contractModel": "نموذج العقد",
+      "contractValue": "قيمة العقد",
+      "country": "الدولة",
+      "city": "المدينة",
+      "basin": "الحوض",
+      "village": "القرية",
+      "directorate": "المديرية",
+      "plotNumber": "رقم القطعة",
+      "floorNumber": "رقم الطابق",
+      "projectArea": "مساحة المشروع (م²)",
+      "drillingQuantity": "كمية الحفر",
+      "client": "العميل والممثل",
+      "contactPerson": "الشخص المسؤول",
+      "representative": "الممثل",
+      "services": "الخدمات المختارة"
+    },
+    "scope": {
+      "areas": "مناطق المشروع والملاحق",
+      "annex": "الملحق",
+      "amount": "الكمية",
+      "unit": "الوحدة",
+      "milestones": "مراحل الاتفاقية",
+      "order": "#",
+      "milestoneName": "المرحلة",
+      "description": "الوصف",
+      "stageStatus": "حالة التنفيذ",
+      "stageLinked": "قيد التنفيذ / مرتبطة بمرحلة مشروع",
+      "stageNotLinked": "غير مرتبطة بعد بمرحلة مشروع"
+    },
+    "contractors": {
+      "contractValue": "قيمة العقد",
+      "paid": "المدفوع",
+      "remaining": "المتبقي",
+      "totalContractValue": "إجمالي قيمة العقود",
+      "totalPaid": "إجمالي المدفوع",
+      "totalRemaining": "إجمالي المتبقي",
+      "dutyType": "البند",
+      "responsibility": "المسؤولية",
+      "unit": "الوحدة",
+      "quantity": "الكمية",
+      "price": "السعر",
+      "subTotal": "المجموع الفرعي",
+      "noDuties": "لا توجد بنود مسجلة لهذا المقاول.",
+      "paymentDate": "التاريخ",
+      "paymentAmount": "المبلغ",
+      "paymentReference": "المرجع",
+      "noPayments": "لا توجد دفعات مسجلة لهذا المقاول.",
+      "classification": {
+        "mainContractor": "مقاول رئيسي",
+        "subContractor": "مقاول من الباطن"
+      }
+    },
+    "suppliers": {
+      "agreementSuppliers": "موردو الاتفاقية",
+      "supplier": "المورد",
+      "material": "المادة",
+      "representative": "المندوب",
+      "agreementQuantityBill": "جدول الكميات (مستوى الاتفاقية)",
+      "quantityBillNote": "الكميات والأسعار المتعاقد عليها في مرحلة الاتفاقية — سجل منفصل عن جدول الكميات على مستوى مرحلة المشروع أدناه؛ لا يتم جمعهما معًا.",
+      "projectStageBoq": "جدول الكميات (مستوى مرحلة المشروع)",
+      "boqNote": "الكميات الفعلية المسجلة أثناء التنفيذ لكل مرحلة من مراحل المشروع.",
+      "quantity": "الكمية",
+      "expectedQuantity": "الكمية المتوقعة",
+      "actualQuantity": "الكمية الفعلية",
+      "price": "السعر",
+      "subTotal": "المجموع الفرعي",
+      "milestone": "المرحلة",
+      "stage": "المرحلة (تنفيذ)",
+      "purchaseOrders": "أوامر الشراء",
+      "poNumber": "رقم أمر الشراء",
+      "description": "الوصف",
+      "status": "الحالة"
+    },
+    "financial": {
+      "contractAndBudget": "العقد والميزانية",
+      "contractValue": "قيمة العقد",
+      "budget": "ميزانية المشروع",
+      "procurementAndWork": "المشتريات والأعمال",
+      "boqTotal": "إجمالي جدول الكميات",
+      "contractorCommitments": "التزامات المقاولين",
+      "contractorPaid": "المدفوع للمقاولين",
+      "contractorRemaining": "المتبقي للمقاولين",
+      "purchaseOrdersTotal": "إجمالي أوامر الشراء",
+      "cashAndAdvances": "النقدية والسلف",
+      "expensesTotal": "إجمالي المصروفات",
+      "advancesTotal": "إجمالي السلف",
+      "advancesRemaining": "المتبقي من السلف",
+      "ownerPaymentsTotal": "المبالغ المستلمة من المالك",
+      "variationOrders": "أوامر التغيير",
+      "voApproved": "معتمدة",
+      "voPending": "قيد الانتظار",
+      "voRejected": "مرفوضة",
+      "paymentClaimEstimate": "تقدير مستخلص الدفعات",
+      "paymentClaimEstimateTotal": "المبلغ المقدر القابل للمطالبة",
+      "paymentClaimEstimateNote": "قيمة تقديرية محسوبة للاطلاع فقط — وليست سجل مستخلص رسمي مخزّن.",
+      "notes": {
+        "engineeringFeeExcluded": "أتعاب مكتب الإشراف الهندسي محسوبة كنسبة مئوية أو رسم شهري ولم تُدرج ضمن هذا التقدير.",
+        "ledgersAreSeparate": "كل رقم أعلاه يمثل سجلاً مستقلاً ولا يُجمع مع غيره — تعامل معها كإجماليات منفصلة وليست رصيدًا تراكميًا واحدًا.",
+        "quantityBillVsBoq": "يتم تتبع جدول كميات الاتفاقية وجدول كميات مرحلة المشروع بشكل منفصل (انظر قسم الموردين) ولا يتم احتسابهما مرتين."
+      }
+    },
+    "schedule": {
+      "plannedStart": "تاريخ البدء المخطط",
+      "plannedEnd": "تاريخ الانتهاء المخطط",
+      "asOf": "حتى تاريخ",
+      "daysElapsed": "الأيام المنقضية",
+      "daysRemaining": "الأيام المتبقية",
+      "taskTodo": "لم تبدأ",
+      "taskInProgress": "قيد التنفيذ",
+      "taskReview": "قيد المراجعة",
+      "taskCompleted": "مكتملة",
+      "blockedNotTracked": "لا يتم حاليًا تتبع حالة \"معلّقة\" كحالة مستقلة للمهام في النظام.",
+      "stages": "مراحل المشروع",
+      "stageName": "المرحلة",
+      "stageType": "النوع",
+      "stageStatus": "الحالة",
+      "completedWork": "الأعمال المنجزة",
+      "inProgressWork": "الأعمال قيد التنفيذ",
+      "upcomingWork": "الأعمال المخطط لها لاحقًا"
+    },
+    "siteActivities": {
+      "tasks": "المهام",
+      "task": "المهمة",
+      "status": "الحالة",
+      "type": "النوع",
+      "responsibility": "المسؤولية",
+      "startDate": "تاريخ البدء",
+      "endDate": "تاريخ الانتهاء",
+      "subtasks": "المهام الفرعية",
+      "surveyingVisits": "زيارات المساحة",
+      "visitDate": "التاريخ",
+      "surveyor": "المساح",
+      "purpose": "الغرض",
+      "subTotal": "المجموع الفرعي"
+    },
+    "documents": {
+      "photos": "صور سير العمل",
+      "noPhotos": "لا تتوفر صور لسير العمل لهذا المشروع.",
+      "morePhotosOmitted": "يوجد {{count}} صورة إضافية مسجلة لم تُعرض هنا.",
+      "register": "سجل المستندات",
+      "fileName": "اسم الملف",
+      "type": "النوع",
+      "relatedTo": "متعلق بـ",
+      "noDocuments": "لا توجد مستندات مسجلة لهذا المشروع."
+    },
+    "risks": {
+      "noTrackedRisks": "لا توجد مخاطر أو مشكلات متتبعة لهذا المشروع في النظام الحالي.",
+      "missingData": "بيانات غير متوفرة في النظام الحالي"
+    },
+    "signatures": {
+      "preparedBy": "أُعد بواسطة",
+      "reviewedBy": "روجع بواسطة",
+      "approvedBy": "اعتُمد بواسطة",
+      "date": "التاريخ: ____________"
+    },
+    "purchaseOrders": {
+      "status": {
+        "approved": "معتمد",
+        "pending": "قيد الانتظار",
+        "rejected": "مرفوض"
+      }
+    },
+    "surveyingVisits": {
+      "status": {
+        "inProgress": "قيد التنفيذ",
+        "scheduled": "مجدولة",
+        "completed": "مكتملة"
+      }
+    },
+    "responsibility": {
+      "internal": "داخلي",
+      "contractor": "مقاول",
+      "supplier": "مورد",
+      "client": "العميل",
+      "consultant": "استشاري"
+    },
+    "stageType": {
+      "preparing": "التحضير",
+      "excavation": "الحفر",
+      "milestones": "مرحلة رئيسية"
+    },
+    "status": {
+      "toDO": "لم تبدأ",
+      "inProgress": "قيد التنفيذ",
+      "review": "قيد المراجعة",
+      "completed": "مكتملة"
+    },
+    "taskStatus": {
+      "toDO": "لم تبدأ",
+      "inProgress": "قيد التنفيذ",
+      "review": "قيد المراجعة",
+      "completed": "مكتملة"
+    },
+    "attachmentType": {
+      "agreement": "الاتفاقية",
+      "project": "المشروع",
+      "milestone": "المرحلة الرئيسية",
+      "task": "المهمة",
+      "projectPO": "أمر الشراء",
+      "surveyingVisit": "زيارة المساحة",
+      "projectMainContractorPayment": "دفعة مقاول",
+      "constructor": "مقاول",
+      "supplier": "مورد",
+      "other": "أخرى"
+    },
+    "missingData": {
+      "noAgreement": "هذا المشروع غير مرتبط باتفاقية، أو تعذّر تحميل بيانات الاتفاقية — الأقسام المشتقة من الاتفاقية غير متوفرة.",
+      "milestoneStatus": "حالة تنفيذ كل مرحلة على حدة غير متاحة حاليًا في النظام؛ يتم عرض اسم المرحلة وترتيبها فقط.",
+      "milestoneStatusShort": "غير متتبعة",
+      "blockedTasks": "تتبع حالة \"معلّقة\" للمهام غير متوفر حاليًا في النظام.",
+      "domainFailed": "تعذّر تحميل بيانات {{domain}} لهذا التقرير."
+    },
+    "common": {
+      "notAvailable": "غير متوفر",
+      "noData": "لا توجد بيانات متاحة.",
+      "noDataOrRestricted": "لا توجد بيانات متاحة، أو لا تملك صلاحية الاطلاع على هذه المعلومات.",
+      "restricted": "لا تملك صلاحية الاطلاع على هذا القسم."
+    },
+    "footer": {
+      "generated": "تم إصدار هذا التقرير بتاريخ {{date}} بواسطة {{user}}. تم إعداد هذا المستند بواسطة أداة التقارير في منصة إدارة المشاريع."
     }
   }
 }

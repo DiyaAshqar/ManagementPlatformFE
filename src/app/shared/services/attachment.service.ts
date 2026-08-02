@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, map } from 'rxjs';
+import { Observable, map, switchMap } from 'rxjs';
 import {
   AttachmentClient,
   AttachmentType,
@@ -131,6 +131,29 @@ export class AttachmentService {
         return { url: URL.createObjectURL(blob), mimeType };
       })
     );
+  }
+
+  /**
+   * Fetch an attachment and convert it to a base64 `data:` URL — used to embed
+   * images directly into self-contained print/PDF HTML documents, which are
+   * opened in a separate window that can't rely on the app's auth headers to
+   * (re)load a live `/api/Attachment/{id}/download` URL.
+   */
+  getAttachmentDataUrl(id: number): Observable<string> {
+    const url = `${this.baseUrl}/api/Attachment/${id}/download`;
+    return this.http.get(url, { responseType: 'blob' }).pipe(switchMap((blob) => this.blobToDataUrl(blob)));
+  }
+
+  private blobToDataUrl(blob: Blob): Observable<string> {
+    return new Observable<string>((observer) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        observer.next(reader.result as string);
+        observer.complete();
+      };
+      reader.onerror = (err) => observer.error(err);
+      reader.readAsDataURL(blob);
+    });
   }
 
   /**
