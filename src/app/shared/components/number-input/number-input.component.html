@@ -1,0 +1,22 @@
+<p-inputnumber
+  [inputId]="inputId()"
+  [ngModel]="value()"
+  (ngModelChange)="handleValueChange($event)"
+  [ngModelOptions]="{ standalone: true }"
+  mode="decimal"
+  locale="en-US"
+  [minFractionDigits]="3"
+  [maxFractionDigits]="3"
+  [useGrouping]="true"
+  [min]="min()"
+  [max]="max()"
+  [showButtons]="showButtons()"
+  [readonly]="readonlyInput()"
+  [disabled]="isDisabled"
+  [placeholder]="placeholder()"
+  [styleClass]="styleClass()"
+  [inputStyleClass]="inputStyleClass()"
+  [class.ng-dirty]="invalid()"
+  [class.ng-invalid]="invalid()"
+  (onBlur)="markTouched()">
+</p-inputnumber>

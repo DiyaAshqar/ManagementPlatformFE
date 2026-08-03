@@ -7,7 +7,6 @@ import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
@@ -19,6 +18,8 @@ import {
   IGetProjectSurveyingVisitDto
 } from '../../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../../shared/components/documents-table/documents-table.component';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
+import { AppNumberPipe } from '../../../../../shared/pipes/app-number.pipe';
 
 export enum VisitStatus {
   InProgress = 0,
@@ -37,11 +38,12 @@ export enum VisitStatus {
     ButtonModule,
     InputTextModule,
     TextareaModule,
-    InputNumberModule,
     SelectModule,
     FloatLabelModule,
     DatePickerModule,
-    DocumentsTableComponent
+    DocumentsTableComponent,
+    NumberInputComponent,
+    AppNumberPipe
   ],
   templateUrl: './add-surveying-visit-dialog.component.html',
   styleUrls: ['./add-surveying-visit-dialog.component.scss']

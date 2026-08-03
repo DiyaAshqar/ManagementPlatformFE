@@ -12,7 +12,7 @@
   <div class="contractor-toolbar">
     <div class="contractor-stats">
       <span class="contractor-total-label">{{ 'projectTabs.projectMainContractor.totalContractors' | translate }}: {{ contractorItems().length }}</span>
-      <span class="contractor-value-label">{{ 'projectTabs.projectMainContractor.totalValue' | translate }}: {{ totalContractValue | number:'1.0-0' }}</span>
+      <span class="contractor-value-label">{{ 'projectTabs.projectMainContractor.totalValue' | translate }}: {{ totalContractValue | appNumber }}</span>
     </div>
       <p-button *appHasPermission="permissions.MainContractor.Manage"
         [label]="'projectTabs.projectMainContractor.addContractor' | translate"
@@ -52,10 +52,10 @@
         </td>
         <td>{{ getClassificationLabel(item.classification) }}</td>
         <td class="text-right contractor-amount">
-          {{ item.amount | number:'1.0-0' }}
+          {{ item.amount | appNumber }}
         </td>
         <td class="text-right contractor-total-payments">
-          {{ item.totalPayments | number:'1.0-0' }}
+          {{ item.totalPayments | appNumber }}
         </td>
         <td>{{ item.startDate | date:'yyyy-MM-dd' }}</td>
         <td>{{ item.endDate | date:'yyyy-MM-dd' }}</td>
@@ -119,7 +119,7 @@
     <ng-template pTemplate="footer">
       <tr>
         <td colspan="3" class="font-semibold text-right">{{ 'common.total' | translate }}</td>
-        <td class="text-right font-bold contractor-amount">{{ totalContractValue | number:'1.0-0' }}</td>
+        <td class="text-right font-bold contractor-amount">{{ totalContractValue | appNumber }}</td>
         <td colspan="4"></td>
       </tr>
     </ng-template>

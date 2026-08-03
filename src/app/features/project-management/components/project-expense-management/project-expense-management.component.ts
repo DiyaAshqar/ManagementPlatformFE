@@ -10,7 +10,6 @@ import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -33,6 +32,8 @@ import {
 } from '../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../shared/components/documents-table/documents-table.component';
 import { MaterialSelectComponent } from '../../../../shared/components/material-select/material-select.component';
+import { NumberInputComponent } from '../../../../shared/components/number-input/number-input.component';
+import { AppNumberPipe } from '../../../../shared/pipes/app-number.pipe';
 import { ExpenseApiService } from '../../services/expense-api.service';
 import { Permissions } from '../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../core/auth/services/auth.service';
@@ -61,7 +62,6 @@ const emptyDetails = (): IExpenseDetailDto[] => [createEmptyDetail()];
     CardModule,
     TableModule,
     InputTextModule,
-    InputNumberModule,
     SelectModule,
     DatePickerModule,
     TooltipModule,
@@ -73,6 +73,8 @@ const emptyDetails = (): IExpenseDetailDto[] => [createEmptyDetail()];
     DocumentsTableComponent,
     MaterialSelectComponent,
     HasPermissionDirective,
+    NumberInputComponent,
+    AppNumberPipe,
   ],
   providers: [ConfirmationService, LookupClient],
   templateUrl: './project-expense-management.component.html',
@@ -356,9 +358,5 @@ export class ProjectExpenseManagementComponent implements OnInit {
 
   canDelete(expense: GetExpenseDto): boolean {
     return this.canDeletePermission() && !this.isLocked(expense);
-  }
-
-  formatAmount(value: number): string {
-    return value.toFixed(2);
   }
 }

@@ -32,6 +32,7 @@ import { ProjectMainContractorPaymentsComponent } from '../../../../components/p
 import { Permissions } from '../../../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
 import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
+import { AppNumberPipe } from '../../../../../../shared/pipes/app-number.pipe';
 
 @Component({
   selector: 'app-project-main-contractor-tab',
@@ -48,7 +49,8 @@ import { HasPermissionDirective } from '../../../../../../core/auth/directives/h
     AddContractorDialogComponent,
     ContractorDutiesDialogComponent,
     ProjectMainContractorPaymentsComponent,
-    HasPermissionDirective
+    HasPermissionDirective,
+    AppNumberPipe
   ],
   providers: [ProjectMainContractorClient, ProjectMainContractorDutyClient, ConstructorClient, LookupClient],
   templateUrl: './project-main-contractor-tab.component.html',

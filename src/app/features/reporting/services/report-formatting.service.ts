@@ -43,7 +43,7 @@ export class ReportFormattingService {
     const fraction =
       options.decimals != null
         ? { minimumFractionDigits: options.decimals, maximumFractionDigits: options.decimals }
-        : { maximumFractionDigits: 3 };
+        : { maximumFractionDigits: 2 };
     return new Intl.NumberFormat(this.locale(options.locale), fraction).format(num);
   }
 

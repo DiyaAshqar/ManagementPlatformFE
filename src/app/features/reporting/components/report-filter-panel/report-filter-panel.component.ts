@@ -14,11 +14,11 @@ import { FormsModule } from '@angular/forms';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
 
+import { NumberInputComponent } from '../../../../shared/components/number-input/number-input.component';
 import { NumberRangeValue } from '../../models/report-common.model';
 import { ReportFilterConfig, ReportFilterOption, ReportFilterValues } from '../../models/report-filter.model';
 import { isBlankFilterValue } from '../../utilities/report-filter.utils';
@@ -46,10 +46,10 @@ interface DisplayOption {
     TranslateModule,
     ButtonModule,
     InputTextModule,
-    InputNumberModule,
     DatePickerModule,
     SelectModule,
     MultiSelectModule,
+    NumberInputComponent,
   ],
   templateUrl: './report-filter-panel.component.html',
   styleUrls: ['./report-filter-panel.component.scss'],

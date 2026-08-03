@@ -35,15 +35,11 @@
       <div class="col-12 md:col-6">
         <div class="field">
           <p-floatlabel variant="in">
-            <p-inputnumber
+            <app-number-input
               inputId="paidAmount"
               formControlName="paidAmount"
-              mode="decimal"
-              locale="en-US"
-              [minFractionDigits]="2"
-              class="w-full"
-              [class.ng-invalid]="isFieldInvalid('paidAmount')">
-            </p-inputnumber>
+              [invalid]="isFieldInvalid('paidAmount')">
+            </app-number-input>
             <label for="paidAmount">{{ 'dialogs.contractorPayment.paidAmount' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('paidAmount')" class="p-error">{{ 'dialogs.contractorPayment.paidAmountRequired' | translate }}</small>

@@ -3,6 +3,8 @@
 // Pure HTML-generation logic, completely decoupled from Angular.
 // ─────────────────────────────────────────────────────────────────────────────
 
+import { formatAppNumber } from '../../../../../../shared/pipes/app-number.pipe';
+
 export interface ClaimReportSection {
   key: string;
   title: string;
@@ -36,7 +38,7 @@ export interface ClaimReportOptions {
 // ─── Internal helpers ────────────────────────────────────────────────────────
 
 function fmt(value: number): string {
-  return value.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return formatAppNumber(value) ?? '0';
 }
 
 function buildSectionHtml(section: ClaimReportSection, itemsLabel: string): string {

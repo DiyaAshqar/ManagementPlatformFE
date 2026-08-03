@@ -71,34 +71,31 @@
           class="w-full" />
       }
       @case ('number') {
-        <p-inputNumber
+        <app-number-input
           [inputId]="'flt-' + filter.key"
           [ngModel]="value(filter.key)"
           [ngModelOptions]="{ standalone: true }"
           (ngModelChange)="setValue(filter.key, $event)"
-          [placeholder]="placeholder(filter)"
-          styleClass="w-full">
-        </p-inputNumber>
+          [placeholder]="placeholder(filter)">
+        </app-number-input>
       }
       @case ('numberRange') {
         <div class="filter-field__range">
-          <p-inputNumber
+          <app-number-input
             [inputId]="'flt-' + filter.key + '-from'"
             [ngModel]="range(filter.key).from"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="setRangePart(filter.key, 'from', $event)"
-            [placeholder]="'reporting.filters.min' | translate"
-            styleClass="w-full">
-          </p-inputNumber>
+            [placeholder]="'reporting.filters.min' | translate">
+          </app-number-input>
           <span class="filter-field__range-sep">–</span>
-          <p-inputNumber
+          <app-number-input
             [inputId]="'flt-' + filter.key + '-to'"
             [ngModel]="range(filter.key).to"
             [ngModelOptions]="{ standalone: true }"
             (ngModelChange)="setRangePart(filter.key, 'to', $event)"
-            [placeholder]="'reporting.filters.max' | translate"
-            styleClass="w-full">
-          </p-inputNumber>
+            [placeholder]="'reporting.filters.max' | translate">
+          </app-number-input>
         </div>
       }
       @case ('date') {

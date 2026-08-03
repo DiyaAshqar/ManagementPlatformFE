@@ -4,7 +4,6 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
@@ -15,6 +14,8 @@ import { MessageService } from 'primeng/api';
 import { AgreementWizardService } from '../../../services/agreement-wizard.service';
 import { MaterialSelectComponent } from '../../../../../shared/components/material-select/material-select.component';
 import { MaterialCatalogService } from '../../../../../shared/services/material-catalog.service';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
+import { AppNumberPipe } from '../../../../../shared/pipes/app-number.pipe';
 import { FullAgreementDto, LookupDto, MileStonesDto, QuantityBillDto, SixthStepDto } from '../../../../../../nswag/api-client';
 
 @Component({
@@ -25,13 +26,14 @@ import { FullAgreementDto, LookupDto, MileStonesDto, QuantityBillDto, SixthStepD
     ReactiveFormsModule,
     SelectModule,
     ProgressSpinnerModule,
-    InputNumberModule,
     ButtonModule,
     TranslateModule,
     FloatLabelModule,
     TableModule,
     TooltipModule,
-    MaterialSelectComponent
+    MaterialSelectComponent,
+    NumberInputComponent,
+    AppNumberPipe
   ],
   templateUrl: './step6.component.html'
 })

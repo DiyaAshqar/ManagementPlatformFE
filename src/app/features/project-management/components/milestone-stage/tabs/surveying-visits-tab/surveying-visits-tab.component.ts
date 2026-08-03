@@ -21,6 +21,7 @@ import { AddSurveyingVisitDialogComponent } from '../../../dialog/add-surveying-
 import { Permissions } from '../../../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
 import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
+import { AppNumberPipe } from '../../../../../../shared/pipes/app-number.pipe';
 
 export enum VisitStatus {
   InProgress = 0,
@@ -40,7 +41,8 @@ export enum VisitStatus {
     SkeletonModule,
     BadgeModule,
     AddSurveyingVisitDialogComponent,
-    HasPermissionDirective
+    HasPermissionDirective,
+    AppNumberPipe
   ],
   providers: [ProjectSurveyingVisitClient, LookupClient],
   templateUrl: './surveying-visits-tab.component.html',

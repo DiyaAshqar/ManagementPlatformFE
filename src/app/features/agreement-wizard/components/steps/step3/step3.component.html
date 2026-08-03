@@ -33,9 +33,9 @@
                     <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
-                                <p-inputNumber inputId="amount" formControlName="amount" [min]="0" [showButtons]="true"
-                                    [ngClass]="{'ng-invalid': isFieldInvalid('amount')}" inputStyleClass="w-full">
-                                </p-inputNumber>
+                                <app-number-input inputId="amount" formControlName="amount" [min]="0"
+                                    [showButtons]="true" [invalid]="isFieldInvalid('amount')">
+                                </app-number-input>
                                 <label for="amount">{{ 'wizard.step3.quantity' | translate }} <span class="required-asterisk">*</span></label>
                             </p-floatlabel>
                             @if (isFieldInvalid('amount')) {
@@ -107,7 +107,7 @@
                     <ng-template pTemplate="body" let-entry let-rowIndex="rowIndex">
                         <tr>
                             <td>{{ getAnnexName(entry.annexId) }}</td>
-                            <td>{{ entry.amount | number }}</td>
+                            <td>{{ entry.amount | appNumber }}</td>
                             <td>{{ getUnitName(entry.unitId) }}</td>
                             @if (!isViewMode()) {
                             <td class="text-center">

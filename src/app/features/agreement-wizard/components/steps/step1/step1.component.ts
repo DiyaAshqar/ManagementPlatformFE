@@ -7,7 +7,6 @@ import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputGroupModule } from 'primeng/inputgroup';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -15,6 +14,7 @@ import { SelectModule } from 'primeng/select';
 import { Subject, takeUntil } from 'rxjs';
 import { AgreementWizardService } from '../../../services/agreement-wizard.service';
 import { LookupDto, FullAgreementDto, FirstStepDto, AgreementDto, ClientDto, LandInformationDto } from '../../../../../../nswag/api-client';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
 
 @Component({
   selector: 'app-step1',
@@ -25,13 +25,13 @@ import { LookupDto, FullAgreementDto, FirstStepDto, AgreementDto, ClientDto, Lan
     DatePickerModule,
     SelectModule,
     ProgressSpinnerModule,
-    InputNumberModule,
     InputTextModule,
     TextareaModule,
     ButtonModule,
     TranslateModule,
     FloatLabelModule,
-    InputGroupModule
+    InputGroupModule,
+    NumberInputComponent
   ],
   templateUrl: './step1.component.html'
 })

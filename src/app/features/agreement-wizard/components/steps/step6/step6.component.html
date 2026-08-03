@@ -36,10 +36,9 @@
                     <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
-                                <p-inputNumber inputId="ammount" formControlName="ammount" [min]="0"
-                                    [showButtons]="true" [ngClass]="{'ng-invalid': isFieldInvalid('ammount')}"
-                                    inputStyleClass="w-full">
-                                </p-inputNumber>
+                                <app-number-input inputId="ammount" formControlName="ammount" [min]="0"
+                                    [showButtons]="true" [invalid]="isFieldInvalid('ammount')">
+                                </app-number-input>
                                 <label for="ammount">{{ 'wizard.step6.quantity' | translate }}</label>
                             </p-floatlabel>
                             @if (isFieldInvalid('ammount')) {
@@ -117,11 +116,9 @@
                     <div class="col-12 md:col-6 lg:col-3 mb-1">
                         <div class="field">
                             <p-floatlabel variant="in">
-                                <p-inputNumber inputId="price" formControlName="price" [min]="0" [showButtons]="false"
-                                    mode="decimal" locale="en-US" [minFractionDigits]="2"
-                                    [maxFractionDigits]="2" [ngClass]="{'ng-invalid': isFieldInvalid('price')}"
-                                    inputStyleClass="w-full">
-                                </p-inputNumber>
+                                <app-number-input inputId="price" formControlName="price" [min]="0"
+                                    [invalid]="isFieldInvalid('price')">
+                                </app-number-input>
                                 <label for="price">{{ 'wizard.step6.price' | translate }}</label>
                             </p-floatlabel>
                             @if (isFieldInvalid('price')) {
@@ -180,13 +177,13 @@
                 <ng-template pTemplate="body" let-entry let-rowIndex="rowIndex">
                     <tr>
                         <td>{{ getMaterialName(entry.materialId) }}</td>
-                        <td>{{ entry.quantity | number }}</td>
+                        <td>{{ entry.quantity | appNumber }}</td>
                         <td>{{ getUnitName(entry.unitId) }}</td>
                         <td>{{ getMilestoneName(entry.mileStoneId) }}</td>
                         <td>{{ getConstructorName(entry.constructorId) }}</td>
                         <td>{{ getSupplierName(entry.supplierId) }}</td>
-                        <td>{{ entry.price | number:'1.2-2' }}</td>
-                        <td class="font-semibold">{{ calculateTotal(entry) | number:'1.2-2' }}</td>
+                        <td>{{ entry.price | appNumber }}</td>
+                        <td class="font-semibold">{{ calculateTotal(entry) | appNumber }}</td>
                         @if (!isViewMode()) {
                         <td class="text-center">
                             <button type="button" class="p-button-rounded p-button-text p-button-info mr-2"

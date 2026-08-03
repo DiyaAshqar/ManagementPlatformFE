@@ -4,12 +4,12 @@ import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
 import { AttachmentType, CreateTaskCommand, StatusTask } from '../../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../../shared/components/documents-table/documents-table.component';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
 import { ProjectService } from '../../../services/project.service';
 import { TaskService } from '../../../services/task.service';
 
@@ -41,9 +41,9 @@ export interface AddTaskFormData {
     SelectModule,
     TextareaModule,
     ButtonModule,
-    InputNumberModule,
     CalendarModule,
     DocumentsTableComponent,
+    NumberInputComponent,
   ],
   templateUrl: './add-task-dialog.component.html',
   styleUrls: ['./add-task-dialog.component.scss']

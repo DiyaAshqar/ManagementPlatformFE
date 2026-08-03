@@ -10,7 +10,6 @@ import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { DialogModule } from 'primeng/dialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 
 import {
@@ -19,6 +18,7 @@ import {
   CreateProjectMainContractorCommand,
   IGetProjectMainContractorDto
 } from '../../../../../../nswag/api-client';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
 
 @Component({
   selector: 'app-add-contractor-dialog',
@@ -29,10 +29,10 @@ import {
     ReactiveFormsModule,
     DialogModule,
     ButtonModule,
-    InputNumberModule,
     SelectModule,
     FloatLabelModule,
-    CalendarModule
+    CalendarModule,
+    NumberInputComponent
   ],
   providers: [ConstructorClient],
   templateUrl: './add-contractor-dialog.component.html',

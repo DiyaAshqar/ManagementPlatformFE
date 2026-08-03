@@ -6,7 +6,6 @@ import { format, parseISO } from 'date-fns';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DynamicDialogConfig, DynamicDialogRef } from 'primeng/dynamicdialog';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectFilterEvent, SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
@@ -21,6 +20,7 @@ import {
   SupplierClient
 } from '../../../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../../../shared/components/documents-table/documents-table.component';
+import { NumberInputComponent } from '../../../../../../shared/components/number-input/number-input.component';
 import { UsersApiService } from '../../../../../user-management/services/users-api.service';
 import { TaskService } from '../../../../services/task.service';
 
@@ -40,9 +40,9 @@ export interface MilestoneTaskFormData extends ICreateTaskCommand {
     SelectModule,
     TextareaModule,
     ButtonModule,
-    InputNumberModule,
     DatePickerModule,
-    DocumentsTableComponent
+    DocumentsTableComponent,
+    NumberInputComponent
   ],
   providers: [ConstructorClient, ProjectMainContractorClient, SupplierClient],
   templateUrl: './milestone-task-dialog.component.html',

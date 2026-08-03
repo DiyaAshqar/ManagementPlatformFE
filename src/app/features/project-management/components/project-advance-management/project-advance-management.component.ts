@@ -12,7 +12,6 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { SkeletonModule } from 'primeng/skeleton';
@@ -37,6 +36,8 @@ import { AdvanceApiService } from '../../services/advance-api.service';
 import { Permissions } from '../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
+import { NumberInputComponent } from '../../../../shared/components/number-input/number-input.component';
+import { formatAppNumber } from '../../../../shared/pipes/app-number.pipe';
 
 const emptySummary = (): AdvanceSummaryDto => ({
   total_advances: 0,
@@ -56,7 +57,6 @@ const emptySummary = (): AdvanceSummaryDto => ({
     CardModule,
     TableModule,
     InputTextModule,
-    InputNumberModule,
     SelectModule,
     DatePickerModule,
     TooltipModule,
@@ -68,6 +68,7 @@ const emptySummary = (): AdvanceSummaryDto => ({
     IconFieldModule,
     InputIconModule,
     HasPermissionDirective,
+    NumberInputComponent,
   ],
   templateUrl: './project-advance-management.component.html',
   styleUrls: ['./project-advance-management.component.scss'],
@@ -380,7 +381,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
   // -- Display helpers -------------------------------------------------------
 
   formatAmount(value: number | undefined, currency?: string): string {
-    return `${(value ?? 0).toFixed(2)}${currency ? ' ' + currency : ''}`;
+    return `${formatAppNumber(value ?? 0)}${currency ? ' ' + currency : ''}`;
   }
 
   statusSeverity(status: AdvanceStatus): 'info' | 'warn' | 'success' {

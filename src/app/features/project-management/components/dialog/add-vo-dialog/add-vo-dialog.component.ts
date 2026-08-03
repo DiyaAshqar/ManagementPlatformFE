@@ -8,7 +8,6 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
@@ -16,6 +15,8 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { MessageService } from 'primeng/api';
 import { CreateProjectVOCommand, IGetProjectVODto } from '../../../../../../nswag/api-client';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
+import { AppNumberPipe } from '../../../../../shared/pipes/app-number.pipe';
 
 @Component({
     selector: 'app-add-vo-dialog',
@@ -27,12 +28,13 @@ import { CreateProjectVOCommand, IGetProjectVODto } from '../../../../../../nswa
         ButtonModule,
         InputTextModule,
         TextareaModule,
-        InputNumberModule,
         SelectModule,
         TranslateModule,
         FloatLabelModule,
         CheckboxModule,
-        DatePickerModule
+        DatePickerModule,
+        NumberInputComponent,
+        AppNumberPipe
     ],
     templateUrl: './add-vo-dialog.component.html',
     styleUrls: ['./add-vo-dialog.component.scss']

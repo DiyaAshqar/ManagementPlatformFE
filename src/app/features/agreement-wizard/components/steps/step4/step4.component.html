@@ -46,10 +46,8 @@
                 <div class="col-12 md:col-6 lg:col-2 mb-1">
                     <div class="field">
                         <p-floatlabel variant="in">
-                            <p-inputNumber inputId="total" formControlName="total" [min]="0.01" [showButtons]="false"
-                                mode="decimal" locale="en-US"
-                                [ngClass]="{'ng-invalid': isFieldInvalid('total')}"
-                                styleClass="w-full" inputStyleClass="w-full md:min-w-9rem"></p-inputNumber>
+                            <app-number-input inputId="total" formControlName="total" [min]="0.01"
+                                [invalid]="isFieldInvalid('total')"></app-number-input>
                             <label for="total">{{ 'wizard.step4.totalAmount' | translate }}</label>
                         </p-floatlabel>
                         @if (isFieldInvalid('total')) {
@@ -153,7 +151,7 @@
                     <tr>
                         <td>{{ getMainContractTypeDisplayName(contract) }}</td>
                         <td>{{ getConstructorDisplayName(contract) }}</td>
-                        <td>{{ contract.total | number:'1.2-2' }}</td>
+                        <td>{{ contract.total | appNumber }}</td>
                         <td>{{ formatDate(contract.startDate) }}</td>
                         <td>{{ formatDate(contract.endDate) }}</td>
                         <td>{{ getMilestoneDisplayName(contract) }}</td>

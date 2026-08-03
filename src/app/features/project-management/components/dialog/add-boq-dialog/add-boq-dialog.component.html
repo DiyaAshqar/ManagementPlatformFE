@@ -119,15 +119,12 @@
       <div class="col-12 md:col-6">
         <div class="field">
           <p-floatlabel variant="in">
-            <p-inputnumber
+            <app-number-input
               inputId="actualQuantity"
               formControlName="actualQuantity"
-              [minFractionDigits]="0"
-              [maxFractionDigits]="4"
               [min]="0"
-              class="w-full"
-              [class.ng-invalid]="isFieldInvalid('actualQuantity')">
-            </p-inputnumber>
+              [invalid]="isFieldInvalid('actualQuantity')">
+            </app-number-input>
             <label for="actualQuantity">{{ 'projectTabs.boq.dialog.actualQuantity' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('actualQuantity')" class="p-error">{{ 'projectTabs.boq.dialog.quantityRequired' | translate }}</small>
@@ -138,16 +135,12 @@
       <div class="col-12 md:col-6">
         <div class="field">
           <p-floatlabel variant="in">
-            <p-inputnumber
+            <app-number-input
               inputId="price"
               formControlName="price"
-              mode="decimal"
-              [minFractionDigits]="2"
-              [maxFractionDigits]="2"
               [min]="0"
-              class="w-full"
-              [class.ng-invalid]="isFieldInvalid('price')">
-            </p-inputnumber>
+              [invalid]="isFieldInvalid('price')">
+            </app-number-input>
             <label for="price">{{ 'projectTabs.boq.dialog.unitPrice' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('price')" class="p-error">{{ 'projectTabs.boq.dialog.priceRequired' | translate }}</small>
@@ -158,7 +151,7 @@
       <div class="col-12">
         <div class="boq-subtotal-preview">
           <span class="label">{{ 'projectTabs.boq.dialog.subtotal' | translate }}:</span>
-          <span class="value">{{ computedSubTotal | number:'1.2-2' }}</span>
+          <span class="value">{{ computedSubTotal | appNumber }}</span>
         </div>
       </div>
 

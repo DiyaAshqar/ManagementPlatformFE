@@ -5,6 +5,7 @@ import {
   ProjectSubTaskDtoResponse,
   SubTaskType
 } from '../../../../nswag/api-client';
+import { formatAppNumber } from '../../../shared/pipes/app-number.pipe';
 
 @Injectable({
   providedIn: 'root'
@@ -46,7 +47,7 @@ export class SubtaskService {
       endDate: data.endDate ? this.formatDateForInput(data.endDate) : '',
       status: this.mapEnumToStatus(data.status),
       type: this.mapEnumToType(data.type),
-      cost: data.cost ? `$${data.cost.toLocaleString()}` : '',
+      cost: data.cost ? `$${formatAppNumber(data.cost)}` : '',
       quantity: data.qty ? `${data.qty}` : ''
     };
   }
