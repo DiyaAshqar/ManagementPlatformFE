@@ -197,13 +197,15 @@ export class AddContractorDialogComponent implements OnInit, OnChanges, OnDestro
       return;
     }
 
-    const { constructorId, classification, amount, startDate, endDate } = this.contractorForm.value;
+    const { mainContractorTypeId, constructorId, classification, amount, startDate, endDate } = this.contractorForm.value;
 
     const command = new CreateProjectMainContractorCommand({
       id: this.isEditMode ? this.editItem!.id : undefined,
       projectStageId: this.projectStageId,
       constructorId,
+      contractorTypeId: mainContractorTypeId,
       amount,
+      totalPayments: this.isEditMode ? this.editItem!.totalPayments : undefined,
       startDate,
       endDate,
       classification
