@@ -357,13 +357,7 @@
                   {{ fee.agreedValue | appNumber }}
                 }
               </td>
-              <td class="text-right">
-                @if (fee.type === 'percentage') {
-                  {{ engineeringOfficeFeeBase | appNumber }}
-                } @else {
-                  &mdash;
-                }
-              </td>
+              <td class="text-right">{{ engineeringOfficeFeeBase | appNumber }}</td>
               <td class="text-right font-semibold">{{ engineeringOfficeFeeTotal | appNumber }}</td>
             </tr>
           </ng-template>

@@ -453,7 +453,7 @@ export class PaymentClaimTabComponent implements OnInit {
         rows: row(0,
           `<td>${t(this.engineeringOfficeFeeTypeKey)}</td>
            <td class="right bold">${isPercentage ? `${fmtN(engineeringFee.agreedValue)}%` : fmtN(engineeringFee.agreedValue)}</td>
-           <td class="right">${isPercentage ? fmtN(this.engineeringOfficeFeeBase) : '&mdash;'}</td>
+           <td class="right">${fmtN(this.engineeringOfficeFeeBase)}</td>
            <td class="right bold">${fmtN(this.engineeringOfficeFeeTotal)}</td>`
         ),
       });
@@ -513,7 +513,7 @@ export class PaymentClaimTabComponent implements OnInit {
   }
 
   get engineeringOfficeFeeBase(): number {
-    return this.pmcTotal + this.expTotal;
+    return this.pmcTotal + this.expTotal + this.voTotal + this.svTotal;
   }
 
   get engineeringOfficeFeeTotal(): number {
