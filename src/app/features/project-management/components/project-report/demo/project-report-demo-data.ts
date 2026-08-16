@@ -2,15 +2,15 @@ import { computeRemainingBalance, sumBy } from '../utilities/project-report-calc
 import { ProjectReportSnapshot } from '../models/project-report.model';
 
 /**
- * Name of the one Milestone Stage in this demo populated from a real
- * `ProjectBOQs` API response (project stage #48) rather than fabricated
- * figures — every BOQ/contractor/PO row below tagged with this name is
- * copied verbatim (quantities, prices, names) from that response, joined
- * against the accompanying Constructors/Suppliers lookups. Its label comes
- * from the stage's own attachment file name ("Payment Claim Report —
- * مرحلة القواعد").
+ * Name of the one Milestone Stage in this demo populated from real backend
+ * responses (project stage #48, "تحضيرات") rather than fabricated figures —
+ * every BOQ/contractor/PO/surveying-visit row below tagged with this name is
+ * copied verbatim (quantities, prices, names) from those responses, joined
+ * against the accompanying Constructors/Units/Suppliers lookups. The
+ * Expenses/Advances/Variation-Orders ledger totals in the `financial`
+ * section are likewise the real sums for this stage, not placeholders.
  */
-const REAL_STAGE_NAME = 'مرحلة القواعد';
+export const REAL_STAGE_NAME = 'تحضيرات';
 
 /**
  * Small inline SVG placeholders standing in for real jobsite photos in the
@@ -125,31 +125,47 @@ export function buildDemoSnapshot(): ProjectReportSnapshot {
       expectedPrice: 9.5, actualPrice: 9.5, subTotal: 2470, supplierName: null,
       constructorName: 'Al-Basha’ir Contracting Co.', stageName: 'Superstructure — Ground Floor',
     },
-    // Real ProjectBOQs rows for project stage #48 (materialId 1/92/93 — id 15-17 test rows omitted, see module doc).
+    // Real ProjectBOQs rows for project stage #48 (materialId 1/92/93, constructorId 10).
     {
-      material: 'باطون تجهيزات غرف العمال والمستودعات', unit: null, expectedQuantity: null, actualQuantity: 3,
+      material: 'باطون تجهيزات غرف العمال والمستودعات', unit: 'm³', expectedQuantity: null, actualQuantity: 3,
       expectedPrice: 45, actualPrice: 46, subTotal: 138, supplierName: null,
       constructorName: 'شركة محمد ثلجي وشركاؤه', stageName: REAL_STAGE_NAME,
     },
     {
-      material: 'بناء طوب غرف العمال والحارس والمستودع', unit: null, expectedQuantity: null, actualQuantity: 3000,
+      material: 'بناء طوب غرف العمال والحارس والمستودع', unit: 'piece', expectedQuantity: null, actualQuantity: 3000,
       expectedPrice: 0, actualPrice: 0.26, subTotal: 780, supplierName: null,
       constructorName: 'شركة محمد ثلجي وشركاؤه', stageName: REAL_STAGE_NAME,
     },
     {
-      material: 'توريد وتجهيزات الموقع بالكرفان وطابعة خاصة وتمديداته الكهروميكانيكية بقيمة 1600 دينار', unit: null, expectedQuantity: null, actualQuantity: 1,
+      material: 'توريد وتجهيزات الموقع بالكرفان وطابعة خاصة وتمديداته الكهروميكانيكية بقيمة 1600 دينار', unit: 'piece', expectedQuantity: null, actualQuantity: 1,
       expectedPrice: 0, actualPrice: 0, subTotal: 0, supplierName: null,
       constructorName: 'شركة محمد ثلجي وشركاؤه', stageName: REAL_STAGE_NAME,
+    },
+    // Real ProjectBOQs rows for project stage #48 (materialId 1, constructorId 2).
+    {
+      material: 'Concrete', unit: 'm²', expectedQuantity: null, actualQuantity: 2,
+      expectedPrice: 45, actualPrice: 2, subTotal: 4, supplierName: null,
+      constructorName: 'Darwish Company', stageName: REAL_STAGE_NAME,
+    },
+    {
+      material: 'Concrete', unit: 'm²', expectedQuantity: null, actualQuantity: 3,
+      expectedPrice: 45, actualPrice: 3, subTotal: 9, supplierName: null,
+      constructorName: 'Darwish Company', stageName: REAL_STAGE_NAME,
+    },
+    {
+      material: 'Concrete', unit: 'm³', expectedQuantity: null, actualQuantity: 22,
+      expectedPrice: 45, actualPrice: 4, subTotal: 88, supplierName: null,
+      constructorName: 'Darwish Company', stageName: REAL_STAGE_NAME,
     },
   ];
 
   const poRows = [
     { poNumber: 'PO-2026-031', supplierName: 'Al-Ameed Ready-Mix', description: 'Ground-floor slab pour', unit: 'm³', price: 62, subTotal: 6820, statusLabel: 'Approved', stageName: 'Superstructure — Ground Floor' },
     { poNumber: 'PO-2026-034', supplierName: 'Jordan Steel Trading', description: 'First-floor reinforcement batch', unit: 'ton', price: 735, subTotal: 8820, statusLabel: 'Pending', stageName: 'Superstructure — First Floor' },
-    // Real ProjectPOs rows for project stage #48, supplier names resolved from the Suppliers lookup.
-    { poNumber: '32432', supplierName: 'Building Materials Inc.', description: 'SSDFSDF', unit: null, price: 343, subTotal: 343, statusLabel: null, stageName: REAL_STAGE_NAME },
-    { poNumber: '3243243333', supplierName: 'Materials Supplier Co.', description: 'SDFSDFSD', unit: null, price: 45454, subTotal: 45454, statusLabel: null, stageName: REAL_STAGE_NAME },
-    { poNumber: '44', supplierName: 'Building Materials Inc.', description: 'werwer', unit: null, price: 77, subTotal: 77, statusLabel: null, stageName: REAL_STAGE_NAME },
+    // Real ProjectPOs rows for project stage #48 (status 2 = Pending), supplier names resolved from the Suppliers lookup.
+    { poNumber: '32432', supplierName: 'Building Materials Inc.', description: 'SSDFSDF', unit: 'm²', price: 343, subTotal: 343, statusLabel: 'Pending', stageName: REAL_STAGE_NAME },
+    { poNumber: '3243243333', supplierName: 'Materials Supplier Co.', description: 'SDFSDFSD', unit: null, price: 45454, subTotal: 45454, statusLabel: 'Pending', stageName: REAL_STAGE_NAME },
+    { poNumber: '44', supplierName: 'Building Materials Inc.', description: 'werwer', unit: 'm³', price: 77, subTotal: 77, statusLabel: 'Pending', stageName: REAL_STAGE_NAME },
   ];
 
   return {
@@ -236,7 +252,7 @@ export function buildDemoSnapshot(): ProjectReportSnapshot {
         { order: 4, name: 'Superstructure — First Floor', description: 'Columns, beams, slab and walls for the first floor.', statusLabel: null, stageLinked: false },
         { order: 5, name: 'Finishing Works', description: 'Plastering, tiling, joinery and paint.', statusLabel: null, stageLinked: false },
         { order: 6, name: 'External Works & Handover', description: 'Boundary wall, landscaping, snagging and handover.', statusLabel: null, stageLinked: false },
-        { order: 7, name: REAL_STAGE_NAME, description: 'Site facilities and camp works — sourced verbatim from the live ProjectBOQs API response for project stage #48.', statusLabel: null, stageLinked: true },
+        { order: 7, name: REAL_STAGE_NAME, description: 'Site facilities and camp works — sourced verbatim from live backend responses for project stage #48.', statusLabel: null, stageLinked: true },
       ],
     },
     contractors: {
@@ -276,13 +292,16 @@ export function buildDemoSnapshot(): ProjectReportSnapshot {
       contractorPaid: sumBy(contractorRows, (r) => r.totalPaid),
       contractorRemaining: sumBy(contractorRows, (r) => r.remainingBalance),
       purchaseOrdersTotal: sumBy(poRows, (r) => r.subTotal),
-      expensesTotal: 6280,
-      advancesTotal: 15000,
-      advancesRemaining: 4200,
+      // Real Expenses total for project stage #48 (sum of 10 expense records' totalAmount).
+      expensesTotal: 30335.14,
+      // Real Advances summary (project-wide, not stage-scoped — the backend does not tie advances to a stage).
+      advancesTotal: 56577,
+      advancesRemaining: 56283.8,
       ownerPaymentsTotal: 110000,
-      variationOrdersApprovedTotal: 3400,
-      variationOrdersPendingTotal: 1200,
-      variationOrdersRejectedTotal: 600,
+      // Real ProjectVOs total for project stage #48 (one VO, status "approved").
+      variationOrdersApprovedTotal: 102732,
+      variationOrdersPendingTotal: 0,
+      variationOrdersRejectedTotal: 0,
       paymentClaimAuthorized: true,
       paymentClaimEstimateTotal: 86114,
       notes: [
@@ -318,6 +337,9 @@ export function buildDemoSnapshot(): ProjectReportSnapshot {
       surveyingVisits: [
         { date: new Date(startDate.getFullYear(), startDate.getMonth(), 12), surveyor: 'Eng. Rami Salameh', purpose: 'Boundary and setting-out verification', statusLabel: 'Completed', subTotal: 120 },
         { date: new Date(startDate.getFullYear(), startDate.getMonth() + 2, 2), surveyor: 'Eng. Rami Salameh', purpose: 'Foundation level check', statusLabel: 'Completed', subTotal: 120 },
+        // Real ProjectSurveyingVisits rows for project stage #48 (status 0 = In Progress, 1 = Scheduled).
+        { date: new Date(2026, 5, 8), surveyor: 'ibrahim', purpose: 'test', statusLabel: 'In Progress', subTotal: 880 },
+        { date: new Date(2026, 5, 30), surveyor: 'werwe', purpose: 'wrwewr', statusLabel: 'Scheduled', subTotal: 132 },
       ],
     },
     documents: {
@@ -330,7 +352,7 @@ export function buildDemoSnapshot(): ProjectReportSnapshot {
       documents: [
         { fileName: 'structural-drawings-rev3.pdf', typeLabel: 'Project', relatedTo: null },
         { fileName: 'agreement-signed.pdf', typeLabel: 'Agreement', relatedTo: 'Sunrise Villas — Building B' },
-        { fileName: 'تقرير مطالبة الدفع - مرحلة القواعد.pdf', typeLabel: 'Payment Claim', relatedTo: REAL_STAGE_NAME },
+        { fileName: `تقرير مطالبة الدفع - ${REAL_STAGE_NAME}.pdf`, typeLabel: 'Payment Claim', relatedTo: REAL_STAGE_NAME },
       ],
     },
     risks: {

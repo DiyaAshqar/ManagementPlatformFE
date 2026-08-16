@@ -26,7 +26,8 @@ import {
   filterSnapshotByStage,
 } from '../../utilities/project-report-stage-filter.util';
 import { resolveTranslationKey } from '../../utilities/project-report-translate.util';
-import { buildDemoSnapshot, buildDemoSnapshotPartialFailure, buildDemoSnapshotRestricted } from '../project-report-demo-data';
+import { buildDemoSnapshot, buildDemoSnapshotPartialFailure, buildDemoSnapshotRestricted, REAL_STAGE_NAME } from '../project-report-demo-data';
+import { buildStageDataTablesHtml } from '../project-report-demo-stage-tables';
 
 interface Option<V> {
   label: string;
@@ -167,7 +168,8 @@ export class ProjectReportDemoPageComponent {
       next: (translations) => {
         const t = (key: string, params?: Record<string, unknown>) => resolveTranslationKey(translations, key, params);
         const sections = resolveReportSections(config);
-        const html = buildProjectReportHtml(snapshot, config, sections, t);
+        const reportHtml = buildProjectReportHtml(snapshot, config, sections, t);
+        const html = this.injectStageDataTables(reportHtml);
         this.lastGeneratedHtml = html;
         this.previewHtml.set(this.sanitizer.bypassSecurityTrustHtml(html));
         this.isRendering.set(false);
@@ -182,6 +184,24 @@ export class ProjectReportDemoPageComponent {
     if (this.lastGeneratedHtml) {
       this.printService.openAndPrint(this.lastGeneratedHtml);
     }
+  }
+
+  /**
+   * Splices the color-coded raw-data tables (BOQ/PMC/PO/SV/VO/EXP/ADV) for
+   * the demo's one real Milestone Stage right after the Agreement section,
+   * so they read as part of the normal report flow instead of a disconnected
+   * block bolted onto the front. Falls back to right after `<body>` when the
+   * Agreement section itself is excluded from the current report type/custom
+   * selection (its `id="agreement"` marker won't be present).
+   */
+  private injectStageDataTables(html: string): string {
+    const fragment = buildStageDataTablesHtml(REAL_STAGE_NAME);
+    const agreementStart = html.indexOf('id="agreement"');
+    if (agreementStart === -1) {
+      return html.replace('<body>', `<body>\n${fragment}`);
+    }
+    const sectionEnd = html.indexOf('</section>', agreementStart) + '</section>'.length;
+    return `${html.slice(0, sectionEnd)}\n${fragment}${html.slice(sectionEnd)}`;
   }
 
   private resolveSnapshot(): ProjectReportSnapshot {
