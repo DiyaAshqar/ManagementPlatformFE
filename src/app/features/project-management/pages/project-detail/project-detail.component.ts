@@ -1,16 +1,13 @@
 import { CommonModule } from '@angular/common';
-import { Component, computed, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, OnInit, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
-import { Subscription } from 'rxjs';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
-import { DialogModule } from 'primeng/dialog';
 import { ProgressBarModule } from 'primeng/progressbar';
-import { SelectModule } from 'primeng/select';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TabsModule } from 'primeng/tabs';
 import { TagModule } from 'primeng/tag';
@@ -22,6 +19,7 @@ import { ExcavationStageComponent } from '../../components/excavation-stage/exca
 import { MilestoneStageComponent } from '../../components/milestone-stage/milestone-stage.component';
 import { OwnerPaymentTabComponent } from '../../components/owner-payment-tab/owner-payment-tab.component';
 import { PreparingStageComponent } from '../../components/preparing-stage/preparing-stage.component';
+import { ProjectReportDialogComponent } from '../../components/project-report/project-report-dialog/project-report-dialog.component';
 import { StageKanbanComponent } from '../../components/stage-kanban/stage-kanban.component';
 import { TimeframeComponent } from '../../components/timeframe/timeframe.component';
 import { Project, ProjectStatus, Stage, TaskStatus } from '../../models';
@@ -30,11 +28,6 @@ import { ProjectService } from '../../services/project.service';
 import { Permissions } from '../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
-
-interface ReportType {
-  label: string;
-  value: string;
-}
 
 @Component({
   selector: 'app-project-detail',
@@ -50,12 +43,11 @@ interface ReportType {
     ProgressBarModule,
     TooltipModule,
     SkeletonModule,
-    DialogModule,
-    SelectModule,
     PreparingStageComponent,
     ExcavationStageComponent,
     MilestoneStageComponent,
     OwnerPaymentTabComponent,
+    ProjectReportDialogComponent,
     StageKanbanComponent,
     TimeframeComponent,
     DocumentsStageComponent,
@@ -65,16 +57,14 @@ interface ReportType {
   templateUrl: './project-detail.component.html',
   styleUrls: ['./project-detail.component.scss']
 })
-export class ProjectDetailComponent implements OnInit, OnDestroy {
+export class ProjectDetailComponent implements OnInit {
   readonly permissions = Permissions;
   project = signal<Project | null>(null);
   projectData = signal<GetProjectDto | null>(null);
   isLoading = signal<boolean>(true);
   activeTabIndex = "0";
-  showPrintDialog = false;
-  selectedReportType = 'full';
-  private langSub!: Subscription;
-  
+  showReportDialog = false;
+
   // Computed signals for stage IDs
   preparingStageId = computed(() => {
     const stages = this.projectData()?.projectStages;
@@ -91,18 +81,8 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
     const stages = this.projectData()?.projectStages;
     return stages?.filter((s: ProjectStageDto) => s.stageType === ProjectStageType.Milestones) || [];
   });
-  
-  reportTypes: ReportType[] = [];
 
-  private buildReportTypes(): void {
-    this.reportTypes = [
-      { label: this.translate.instant('projectDetail.printDialog.reportTypes.full'), value: 'full' },
-      { label: this.translate.instant('projectDetail.printDialog.reportTypes.summary'), value: 'summary' },
-      { label: this.translate.instant('projectDetail.printDialog.reportTypes.progress'), value: 'progress' },
-      { label: this.translate.instant('projectDetail.printDialog.reportTypes.financial'), value: 'financial' },
-      { label: this.translate.instant('projectDetail.printDialog.reportTypes.custom'), value: 'custom' }
-    ];
-  }
+  projectIdNumber = computed(() => Number(this.project()?.id ?? 0));
 
   constructor(
     private route: ActivatedRoute,
@@ -114,8 +94,6 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.activeTabIndex = this.firstAccessibleTab();
-    this.buildReportTypes();
-    this.langSub = this.translate.onLangChange.subscribe(() => this.buildReportTypes());
     const projectId = this.route.snapshot.paramMap.get('id');
     if (projectId) {
       this.loadProject(projectId);
@@ -137,10 +115,6 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
       ['7', Permissions.ProjectTabs.Timeframe],
     ] as const;
     return tabs.find(([, permission]) => this.canViewTab(permission))?.[0] ?? '0';
-  }
-
-  ngOnDestroy(): void {
-    this.langSub?.unsubscribe();
   }
 
   loadProject(id: string): void {
@@ -166,22 +140,6 @@ export class ProjectDetailComponent implements OnInit, OnDestroy {
 
   goBack(): void {
     this.router.navigate(['/projects']);
-  }
-
-  openPrintDialog(): void {
-    this.showPrintDialog = true;
-  }
-
-  printReport(): void {
-    console.log('Printing report:', this.selectedReportType);
-    window.print();
-    this.showPrintDialog = false;
-  }
-
-  downloadReport(): void {
-    console.log('Downloading report:', this.selectedReportType);
-    // Implement PDF download logic
-    this.showPrintDialog = false;
   }
 
   viewStageDetails(stage: Stage): void {

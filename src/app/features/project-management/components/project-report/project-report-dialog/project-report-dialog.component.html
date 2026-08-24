@@ -1,0 +1,122 @@
+<p-dialog
+  [visible]="visible"
+  (visibleChange)="onVisibleChange($event)"
+  [modal]="true"
+  [style]="{ width: '48rem' }"
+  [header]="'projectDetail.printDialog.header' | translate"
+  [draggable]="false"
+  [resizable]="false">
+  <p class="text-color-secondary mb-3">{{ 'projectDetail.printDialog.description' | translate }}</p>
+
+  <div class="report-dialog-grid">
+    <div class="field-block">
+      <label class="block text-sm font-medium mb-2 text-color">{{ 'projectDetail.printDialog.reportType' | translate }}</label>
+      <p-select
+        [(ngModel)]="selectedType"
+        [options]="reportTypeOptions"
+        optionLabel="label"
+        optionValue="value"
+        [placeholder]="'projectDetail.printDialog.selectReportType' | translate"
+        styleClass="w-full">
+      </p-select>
+    </div>
+
+    <div class="field-block">
+      <label class="block text-sm font-medium mb-2 text-color" for="reportAsOfDate">{{ 'projectDetail.printDialog.asOfDate' | translate }}</label>
+      <p-datepicker
+        inputId="reportAsOfDate"
+        [(ngModel)]="asOfDate"
+        dateFormat="yy-mm-dd"
+        [showIcon]="true"
+        styleClass="w-full">
+      </p-datepicker>
+    </div>
+
+    <div class="field-block">
+      <label class="block text-sm font-medium mb-2 text-color">{{ 'projectDetail.printDialog.language' | translate }}</label>
+      <p-select
+        [(ngModel)]="selectedLanguage"
+        [options]="languageOptions"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="w-full">
+      </p-select>
+    </div>
+  </div>
+
+  @if (isCustom) {
+    <div class="field-block mt-3">
+      <label class="block text-sm font-medium mb-2 text-color">{{ 'projectDetail.printDialog.customSections' | translate }}</label>
+      <p-multiSelect
+        [(ngModel)]="customSections"
+        [options]="sectionOptions"
+        optionLabel="label"
+        optionValue="value"
+        display="chip"
+        styleClass="w-full">
+      </p-multiSelect>
+    </div>
+  }
+
+  <div class="toggle-grid mt-3">
+    <div class="toggle-item">
+      <p-checkbox [(ngModel)]="includeCompanyHeader" [binary]="true" inputId="rptCompanyHeader"></p-checkbox>
+      <label for="rptCompanyHeader">{{ 'projectDetail.printDialog.includeCompanyHeader' | translate }}</label>
+    </div>
+    <div class="toggle-item">
+      <p-checkbox [(ngModel)]="includeFinancial" [binary]="true" [disabled]="!canViewFinancial" inputId="rptFinancial"></p-checkbox>
+      <label for="rptFinancial">{{ 'projectDetail.printDialog.includeFinancial' | translate }}</label>
+    </div>
+    <div class="toggle-item">
+      <p-checkbox [(ngModel)]="includeDocuments" [binary]="true" [disabled]="!canViewDocuments" inputId="rptDocuments"></p-checkbox>
+      <label for="rptDocuments">{{ 'projectDetail.printDialog.includeDocuments' | translate }}</label>
+    </div>
+    <div class="toggle-item">
+      <p-checkbox [(ngModel)]="includePhotos" [binary]="true" [disabled]="!canViewDocuments" inputId="rptPhotos"></p-checkbox>
+      <label for="rptPhotos">{{ 'projectDetail.printDialog.includePhotos' | translate }}</label>
+    </div>
+    <div class="toggle-item">
+      <p-checkbox [(ngModel)]="includeSignatures" [binary]="true" inputId="rptSignatures"></p-checkbox>
+      <label for="rptSignatures">{{ 'projectDetail.printDialog.includeSignatures' | translate }}</label>
+    </div>
+    <div class="toggle-item">
+      <p-checkbox [(ngModel)]="confidential" [binary]="true" inputId="rptConfidential"></p-checkbox>
+      <label for="rptConfidential">{{ 'projectDetail.printDialog.confidential' | translate }}</label>
+    </div>
+  </div>
+
+  <p class="text-xs text-color-secondary mt-3">
+    <i class="pi pi-info-circle mr-1"></i>{{ 'projectDetail.printDialog.pdfHint' | translate }}
+  </p>
+
+  @if (errorMessage(); as error) {
+    <p class="report-dialog-error mt-2"><i class="pi pi-exclamation-triangle mr-1"></i>{{ error }}</p>
+  }
+  @if (warningMessage(); as warning) {
+    <p class="report-dialog-warning mt-2"><i class="pi pi-info-circle mr-1"></i>{{ warning }}</p>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button
+      [label]="'projectDetail.printDialog.cancel' | translate"
+      [outlined]="true"
+      [disabled]="isGenerating()"
+      (onClick)="cancel()">
+    </p-button>
+    <p-button
+      [label]="'projectDetail.printDialog.downloadPdf' | translate"
+      icon="pi pi-download"
+      [outlined]="true"
+      [loading]="isGenerating()"
+      [disabled]="isGenerating()"
+      (onClick)="downloadPdf()">
+    </p-button>
+    <p-button
+      [label]="'projectDetail.printDialog.print' | translate"
+      icon="pi pi-print"
+      [loading]="isGenerating()"
+      [disabled]="isGenerating()"
+      (onClick)="print()">
+    </p-button>
+  </ng-template>
+</p-dialog>

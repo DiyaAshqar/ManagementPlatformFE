@@ -1,0 +1,116 @@
+<div class="demo-page p-3" dir="rtl">
+  <p-card>
+    <ng-template pTemplate="title">تقرير المشروع — نسخة تجريبية</ng-template>
+    <ng-template pTemplate="subtitle">
+      بيئة تجريبية حية لمولّد التقرير، باستخدام بيانات نموذجية ثابتة — لا حاجة لمشروع حقيقي أو اتصال بالخادم.
+    </ng-template>
+
+    <div class="demo-grid">
+      <div class="field-block">
+        <label class="block text-sm font-medium mb-2">سيناريو العرض التجريبي</label>
+        <p-select
+          [(ngModel)]="scenario"
+          [options]="scenarioOptions"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+          (onChange)="refresh()">
+        </p-select>
+      </div>
+
+      <div class="field-block">
+        <label class="block text-sm font-medium mb-2">نوع التقرير</label>
+        <p-select
+          [(ngModel)]="selectedType"
+          [options]="reportTypeOptions"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+          (onChange)="refresh()">
+        </p-select>
+      </div>
+
+      <div class="field-block">
+        <label class="block text-sm font-medium mb-2">لغة التقرير</label>
+        <p-select
+          [(ngModel)]="selectedLanguage"
+          [options]="languageOptions"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+          (onChange)="refresh()">
+        </p-select>
+      </div>
+
+      <div class="field-block">
+        <label class="block text-sm font-medium mb-2">مرحلة الإنجاز (Milestone Stage)</label>
+        <p-select
+          [(ngModel)]="selectedStageId"
+          [options]="stageOptions"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+          (onChange)="refresh()">
+        </p-select>
+      </div>
+    </div>
+
+    @if (isCustom) {
+      <div class="field-block mt-3">
+        <label class="block text-sm font-medium mb-2">الأقسام المخصصة</label>
+        <p-multiSelect
+          [(ngModel)]="customSections"
+          [options]="sectionOptions"
+          optionLabel="label"
+          optionValue="value"
+          display="chip"
+          styleClass="w-full"
+          (onChange)="refresh()">
+        </p-multiSelect>
+      </div>
+    }
+
+    <div class="toggle-grid mt-3">
+      <div class="toggle-item">
+        <p-checkbox [(ngModel)]="includeCompanyHeader" [binary]="true" inputId="demoCompanyHeader" (onChange)="refresh()"></p-checkbox>
+        <label for="demoCompanyHeader">تضمين ترويسة الشركة والشعار</label>
+      </div>
+      <div class="toggle-item">
+        <p-checkbox [(ngModel)]="includeFinancial" [binary]="true" inputId="demoFinancial" (onChange)="refresh()"></p-checkbox>
+        <label for="demoFinancial">تضمين المعلومات المالية</label>
+      </div>
+      <div class="toggle-item">
+        <p-checkbox [(ngModel)]="includeDocuments" [binary]="true" inputId="demoDocuments" (onChange)="refresh()"></p-checkbox>
+        <label for="demoDocuments">تضمين المستندات</label>
+      </div>
+      <div class="toggle-item">
+        <p-checkbox [(ngModel)]="includePhotos" [binary]="true" inputId="demoPhotos" (onChange)="refresh()"></p-checkbox>
+        <label for="demoPhotos">تضمين صور سير العمل</label>
+      </div>
+      <div class="toggle-item">
+        <p-checkbox [(ngModel)]="includeSignatures" [binary]="true" inputId="demoSignatures" (onChange)="refresh()"></p-checkbox>
+        <label for="demoSignatures">تضمين التوقيعات</label>
+      </div>
+      <div class="toggle-item">
+        <p-checkbox [(ngModel)]="confidential" [binary]="true" inputId="demoConfidential" (onChange)="refresh()"></p-checkbox>
+        <label for="demoConfidential">تصنيف كوثيقة سرية</label>
+      </div>
+    </div>
+
+    <div class="actions mt-3">
+      <p-button label="تحديث المعاينة" icon="pi pi-refresh" [outlined]="true" [loading]="isRendering()" (onClick)="refresh()"></p-button>
+      <p-button label="طباعة" icon="pi pi-print" (onClick)="print()"></p-button>
+    </div>
+  </p-card>
+
+  <p-card styleClass="mt-3 preview-card">
+    <ng-template pTemplate="title">معاينة حية</ng-template>
+    <div class="preview-frame-wrap">
+      @if (previewHtml(); as html) {
+        <iframe class="preview-frame" [srcdoc]="html" title="معاينة تقرير المشروع"></iframe>
+      } @else {
+        <p class="text-color-secondary">جارٍ إنشاء المعاينة…</p>
+      }
+    </div>
+  </p-card>
+</div>

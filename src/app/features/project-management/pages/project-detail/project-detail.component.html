@@ -26,11 +26,11 @@
             </div>
           </div>
           <div class="flex align-items-center gap-2">
-            <p-button 
+            <p-button
               icon="pi pi-print"
               [label]="'projectDetail.printReport' | translate"
               [outlined]="true"
-              (onClick)="openPrintDialog()"
+              (onClick)="showReportDialog = true"
               severity="secondary">
             </p-button>
             <p-tag 
@@ -233,47 +233,12 @@
         </p-tabs>
       </p-card>
     </div>
+
+    <!-- Project Document Report Dialog -->
+    <app-project-report-dialog
+      [(visible)]="showReportDialog"
+      [projectId]="projectIdNumber()"
+      [projectName]="project()!.name">
+    </app-project-report-dialog>
   }
 </div>
-
-<!-- Print Dialog -->
-<p-dialog 
-  [(visible)]="showPrintDialog"
-  [modal]="true"
-  [style]="{ width: '40rem' }"
-  [header]="'projectDetail.printDialog.header' | translate"
-  [draggable]="false"
-  [resizable]="false">
-  <p class="text-color-secondary mb-2">{{ 'projectDetail.printDialog.description' | translate }}</p>
-  
-  <div class="mb-2">
-    <label class="block text-sm font-medium mb-2 text-color">{{ 'projectDetail.printDialog.reportType' | translate }}</label>
-    <p-select 
-      [(ngModel)]="selectedReportType"
-      [options]="reportTypes"
-      optionLabel="label"
-      optionValue="value"
-      [placeholder]="'projectDetail.printDialog.selectReportType' | translate"
-      styleClass="w-full">
-    </p-select>
-  </div>
-  
-  <ng-template pTemplate="footer">
-    <p-button 
-      [label]="'projectDetail.printDialog.cancel' | translate"
-      [outlined]="true"
-      (onClick)="showPrintDialog = false">
-    </p-button>
-    <p-button 
-      [label]="'projectDetail.printDialog.downloadPdf' | translate"
-      icon="pi pi-download"
-      [outlined]="true"
-      (onClick)="downloadReport()">
-    </p-button>
-    <p-button 
-      [label]="'projectDetail.printDialog.print' | translate"
-      icon="pi pi-print"
-      (onClick)="printReport()">
-    </p-button>
-  </ng-template>
-</p-dialog>
