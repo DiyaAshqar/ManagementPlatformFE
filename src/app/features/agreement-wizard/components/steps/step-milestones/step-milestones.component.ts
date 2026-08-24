@@ -5,7 +5,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TableModule } from 'primeng/table';
@@ -13,6 +12,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { AgreementWizardService } from '../../../services/agreement-wizard.service';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
 import {
   FullAgreementDto,
   MileStonesDto,
@@ -26,13 +26,13 @@ import {
     CommonModule,
     ReactiveFormsModule,
     ProgressSpinnerModule,
-    InputNumberModule,
     InputTextModule,
     ButtonModule,
     TranslateModule,
     FloatLabelModule,
     TooltipModule,
-    TableModule
+    TableModule,
+    NumberInputComponent
   ],
   templateUrl: './step-milestones.component.html'
 })

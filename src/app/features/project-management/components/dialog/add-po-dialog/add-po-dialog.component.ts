@@ -7,7 +7,6 @@ import { TranslateService, TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectFilterEvent, SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
@@ -15,6 +14,8 @@ import { TextareaModule } from 'primeng/textarea';
 import { MessageService } from 'primeng/api';
 import { AttachmentType, CreateProjectPOCommand, IGetProjectPODto } from '../../../../../../nswag/api-client';
 import { DocumentsTableComponent } from '../../../../../shared/components/documents-table/documents-table.component';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
+import { AppNumberPipe } from '../../../../../shared/pipes/app-number.pipe';
 
 @Component({
     selector: 'app-add-po-dialog',
@@ -27,10 +28,11 @@ import { DocumentsTableComponent } from '../../../../../shared/components/docume
         ButtonModule,
         InputTextModule,
         TextareaModule,
-        InputNumberModule,
         SelectModule,
         FloatLabelModule,
-        DocumentsTableComponent
+        DocumentsTableComponent,
+        NumberInputComponent,
+        AppNumberPipe
     ],
     templateUrl: './add-po-dialog.component.html',
     styleUrls: ['./add-po-dialog.component.scss']

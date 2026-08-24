@@ -6,7 +6,6 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 // PrimeNG
 import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { SelectModule } from 'primeng/select';
@@ -28,6 +27,8 @@ import {
 } from '../../../../../../nswag/api-client';
 import { getLookupData } from '../../../../../shared/utils/lookup.util';
 import { DocumentsTableComponent } from '../../../../../shared/components/documents-table/documents-table.component';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
+import { AppNumberPipe } from '../../../../../shared/pipes/app-number.pipe';
 
 @Component({
   selector: 'app-project-main-contractor-payments',
@@ -38,7 +39,6 @@ import { DocumentsTableComponent } from '../../../../../shared/components/docume
     TranslateModule,
     ButtonModule,
     CalendarModule,
-    InputNumberModule,
     InputTextModule,
     SelectModule,
     SkeletonModule,
@@ -47,7 +47,9 @@ import { DocumentsTableComponent } from '../../../../../shared/components/docume
     TagModule,
     DialogModule,
     TextareaModule,
-    DocumentsTableComponent
+    DocumentsTableComponent,
+    NumberInputComponent,
+    AppNumberPipe
   ],
   providers: [ProjectMainContractorPaymentClient, LookupClient],
   templateUrl: './project-main-contractor-payments.component.html',

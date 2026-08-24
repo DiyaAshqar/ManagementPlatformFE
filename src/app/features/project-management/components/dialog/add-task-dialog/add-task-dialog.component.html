@@ -46,13 +46,13 @@
 
       <div class="form-group col-6">
         <label for="taskPoints">Estimated Hours</label>
-        <p-inputNumber
-          id="taskPoints"
+        <app-number-input
+          inputId="taskPoints"
           [(ngModel)]="formData.taskPoints"
           name="taskPoints"
           placeholder="0"
           class="form-control"
-        ></p-inputNumber>
+        ></app-number-input>
       </div>
     </div>
 
@@ -133,15 +133,13 @@
 
         <div class="form-group col-6">
           <label for="depth">Depth (m)</label>
-          <p-inputNumber
-            id="depth"
+          <app-number-input
+            inputId="depth"
             [(ngModel)]="formData.depth"
             name="depth"
             placeholder="0"
-            [minFractionDigits]="1"
-            [maxFractionDigits]="2"
             class="form-control"
-          ></p-inputNumber>
+          ></app-number-input>
         </div>
       </div>
 
@@ -149,15 +147,13 @@
       <div class="form-row">
         <div class="form-group col-6">
           <label for="volume">Volume (m³)</label>
-          <p-inputNumber
-            id="volume"
+          <app-number-input
+            inputId="volume"
             [(ngModel)]="formData.volume"
             name="volume"
             placeholder="0"
-            [minFractionDigits]="1"
-            [maxFractionDigits]="2"
             class="form-control"
-          ></p-inputNumber>
+          ></app-number-input>
         </div>
 
         <div class="form-group col-6">

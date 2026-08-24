@@ -35,6 +35,7 @@ import {
 import { Permissions } from '../../../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
 import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
+import { AppNumberPipe, formatAppNumber } from '../../../../../../shared/pipes/app-number.pipe';
 
 export type ClaimType = 'BOQ' | 'PMC' | 'SV' | 'VO' | 'EXP';
 
@@ -74,6 +75,7 @@ export interface EngineeringOfficeFee {
     TooltipModule,
     ConfirmDialogModule,
     HasPermissionDirective,
+    AppNumberPipe,
   ],
   providers: [
     ConfirmationService,
@@ -312,8 +314,7 @@ export class PaymentClaimTabComponent implements OnInit {
     const data = this.claimData();
     const sel  = this.selectedTypes();
 
-    const fmtN = (v: number | null | undefined, dec = 2): string =>
-      (v ?? 0).toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec });
+    const fmtN = (v: number | null | undefined): string => formatAppNumber(v ?? 0) ?? '0';
 
     const row = (i: number, cells: string): string =>
       `<tr class="${i % 2 === 0 ? 'even' : 'odd'}">${cells}</tr>`;
@@ -338,7 +339,7 @@ export class PaymentClaimTabComponent implements OnInit {
            <td dir="auto">${this.getMaterialName(item)}</td>
            <td dir="auto">${item.description || '—'}</td>
            <td dir="auto">${this.getUnitName(item)}</td>
-           <td class="right">${fmtN(item.actualQuantity, 0)}</td>
+           <td class="right">${fmtN(item.actualQuantity)}</td>
            <td class="right">${fmtN(item.price)}</td>
            <td class="right bold">${fmtN(item.subTotal)}</td>`
         )).join(''),
@@ -384,7 +385,7 @@ export class PaymentClaimTabComponent implements OnInit {
            <td>${this.formatDate(item.visitDate)}</td>
            <td dir="auto">${item.surveyor || '—'}</td>
            <td dir="auto">${item.purpose  || '—'}</td>
-           <td class="right">${fmtN(item.quantity, 0)}</td>
+           <td class="right">${fmtN(item.quantity)}</td>
            <td class="right">${fmtN(item.price)}</td>
            <td class="right bold">${fmtN(item.subTotal)}</td>`
         )).join(''),
@@ -407,7 +408,7 @@ export class PaymentClaimTabComponent implements OnInit {
           `<td class="center">${i + 1}</td>
            <td><span class="badge">${item.voNumber || '—'}</span></td>
            <td dir="auto">${item.description || '—'}</td>
-           <td class="right">${fmtN(item.quantity, 0)}</td>
+           <td class="right">${fmtN(item.quantity)}</td>
            <td class="right">${fmtN(item.price)}</td>
            <td class="right bold">${fmtN(item.subTotal)}</td>`
         )).join(''),
@@ -452,7 +453,7 @@ export class PaymentClaimTabComponent implements OnInit {
         rows: row(0,
           `<td>${t(this.engineeringOfficeFeeTypeKey)}</td>
            <td class="right bold">${isPercentage ? `${fmtN(engineeringFee.agreedValue)}%` : fmtN(engineeringFee.agreedValue)}</td>
-           <td class="right">${isPercentage ? fmtN(this.engineeringOfficeFeeBase) : '&mdash;'}</td>
+           <td class="right">${fmtN(this.engineeringOfficeFeeBase)}</td>
            <td class="right bold">${fmtN(this.engineeringOfficeFeeTotal)}</td>`
         ),
       });
@@ -512,7 +513,7 @@ export class PaymentClaimTabComponent implements OnInit {
   }
 
   get engineeringOfficeFeeBase(): number {
-    return this.pmcTotal + this.expTotal;
+    return this.pmcTotal + this.expTotal + this.voTotal + this.svTotal;
   }
 
   get engineeringOfficeFeeTotal(): number {

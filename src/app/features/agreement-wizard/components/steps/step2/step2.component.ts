@@ -6,13 +6,13 @@ import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputGroupModule } from 'primeng/inputgroup';
 import { InputGroupAddonModule } from 'primeng/inputgroupaddon';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 import { AgreementWizardService } from '../../../services/agreement-wizard.service';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
 import {
   FullAgreementDto,
   SecondStepDto,
@@ -30,12 +30,12 @@ import {
     ReactiveFormsModule,
     SelectModule,
     ProgressSpinnerModule,
-    InputNumberModule,
     ButtonModule,
     TranslateModule,
     FloatLabelModule,
     InputGroupModule,
-    InputGroupAddonModule
+    InputGroupAddonModule,
+    NumberInputComponent
   ],
   templateUrl: './step2.component.html'
 })

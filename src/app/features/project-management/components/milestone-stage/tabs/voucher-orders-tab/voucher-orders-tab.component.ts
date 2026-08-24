@@ -22,6 +22,7 @@ import { AddVoDialogComponent } from '../../../dialog/add-vo-dialog/add-vo-dialo
 import { Permissions } from '../../../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
 import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
+import { AppNumberPipe } from '../../../../../../shared/pipes/app-number.pipe';
 
 // VO Status enum matching the backend
 export enum VOStatus {
@@ -42,7 +43,8 @@ export enum VOStatus {
     SkeletonModule,
     BadgeModule,
     AddVoDialogComponent,
-    HasPermissionDirective
+    HasPermissionDirective,
+    AppNumberPipe
   ],
   providers: [ProjectVOClient, LookupClient],
   templateUrl: './voucher-orders-tab.component.html',

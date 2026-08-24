@@ -34,14 +34,12 @@
         <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="field">
             <p-floatlabel variant="in">
-              <p-inputNumber
+              <app-number-input
                 inputId="order"
                 formControlName="order"
                 [min]="1"
-                [showButtons]="false"
-                [ngClass]="{'ng-invalid': isFieldInvalid('order')}"
-                inputStyleClass="w-full"
-              ></p-inputNumber>
+                [invalid]="isFieldInvalid('order')"
+              ></app-number-input>
               <label for="order">{{ 'wizard.stepMilestones.orderNo' | translate }} <span class="required-asterisk">*</span></label>
             </p-floatlabel>
             @if (isFieldInvalid('order')) {

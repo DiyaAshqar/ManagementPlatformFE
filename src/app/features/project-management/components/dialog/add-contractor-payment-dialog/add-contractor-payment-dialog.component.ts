@@ -8,7 +8,6 @@ import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { DialogModule } from 'primeng/dialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
@@ -17,6 +16,7 @@ import {
   CreateProjectMainContractorPaymentCommand,
   GetProjectMainContractorPaymentDto
 } from '../../../../../../nswag/api-client';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
 
 @Component({
   selector: 'app-add-contractor-payment-dialog',
@@ -28,11 +28,11 @@ import {
     DialogModule,
     ButtonModule,
     InputTextModule,
-    InputNumberModule,
     SelectModule,
     FloatLabelModule,
     CalendarModule,
-    TextareaModule
+    TextareaModule,
+    NumberInputComponent
   ],
   templateUrl: './add-contractor-payment-dialog.component.html',
   styleUrl: './add-contractor-payment-dialog.component.scss'

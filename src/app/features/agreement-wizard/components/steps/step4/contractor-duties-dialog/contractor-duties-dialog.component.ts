@@ -6,7 +6,6 @@ import { ButtonModule } from 'primeng/button';
 import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectFilterEvent, SelectModule } from 'primeng/select';
@@ -17,6 +16,8 @@ import { debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil } f
 import { MessageService } from 'primeng/api';
 import { AgreementWizardService } from '../../../../services/agreement-wizard.service';
 import { MaterialSelectComponent } from '../../../../../../shared/components/material-select/material-select.component';
+import { NumberInputComponent } from '../../../../../../shared/components/number-input/number-input.component';
+import { AppNumberPipe } from '../../../../../../shared/pipes/app-number.pipe';
 import {
   ContractorDutyDto,
   CreateProjectMainContractorDutyCommand,
@@ -36,7 +37,6 @@ import {
     DialogModule,
     SelectModule,
     ProgressSpinnerModule,
-    InputNumberModule,
     InputTextModule,
     CheckboxModule,
     ButtonModule,
@@ -44,7 +44,9 @@ import {
     FloatLabelModule,
     TableModule,
     TooltipModule,
-    MaterialSelectComponent
+    MaterialSelectComponent,
+    NumberInputComponent,
+    AppNumberPipe
   ],
   providers: [SupplierClient, ProjectMainContractorDutyClient],
   templateUrl: './contractor-duties-dialog.component.html'

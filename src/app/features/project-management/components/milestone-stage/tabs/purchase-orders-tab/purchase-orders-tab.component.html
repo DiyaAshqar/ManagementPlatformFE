@@ -47,9 +47,9 @@
         <td>{{ supplierMap[item.supplierId ?? 0] || '—' }}</td>
         <td>{{ item.description }}</td>
         <td><span class="po-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
-        <td class="text-right">{{ item.price | number:'1.2-2' }}</td>
-        <td class="text-right">{{ getAmount(item) | number:'1.0-0' }}</td>
-        <td class="text-right po-subtotal">{{ item.subTotal | number:'1.0-0' }}</td>
+        <td class="text-right">{{ item.price | appNumber }}</td>
+        <td class="text-right">{{ getAmount(item) | appNumber }}</td>
+        <td class="text-right po-subtotal">{{ item.subTotal | appNumber }}</td>
         <td>
           <p-badge 
             [value]="getStatusLabel(item.status)" 
@@ -119,7 +119,7 @@
             <span class="po-grand-total-label">{{ 'projectTabs.purchaseOrders.totalValue' | translate }}:</span>
           </td>
           <td class="text-right po-grand-total-value">
-            {{ totalPOValue | number:'1.0-0' }}
+            {{ totalPOValue | appNumber }}
           </td>
           <td colspan="2"></td>
         </tr>

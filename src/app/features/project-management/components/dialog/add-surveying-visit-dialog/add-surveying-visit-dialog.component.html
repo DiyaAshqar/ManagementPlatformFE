@@ -90,15 +90,12 @@
       <div class="col-12 md:col-6">
         <div class="field">
           <p-floatlabel variant="in">
-            <p-inputnumber
+            <app-number-input
               inputId="quantity"
               formControlName="quantity"
-              [minFractionDigits]="0"
-              [maxFractionDigits]="4"
               [min]="0"
-              class="w-full"
-              [class.ng-invalid]="isFieldInvalid('quantity')">
-            </p-inputnumber>
+              [invalid]="isFieldInvalid('quantity')">
+            </app-number-input>
             <label for="quantity">{{ 'dialogs.surveyingVisit.quantity' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('quantity')" class="p-error">{{ 'dialogs.surveyingVisit.quantityRequired' | translate }}</small>
@@ -109,16 +106,12 @@
       <div class="col-12">
         <div class="field">
           <p-floatlabel variant="in">
-            <p-inputnumber
+            <app-number-input
               inputId="price"
               formControlName="price"
-              mode="decimal"
-              [minFractionDigits]="2"
-              [maxFractionDigits]="2"
               [min]="0"
-              class="w-full"
-              [class.ng-invalid]="isFieldInvalid('price')">
-            </p-inputnumber>
+              [invalid]="isFieldInvalid('price')">
+            </app-number-input>
             <label for="price">{{ 'dialogs.surveyingVisit.unitPrice' | translate }} <span class="required-asterisk">*</span></label>
           </p-floatlabel>
           <small *ngIf="isFieldInvalid('price')" class="p-error">{{ 'dialogs.surveyingVisit.unitPriceRequired' | translate }}</small>
@@ -149,7 +142,7 @@
       <div class="col-12">
         <div class="sv-subtotal-preview">
           <span class="label">{{ 'dialogs.surveyingVisit.subtotal' | translate }}:</span>
-          <span class="value">{{ computedSubTotal | number:'1.2-2' }}</span>
+          <span class="value">{{ computedSubTotal | appNumber }}</span>
         </div>
       </div>
 

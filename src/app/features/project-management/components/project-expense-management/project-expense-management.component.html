@@ -25,7 +25,7 @@
         </div>
         <div class="flex align-items-center gap-2">
           <span class="text-500 text-sm">{{ 'projectTabs.expenses.list.totalAmount' | translate }}:</span>
-          <span class="font-bold text-primary">{{ formatAmount(totalExpensesAmount()) }}</span>
+          <span class="font-bold text-primary">{{ totalExpensesAmount() | appNumber }}</span>
         </div>
       </div>
         <p-button *appHasPermission="permissions.PettyCash.Create"
@@ -65,7 +65,7 @@
           <td><span class="font-semibold text-color">{{ expense.expenseNo || '—' }}</span></td>
           <td>{{ expense.supplierName || '—' }}</td>
           <td>{{ expense.expenseDate | date: 'yyyy-MM-dd' }}</td>
-          <td class="text-right font-semibold text-primary">{{ formatAmount(expense.totalAmount) }}</td>
+          <td class="text-right font-semibold text-primary">{{ expense.totalAmount | appNumber }}</td>
           <td><span class="text-500 text-sm">{{ expense.notes || '—' }}</span></td>
           <td class="text-center">
             <div class="flex align-items-center justify-content-center gap-1">
@@ -219,7 +219,7 @@
           <div class="col-12 md:col-6 lg:col-3">
             <div class="flex flex-column gap-2">
               <label class="text-sm font-medium text-color">{{ 'projectTabs.expenses.columns.total' | translate }}</label>
-              <input pInputText [value]="formatAmount(calculateFormTotal())" readonly
+              <input pInputText [value]="calculateFormTotal() | appNumber" readonly
                 class="w-full font-semibold surface-100 text-primary" />
             </div>
           </div>
@@ -290,17 +290,13 @@
               </app-material-select>
             </td>
             <td>
-              <p-inputNumber [(ngModel)]="detail.qty"
-                [min]="0" [minFractionDigits]="0" [maxFractionDigits]="2" placeholder="0" inputStyleClass="w-full">
-              </p-inputNumber>
+              <app-number-input [(ngModel)]="detail.qty" [min]="0" placeholder="0"></app-number-input>
             </td>
             <td>
-              <p-inputNumber [(ngModel)]="detail.unitPrice"
-                [min]="0" [minFractionDigits]="0" [maxFractionDigits]="2" placeholder="0.00" inputStyleClass="w-full">
-              </p-inputNumber>
+              <app-number-input [(ngModel)]="detail.unitPrice" [min]="0" placeholder="0.00"></app-number-input>
             </td>
             <td>
-              <input pInputText [value]="formatAmount(calculateSubTotal(detail))" readonly
+              <input pInputText [value]="calculateSubTotal(detail) | appNumber" readonly
                 class="w-full surface-100 font-medium" />
             </td>
             <td>
@@ -322,7 +318,7 @@
         <ng-template pTemplate="footer">
           <tr>
             <td colspan="4" class="text-right font-semibold text-color">{{ 'projectTabs.expenses.lineItems.total' | translate }}:</td>
-            <td class="font-bold text-primary">{{ formatAmount(calculateFormTotal()) }}</td>
+            <td class="font-bold text-primary">{{ calculateFormTotal() | appNumber }}</td>
             <td colspan="2"></td>
           </tr>
         </ng-template>

@@ -5,7 +5,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { DatePickerModule } from 'primeng/datepicker';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
@@ -24,6 +23,8 @@ import {
   MileStonesDto
 } from '../../../../../../nswag/api-client';
 import { ContractorDutiesDialogComponent } from './contractor-duties-dialog/contractor-duties-dialog.component';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
+import { AppNumberPipe } from '../../../../../shared/pipes/app-number.pipe';
 
 @Component({
   selector: 'app-step4',
@@ -33,14 +34,15 @@ import { ContractorDutiesDialogComponent } from './contractor-duties-dialog/cont
     ReactiveFormsModule,
     SelectModule,
     ProgressSpinnerModule,
-    InputNumberModule,
     DatePickerModule,
     ButtonModule,
     TranslateModule,
     FloatLabelModule,
     TableModule,
     TooltipModule,
-    ContractorDutiesDialogComponent
+    ContractorDutiesDialogComponent,
+    NumberInputComponent,
+    AppNumberPipe
   ],
   templateUrl: './step4.component.html'
 })

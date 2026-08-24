@@ -27,16 +27,12 @@
         <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="field">
             <p-floatlabel variant="in">
-              <p-inputNumber
+              <app-number-input
                 inputId="quantity"
                 formControlName="quantity"
                 [min]="0.01"
-                [showButtons]="false"
-                mode="decimal"
-                [minFractionDigits]="2"
-                [ngClass]="{'ng-invalid': isFieldInvalid('quantity')}"
-                inputStyleClass="w-full">
-              </p-inputNumber>
+                [invalid]="isFieldInvalid('quantity')">
+              </app-number-input>
               <label for="quantity">{{ 'wizard.step4.quantity' | translate }}</label>
             </p-floatlabel>
             @if (isFieldInvalid('quantity')) {
@@ -49,16 +45,12 @@
         <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="field">
             <p-floatlabel variant="in">
-              <p-inputNumber
+              <app-number-input
                 inputId="price"
                 formControlName="price"
                 [min]="0.01"
-                [showButtons]="false"
-                mode="decimal"
-                locale="en-US"
-                [ngClass]="{'ng-invalid': isFieldInvalid('price')}"
-                inputStyleClass="w-full">
-              </p-inputNumber>
+                [invalid]="isFieldInvalid('price')">
+              </app-number-input>
               <label for="price">{{ 'wizard.step4.price' | translate }}</label>
             </p-floatlabel>
             @if (isFieldInvalid('price')) {
@@ -71,14 +63,11 @@
         <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="field">
             <p-floatlabel variant="in">
-              <p-inputNumber
+              <app-number-input
                 inputId="subTotal"
                 formControlName="subTotal"
-                [readonly]="true"
-                mode="decimal"
-                locale="en-US"
-                inputStyleClass="w-full">
-              </p-inputNumber>
+                [readonly]="true">
+              </app-number-input>
               <label for="subTotal">{{ 'wizard.step4.subTotal' | translate }}</label>
             </p-floatlabel>
           </div>
@@ -283,9 +272,9 @@
 
         <ng-template pTemplate="body" let-duty let-rowIndex="rowIndex">
           <tr>
-            <td>{{ duty.quantity | number:'1.2-2' }}</td>
-            <td>{{ duty.price | number:'1.2-2' }}</td>
-            <td>{{ duty.subTotal | number:'1.2-2' }}</td>
+            <td>{{ duty.quantity | appNumber }}</td>
+            <td>{{ duty.price | appNumber }}</td>
+            <td>{{ duty.subTotal | appNumber }}</td>
             <td>{{ getUnitName(duty.unitId) }}</td>
             <td>{{ getDutyTypeName(duty.dutyTypeId) }}</td>
             <td>{{ getDutyResponsibilityName(duty.dutyResponsibilityId) }}</td>

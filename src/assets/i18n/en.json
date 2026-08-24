@@ -601,7 +601,7 @@
       "title": "Engineering Office Fees",
       "feeType": "Fee Type",
       "agreedValue": "Agreed Fee",
-      "calculationBase": "Expenses + Contractor Contracts",
+      "calculationBase": "Expenses + Contractor Contracts + VOs + Surveying Visits",
       "feeAmount": "Engineering Office Fee",
       "types": {
         "percentage": "Percentage",

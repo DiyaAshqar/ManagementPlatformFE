@@ -21,7 +21,7 @@
     <div class="payments-master-details">
       <div class="master-detail-item">
         <span class="master-detail-label">{{ 'projectTabs.contractorPayment.contractAmount' | translate }}</span>
-        <span class="master-detail-value font-semibold">{{ contractor.amount | number:'1.0-0' }}</span>
+        <span class="master-detail-value font-semibold">{{ contractor.amount | appNumber }}</span>
       </div>
       <div class="master-detail-item">
         <span class="master-detail-label">{{ 'projectTabs.contractorPayment.startDate' | translate }}</span>
@@ -41,10 +41,10 @@
         {{ 'projectTabs.contractorPayment.totalPayments' | translate }}: {{ rows.length }}
       </span>
       <span class="payments-value-label">
-        {{ 'projectTabs.contractorPayment.totalPaid' | translate }}: {{ totalPaid | number:'1.0-0' }}
+        {{ 'projectTabs.contractorPayment.totalPaid' | translate }}: {{ totalPaid | appNumber }}
       </span>
       <span [class]="remainingBalance < 0 ? 'payments-remaining-label text-red-500' : 'payments-remaining-label text-green-600'">
-        {{ 'projectTabs.contractorPayment.remainingBalance' | translate }}: {{ remainingBalance | number:'1.0-0' }}
+        {{ 'projectTabs.contractorPayment.remainingBalance' | translate }}: {{ remainingBalance | appNumber }}
       </span>
     </div>
     <p-button
@@ -104,15 +104,10 @@
         <td pEditableColumn class="text-right">
           <p-cellEditor>
             <ng-template pTemplate="input">
-              <p-inputnumber
-                [(ngModel)]="item.paidAmount"
-                mode="decimal"
-                [minFractionDigits]="2"
-                class="w-full">
-              </p-inputnumber>
+              <app-number-input [(ngModel)]="item.paidAmount"></app-number-input>
             </ng-template>
             <ng-template pTemplate="output">
-              <span class="payment-amount">{{ item.paidAmount | number:'1.0-2' }}</span>
+              <span class="payment-amount">{{ item.paidAmount | appNumber }}</span>
             </ng-template>
           </p-cellEditor>
         </td>

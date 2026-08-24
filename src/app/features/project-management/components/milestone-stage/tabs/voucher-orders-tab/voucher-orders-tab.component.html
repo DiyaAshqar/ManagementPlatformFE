@@ -51,8 +51,8 @@
         <td>{{ item.description }}</td>
         <td class="text-right">{{ item.quantity }}</td>
         <td><span class="vo-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
-        <td class="text-right">{{ item.price | number:'1.2-2' }}</td>
-        <td class="text-right vo-subtotal">{{ item.subTotal | number:'1.0-0' }}</td>
+        <td class="text-right">{{ item.price | appNumber }}</td>
+        <td class="text-right vo-subtotal">{{ item.subTotal | appNumber }}</td>
         <td class="text-center">
           <p-badge 
             [value]="item.isEffected ? ('projectTabs.voucherOrders.yes' | translate) : ('projectTabs.voucherOrders.no' | translate)" 
@@ -132,7 +132,7 @@
             <span class="vo-grand-total-label">{{ 'projectTabs.voucherOrders.totalVOValue' | translate }}:</span>
           </td>
           <td class="text-right vo-grand-total-value">
-            {{ totalVOValue | number:'1.0-0' }}
+            {{ totalVOValue | appNumber }}
           </td>
           <td colspan="5"></td>
         </tr>

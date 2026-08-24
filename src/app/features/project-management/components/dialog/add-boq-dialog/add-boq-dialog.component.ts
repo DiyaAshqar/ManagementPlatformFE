@@ -7,7 +7,6 @@ import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectFilterEvent, SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
@@ -15,6 +14,8 @@ import { TextareaModule } from 'primeng/textarea';
 import { MessageService } from 'primeng/api';
 import { CreateProjectBOQCommand, IGetProjectBOQDto } from '../../../../../../nswag/api-client';
 import { MaterialSelectComponent } from '../../../../../shared/components/material-select/material-select.component';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
+import { AppNumberPipe } from '../../../../../shared/pipes/app-number.pipe';
 
 @Component({
     selector: 'app-add-boq-dialog',
@@ -27,10 +28,11 @@ import { MaterialSelectComponent } from '../../../../../shared/components/materi
         ButtonModule,
         InputTextModule,
         TextareaModule,
-        InputNumberModule,
         SelectModule,
         FloatLabelModule,
-        MaterialSelectComponent
+        MaterialSelectComponent,
+        NumberInputComponent,
+        AppNumberPipe
     ],
     templateUrl: './add-boq-dialog.component.html',
     styleUrls: ['./add-boq-dialog.component.scss']

@@ -34,18 +34,14 @@
 
         <div class="field-block">
           <label for="ownerPaymentAmount">{{ 'ownerPaymentEntry.amount' | translate }} <span>*</span></label>
-          <p-inputNumber
+          <app-number-input
             inputId="ownerPaymentAmount"
             [ngModel]="amount()"
             (ngModelChange)="amount.set($event)"
             [min]="0"
-            [minFractionDigits]="2"
-            [maxFractionDigits]="2"
             [placeholder]="'ownerPaymentEntry.amountPlaceholder' | translate"
-            inputStyleClass="w-full"
-            styleClass="w-full"
-            [class.ng-invalid]="submitted() && (!amount() || amount()! <= 0)">
-          </p-inputNumber>
+            [invalid]="submitted() && (!amount() || amount()! <= 0)">
+          </app-number-input>
           @if (submitted() && (!amount() || amount()! <= 0)) {
             <small class="p-error">{{ 'ownerPaymentEntry.amountRequired' | translate }}</small>
           }

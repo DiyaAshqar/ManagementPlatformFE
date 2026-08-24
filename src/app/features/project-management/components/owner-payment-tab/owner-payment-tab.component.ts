@@ -7,7 +7,6 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { DatePickerModule } from 'primeng/datepicker';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
@@ -30,6 +29,8 @@ import { getLookupData } from '../../../../shared/utils/lookup.util';
 import { Permissions } from '../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../core/auth/services/auth.service';
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
+import { NumberInputComponent } from '../../../../shared/components/number-input/number-input.component';
+import { formatAppNumber } from '../../../../shared/pipes/app-number.pipe';
 
 interface SelectOption<T = number> {
   label: string;
@@ -47,13 +48,13 @@ interface SelectOption<T = number> {
     CardModule,
     ConfirmDialogModule,
     DatePickerModule,
-    InputNumberModule,
     InputTextModule,
     SelectModule,
     TableModule,
     TextareaModule,
     TooltipModule,
     HasPermissionDirective,
+    NumberInputComponent,
   ],
   providers: [ConfirmationService, PaymentFlowClient, LookupClient, CurrencyClient],
   templateUrl: './owner-payment-tab.component.html',
@@ -259,7 +260,7 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
   }
 
   formatAmount(value: number | undefined, currency: string = this.selectedCurrencyLabel): string {
-    return `${(value ?? 0).toFixed(2)} ${currency}`;
+    return `${formatAppNumber(value ?? 0)} ${currency}`;
   }
 
   isDeleting(record: GetPaymentFlowDto): boolean {
@@ -283,7 +284,7 @@ export class OwnerPaymentTabComponent implements OnInit, OnChanges {
     const dateEn = record.createdAt
       ? new Date(record.createdAt).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
       : '';
-    const amount = (record.cash ?? 0).toFixed(2);
+    const amount = formatAppNumber(record.cash ?? 0) ?? '0';
 
     this.printService.openAndPrint(this.buildReceiptHtml({
       receiptNo: record.id ?? 0,

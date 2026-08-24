@@ -10,7 +10,6 @@ import { ButtonModule } from 'primeng/button';
 import { CalendarModule } from 'primeng/calendar';
 import { DialogModule } from 'primeng/dialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { SelectModule } from 'primeng/select';
 
 import {
@@ -19,6 +18,7 @@ import {
   CreateProjectMainContractorCommand,
   IGetProjectMainContractorDto
 } from '../../../../../../nswag/api-client';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
 
 @Component({
   selector: 'app-add-contractor-dialog',
@@ -29,10 +29,10 @@ import {
     ReactiveFormsModule,
     DialogModule,
     ButtonModule,
-    InputNumberModule,
     SelectModule,
     FloatLabelModule,
-    CalendarModule
+    CalendarModule,
+    NumberInputComponent
   ],
   providers: [ConstructorClient],
   templateUrl: './add-contractor-dialog.component.html',
@@ -197,13 +197,15 @@ export class AddContractorDialogComponent implements OnInit, OnChanges, OnDestro
       return;
     }
 
-    const { constructorId, classification, amount, startDate, endDate } = this.contractorForm.value;
+    const { mainContractorTypeId, constructorId, classification, amount, startDate, endDate } = this.contractorForm.value;
 
     const command = new CreateProjectMainContractorCommand({
       id: this.isEditMode ? this.editItem!.id : undefined,
       projectStageId: this.projectStageId,
       constructorId,
+      contractorTypeId: mainContractorTypeId,
       amount,
+      totalPayments: this.isEditMode ? this.editItem!.totalPayments : undefined,
       startDate,
       endDate,
       classification

@@ -24,6 +24,7 @@ import { AddPoDialogComponent } from '../../../dialog/add-po-dialog/add-po-dialo
 import { Permissions } from '../../../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
 import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
+import { AppNumberPipe } from '../../../../../../shared/pipes/app-number.pipe';
 
 // PO Status enum matching the backend
 export enum POStatus {
@@ -44,7 +45,8 @@ export enum POStatus {
     SkeletonModule,
     BadgeModule,
     AddPoDialogComponent,
-    HasPermissionDirective
+    HasPermissionDirective,
+    AppNumberPipe
   ],
   providers: [ProjectPOClient, LookupClient, SupplierClient],
   templateUrl: './purchase-orders-tab.component.html',

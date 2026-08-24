@@ -133,9 +133,8 @@
           <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
-                <p-inputNumber inputId="projectArea" formControlName="projectArea" [min]="0" [showButtons]="false"
-                  [ngClass]="{'ng-invalid': isFieldInvalid('agreementDto.projectArea')}" styleClass="w-full"
-                  inputStyleClass="w-full"></p-inputNumber>
+                <app-number-input inputId="projectArea" formControlName="projectArea" [min]="0"
+                  [invalid]="isFieldInvalid('agreementDto.projectArea')"></app-number-input>
                 <label for="projectArea">{{ 'wizard.step1.projectArea' | translate }} </label>
               </p-floatlabel>
             </div>
@@ -146,9 +145,8 @@
           <div class="col-12 md:col-6 mb-1">
             <div class="field">
               <p-floatlabel variant="in">
-                <p-inputNumber inputId="drillingQuantity" formControlName="drillingQuantity" [min]="0" [showButtons]="false"
-                  [ngClass]="{'ng-invalid': isFieldInvalid('agreementDto.drillingQuantity')}" styleClass="w-full"
-                  inputStyleClass="w-full"></p-inputNumber>
+                <app-number-input inputId="drillingQuantity" formControlName="drillingQuantity" [min]="0"
+                  [invalid]="isFieldInvalid('agreementDto.drillingQuantity')"></app-number-input>
                 <label for="drillingQuantity">{{ 'wizard.step1.drillingQuantity' | translate }} </label>
               </p-floatlabel>
             </div>

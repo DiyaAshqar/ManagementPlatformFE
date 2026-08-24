@@ -38,13 +38,9 @@
                     <div class="field">
                         <p-inputgroup>
                             <p-floatlabel variant="in" class="flex-1">
-                                <p-inputNumber inputId="amount" formControlName="amount" [min]="0" [showButtons]="false"
-                                    [max]="isCostPlusSelected() ? 100 : null"
-                                    mode="decimal" locale="en-US"
-                                    [minFractionDigits]="0"
-                                    [maxFractionDigits]="2"
-                                    [ngClass]="{'ng-invalid': isFieldInvalid('amount')}"
-                                    inputStyleClass="w-full"></p-inputNumber>
+                                <app-number-input inputId="amount" formControlName="amount" [min]="0"
+                                    [max]="isCostPlusSelected() ? 100 : undefined"
+                                    [invalid]="isFieldInvalid('amount')"></app-number-input>
                                 <label for="amount">{{ getContractModelValueLabel() | translate }}</label>
                             </p-floatlabel>
                             @if (isCostPlusSelected()) {

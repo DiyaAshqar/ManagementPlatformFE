@@ -89,14 +89,13 @@
     </div>
     <div class="col-6">
       <label for="milestone-task-points" class="block text-sm font-medium mb-2">{{ 'milestoneTaskDialog.fields.taskPoints' | translate }}</label>
-      <p-inputNumber
-        id="milestone-task-points"
+      <app-number-input
+        inputId="milestone-task-points"
         [ngModel]="currentFormData.taskPoint"
         (ngModelChange)="updateFormField('taskPoint', $event)"
         [min]="0"
-        [placeholder]="'milestoneTaskDialog.fields.taskPointsPlaceholder' | translate"
-        styleClass="w-full">
-      </p-inputNumber>
+        [placeholder]="'milestoneTaskDialog.fields.taskPointsPlaceholder' | translate">
+      </app-number-input>
     </div>
   </div>
 
