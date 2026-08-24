@@ -272,11 +272,40 @@ export class ProjectExpenseManagementComponent implements OnInit {
     return this.suppliers().find((s) => s.id === supplierId)?.name ?? '—';
   }
 
+  /** Prevent duplicate expense numbers within this project stage. */
+  hasDuplicateExpenseNo(): boolean {
+    const expenseNo = this.formExpenseNo().trim().toLocaleLowerCase();
+
+    if (!expenseNo) {
+      return false;
+    }
+
+    return this.expenses().some((expense) =>
+      expense.id !== this.editingExpenseId() &&
+      (expense.expenseNo ?? '').trim().toLocaleLowerCase() === expenseNo
+    );
+  }
+
+  /** Prevent selecting the same supplier more than once within this project stage. */
+  hasDuplicateSupplier(): boolean {
+    const supplierId = this.formSupplierId();
+
+    return supplierId != null && this.expenses().some((expense) =>
+      expense.id !== this.editingExpenseId() && expense.supplierId === supplierId
+    );
+  }
+
+  hasDuplicateExpense(): boolean {
+    return this.hasDuplicateExpenseNo() || this.hasDuplicateSupplier();
+  }
+
   // -- Save / Delete -------------------------------------------------------------
 
   handleSave(): void {
     const editingId = this.editingExpenseId();
     if (editingId ? !this.canEditPermission() : !this.canCreate()) return;
+    if (this.hasDuplicateExpense()) return;
+
     this.isSaving.set(true);
 
     const details: CreateExpenseDetailModel[] = [];

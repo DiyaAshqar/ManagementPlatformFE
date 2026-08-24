@@ -189,6 +189,9 @@
               <input pInputText type="text"
                 [placeholder]="'projectTabs.expenses.form.expenseNoPlaceholder' | translate"
                 [ngModel]="formExpenseNo()" (ngModelChange)="formExpenseNo.set($event)"
+                [class.ng-invalid]="hasDuplicateExpenseNo()"
+                [class.ng-dirty]="hasDuplicateExpenseNo()"
+                [attr.aria-invalid]="hasDuplicateExpenseNo()"
                 maxlength="50" class="w-full" />
             </div>
           </div>
@@ -208,7 +211,8 @@
                 [ngModel]="formSupplierId()" (ngModelChange)="formSupplierId.set($event)"
                 [options]="suppliers()" optionLabel="name" optionValue="id"
                 [placeholder]="'projectTabs.expenses.form.selectSupplier' | translate"
-                [loading]="isLoadingLookups()" styleClass="w-full">
+                [loading]="isLoadingLookups()"
+                [styleClass]="hasDuplicateSupplier() ? 'w-full ng-invalid ng-dirty' : 'w-full'">
               </p-select>
             </div>
           </div>
@@ -219,6 +223,20 @@
                 class="w-full font-semibold surface-100 text-primary" />
             </div>
           </div>
+          @if (hasDuplicateExpenseNo()) {
+            <div class="col-12 pb-0">
+              <small class="text-red-500" role="alert">
+                {{ 'projectTabs.expenses.form.duplicateExpenseNo' | translate }}
+              </small>
+            </div>
+          }
+          @if (hasDuplicateSupplier()) {
+            <div class="col-12 pb-0">
+              <small class="text-red-500" role="alert">
+                {{ 'projectTabs.expenses.form.duplicateSupplier' | translate }}
+              </small>
+            </div>
+          }
           <div class="col-12">
             <div class="flex flex-column gap-2">
               <label class="text-sm font-medium text-color">{{ 'projectTabs.expenses.columns.notes' | translate }}</label>
@@ -337,7 +355,8 @@
 
     <div class="flex justify-content-end gap-2 mt-2 pt-2 border-top-1 surface-border">
       <p-button [label]="'common.cancel' | translate" [outlined]="true" severity="secondary" (onClick)="backToList()"></p-button>
-      <p-button [label]="'projectTabs.expenses.form.save' | translate" icon="pi pi-save" [loading]="isSaving()" (onClick)="handleSave()"></p-button>
+      <p-button [label]="'projectTabs.expenses.form.save' | translate" icon="pi pi-save"
+        [loading]="isSaving()" [disabled]="hasDuplicateExpense()" (onClick)="handleSave()"></p-button>
     </div>
   </p-card>
 }

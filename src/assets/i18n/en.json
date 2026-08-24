@@ -914,6 +914,8 @@
         "backToList": "Back to list",
         "expenseNoPlaceholder": "e.g. EXP-2026-001",
         "selectSupplier": "Select supplier",
+        "duplicateExpenseNo": "This Expense No already exists in this project stage.",
+        "duplicateSupplier": "This supplier already has an expense in this project stage.",
         "notesPlaceholder": "Optional notes...",
         "save": "Save Expense"
       },

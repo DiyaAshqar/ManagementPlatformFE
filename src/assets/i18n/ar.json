@@ -910,6 +910,8 @@
         "backToList": "عودة للقائمة",
         "expenseNoPlaceholder": "مثال: EXP-2026-001",
         "selectSupplier": "اختر المورد",
+        "duplicateExpenseNo": "رقم المصروف موجود بالفعل في مرحلة المشروع هذه.",
+        "duplicateSupplier": "هذا المورد لديه مصروف مسجل بالفعل في مرحلة المشروع هذه.",
         "notesPlaceholder": "ملاحظات اختيارية...",
         "save": "حفظ المصروف"
       },

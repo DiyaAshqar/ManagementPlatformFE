@@ -162,10 +162,6 @@ export function buildDemoSnapshot(): ProjectReportSnapshot {
   const poRows = [
     { poNumber: 'PO-2026-031', supplierName: 'Al-Ameed Ready-Mix', description: 'Ground-floor slab pour', unit: 'm³', price: 62, subTotal: 6820, statusLabel: 'Approved', stageName: 'Superstructure — Ground Floor' },
     { poNumber: 'PO-2026-034', supplierName: 'Jordan Steel Trading', description: 'First-floor reinforcement batch', unit: 'ton', price: 735, subTotal: 8820, statusLabel: 'Pending', stageName: 'Superstructure — First Floor' },
-    // Real ProjectPOs rows for project stage #48 (status 2 = Pending), supplier names resolved from the Suppliers lookup.
-    { poNumber: '32432', supplierName: 'Building Materials Inc.', description: 'SSDFSDF', unit: 'm²', price: 343, subTotal: 343, statusLabel: 'Pending', stageName: REAL_STAGE_NAME },
-    { poNumber: '3243243333', supplierName: 'Materials Supplier Co.', description: 'SDFSDFSD', unit: null, price: 45454, subTotal: 45454, statusLabel: 'Pending', stageName: REAL_STAGE_NAME },
-    { poNumber: '44', supplierName: 'Building Materials Inc.', description: 'werwer', unit: 'm³', price: 77, subTotal: 77, statusLabel: 'Pending', stageName: REAL_STAGE_NAME },
   ];
 
   return {

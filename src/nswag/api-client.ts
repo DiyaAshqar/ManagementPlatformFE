@@ -6465,6 +6465,377 @@ export class ProjectVOClient {
 }
 
 @Injectable()
+export class ProjectWirClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createOrUpdate(body: CreateProjectWirCommand | undefined): Observable<Int32Response> {
+        let url_ = this.baseUrl + "/api/ProjectWir";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<Int32Response>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<Int32Response>;
+        }));
+    }
+
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<Int32Response> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = Int32Response.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return OK
+     */
+    delete(id: number | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/ProjectWir?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getAll(requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetProjectWirDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/ProjectWir?";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectWirDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectWirDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<GetProjectWirDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectWirDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    clone(body: CloneProjectWirCommand | undefined): Observable<GetProjectWirDtoResponse> {
+        let url_ = this.baseUrl + "/api/ProjectWir/clone";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processClone(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processClone(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectWirDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectWirDtoResponse>;
+        }));
+    }
+
+    protected processClone(response: HttpResponseBase): Observable<GetProjectWirDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectWirDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getById(id: number): Observable<GetProjectWirDtoResponse> {
+        let url_ = this.baseUrl + "/api/ProjectWir/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectWirDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectWirDtoResponse>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<GetProjectWirDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectWirDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param stageId (optional) 
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getByStageId(stageId: number | undefined, requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetProjectWirDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/ProjectWir/by-stage?";
+        if (stageId === null)
+            throw new globalThis.Error("The parameter 'stageId' cannot be null.");
+        else if (stageId !== undefined)
+            url_ += "StageId=" + encodeURIComponent("" + stageId) + "&";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetByStageId(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetByStageId(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetProjectWirDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetProjectWirDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetByStageId(response: HttpResponseBase): Observable<GetProjectWirDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetProjectWirDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
 export class ReportClient {
     private http: HttpClient;
     private baseUrl: string;
@@ -8097,6 +8468,250 @@ export class UsersClient {
             let result200: any = null;
             let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
             result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+}
+
+@Injectable()
+export class WirChecklistItemClient {
+    private http: HttpClient;
+    private baseUrl: string;
+    protected jsonParseReviver: ((key: string, value: any) => any) | undefined = undefined;
+
+    constructor(@Inject(HttpClient) http: HttpClient, @Optional() @Inject(API_BASE_URL) baseUrl?: string) {
+        this.http = http;
+        this.baseUrl = baseUrl ?? "";
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    createOrUpdate(body: CreateWirChecklistItemCommand | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/WirChecklistItem";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processCreateOrUpdate(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processCreateOrUpdate(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processCreateOrUpdate(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param id (optional) 
+     * @return OK
+     */
+    delete(id: number | undefined): Observable<BooleanResponse> {
+        let url_ = this.baseUrl + "/api/WirChecklistItem?";
+        if (id === null)
+            throw new globalThis.Error("The parameter 'id' cannot be null.");
+        else if (id !== undefined)
+            url_ += "Id=" + encodeURIComponent("" + id) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("delete", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDelete(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDelete(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<BooleanResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<BooleanResponse>;
+        }));
+    }
+
+    protected processDelete(response: HttpResponseBase): Observable<BooleanResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = BooleanResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param requestParameter_PageNumber (optional) 
+     * @param requestParameter_PageSize (optional) 
+     * @param requestParameter_Filter (optional) 
+     * @return OK
+     */
+    getAll(requestParameter_PageNumber: number | undefined, requestParameter_PageSize: number | undefined, requestParameter_Filter: string | undefined): Observable<GetWirChecklistItemDtoListPagedResponseResponse> {
+        let url_ = this.baseUrl + "/api/WirChecklistItem?";
+        if (requestParameter_PageNumber === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageNumber' cannot be null.");
+        else if (requestParameter_PageNumber !== undefined)
+            url_ += "RequestParameter.PageNumber=" + encodeURIComponent("" + requestParameter_PageNumber) + "&";
+        if (requestParameter_PageSize === null)
+            throw new globalThis.Error("The parameter 'requestParameter_PageSize' cannot be null.");
+        else if (requestParameter_PageSize !== undefined)
+            url_ += "RequestParameter.PageSize=" + encodeURIComponent("" + requestParameter_PageSize) + "&";
+        if (requestParameter_Filter === null)
+            throw new globalThis.Error("The parameter 'requestParameter_Filter' cannot be null.");
+        else if (requestParameter_Filter !== undefined)
+            url_ += "RequestParameter.Filter=" + encodeURIComponent("" + requestParameter_Filter) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetAll(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetAll(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetWirChecklistItemDtoListPagedResponseResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetWirChecklistItemDtoListPagedResponseResponse>;
+        }));
+    }
+
+    protected processGetAll(response: HttpResponseBase): Observable<GetWirChecklistItemDtoListPagedResponseResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetWirChecklistItemDtoListPagedResponseResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @return OK
+     */
+    getById(id: number): Observable<GetWirChecklistItemDtoResponse> {
+        let url_ = this.baseUrl + "/api/WirChecklistItem/{id}";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetById(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetById(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<GetWirChecklistItemDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<GetWirChecklistItemDtoResponse>;
+        }));
+    }
+
+    protected processGetById(response: HttpResponseBase): Observable<GetWirChecklistItemDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = GetWirChecklistItemDtoResponse.fromJS(resultData200);
             return _observableOf(result200);
             }));
         } else if (status !== 200 && status !== 204) {
@@ -10241,6 +10856,42 @@ export interface IClientDto {
     representerCountryCodeName?: string | undefined;
 }
 
+export class CloneProjectWirCommand implements ICloneProjectWirCommand {
+    projectWirId?: number;
+
+    constructor(data?: ICloneProjectWirCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.projectWirId = _data["projectWirId"];
+        }
+    }
+
+    static fromJS(data: any): CloneProjectWirCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CloneProjectWirCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["projectWirId"] = this.projectWirId;
+        return data;
+    }
+}
+
+export interface ICloneProjectWirCommand {
+    projectWirId?: number;
+}
+
 export class Constructor implements IConstructor {
     id?: number;
     isDeleted?: boolean;
@@ -11921,6 +12572,194 @@ export interface ICreateProjectVOCommand {
     status?: AcceptenceStatus;
 }
 
+export class CreateProjectWirChecklistItemModel implements ICreateProjectWirChecklistItemModel {
+    id?: number | undefined;
+    wirChecklistItemId?: number | undefined;
+    checklistItem?: string | undefined;
+    displayOrder?: number | undefined;
+    status?: WirChecklistItemStatus;
+    inspectorComment?: string | undefined;
+    severityCode?: string | undefined;
+
+    constructor(data?: ICreateProjectWirChecklistItemModel) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.wirChecklistItemId = _data["wirChecklistItemId"];
+            this.checklistItem = _data["checklistItem"];
+            this.displayOrder = _data["displayOrder"];
+            this.status = _data["status"];
+            this.inspectorComment = _data["inspectorComment"];
+            this.severityCode = _data["severityCode"];
+        }
+    }
+
+    static fromJS(data: any): CreateProjectWirChecklistItemModel {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateProjectWirChecklistItemModel();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["wirChecklistItemId"] = this.wirChecklistItemId;
+        data["checklistItem"] = this.checklistItem;
+        data["displayOrder"] = this.displayOrder;
+        data["status"] = this.status;
+        data["inspectorComment"] = this.inspectorComment;
+        data["severityCode"] = this.severityCode;
+        return data;
+    }
+}
+
+export interface ICreateProjectWirChecklistItemModel {
+    id?: number | undefined;
+    wirChecklistItemId?: number | undefined;
+    checklistItem?: string | undefined;
+    displayOrder?: number | undefined;
+    status?: WirChecklistItemStatus;
+    inspectorComment?: string | undefined;
+    severityCode?: string | undefined;
+}
+
+export class CreateProjectWirCommand implements ICreateProjectWirCommand {
+    id?: number | undefined;
+    wirNo?: string | undefined;
+    projectStageId?: number;
+    constructorId?: number;
+    disciplineCode?: string | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    drawingReference?: string | undefined;
+    levelName?: string | undefined;
+    zoneName?: string | undefined;
+    gridReference?: string | undefined;
+    x_AXIS?: string | undefined;
+    y_AXIS?: string | undefined;
+    requestedBy?: number;
+    assignedTo?: number | undefined;
+    inspectionDate?: Date | undefined;
+    status?: WirStatus;
+    submittedDate?: Date | undefined;
+    approvedDate?: Date | undefined;
+    rejectedDate?: Date | undefined;
+    revisionNo?: number;
+    checklistItems?: CreateProjectWirChecklistItemModel[] | undefined;
+
+    constructor(data?: ICreateProjectWirCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.wirNo = _data["wirNo"];
+            this.projectStageId = _data["projectStageId"];
+            this.constructorId = _data["constructorId"];
+            this.disciplineCode = _data["disciplineCode"];
+            this.title = _data["title"];
+            this.description = _data["description"];
+            this.drawingReference = _data["drawingReference"];
+            this.levelName = _data["levelName"];
+            this.zoneName = _data["zoneName"];
+            this.gridReference = _data["gridReference"];
+            this.x_AXIS = _data["x_AXIS"];
+            this.y_AXIS = _data["y_AXIS"];
+            this.requestedBy = _data["requestedBy"];
+            this.assignedTo = _data["assignedTo"];
+            this.inspectionDate = _data["inspectionDate"] ? new Date(_data["inspectionDate"].toString()) : undefined as any;
+            this.status = _data["status"];
+            this.submittedDate = _data["submittedDate"] ? new Date(_data["submittedDate"].toString()) : undefined as any;
+            this.approvedDate = _data["approvedDate"] ? new Date(_data["approvedDate"].toString()) : undefined as any;
+            this.rejectedDate = _data["rejectedDate"] ? new Date(_data["rejectedDate"].toString()) : undefined as any;
+            this.revisionNo = _data["revisionNo"];
+            if (Array.isArray(_data["checklistItems"])) {
+                this.checklistItems = [] as any;
+                for (let item of _data["checklistItems"])
+                    this.checklistItems!.push(CreateProjectWirChecklistItemModel.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): CreateProjectWirCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateProjectWirCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["wirNo"] = this.wirNo;
+        data["projectStageId"] = this.projectStageId;
+        data["constructorId"] = this.constructorId;
+        data["disciplineCode"] = this.disciplineCode;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        data["drawingReference"] = this.drawingReference;
+        data["levelName"] = this.levelName;
+        data["zoneName"] = this.zoneName;
+        data["gridReference"] = this.gridReference;
+        data["x_AXIS"] = this.x_AXIS;
+        data["y_AXIS"] = this.y_AXIS;
+        data["requestedBy"] = this.requestedBy;
+        data["assignedTo"] = this.assignedTo;
+        data["inspectionDate"] = this.inspectionDate ? this.inspectionDate.toISOString() : undefined as any;
+        data["status"] = this.status;
+        data["submittedDate"] = this.submittedDate ? this.submittedDate.toISOString() : undefined as any;
+        data["approvedDate"] = this.approvedDate ? this.approvedDate.toISOString() : undefined as any;
+        data["rejectedDate"] = this.rejectedDate ? this.rejectedDate.toISOString() : undefined as any;
+        data["revisionNo"] = this.revisionNo;
+        if (Array.isArray(this.checklistItems)) {
+            data["checklistItems"] = [];
+            for (let item of this.checklistItems)
+                data["checklistItems"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface ICreateProjectWirCommand {
+    id?: number | undefined;
+    wirNo?: string | undefined;
+    projectStageId?: number;
+    constructorId?: number;
+    disciplineCode?: string | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    drawingReference?: string | undefined;
+    levelName?: string | undefined;
+    zoneName?: string | undefined;
+    gridReference?: string | undefined;
+    x_AXIS?: string | undefined;
+    y_AXIS?: string | undefined;
+    requestedBy?: number;
+    assignedTo?: number | undefined;
+    inspectionDate?: Date | undefined;
+    status?: WirStatus;
+    submittedDate?: Date | undefined;
+    approvedDate?: Date | undefined;
+    rejectedDate?: Date | undefined;
+    revisionNo?: number;
+    checklistItems?: CreateProjectWirChecklistItemModel[] | undefined;
+}
+
 export class CreateSubTaskCommand implements ICreateSubTaskCommand {
     id?: number | undefined;
     title?: string | undefined;
@@ -12147,6 +12986,50 @@ export interface ICreateTaskCommand {
     status?: StatusTask;
     projectStageId?: number;
     taskTypeId?: number;
+}
+
+export class CreateWirChecklistItemCommand implements ICreateWirChecklistItemCommand {
+    id?: number | undefined;
+    checklistItem?: string | undefined;
+    displayOrder?: number;
+
+    constructor(data?: ICreateWirChecklistItemCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.checklistItem = _data["checklistItem"];
+            this.displayOrder = _data["displayOrder"];
+        }
+    }
+
+    static fromJS(data: any): CreateWirChecklistItemCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new CreateWirChecklistItemCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["checklistItem"] = this.checklistItem;
+        data["displayOrder"] = this.displayOrder;
+        return data;
+    }
+}
+
+export interface ICreateWirChecklistItemCommand {
+    id?: number | undefined;
+    checklistItem?: string | undefined;
+    displayOrder?: number;
 }
 
 export class Currency implements ICurrency {
@@ -18219,6 +19102,670 @@ export interface IGetProjectVODtoResponse {
     message?: string | undefined;
     errors?: string[] | undefined;
     data?: GetProjectVODto;
+}
+
+export class GetProjectWirChecklistItemDto implements IGetProjectWirChecklistItemDto {
+    id?: number;
+    wirId?: number;
+    wirChecklistItemId?: number;
+    checklistItem?: string | undefined;
+    displayOrder?: number;
+    status?: WirChecklistItemStatus;
+    inspectorComment?: string | undefined;
+    severityCode?: string | undefined;
+    createdDate?: Date;
+
+    constructor(data?: IGetProjectWirChecklistItemDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.wirId = _data["wirId"];
+            this.wirChecklistItemId = _data["wirChecklistItemId"];
+            this.checklistItem = _data["checklistItem"];
+            this.displayOrder = _data["displayOrder"];
+            this.status = _data["status"];
+            this.inspectorComment = _data["inspectorComment"];
+            this.severityCode = _data["severityCode"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectWirChecklistItemDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectWirChecklistItemDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["wirId"] = this.wirId;
+        data["wirChecklistItemId"] = this.wirChecklistItemId;
+        data["checklistItem"] = this.checklistItem;
+        data["displayOrder"] = this.displayOrder;
+        data["status"] = this.status;
+        data["inspectorComment"] = this.inspectorComment;
+        data["severityCode"] = this.severityCode;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectWirChecklistItemDto {
+    id?: number;
+    wirId?: number;
+    wirChecklistItemId?: number;
+    checklistItem?: string | undefined;
+    displayOrder?: number;
+    status?: WirChecklistItemStatus;
+    inspectorComment?: string | undefined;
+    severityCode?: string | undefined;
+    createdDate?: Date;
+}
+
+export class GetProjectWirDto implements IGetProjectWirDto {
+    id?: number;
+    wirNo?: string | undefined;
+    projectStageId?: number;
+    constructorId?: number;
+    constructorName?: string | undefined;
+    disciplineCode?: string | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    drawingReference?: string | undefined;
+    levelName?: string | undefined;
+    zoneName?: string | undefined;
+    gridReference?: string | undefined;
+    x_AXIS?: string | undefined;
+    y_AXIS?: string | undefined;
+    requestedBy?: number;
+    assignedTo?: number | undefined;
+    inspectionDate?: Date | undefined;
+    status?: WirStatus;
+    submittedDate?: Date | undefined;
+    approvedDate?: Date | undefined;
+    rejectedDate?: Date | undefined;
+    parentId?: number | undefined;
+    revisionNo?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    checklistItems?: GetProjectWirChecklistItemDto[] | undefined;
+
+    constructor(data?: IGetProjectWirDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.wirNo = _data["wirNo"];
+            this.projectStageId = _data["projectStageId"];
+            this.constructorId = _data["constructorId"];
+            this.constructorName = _data["constructorName"];
+            this.disciplineCode = _data["disciplineCode"];
+            this.title = _data["title"];
+            this.description = _data["description"];
+            this.drawingReference = _data["drawingReference"];
+            this.levelName = _data["levelName"];
+            this.zoneName = _data["zoneName"];
+            this.gridReference = _data["gridReference"];
+            this.x_AXIS = _data["x_AXIS"];
+            this.y_AXIS = _data["y_AXIS"];
+            this.requestedBy = _data["requestedBy"];
+            this.assignedTo = _data["assignedTo"];
+            this.inspectionDate = _data["inspectionDate"] ? new Date(_data["inspectionDate"].toString()) : undefined as any;
+            this.status = _data["status"];
+            this.submittedDate = _data["submittedDate"] ? new Date(_data["submittedDate"].toString()) : undefined as any;
+            this.approvedDate = _data["approvedDate"] ? new Date(_data["approvedDate"].toString()) : undefined as any;
+            this.rejectedDate = _data["rejectedDate"] ? new Date(_data["rejectedDate"].toString()) : undefined as any;
+            this.parentId = _data["parentId"];
+            this.revisionNo = _data["revisionNo"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            if (Array.isArray(_data["checklistItems"])) {
+                this.checklistItems = [] as any;
+                for (let item of _data["checklistItems"])
+                    this.checklistItems!.push(GetProjectWirChecklistItemDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): GetProjectWirDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectWirDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["wirNo"] = this.wirNo;
+        data["projectStageId"] = this.projectStageId;
+        data["constructorId"] = this.constructorId;
+        data["constructorName"] = this.constructorName;
+        data["disciplineCode"] = this.disciplineCode;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        data["drawingReference"] = this.drawingReference;
+        data["levelName"] = this.levelName;
+        data["zoneName"] = this.zoneName;
+        data["gridReference"] = this.gridReference;
+        data["x_AXIS"] = this.x_AXIS;
+        data["y_AXIS"] = this.y_AXIS;
+        data["requestedBy"] = this.requestedBy;
+        data["assignedTo"] = this.assignedTo;
+        data["inspectionDate"] = this.inspectionDate ? this.inspectionDate.toISOString() : undefined as any;
+        data["status"] = this.status;
+        data["submittedDate"] = this.submittedDate ? this.submittedDate.toISOString() : undefined as any;
+        data["approvedDate"] = this.approvedDate ? this.approvedDate.toISOString() : undefined as any;
+        data["rejectedDate"] = this.rejectedDate ? this.rejectedDate.toISOString() : undefined as any;
+        data["parentId"] = this.parentId;
+        data["revisionNo"] = this.revisionNo;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        if (Array.isArray(this.checklistItems)) {
+            data["checklistItems"] = [];
+            for (let item of this.checklistItems)
+                data["checklistItems"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IGetProjectWirDto {
+    id?: number;
+    wirNo?: string | undefined;
+    projectStageId?: number;
+    constructorId?: number;
+    constructorName?: string | undefined;
+    disciplineCode?: string | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    drawingReference?: string | undefined;
+    levelName?: string | undefined;
+    zoneName?: string | undefined;
+    gridReference?: string | undefined;
+    x_AXIS?: string | undefined;
+    y_AXIS?: string | undefined;
+    requestedBy?: number;
+    assignedTo?: number | undefined;
+    inspectionDate?: Date | undefined;
+    status?: WirStatus;
+    submittedDate?: Date | undefined;
+    approvedDate?: Date | undefined;
+    rejectedDate?: Date | undefined;
+    parentId?: number | undefined;
+    revisionNo?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    checklistItems?: GetProjectWirChecklistItemDto[] | undefined;
+}
+
+export class GetProjectWirDtoListPagedResponse implements IGetProjectWirDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectWirDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IGetProjectWirDtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetProjectWirDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): GetProjectWirDtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectWirDtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IGetProjectWirDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectWirDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class GetProjectWirDtoListPagedResponseResponse implements IGetProjectWirDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectWirDtoListPagedResponse;
+
+    constructor(data?: IGetProjectWirDtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectWirDtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectWirDtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectWirDtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectWirDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectWirDtoListPagedResponse;
+}
+
+export class GetProjectWirDtoResponse implements IGetProjectWirDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectWirDto;
+
+    constructor(data?: IGetProjectWirDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetProjectWirDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetProjectWirDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectWirDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetProjectWirDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetProjectWirDto;
+}
+
+export class GetWirChecklistItemDto implements IGetWirChecklistItemDto {
+    id?: number;
+    checklistItem?: string | undefined;
+    displayOrder?: number;
+
+    constructor(data?: IGetWirChecklistItemDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.checklistItem = _data["checklistItem"];
+            this.displayOrder = _data["displayOrder"];
+        }
+    }
+
+    static fromJS(data: any): GetWirChecklistItemDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetWirChecklistItemDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["checklistItem"] = this.checklistItem;
+        data["displayOrder"] = this.displayOrder;
+        return data;
+    }
+}
+
+export interface IGetWirChecklistItemDto {
+    id?: number;
+    checklistItem?: string | undefined;
+    displayOrder?: number;
+}
+
+export class GetWirChecklistItemDtoListPagedResponse implements IGetWirChecklistItemDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetWirChecklistItemDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    readonly hasPreviousPage?: boolean;
+    readonly hasNextPage?: boolean;
+
+    constructor(data?: IGetWirChecklistItemDtoListPagedResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            if (Array.isArray(_data["data"])) {
+                this.data = [] as any;
+                for (let item of _data["data"])
+                    this.data!.push(GetWirChecklistItemDto.fromJS(item));
+            }
+            this.pageNumber = _data["pageNumber"];
+            this.pageSize = _data["pageSize"];
+            this.totalPages = _data["totalPages"];
+            this.totalRecords = _data["totalRecords"];
+            (this as any).hasPreviousPage = _data["hasPreviousPage"];
+            (this as any).hasNextPage = _data["hasNextPage"];
+        }
+    }
+
+    static fromJS(data: any): GetWirChecklistItemDtoListPagedResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetWirChecklistItemDtoListPagedResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        if (Array.isArray(this.data)) {
+            data["data"] = [];
+            for (let item of this.data)
+                data["data"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["pageNumber"] = this.pageNumber;
+        data["pageSize"] = this.pageSize;
+        data["totalPages"] = this.totalPages;
+        data["totalRecords"] = this.totalRecords;
+        data["hasPreviousPage"] = this.hasPreviousPage;
+        data["hasNextPage"] = this.hasNextPage;
+        return data;
+    }
+}
+
+export interface IGetWirChecklistItemDtoListPagedResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetWirChecklistItemDto[] | undefined;
+    pageNumber?: number;
+    pageSize?: number;
+    totalPages?: number;
+    totalRecords?: number;
+    hasPreviousPage?: boolean;
+    hasNextPage?: boolean;
+}
+
+export class GetWirChecklistItemDtoListPagedResponseResponse implements IGetWirChecklistItemDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetWirChecklistItemDtoListPagedResponse;
+
+    constructor(data?: IGetWirChecklistItemDtoListPagedResponseResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetWirChecklistItemDtoListPagedResponse.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetWirChecklistItemDtoListPagedResponseResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetWirChecklistItemDtoListPagedResponseResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetWirChecklistItemDtoListPagedResponseResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetWirChecklistItemDtoListPagedResponse;
+}
+
+export class GetWirChecklistItemDtoResponse implements IGetWirChecklistItemDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetWirChecklistItemDto;
+
+    constructor(data?: IGetWirChecklistItemDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? GetWirChecklistItemDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): GetWirChecklistItemDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetWirChecklistItemDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IGetWirChecklistItemDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: GetWirChecklistItemDto;
 }
 
 export class Int32Response implements IInt32Response {
@@ -25566,6 +27113,20 @@ export interface IUserRole {
     user?: User;
     roleId?: number;
     role?: Role;
+}
+
+export enum WirChecklistItemStatus {
+    Approved = "approved",
+    ApprovedWithComment = "approvedWithComment",
+    Rejected = "rejected",
+}
+
+export enum WirStatus {
+    Draft = "draft",
+    Submitted = "submitted",
+    Approved = "approved",
+    Rejected = "rejected",
+    Archived = "archived",
 }
 
 function formatDate(d: Date) {
