@@ -107,6 +107,7 @@ export class SidebarComponent implements OnInit {
           label: 'sidebar.items.projectReportDemo',
           icon: 'pi pi-file-pdf',
           route: '/project-report-demo',
+          permissions: [Permissions.ProjectReport.View],
         },
         // {
         //   label: 'sidebar.items.reportingDemo',

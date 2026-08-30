@@ -36,17 +36,13 @@
 
                 <div class="col-12 md:col-6 mb-1">
                     <div class="field">
-                        <p-inputgroup>
-                            <p-floatlabel variant="in" class="flex-1">
-                                <app-number-input inputId="amount" formControlName="amount" [min]="0"
-                                    [max]="isCostPlusSelected() ? 100 : undefined"
-                                    [invalid]="isFieldInvalid('amount')"></app-number-input>
-                                <label for="amount">{{ getContractModelValueLabel() | translate }}</label>
-                            </p-floatlabel>
-                            @if (isCostPlusSelected()) {
-                                <p-inputgroup-addon>%</p-inputgroup-addon>
-                            }
-                        </p-inputgroup>
+                        <p-floatlabel variant="in">
+                            <app-number-input inputId="amount" formControlName="amount" [min]="0"
+                                [max]="isCostPlusSelected() ? 100 : undefined"
+                                [suffix]="isCostPlusSelected() ? ' %' : undefined"
+                                [invalid]="isFieldInvalid('amount')"></app-number-input>
+                            <label for="amount">{{ getContractModelValueLabel() | translate }}</label>
+                        </p-floatlabel>
                     </div>
                 </div>
             </div>

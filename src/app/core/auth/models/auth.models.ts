@@ -223,6 +223,7 @@ export const SystemFeatures = {
   ProjectMilestoneAdvancePayments: { id: 21, code: 'PROJECT_MILESTONE_ADVANCE_PAYMENTS' },
   ProjectMilestoneTasks: { id: 22, code: 'PROJECT_MILESTONE_TASKS' },
   ProjectMilestonePaymentClaim: { id: 23, code: 'PROJECT_MILESTONE_PAYMENT_CLAIM' },
+  ProjectReport: { id: 24, code: 'PROJECT_REPORT' },
 } as const;
 
 /** Resolve a system feature id from its backend code (e.g. `'PROJECTS'` → `7`). */
@@ -347,6 +348,9 @@ export const Permissions = {
   RolesPermissions: {
     View: 'roles-permissions.view',
     Manage: 'roles-permissions.manage',
+  },
+  ProjectReport: {
+    View: 'project-report.view',
   },
 } as const;
 
@@ -505,6 +509,7 @@ export const PERMISSION_FEATURE_MAP: Record<string, FeaturePermissionMapping> = 
   [Permissions.MilestoneTabs.Advances]: { featureCode: 'PROJECT_MILESTONE_ADVANCE_PAYMENTS', permissionCodes: ['READ'] },
   [Permissions.MilestoneTabs.Tasks]: { featureCode: 'PROJECT_MILESTONE_TASKS', permissionCodes: ['READ'] },
   [Permissions.MilestoneTabs.PaymentClaims]: { featureCode: 'PROJECT_MILESTONE_PAYMENT_CLAIM', permissionCodes: ['READ'] },
+  [Permissions.ProjectReport.View]: { featureCode: 'PROJECT_REPORT', permissionCodes: ['READ'] },
 
   [Permissions.MainContractor.Manage]: { featureCode: 'PROJECT_MILESTONE_MC', permissionCodes: ['CREATE', 'UPDATE', 'DELETE'] },
   [Permissions.VoucherOrders.Manage]: { featureCode: 'PROJECT_MILESTONE_VO', permissionCodes: ['CREATE', 'UPDATE', 'DELETE'] },

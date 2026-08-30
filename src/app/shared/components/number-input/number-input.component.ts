@@ -27,6 +27,7 @@ export class NumberInputComponent implements ControlValueAccessor {
   placeholder = input('');
   min = input<number | undefined>(undefined);
   max = input<number | undefined>(undefined);
+  suffix = input<string | undefined>(undefined);
   showButtons = input(false);
   readonlyInput = input(false, { alias: 'readonly' });
   invalid = input(false);

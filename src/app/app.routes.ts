@@ -58,6 +58,7 @@ export const routes: Routes = [
       },
       {
         path: 'project-report-demo',
+        // canActivate: [permissionGuard([Permissions.ProjectReport.View])],
         loadComponent: () => import('./features/project-management/components/project-report/demo/project-report-demo-page/project-report-demo-page.component')
           .then(m => m.ProjectReportDemoPageComponent)
       },
