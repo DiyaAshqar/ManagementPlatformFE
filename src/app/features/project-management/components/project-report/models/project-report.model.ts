@@ -15,7 +15,6 @@ export type ProjectReportSectionKey =
   | 'agreement'
   | 'scope'
   | 'financial'
-  | 'schedule'
   | 'siteActivities'
   | 'documents'
   | 'signatures';
@@ -26,7 +25,6 @@ export const PROJECT_REPORT_SECTION_KEYS: readonly ProjectReportSectionKey[] = [
   'agreement',
   'scope',
   'financial',
-  'schedule',
   'siteActivities',
   'documents',
   'signatures',

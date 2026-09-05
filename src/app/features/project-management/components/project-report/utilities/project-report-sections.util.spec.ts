@@ -29,9 +29,9 @@ describe('project-report-sections.util', () => {
       expect(sections.has('siteActivities')).toBeFalse();
     });
 
-    it('limits the progress report to schedule/site-activity concerns', () => {
+    it('limits the progress report to scope/site-activity concerns', () => {
       const sections = resolveReportSections(config({ type: 'progress' }));
-      expect(sections.has('schedule')).toBeTrue();
+      expect(sections.has('scope')).toBeTrue();
       expect(sections.has('siteActivities')).toBeTrue();
       expect(sections.has('documents')).toBeTrue();
       expect(sections.has('financial')).toBeFalse();
@@ -41,7 +41,6 @@ describe('project-report-sections.util', () => {
       const sections = resolveReportSections(config({ type: 'financial' }));
       expect(sections.has('financial')).toBeTrue();
       expect(sections.has('agreement')).toBeTrue();
-      expect(sections.has('schedule')).toBeFalse();
       expect(sections.has('siteActivities')).toBeFalse();
     });
 

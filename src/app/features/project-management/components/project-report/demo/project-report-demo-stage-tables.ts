@@ -3,7 +3,7 @@ import { formatReportDate, formatReportNumber } from '../utilities/project-repor
 
 /**
  * Renders every raw data category (BOQ, Main Contractors, Purchase Orders,
- * Surveying Visits, Variation Orders, Expenses, Advances) for the demo's one
+ * Surveying Visits, Variation Orders, Expenses, Tasks) for the demo's one
  * real Milestone Stage ("تحضيرات", project stage #48) as its own
  * color-coded, stacked table — a literal transcription of the real API
  * responses, not folded into the formal report's narrative sections. Demo
@@ -291,90 +291,100 @@ function buildExp(): string {
   );
 }
 
-function buildAdv(): string {
-  // Master: an advance (السلفة). Detail: expenses available to settle
-  // against it (from "GET available expenses" per advance — same open
-  // pool of unlocked expenses, offered per-advance in the real UI).
-  interface AdvanceExpense {
-    expenseNo: string;
-    type: string;
-    amount: number;
-    date: Date;
+const TASK_STATUS_LABELS: Record<string, string> = {
+  todo: 'لم تبدأ',
+  inProgress: 'قيد التنفيذ',
+  review: 'قيد المراجعة',
+  done: 'مكتملة',
+};
+
+const TASK_PRIORITY_LABELS: Record<number, string> = {
+  0: 'منخفضة',
+  1: 'متوسطة',
+  2: 'عالية',
+  3: 'حرجة',
+};
+
+const TASK_RESPONSIBILITY_LABELS: Record<string, string> = {
+  supplier: 'مورّد',
+  contractor: 'مقاول',
+};
+
+function buildTask(): string {
+  interface TaskRow {
+    id: number;
+    title: string;
+    description: string;
+    responsibility: string | null;
+    assignTo: number | null;
+    taskPoint: number;
+    startDate: Date;
+    endDate: Date;
+    priority: number;
     status: string;
   }
-  interface Advance {
-    code: string;
-    date: Date;
-    engineer: string;
-    amount: number;
-    remaining: number;
-    status: string;
-    expenses: AdvanceExpense[];
-  }
 
-  const availableExpenses: AdvanceExpense[] = [
-    { expenseNo: '6868NN', type: 'Auto generated from project main contractor duty', amount: 6868, date: new Date('2026-08-30T13:44:43.224169'), status: 'متاح' },
-    { expenseNo: 'xxxx', type: 'Auto generated from project main contractor duty', amount: 7128, date: new Date('2026-07-10T18:57:52.7561861'), status: 'متاح' },
-    { expenseNo: '2222', type: '', amount: 21642.88, date: new Date('2026-07-05T08:33:36.568'), status: 'متاح' },
+  const tasks: TaskRow[] = [
+    {
+      id: 5,
+      title: 'test',
+      description: 'test',
+      responsibility: 'supplier',
+      assignTo: 5,
+      taskPoint: 2,
+      startDate: new Date('2026-07-20T21:00:00'),
+      endDate: new Date('2026-07-27T21:00:00'),
+      priority: 1,
+      status: 'inProgress',
+    },
+    {
+      id: 6,
+      title: 'Dolorum labore rerum',
+      description: 'Earum aut ipsam ut r',
+      responsibility: null,
+      assignTo: null,
+      taskPoint: 3,
+      startDate: new Date('2026-07-08T21:00:00'),
+      endDate: new Date('2026-07-07T21:00:00'),
+      priority: 0,
+      status: 'review',
+    },
   ];
 
-  const advances: Advance[] = [
-    { code: 'ADV-2026-005', date: new Date(2026, 7, 3), engineer: 'omar', amount: 100, remaining: 100, status: 'مفتوحة', expenses: availableExpenses },
-    { code: 'ADV-2026-004', date: new Date(2026, 5, 2), engineer: 'diya', amount: 55555, remaining: 55555, status: 'مفتوحة', expenses: availableExpenses },
-    { code: 'ADV-2026-003', date: new Date(2026, 6, 28), engineer: 'omar', amount: 22, remaining: 22, status: 'مفتوحة', expenses: [] },
-    { code: 'ADV-2026-002', date: new Date(2026, 6, 20), engineer: 'omar', amount: 500, remaining: 500, status: 'مفتوحة', expenses: [] },
-    { code: 'ADV-2026-001', date: new Date(2026, 6, 20), engineer: 'omar', amount: 300, remaining: 74.8, status: 'مفتوحة', expenses: [] },
-    { code: '10', date: new Date(2026, 0, 1), engineer: 'omar', amount: 100, remaining: 32, status: 'جزئية', expenses: [] },
-  ];
+  const rows = tasks.map((task, index) => [
+    String(index + 1),
+    esc(task.title),
+    esc(task.description),
+    task.responsibility ? esc(TASK_RESPONSIBILITY_LABELS[task.responsibility] ?? task.responsibility) : '—',
+    task.assignTo === null ? '—' : String(task.assignTo),
+    n(task.taskPoint, 0),
+    d(task.startDate),
+    d(task.endDate),
+    esc(TASK_PRIORITY_LABELS[task.priority] ?? String(task.priority)),
+    esc(TASK_STATUS_LABELS[task.status] ?? task.status),
+  ]);
 
-  const rows = advances
-    .map((advance, index) => {
-      const totalAvailable = advance.expenses.reduce((total, expense) => total + expense.amount, 0);
-      const expensesDetail = advance.expenses.length
-        ? `<details class="sdt-master-detail"${index === 0 ? ' open' : ''}>
-            <summary>عرض المصروفات المتاحة للتسوية (${advance.expenses.length})</summary>
-            <div class="sdt-detail-summary">
-              <span>إجمالي المصروفات المتاحة: <b>${n(totalAvailable)}</b></span>
-            </div>
-            <table class="sdt-detail-table">
-              <thead><tr><th>#</th><th>رقم المصروف</th><th>الملاحظات</th><th>التاريخ</th><th>المبلغ</th><th>الحالة</th></tr></thead>
-              <tbody>${advance.expenses
-                .map(
-                  (expense, expenseIndex) =>
-                    `<tr><td>${expenseIndex + 1}</td><td>${esc(expense.expenseNo)}</td><td>${esc(expense.type)}</td><td>${d(expense.date)}</td><td><b>${n(expense.amount)}</b></td><td>${esc(expense.status)}</td></tr>`
-                )
-                .join('')}</tbody>
-            </table>
-          </details>`
-        : `<span class="sdt-no-details">لا توجد مصروفات متاحة للتسوية</span>`;
-
-      return `<tr class="sdt-master-row">
-          <td style="text-align:center">${index + 1}</td>
-          <td><span class="sdt-code">${esc(advance.code)}</span></td>
-          <td>${d(advance.date)}</td>
-          <td>${esc(advance.engineer)}</td>
-          <td style="text-align:end">${n(advance.amount)}</td>
-          <td style="text-align:end">${n(advance.remaining)}</td>
-          <td>${esc(advance.status)}</td>
-        </tr>
-        <tr class="sdt-detail-row"><td colspan="7">${expensesDetail}</td></tr>`;
-    })
-    .join('');
-
-  return `<div class="sdt-block" style="border-inline-start-color:#4f46e5">
-    <div class="sdt-head" style="background:#4f46e51a">
-      <span class="sdt-badge" style="background:#4f46e5">ADV</span>
-      <div class="sdt-head-text">
-        <div class="sdt-title" style="color:#4f46e5">السُلف — Advances</div>
-        <div class="sdt-subtitle">سُلف المشروع (على مستوى المشروع، غير مرتبطة بمرحلة محدّدة في البيانات)؛ افتح صف التفاصيل للاطلاع على المصروفات المتاحة للتسوية — 6 عناصر، منها 5 مفتوحة</div>
-      </div>
-      <div class="sdt-total" style="color:#4f46e5"><span class="sdt-total-label">إجمالي السُلف / المتبقي</span><span class="sdt-total-value"><span dir="ltr">${n(56577)} / ${n(56283.8)}</span></span></div>
-    </div>
-    <table class="sdt-table">
-      <thead><tr><th>#</th><th>رقم السلفة</th><th>التاريخ</th><th>المهندس</th><th style="text-align:end">المبلغ</th><th style="text-align:end">الرصيد المتبقي</th><th>الحالة</th></tr></thead>
-      <tbody>${rows}</tbody>
-    </table>
-  </div>`;
+  return tableBlock(
+    '#0d9488',
+    'TASK',
+    'المهام — Tasks',
+    'مهام هذه المرحلة المسجّلة في النظام (2 عنصر)',
+    [
+      { text: '#', align: 'center' },
+      { text: 'العنوان' },
+      { text: 'الوصف' },
+      { text: 'المسؤولية' },
+      { text: 'المكلّف' },
+      { text: 'نقاط المهمة', align: 'center' },
+      { text: 'تاريخ البدء' },
+      { text: 'تاريخ الانتهاء' },
+      { text: 'الأولوية' },
+      { text: 'الحالة' },
+    ],
+    rows,
+    'إجمالي المهام',
+    String(tasks.length)
+  );
 }
 
 const STYLES = `
@@ -411,7 +421,7 @@ const STYLES = `
 /**
  * Full raw-data breakdown for the demo's one real Milestone Stage, as
  * color-coded stacked tables — BOQ, Main Contractors, Purchase Orders,
- * Surveying Visits, Variation Orders, Expenses, then Advances, in that
+ * Surveying Visits, Variation Orders, Expenses, then Tasks, in that
  * order. Returned as a self-contained fragment (its own `<style>` plus a
  * wrapper `<div>`) meant to be spliced into the generated report HTML.
  */
@@ -426,6 +436,6 @@ export function buildStageDataTablesHtml(stageName: string): string {
     ${buildSv()}
     ${buildVo()}
     ${buildExp()}
-    ${buildAdv()}
+    ${buildTask()}
   </div>`;
 }

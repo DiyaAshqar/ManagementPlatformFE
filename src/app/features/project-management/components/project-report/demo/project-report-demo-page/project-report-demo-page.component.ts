@@ -52,7 +52,6 @@ const SECTION_LABELS_AR: Record<ProjectReportSectionKey, string> = {
   agreement: 'معلومات الاتفاقية والعقد',
   scope: 'النطاق والمناطق والمراحل',
   financial: 'التقرير المالي',
-  schedule: 'الجدول الزمني والتقدم',
   siteActivities: 'أنشطة الموقع والمعاينات',
   documents: 'المستندات وصور سير العمل',
   signatures: 'الملخص الختامي والتوقيعات',

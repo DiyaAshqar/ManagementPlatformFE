@@ -211,30 +211,11 @@ function buildScope(snapshot: ProjectReportSnapshot, t: Translate): string {
     t('projectReport.common.noData')
   );
 
-  const milestoneRows = scope.milestones.map((m) => [
-    String(m.order),
-    cell(m.name),
-    cell(m.description),
-    m.stageLinked ? t('projectReport.scope.stageLinked') : t('projectReport.scope.stageNotLinked'),
-  ]);
-  const milestonesTable = table(
-    [
-      { text: t('projectReport.scope.order'), align: 'center' },
-      { text: t('projectReport.scope.milestoneName') },
-      { text: t('projectReport.scope.description') },
-      { text: t('projectReport.scope.stageStatus') },
-    ],
-    milestoneRows,
-    t('projectReport.common.noData')
-  );
-
   return section(
     'scope',
     t('projectReport.sections.scope'),
     `<h3>${esc(t('projectReport.scope.areas'))}</h3>
-     ${areasTable}
-     <h3>${esc(t('projectReport.scope.milestones'))}</h3>
-     ${milestonesTable}`
+     ${areasTable}`
   );
 }
 
@@ -293,52 +274,6 @@ function buildFinancial(snapshot: ProjectReportSnapshot, t: Translate): string {
   return section('financial', t('projectReport.sections.financial'), `${ledgers}${claimBlock}${notes}`);
 }
 
-function buildSchedule(snapshot: ProjectReportSnapshot, config: ProjectReportConfig, t: Translate): string {
-  const s = snapshot.schedule;
-  const cards = `<div class="kpi-grid">
-    ${kpiCard(t('projectReport.schedule.plannedStart'), date(s.plannedStart, config.language))}
-    ${kpiCard(t('projectReport.schedule.plannedEnd'), date(s.plannedEnd, config.language))}
-    ${kpiCard(t('projectReport.schedule.asOf'), date(s.asOfDate, config.language))}
-    ${kpiCard(t('projectReport.schedule.daysElapsed'), s.daysElapsed === null ? DASH : String(s.daysElapsed))}
-    ${kpiCard(t('projectReport.schedule.daysRemaining'), s.daysRemaining === null ? DASH : String(s.daysRemaining))}
-  </div>`;
-
-  const taskCards = `<div class="kpi-grid">
-    ${kpiCard(t('projectReport.schedule.taskTodo'), String(s.taskCounts.todo))}
-    ${kpiCard(t('projectReport.schedule.taskInProgress'), String(s.taskCounts.inProgress))}
-    ${kpiCard(t('projectReport.schedule.taskReview'), String(s.taskCounts.review))}
-    ${kpiCard(t('projectReport.schedule.taskCompleted'), String(s.taskCounts.completed))}
-  </div>
-  <p class="note">${esc(t('projectReport.schedule.blockedNotTracked'))}</p>`;
-
-  const stageRows = s.stages.map((st) => [cell(st.name), cell(st.typeLabel)]);
-  const stagesTable = table(
-    [
-      { text: t('projectReport.schedule.stageName') },
-      { text: t('projectReport.schedule.stageType') },
-    ],
-    stageRows,
-    t('projectReport.common.noData')
-  );
-
-  const workList = (label: string, items: string[]) =>
-    `<h3>${esc(label)}</h3>${
-      items.length > 0
-        ? `<ul class="notes-list">${items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`
-        : `<p class="empty-state">${esc(t('projectReport.common.noData'))}</p>`
-    }`;
-
-  return section(
-    'schedule',
-    t('projectReport.sections.schedule'),
-    `${cards}${taskCards}
-     <h3>${esc(t('projectReport.schedule.stages'))}</h3>
-     ${stagesTable}
-     ${workList(t('projectReport.schedule.inProgressWork'), s.inProgressWork)}
-     ${workList(t('projectReport.schedule.upcomingWork'), s.upcomingWork)}`
-  );
-}
-
 function buildSiteActivities(snapshot: ProjectReportSnapshot, config: ProjectReportConfig, t: Translate): string {
   const s = snapshot.siteActivities;
   const taskRows = s.tasks.map((task) => [
@@ -364,25 +299,11 @@ function buildSiteActivities(snapshot: ProjectReportSnapshot, config: ProjectRep
     t('projectReport.common.noData')
   );
 
-  const visitRows = s.surveyingVisits.map((v) => [date(v.date, config.language), cell(v.surveyor), cell(v.purpose), num(v.subTotal)]);
-  const visitsTable = table(
-    [
-      { text: t('projectReport.siteActivities.visitDate') },
-      { text: t('projectReport.siteActivities.surveyor') },
-      { text: t('projectReport.siteActivities.purpose') },
-      { text: t('projectReport.siteActivities.subTotal'), align: 'end' },
-    ],
-    visitRows,
-    t('projectReport.common.noData')
-  );
-
   return section(
     'site-activities',
     t('projectReport.sections.siteActivities'),
     `<h3>${esc(t('projectReport.siteActivities.tasks'))}</h3>
-     ${tasksTable}
-     <h3>${esc(t('projectReport.siteActivities.surveyingVisits'))}</h3>
-     ${visitsTable}`
+     ${tasksTable}`
   );
 }
 
@@ -516,8 +437,7 @@ export function buildProjectReportHtml(
     executiveSummary: () => buildExecutiveSummary(snapshot, config, t),
     agreement: () => buildAgreement(snapshot, config, t),
     scope: () => buildScope(snapshot, t),
-    financial: () => (config.includeFinancial ? buildFinancial(snapshot, t) : ''),
-    schedule: () => buildSchedule(snapshot, config, t),
+    // financial: () => (config.includeFinancial ? buildFinancial(snapshot, t) : ''), // disabled: commented out, not removed — re-enable when ready
     siteActivities: () => buildSiteActivities(snapshot, config, t),
     documents: () => (config.includePhotos ? buildDocuments(snapshot, config, t) : ''),
     signatures: () => buildSignatures(snapshot, config, t),
@@ -529,7 +449,6 @@ export function buildProjectReportHtml(
     'agreement',
     'scope',
     'financial',
-    'schedule',
     'siteActivities',
     'documents',
     'signatures',

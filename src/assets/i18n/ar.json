@@ -1710,7 +1710,6 @@
       "agreement": "معلومات الاتفاقية والعقد",
       "scope": "النطاق والمناطق والمراحل",
       "financial": "التقرير المالي",
-      "schedule": "الجدول الزمني والتقدم",
       "siteActivities": "أنشطة الموقع والمعاينات",
       "documents": "المستندات وصور سير العمل",
       "signatures": "الملخص الختامي والتوقيعات"
@@ -1782,14 +1781,7 @@
       "areas": "مناطق المشروع والملاحق",
       "annex": "الملحق",
       "amount": "الكمية",
-      "unit": "الوحدة",
-      "milestones": "مراحل الاتفاقية",
-      "order": "#",
-      "milestoneName": "المرحلة",
-      "description": "الوصف",
-      "stageStatus": "حالة التنفيذ",
-      "stageLinked": "قيد التنفيذ / مرتبطة بمرحلة مشروع",
-      "stageNotLinked": "غير مرتبطة بعد بمرحلة مشروع"
+      "unit": "الوحدة"
     },
     "financial": {
       "contractAndBudget": "العقد والميزانية",
@@ -1818,23 +1810,6 @@
         "ledgersAreSeparate": "كل رقم أعلاه يمثل سجلاً مستقلاً ولا يُجمع مع غيره — تعامل معها كإجماليات منفصلة وليست رصيدًا تراكميًا واحدًا."
       }
     },
-    "schedule": {
-      "plannedStart": "تاريخ البدء المخطط",
-      "plannedEnd": "تاريخ الانتهاء المخطط",
-      "asOf": "حتى تاريخ",
-      "daysElapsed": "الأيام المنقضية",
-      "daysRemaining": "الأيام المتبقية",
-      "taskTodo": "لم تبدأ",
-      "taskInProgress": "قيد التنفيذ",
-      "taskReview": "قيد المراجعة",
-      "taskCompleted": "مكتملة",
-      "blockedNotTracked": "لا يتم حاليًا تتبع حالة \"معلّقة\" كحالة مستقلة للمهام في النظام.",
-      "stages": "مراحل المشروع",
-      "stageName": "المرحلة",
-      "stageType": "النوع",
-      "inProgressWork": "الأعمال قيد التنفيذ",
-      "upcomingWork": "الأعمال المخطط لها لاحقًا"
-    },
     "siteActivities": {
       "tasks": "المهام",
       "task": "المهمة",
@@ -1843,12 +1818,7 @@
       "responsibility": "المسؤولية",
       "startDate": "تاريخ البدء",
       "endDate": "تاريخ الانتهاء",
-      "subtasks": "المهام الفرعية",
-      "surveyingVisits": "زيارات المساحة",
-      "visitDate": "التاريخ",
-      "surveyor": "المساح",
-      "purpose": "الغرض",
-      "subTotal": "المجموع الفرعي"
+      "subtasks": "المهام الفرعية"
     },
     "documents": {
       "photos": "صور سير العمل",

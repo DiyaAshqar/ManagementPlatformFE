@@ -121,7 +121,6 @@ const ALL_SECTIONS: Set<ProjectReportSectionKey> = new Set([
   'agreement',
   'scope',
   'financial',
-  'schedule',
   'siteActivities',
   'documents',
   'signatures',
@@ -174,16 +173,18 @@ describe('project-report.builder', () => {
   });
 
   describe('permission-based financial redaction', () => {
-    it('shows a restricted notice instead of the ledger figures when the financial section is unauthorized', () => {
+    // The financial section render is currently disabled (see project-report.builder.ts) — it renders
+    // no content, authorized or not, until it's re-enabled.
+    it('renders no financial content — the section is disabled regardless of authorization', () => {
       const snapshot = baseSnapshot({ financial: { ...baseSnapshot().financial, authorized: false } });
       const html = buildProjectReportHtml(snapshot, baseConfig(), ALL_SECTIONS, fakeTranslate);
-      expect(html).toContain('projectReport.common.restricted');
+      expect(html).not.toContain('projectReport.common.restricted');
       expect(html).not.toContain('projectReport.financial.contractAndBudget');
     });
   });
 
   describe('report-type/config gating', () => {
-    it('omits the financial ledger content when includeFinancial is false even though the section is selected', () => {
+    it('omits the financial ledger content — the section is disabled regardless of includeFinancial', () => {
       const html = buildProjectReportHtml(baseSnapshot(), baseConfig({ includeFinancial: false }), ALL_SECTIONS, fakeTranslate);
       expect(html).not.toContain('projectReport.financial.contractAndBudget');
     });
@@ -202,7 +203,7 @@ describe('project-report.builder', () => {
   describe('date and number formatting', () => {
     it('formats currency-like figures with two decimals and thousands separators', () => {
       const html = buildProjectReportHtml(baseSnapshot(), baseConfig(), ALL_SECTIONS, fakeTranslate);
-      expect(html).toContain('20,000.00'); // contractorCommitments
+      expect(html).toContain('50,000.00'); // executiveSummary.budget
     });
   });
 });

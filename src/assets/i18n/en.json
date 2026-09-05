@@ -1714,7 +1714,6 @@
       "agreement": "Agreement & Contract Information",
       "scope": "Scope, Areas & Milestones",
       "financial": "Financial Report",
-      "schedule": "Schedule & Progress",
       "siteActivities": "Site Activities & Inspections",
       "documents": "Documents & Progress Photos",
       "signatures": "Final Summary & Signatures"
@@ -1786,14 +1785,7 @@
       "areas": "Project Areas & Annexes",
       "annex": "Annex",
       "amount": "Amount",
-      "unit": "Unit",
-      "milestones": "Agreement Milestones",
-      "order": "#",
-      "milestoneName": "Milestone",
-      "description": "Description",
-      "stageStatus": "Execution Status",
-      "stageLinked": "In progress / linked to a project stage",
-      "stageNotLinked": "Not yet linked to a project stage"
+      "unit": "Unit"
     },
     "financial": {
       "contractAndBudget": "Contract & Budget",
@@ -1822,23 +1814,6 @@
         "ledgersAreSeparate": "Each figure above is an independent ledger and is not summed into the others — treat them as distinct totals, not a single running balance."
       }
     },
-    "schedule": {
-      "plannedStart": "Planned Start",
-      "plannedEnd": "Planned End",
-      "asOf": "As Of",
-      "daysElapsed": "Days Elapsed",
-      "daysRemaining": "Days Remaining",
-      "taskTodo": "To Do",
-      "taskInProgress": "In Progress",
-      "taskReview": "Review",
-      "taskCompleted": "Completed",
-      "blockedNotTracked": "\"Blocked\" is not currently tracked as a distinct task status by the system.",
-      "stages": "Project Stages",
-      "stageName": "Stage",
-      "stageType": "Type",
-      "inProgressWork": "Work In Progress",
-      "upcomingWork": "Planned / Upcoming Work"
-    },
     "siteActivities": {
       "tasks": "Tasks",
       "task": "Task",
@@ -1847,12 +1822,7 @@
       "responsibility": "Responsibility",
       "startDate": "Start Date",
       "endDate": "End Date",
-      "subtasks": "Subtasks",
-      "surveyingVisits": "Surveying Visits",
-      "visitDate": "Date",
-      "surveyor": "Surveyor",
-      "purpose": "Purpose",
-      "subTotal": "Subtotal"
+      "subtasks": "Subtasks"
     },
     "documents": {
       "photos": "Progress Photos",

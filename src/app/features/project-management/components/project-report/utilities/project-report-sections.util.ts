@@ -12,7 +12,6 @@ const FULL_SECTIONS: ProjectReportSectionKey[] = [
   'agreement',
   'scope',
   'financial',
-  'schedule',
   'siteActivities',
   'documents',
   'signatures',
@@ -31,7 +30,6 @@ const PROGRESS_SECTIONS: ProjectReportSectionKey[] = [
   'cover',
   'executiveSummary',
   'scope',
-  'schedule',
   'siteActivities',
   'documents',
 ];
