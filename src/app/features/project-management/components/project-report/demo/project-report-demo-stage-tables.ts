@@ -96,9 +96,64 @@ function buildBoq(): string {
   );
 }
 
+const DUTY_TYPE_NAMES: Record<number, string> = {
+  1: 'جبسوم بورد فلات',
+  2: 'جبسوم بورد شراشف',
+  3: 'جبسوم بورد قواطع',
+  4: 'فولس سيلنج',
+  5: 'جبسوم بورد بروفايل',
+  6: 'جبسوم بورد ماجناتيك',
+  7: 'جبسوم بورد فرزات',
+};
+
+const DUTY_RESPONSIBILITY_NAMES: Record<number, string> = {
+  1: 'المقاول',
+  2: 'المالك',
+  3: 'الاستشاري',
+  4: 'مشترك',
+  5: 'المهندس',
+};
+
+const DUTY_UNIT_NAMES: Record<number, string> = {
+  1: 'm²',
+  2: 'm³',
+  3: 'kg',
+  4: 'ton',
+  5: 'piece',
+  6: 'ML',
+  7: 'liter',
+  8: 'day',
+  9: 'hour',
+  10: 'set',
+};
+
+const DUTY_MATERIAL_NAMES: Record<number, string> = {
+  2: 'Steel Rebar',
+  19: 'زجاج سيكوريت',
+};
+
+const DUTY_SUPPLIER_NAMES: Record<number, string> = {
+  1: 'Materials Supplier Co.',
+  2: 'Construction Supply Ltd.',
+};
+
 function buildPmc(): string {
-  // Master: ProjectMainContractor. Detail: its ProjectMainContractorPayments.
-  // Payments are linked by contract ID, since one contractor may hold multiple contracts.
+  // Master: ProjectMainContractor. Detail: its ProjectMainContractorPayments
+  // and its ProjectMainContractorDuty line items (the BOQ-like commitments
+  // that make up the contract). Both are linked by contract ID, since one
+  // contractor may hold multiple contracts.
+  interface ContractorDuty {
+    dutyTypeId: number;
+    dutyResponsibilityId: number;
+    unitId: number;
+    quantity: number;
+    price: number;
+    subTotal: number;
+    supplierId: number | null;
+    materialId: number | null;
+    expenseNumber: string | null;
+  }
+
   const contractors = [
     {
       id: 14,
@@ -111,9 +166,35 @@ function buildPmc(): string {
         { date: new Date(2026, 4, 9), amount: 8000, method: 'شيك', receiptNo: '541', notes: 'دفعة اولى' },
         { date: new Date(2026, 6, 7), amount: 500, method: 'تحويل بنكي', receiptNo: '898HJU', notes: 'test' },
       ],
+      duties: [
+        { dutyTypeId: 2, dutyResponsibilityId: 1, unitId: 1, quantity: 11, price: 16, subTotal: 176, supplierId: 2, materialId: 2, expenseNumber: 't-255' },
+        { dutyTypeId: 2, dutyResponsibilityId: 3, unitId: 1, quantity: 11, price: 50, subTotal: 550, supplierId: null, materialId: null, expenseNumber: null },
+        { dutyTypeId: 4, dutyResponsibilityId: 2, unitId: 2, quantity: 12, price: 11, subTotal: 132, supplierId: null, materialId: null, expenseNumber: null },
+        { dutyTypeId: 1, dutyResponsibilityId: 2, unitId: 1, quantity: 3434, price: 2, subTotal: 6868, supplierId: 1, materialId: 19, expenseNumber: '6868NN' },
+      ] as ContractorDuty[],
     },
-    { id: 16, name: 'جهاد الشويكي.', type: 'مقاول كهرباء', startDate: new Date(2026, 5, 24), endDate: new Date(2026, 5, 23), amount: 3, payments: [] },
-    { id: 17, name: 'شركة محمد ثلجي وشركاؤه', type: 'مقاول عظم', startDate: new Date(2026, 6, 8), endDate: new Date(2026, 6, 21), amount: 7878, payments: [] },
+    {
+      id: 16,
+      name: 'جهاد الشويكي.',
+      type: 'مقاول كهرباء',
+      startDate: new Date(2026, 5, 24),
+      endDate: new Date(2026, 5, 23),
+      amount: 3,
+      payments: [],
+      duties: [
+        { dutyTypeId: 2, dutyResponsibilityId: 1, unitId: 2, quantity: 795, price: 461, subTotal: 366495, supplierId: null, materialId: null, expenseNumber: null },
+      ] as ContractorDuty[],
+    },
+    {
+      id: 17,
+      name: 'شركة محمد ثلجي وشركاؤه',
+      type: 'مقاول عظم',
+      startDate: new Date(2026, 6, 8),
+      endDate: new Date(2026, 6, 21),
+      amount: 7878,
+      payments: [],
+      duties: [] as ContractorDuty[],
+    },
   ];
 
   const rows = contractors
@@ -139,6 +220,25 @@ function buildPmc(): string {
           </details>`
         : `<span class="sdt-no-details">لا توجد دفعات مسجلة</span>`;
 
+      const totalDuties = contractor.duties.reduce((total, duty) => total + duty.subTotal, 0);
+      const dutyDetail = contractor.duties.length
+        ? `<details class="sdt-master-detail">
+            <summary>عرض التزامات المقاول (${contractor.duties.length})</summary>
+            <div class="sdt-detail-summary">
+              <span>إجمالي الالتزامات: <b>${n(totalDuties)}</b></span>
+            </div>
+            <table class="sdt-detail-table">
+              <thead><tr><th>#</th><th>البند</th><th>المسؤولية</th><th>الوحدة</th><th>الكمية</th><th>السعر</th><th>المجموع الفرعي</th><th>المورد</th><th>المادة</th><th>رقم المصروف المرتبط</th></tr></thead>
+              <tbody>${contractor.duties
+                .map(
+                  (duty, dutyIndex) =>
+                    `<tr><td>${dutyIndex + 1}</td><td>${esc(DUTY_TYPE_NAMES[duty.dutyTypeId] ?? String(duty.dutyTypeId))}</td><td>${esc(DUTY_RESPONSIBILITY_NAMES[duty.dutyResponsibilityId] ?? String(duty.dutyResponsibilityId))}</td><td>${esc(DUTY_UNIT_NAMES[duty.unitId] ?? String(duty.unitId))}</td><td>${n(duty.quantity, 0)}</td><td>${n(duty.price)}</td><td><b>${n(duty.subTotal)}</b></td><td>${duty.supplierId === null ? '—' : esc(DUTY_SUPPLIER_NAMES[duty.supplierId] ?? String(duty.supplierId))}</td><td>${duty.materialId === null ? '—' : esc(DUTY_MATERIAL_NAMES[duty.materialId] ?? String(duty.materialId))}</td><td>${duty.expenseNumber ? esc(duty.expenseNumber) : '—'}</td></tr>`
+                )
+                .join('')}</tbody>
+            </table>
+          </details>`
+        : `<span class="sdt-no-details">لا توجد التزامات مسجلة</span>`;
+
       return `<tr class="sdt-master-row">
           <td style="text-align:center">${index + 1}</td>
           <td>${esc(contractor.name)}</td>
@@ -148,7 +248,7 @@ function buildPmc(): string {
           <td style="text-align:end">${n(contractor.amount)}</td>
           <td style="text-align:end"><b>${n(totalPaid)}</b></td>
         </tr>
-        <tr class="sdt-detail-row"><td colspan="7">${paymentDetail}</td></tr>`;
+        <tr class="sdt-detail-row"><td colspan="7">${paymentDetail}${dutyDetail}</td></tr>`;
     })
     .join('');
 
@@ -157,7 +257,7 @@ function buildPmc(): string {
       <span class="sdt-badge" style="background:#16a34a">PMC</span>
       <div class="sdt-head-text">
         <div class="sdt-title" style="color:#16a34a">المقاولون الرئيسيون — Main Contractors</div>
-        <div class="sdt-subtitle">العقد هو السجل الرئيسي؛ افتح صف التفاصيل للاطلاع على دفعاته (${contractors.length} عقود)</div>
+        <div class="sdt-subtitle">العقد هو السجل الرئيسي؛ افتح صف التفاصيل للاطلاع على دفعاته والتزاماته (${contractors.length} عقود)</div>
       </div>
       <div class="sdt-total" style="color:#16a34a"><span class="sdt-total-label">إجمالي قيمة العقود</span><span class="sdt-total-value">${n(15881)}</span></div>
     </div>
