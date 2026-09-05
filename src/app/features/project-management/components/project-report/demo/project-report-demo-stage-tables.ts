@@ -97,31 +97,76 @@ function buildBoq(): string {
 }
 
 function buildPmc(): string {
-  const rows: string[][] = [
-    ['1', esc('شركة محمد ثلجي وشركاؤه'), esc('مقاول عظم'), d(new Date(2026, 4, 4)), d(new Date(2026, 4, 9)), n(8000), `<b>${n(8500)}</b>`],
-    ['2', esc('جهاد الشويكي.'), esc('مقاول كهرباء'), d(new Date(2026, 5, 24)), d(new Date(2026, 5, 23)), n(3), `<b>${n(0)}</b>`],
-    ['3', esc('شركة محمد ثلجي وشركاؤه'), esc('مقاول عظم'), d(new Date(2026, 6, 8)), d(new Date(2026, 6, 21)), n(7878), `<b>${n(0)}</b>`],
+  // Master: ProjectMainContractor. Detail: its ProjectMainContractorPayments.
+  // Payments are linked by contract ID, since one contractor may hold multiple contracts.
+  const contractors = [
+    {
+      id: 14,
+      name: 'شركة محمد ثلجي وشركاؤه',
+      type: 'مقاول عظم',
+      startDate: new Date(2026, 4, 4),
+      endDate: new Date(2026, 4, 9),
+      amount: 8000,
+      payments: [
+        { date: new Date(2026, 4, 9), amount: 8000, method: 'شيك', receiptNo: '541', notes: 'دفعة اولى' },
+        { date: new Date(2026, 6, 7), amount: 500, method: 'تحويل بنكي', receiptNo: '898HJU', notes: 'test' },
+      ],
+    },
+    { id: 16, name: 'جهاد الشويكي.', type: 'مقاول كهرباء', startDate: new Date(2026, 5, 24), endDate: new Date(2026, 5, 23), amount: 3, payments: [] },
+    { id: 17, name: 'شركة محمد ثلجي وشركاؤه', type: 'مقاول عظم', startDate: new Date(2026, 6, 8), endDate: new Date(2026, 6, 21), amount: 7878, payments: [] },
   ];
-  return tableBlock(
-    '#16a34a',
-    'PMC',
-    'المقاولون الرئيسيون — Main Contractors',
-    'عقود المقاولين الرئيسيين لهذه المرحلة (3 عناصر)',
-    [
-      { text: '#', align: 'center' },
-      { text: 'المقاول' },
-      { text: 'نوع العقد' },
-      { text: 'تاريخ البدء' },
-      { text: 'تاريخ الانتهاء' },
-      { text: 'قيمة العقد', align: 'end' },
-      { text: 'إجمالي المدفوعات', align: 'end' },
-    ],
-    rows,
-    'إجمالي قيمة العقود',
-    n(15881)
-  );
-}
 
+  const rows = contractors
+    .map((contractor, index) => {
+      const totalPaid = contractor.payments.reduce((total, payment) => total + payment.amount, 0);
+      const balance = contractor.amount - totalPaid;
+      const paymentDetail = contractor.payments.length
+        ? `<details class="sdt-master-detail"${index === 0 ? ' open' : ''}>
+            <summary>عرض الدفعات (${contractor.payments.length})</summary>
+            <div class="sdt-detail-summary">
+              <span>إجمالي المدفوع: <b>${n(totalPaid)}</b></span>
+              <span class="${balance < 0 ? 'sdt-negative' : ''}">الرصيد المتبقي: <b>${n(balance)}</b></span>
+            </div>
+            <table class="sdt-detail-table">
+              <thead><tr><th>#</th><th>تاريخ الدفعة</th><th>المبلغ المدفوع</th><th>طريقة الدفع</th><th>رقم السند</th><th>ملاحظات</th></tr></thead>
+              <tbody>${contractor.payments
+                .map(
+                  (payment, paymentIndex) =>
+                    `<tr><td>${paymentIndex + 1}</td><td>${d(payment.date)}</td><td><b>${n(payment.amount)}</b></td><td>${esc(payment.method)}</td><td>${esc(payment.receiptNo)}</td><td>${esc(payment.notes)}</td></tr>`
+                )
+                .join('')}</tbody>
+            </table>
+          </details>`
+        : `<span class="sdt-no-details">لا توجد دفعات مسجلة</span>`;
+
+      return `<tr class="sdt-master-row">
+          <td style="text-align:center">${index + 1}</td>
+          <td>${esc(contractor.name)}</td>
+          <td>${esc(contractor.type)}</td>
+          <td>${d(contractor.startDate)}</td>
+          <td>${d(contractor.endDate)}</td>
+          <td style="text-align:end">${n(contractor.amount)}</td>
+          <td style="text-align:end"><b>${n(totalPaid)}</b></td>
+        </tr>
+        <tr class="sdt-detail-row"><td colspan="7">${paymentDetail}</td></tr>`;
+    })
+    .join('');
+
+  return `<div class="sdt-block" style="border-inline-start-color:#16a34a">
+    <div class="sdt-head" style="background:#16a34a1a">
+      <span class="sdt-badge" style="background:#16a34a">PMC</span>
+      <div class="sdt-head-text">
+        <div class="sdt-title" style="color:#16a34a">المقاولون الرئيسيون — Main Contractors</div>
+        <div class="sdt-subtitle">العقد هو السجل الرئيسي؛ افتح صف التفاصيل للاطلاع على دفعاته (${contractors.length} عقود)</div>
+      </div>
+      <div class="sdt-total" style="color:#16a34a"><span class="sdt-total-label">إجمالي قيمة العقود</span><span class="sdt-total-value">${n(15881)}</span></div>
+    </div>
+    <table class="sdt-table">
+      <thead><tr><th>#</th><th>المقاول</th><th>نوع العقد</th><th>تاريخ البدء</th><th>تاريخ الانتهاء</th><th style="text-align:end">قيمة العقد</th><th style="text-align:end">إجمالي المدفوعات</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
+}
 function buildPo(): string {
   const rows: string[][] = [
     ['1', `<span class="sdt-code">32432</span>`, esc('Building Materials Inc.'), esc('SSDFSDF'), n(343), `<b>${n(343)}</b>`, esc('قيد الانتظار')],
@@ -247,32 +292,89 @@ function buildExp(): string {
 }
 
 function buildAdv(): string {
-  const rows: string[][] = [
-    ['1', `<span class="sdt-code">ADV-2026-005</span>`, d(new Date(2026, 7, 3)), esc('omar'), n(100), n(100), esc('مفتوحة')],
-    ['2', `<span class="sdt-code">ADV-2026-004</span>`, d(new Date(2026, 5, 2)), esc('diya'), n(55555), n(55555), esc('مفتوحة')],
-    ['3', `<span class="sdt-code">ADV-2026-003</span>`, d(new Date(2026, 6, 28)), esc('omar'), n(22), n(22), esc('مفتوحة')],
-    ['4', `<span class="sdt-code">ADV-2026-002</span>`, d(new Date(2026, 6, 20)), esc('omar'), n(500), n(500), esc('مفتوحة')],
-    ['5', `<span class="sdt-code">ADV-2026-001</span>`, d(new Date(2026, 6, 20)), esc('omar'), n(300), n(74.8), esc('مفتوحة')],
-    ['6', `<span class="sdt-code">10</span>`, d(new Date(2026, 0, 1)), esc('omar'), n(100), n(32), esc('جزئية')],
+  // Master: an advance (السلفة). Detail: expenses available to settle
+  // against it (from "GET available expenses" per advance — same open
+  // pool of unlocked expenses, offered per-advance in the real UI).
+  interface AdvanceExpense {
+    expenseNo: string;
+    type: string;
+    amount: number;
+    date: Date;
+    status: string;
+  }
+  interface Advance {
+    code: string;
+    date: Date;
+    engineer: string;
+    amount: number;
+    remaining: number;
+    status: string;
+    expenses: AdvanceExpense[];
+  }
+
+  const availableExpenses: AdvanceExpense[] = [
+    { expenseNo: '6868NN', type: 'Auto generated from project main contractor duty', amount: 6868, date: new Date('2026-08-30T13:44:43.224169'), status: 'متاح' },
+    { expenseNo: 'xxxx', type: 'Auto generated from project main contractor duty', amount: 7128, date: new Date('2026-07-10T18:57:52.7561861'), status: 'متاح' },
+    { expenseNo: '2222', type: '', amount: 21642.88, date: new Date('2026-07-05T08:33:36.568'), status: 'متاح' },
   ];
-  return tableBlock(
-    '#4f46e5',
-    'ADV',
-    'السُلف — Advances',
-    'سُلف المشروع (على مستوى المشروع، غير مرتبطة بمرحلة محدّدة في البيانات) — 6 عناصر، منها 5 مفتوحة',
-    [
-      { text: '#', align: 'center' },
-      { text: 'رقم السلفة' },
-      { text: 'التاريخ' },
-      { text: 'المهندس' },
-      { text: 'المبلغ', align: 'end' },
-      { text: 'الرصيد المتبقي', align: 'end' },
-      { text: 'الحالة' },
-    ],
-    rows,
-    'إجمالي السُلف / المتبقي',
-    `<span dir="ltr">${n(56577)} / ${n(56283.8)}</span>`
-  );
+
+  const advances: Advance[] = [
+    { code: 'ADV-2026-005', date: new Date(2026, 7, 3), engineer: 'omar', amount: 100, remaining: 100, status: 'مفتوحة', expenses: availableExpenses },
+    { code: 'ADV-2026-004', date: new Date(2026, 5, 2), engineer: 'diya', amount: 55555, remaining: 55555, status: 'مفتوحة', expenses: availableExpenses },
+    { code: 'ADV-2026-003', date: new Date(2026, 6, 28), engineer: 'omar', amount: 22, remaining: 22, status: 'مفتوحة', expenses: [] },
+    { code: 'ADV-2026-002', date: new Date(2026, 6, 20), engineer: 'omar', amount: 500, remaining: 500, status: 'مفتوحة', expenses: [] },
+    { code: 'ADV-2026-001', date: new Date(2026, 6, 20), engineer: 'omar', amount: 300, remaining: 74.8, status: 'مفتوحة', expenses: [] },
+    { code: '10', date: new Date(2026, 0, 1), engineer: 'omar', amount: 100, remaining: 32, status: 'جزئية', expenses: [] },
+  ];
+
+  const rows = advances
+    .map((advance, index) => {
+      const totalAvailable = advance.expenses.reduce((total, expense) => total + expense.amount, 0);
+      const expensesDetail = advance.expenses.length
+        ? `<details class="sdt-master-detail"${index === 0 ? ' open' : ''}>
+            <summary>عرض المصروفات المتاحة للتسوية (${advance.expenses.length})</summary>
+            <div class="sdt-detail-summary">
+              <span>إجمالي المصروفات المتاحة: <b>${n(totalAvailable)}</b></span>
+            </div>
+            <table class="sdt-detail-table">
+              <thead><tr><th>#</th><th>رقم المصروف</th><th>الملاحظات</th><th>التاريخ</th><th>المبلغ</th><th>الحالة</th></tr></thead>
+              <tbody>${advance.expenses
+                .map(
+                  (expense, expenseIndex) =>
+                    `<tr><td>${expenseIndex + 1}</td><td>${esc(expense.expenseNo)}</td><td>${esc(expense.type)}</td><td>${d(expense.date)}</td><td><b>${n(expense.amount)}</b></td><td>${esc(expense.status)}</td></tr>`
+                )
+                .join('')}</tbody>
+            </table>
+          </details>`
+        : `<span class="sdt-no-details">لا توجد مصروفات متاحة للتسوية</span>`;
+
+      return `<tr class="sdt-master-row">
+          <td style="text-align:center">${index + 1}</td>
+          <td><span class="sdt-code">${esc(advance.code)}</span></td>
+          <td>${d(advance.date)}</td>
+          <td>${esc(advance.engineer)}</td>
+          <td style="text-align:end">${n(advance.amount)}</td>
+          <td style="text-align:end">${n(advance.remaining)}</td>
+          <td>${esc(advance.status)}</td>
+        </tr>
+        <tr class="sdt-detail-row"><td colspan="7">${expensesDetail}</td></tr>`;
+    })
+    .join('');
+
+  return `<div class="sdt-block" style="border-inline-start-color:#4f46e5">
+    <div class="sdt-head" style="background:#4f46e51a">
+      <span class="sdt-badge" style="background:#4f46e5">ADV</span>
+      <div class="sdt-head-text">
+        <div class="sdt-title" style="color:#4f46e5">السُلف — Advances</div>
+        <div class="sdt-subtitle">سُلف المشروع (على مستوى المشروع، غير مرتبطة بمرحلة محدّدة في البيانات)؛ افتح صف التفاصيل للاطلاع على المصروفات المتاحة للتسوية — 6 عناصر، منها 5 مفتوحة</div>
+      </div>
+      <div class="sdt-total" style="color:#4f46e5"><span class="sdt-total-label">إجمالي السُلف / المتبقي</span><span class="sdt-total-value"><span dir="ltr">${n(56577)} / ${n(56283.8)}</span></span></div>
+    </div>
+    <table class="sdt-table">
+      <thead><tr><th>#</th><th>رقم السلفة</th><th>التاريخ</th><th>المهندس</th><th style="text-align:end">المبلغ</th><th style="text-align:end">الرصيد المتبقي</th><th>الحالة</th></tr></thead>
+      <tbody>${rows}</tbody>
+    </table>
+  </div>`;
 }
 
 const STYLES = `
@@ -292,6 +394,16 @@ const STYLES = `
 .sdt-table th, .sdt-table td { border: 1px solid #e2e8f0; padding: 5px 7px; font-size: 9.5px; }
 .sdt-table th { background: #f8fafc; font-weight: 700; color: #334155; }
 .sdt-table tbody tr:nth-child(even) { background: #fafcff; }
+.sdt-master-row { background: #fff; }
+.sdt-detail-row td { padding: 0; background: #f8fffa; }
+.sdt-master-detail { padding: 6px 10px; }
+.sdt-master-detail summary { cursor: pointer; color: #15803d; font-weight: 700; font-size: 9px; }
+.sdt-detail-summary { display: flex; gap: 18px; margin: 7px 0 5px; color: #334155; font-size: 8.5px; }
+.sdt-negative { color: #dc2626; }
+.sdt-detail-table { width: 100%; border-collapse: collapse; background: #fff; }
+.sdt-detail-table th, .sdt-detail-table td { border: 1px solid #dbe7df; padding: 4px 6px; font-size: 8.5px; }
+.sdt-detail-table th { background: #eaf7ee; color: #166534; }
+.sdt-no-details { display: block; padding: 7px 10px; color: #64748b; font-size: 8.5px; }
 .sdt-code { font-family: 'Courier New', monospace; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px; padding: 1px 6px; font-size: 9px; }
 .sdt-lock { display: inline-block; margin-inline-start: 4px; background: #fee2e2; color: #991b1b; border-radius: 4px; padding: 1px 5px; font-size: 8px; font-weight: 700; }
 `;

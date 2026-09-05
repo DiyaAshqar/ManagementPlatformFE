@@ -1709,13 +1709,10 @@
       "executiveSummary": "الملخص التنفيذي",
       "agreement": "معلومات الاتفاقية والعقد",
       "scope": "النطاق والمناطق والمراحل",
-      "contractors": "المقاولون",
-      "suppliers": "الموردون والمواد والمشتريات",
       "financial": "التقرير المالي",
       "schedule": "الجدول الزمني والتقدم",
       "siteActivities": "أنشطة الموقع والمعاينات",
       "documents": "المستندات وصور سير العمل",
-      "risks": "المخاطر والمشكلات والمعلومات الناقصة",
       "signatures": "الملخص الختامي والتوقيعات"
     },
     "cover": {
@@ -1794,50 +1791,6 @@
       "stageLinked": "قيد التنفيذ / مرتبطة بمرحلة مشروع",
       "stageNotLinked": "غير مرتبطة بعد بمرحلة مشروع"
     },
-    "contractors": {
-      "contractValue": "قيمة العقد",
-      "paid": "المدفوع",
-      "remaining": "المتبقي",
-      "totalContractValue": "إجمالي قيمة العقود",
-      "totalPaid": "إجمالي المدفوع",
-      "totalRemaining": "إجمالي المتبقي",
-      "dutyType": "البند",
-      "responsibility": "المسؤولية",
-      "unit": "الوحدة",
-      "quantity": "الكمية",
-      "price": "السعر",
-      "subTotal": "المجموع الفرعي",
-      "noDuties": "لا توجد بنود مسجلة لهذا المقاول.",
-      "paymentDate": "التاريخ",
-      "paymentAmount": "المبلغ",
-      "paymentReference": "المرجع",
-      "noPayments": "لا توجد دفعات مسجلة لهذا المقاول.",
-      "classification": {
-        "mainContractor": "مقاول رئيسي",
-        "subContractor": "مقاول من الباطن"
-      }
-    },
-    "suppliers": {
-      "agreementSuppliers": "موردو الاتفاقية",
-      "supplier": "المورد",
-      "material": "المادة",
-      "representative": "المندوب",
-      "agreementQuantityBill": "جدول الكميات (مستوى الاتفاقية)",
-      "quantityBillNote": "الكميات والأسعار المتعاقد عليها في مرحلة الاتفاقية — سجل منفصل عن جدول الكميات على مستوى مرحلة المشروع أدناه؛ لا يتم جمعهما معًا.",
-      "projectStageBoq": "جدول الكميات (مستوى مرحلة المشروع)",
-      "boqNote": "الكميات الفعلية المسجلة أثناء التنفيذ لكل مرحلة من مراحل المشروع.",
-      "quantity": "الكمية",
-      "expectedQuantity": "الكمية المتوقعة",
-      "actualQuantity": "الكمية الفعلية",
-      "price": "السعر",
-      "subTotal": "المجموع الفرعي",
-      "milestone": "المرحلة",
-      "stage": "المرحلة (تنفيذ)",
-      "purchaseOrders": "أوامر الشراء",
-      "poNumber": "رقم أمر الشراء",
-      "description": "الوصف",
-      "status": "الحالة"
-    },
     "financial": {
       "contractAndBudget": "العقد والميزانية",
       "contractValue": "قيمة العقد",
@@ -1862,8 +1815,7 @@
       "paymentClaimEstimateNote": "قيمة تقديرية محسوبة للاطلاع فقط — وليست سجل مستخلص رسمي مخزّن.",
       "notes": {
         "engineeringFeeExcluded": "أتعاب مكتب الإشراف الهندسي محسوبة كنسبة مئوية أو رسم شهري ولم تُدرج ضمن هذا التقدير.",
-        "ledgersAreSeparate": "كل رقم أعلاه يمثل سجلاً مستقلاً ولا يُجمع مع غيره — تعامل معها كإجماليات منفصلة وليست رصيدًا تراكميًا واحدًا.",
-        "quantityBillVsBoq": "يتم تتبع جدول كميات الاتفاقية وجدول كميات مرحلة المشروع بشكل منفصل (انظر قسم الموردين) ولا يتم احتسابهما مرتين."
+        "ledgersAreSeparate": "كل رقم أعلاه يمثل سجلاً مستقلاً ولا يُجمع مع غيره — تعامل معها كإجماليات منفصلة وليست رصيدًا تراكميًا واحدًا."
       }
     },
     "schedule": {
@@ -1880,8 +1832,6 @@
       "stages": "مراحل المشروع",
       "stageName": "المرحلة",
       "stageType": "النوع",
-      "stageStatus": "الحالة",
-      "completedWork": "الأعمال المنجزة",
       "inProgressWork": "الأعمال قيد التنفيذ",
       "upcomingWork": "الأعمال المخطط لها لاحقًا"
     },
@@ -1903,36 +1853,13 @@
     "documents": {
       "photos": "صور سير العمل",
       "noPhotos": "لا تتوفر صور لسير العمل لهذا المشروع.",
-      "morePhotosOmitted": "يوجد {{count}} صورة إضافية مسجلة لم تُعرض هنا.",
-      "register": "سجل المستندات",
-      "fileName": "اسم الملف",
-      "type": "النوع",
-      "relatedTo": "متعلق بـ",
-      "noDocuments": "لا توجد مستندات مسجلة لهذا المشروع."
-    },
-    "risks": {
-      "noTrackedRisks": "لا توجد مخاطر أو مشكلات متتبعة لهذا المشروع في النظام الحالي.",
-      "missingData": "بيانات غير متوفرة في النظام الحالي"
+      "morePhotosOmitted": "يوجد {{count}} صورة إضافية مسجلة لم تُعرض هنا."
     },
     "signatures": {
       "preparedBy": "أُعد بواسطة",
       "reviewedBy": "روجع بواسطة",
       "approvedBy": "اعتُمد بواسطة",
       "date": "التاريخ: ____________"
-    },
-    "purchaseOrders": {
-      "status": {
-        "approved": "معتمد",
-        "pending": "قيد الانتظار",
-        "rejected": "مرفوض"
-      }
-    },
-    "surveyingVisits": {
-      "status": {
-        "inProgress": "قيد التنفيذ",
-        "scheduled": "مجدولة",
-        "completed": "مكتملة"
-      }
     },
     "responsibility": {
       "internal": "داخلي",

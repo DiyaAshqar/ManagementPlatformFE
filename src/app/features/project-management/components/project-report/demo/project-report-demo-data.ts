@@ -251,33 +251,6 @@ export function buildDemoSnapshot(): ProjectReportSnapshot {
         { order: 7, name: REAL_STAGE_NAME, description: 'Site facilities and camp works — sourced verbatim from live backend responses for project stage #48.', statusLabel: null, stageLinked: true },
       ],
     },
-    contractors: {
-      rows: contractorRows,
-      totalContractValue: sumBy(contractorRows, (r) => r.contractValue),
-      totalPaid: sumBy(contractorRows, (r) => r.totalPaid),
-      totalRemaining: sumBy(contractorRows, (r) => r.remainingBalance),
-    },
-    suppliers: {
-      agreementSuppliers: [
-        { supplierName: 'Jordan Steel Trading', materialOrService: 'Reinforcement Steel', representativeName: 'Samer Odeh' },
-        { supplierName: 'Al-Ameed Ready-Mix', materialOrService: 'Concrete', representativeName: 'Fadi Hourani' },
-      ],
-      agreementQuantityBill: {
-        rows: [
-          { material: 'Reinforcement Steel', unit: 'ton', quantity: 24, price: 720, subTotal: 17280, constructorName: null, supplierName: 'Jordan Steel Trading', milestoneName: 'Foundation & Substructure' },
-          { material: 'Ready-Mix Concrete', unit: 'm³', quantity: 210, price: 62, subTotal: 13020, constructorName: null, supplierName: 'Al-Ameed Ready-Mix', milestoneName: 'Foundation & Substructure' },
-        ],
-        total: 30300,
-      },
-      projectStageBoq: {
-        rows: boqRows,
-        total: sumBy(boqRows, (r) => r.subTotal),
-      },
-      purchaseOrders: {
-        rows: poRows,
-        total: sumBy(poRows, (r) => r.subTotal),
-      },
-    },
     financial: {
       authorized: true,
       currencyLabel: 'JOD',
@@ -302,7 +275,6 @@ export function buildDemoSnapshot(): ProjectReportSnapshot {
       paymentClaimEstimateTotal: 86114,
       notes: [
         'Each figure above is an independent ledger and is not summed into the others — treat them as distinct totals, not a single running balance.',
-        'The agreement Quantity Bill and the project-stage BOQ are tracked separately (see Suppliers section) and are never double-counted.',
       ],
     },
     schedule: {
@@ -313,13 +285,12 @@ export function buildDemoSnapshot(): ProjectReportSnapshot {
       daysRemaining: 96,
       taskCounts: { todo: 9, inProgress: 6, review: 2, completed: 18 },
       stages: [
-        { name: 'Site Preparation & Survey', typeLabel: 'Preparing', statusLabel: 'Not tracked' },
-        { name: 'Foundation & Substructure', typeLabel: 'Milestone', statusLabel: 'Not tracked' },
-        { name: 'Superstructure — Ground Floor', typeLabel: 'Milestone', statusLabel: 'Not tracked' },
-        { name: 'Superstructure — First Floor', typeLabel: 'Milestone', statusLabel: 'Not tracked' },
-        { name: REAL_STAGE_NAME, typeLabel: 'Milestone', statusLabel: 'Not tracked' },
+        { name: 'Site Preparation & Survey', typeLabel: 'Preparing' },
+        { name: 'Foundation & Substructure', typeLabel: 'Milestone' },
+        { name: 'Superstructure — Ground Floor', typeLabel: 'Milestone' },
+        { name: 'Superstructure — First Floor', typeLabel: 'Milestone' },
+        { name: REAL_STAGE_NAME, typeLabel: 'Milestone' },
       ],
-      completedWork: ['Site clearing and benchmarking', 'Footing excavation', 'Ground-floor slab pour', 'Ground-floor column formwork'],
       inProgressWork: ['Ground-floor block work', 'Electrical rough-in — ground floor'],
       upcomingWork: ['First-floor column reinforcement', 'First-floor slab formwork'],
     },
@@ -331,11 +302,11 @@ export function buildDemoSnapshot(): ProjectReportSnapshot {
         { title: 'First-floor column reinforcement', statusLabel: 'To Do', typeLabel: 'Structural', responsibility: 'Contractor', startDate: null, endDate: null, subtaskCount: 0 },
       ],
       surveyingVisits: [
-        { date: new Date(startDate.getFullYear(), startDate.getMonth(), 12), surveyor: 'Eng. Rami Salameh', purpose: 'Boundary and setting-out verification', statusLabel: 'Completed', subTotal: 120 },
-        { date: new Date(startDate.getFullYear(), startDate.getMonth() + 2, 2), surveyor: 'Eng. Rami Salameh', purpose: 'Foundation level check', statusLabel: 'Completed', subTotal: 120 },
-        // Real ProjectSurveyingVisits rows for project stage #48 (status 0 = In Progress, 1 = Scheduled).
-        { date: new Date(2026, 5, 8), surveyor: 'ibrahim', purpose: 'test', statusLabel: 'In Progress', subTotal: 880 },
-        { date: new Date(2026, 5, 30), surveyor: 'werwe', purpose: 'wrwewr', statusLabel: 'Scheduled', subTotal: 132 },
+        { date: new Date(startDate.getFullYear(), startDate.getMonth(), 12), surveyor: 'Eng. Rami Salameh', purpose: 'Boundary and setting-out verification', subTotal: 120 },
+        { date: new Date(startDate.getFullYear(), startDate.getMonth() + 2, 2), surveyor: 'Eng. Rami Salameh', purpose: 'Foundation level check', subTotal: 120 },
+        // Real ProjectSurveyingVisits rows for project stage #48.
+        { date: new Date(2026, 5, 8), surveyor: 'ibrahim', purpose: 'test', subTotal: 880 },
+        { date: new Date(2026, 5, 30), surveyor: 'werwe', purpose: 'wrwewr', subTotal: 132 },
       ],
     },
     documents: {
@@ -345,18 +316,6 @@ export function buildDemoSnapshot(): ProjectReportSnapshot {
         { fileName: 'block-work.jpg', dataUrl: placeholderPhoto('Block Work', '#b45309'), relatedTo: 'Superstructure — Ground Floor' },
       ],
       photosOmittedCount: 0,
-      documents: [
-        { fileName: 'structural-drawings-rev3.pdf', typeLabel: 'Project', relatedTo: null },
-        { fileName: 'agreement-signed.pdf', typeLabel: 'Agreement', relatedTo: 'Sunrise Villas — Building B' },
-        { fileName: `تقرير مطالبة الدفع - ${REAL_STAGE_NAME}.pdf`, typeLabel: 'Payment Claim', relatedTo: REAL_STAGE_NAME },
-      ],
-    },
-    risks: {
-      items: ['Steel delivery for the first-floor slab is running two weeks behind schedule.'],
-      missingDataNotes: [
-        'Per-milestone execution status is not currently exposed by the system; only milestone names and order are shown.',
-        '"Blocked" task/status tracking is not currently available in the system.',
-      ],
     },
     signatures: {
       preparedByLabel: 'Prepared By',
@@ -373,13 +332,6 @@ export function buildDemoSnapshotRestricted(): ProjectReportSnapshot {
     ...snapshot,
     executiveSummary: { ...snapshot.executiveSummary, contractValue: null, actualExpenditure: null, committedAmount: null },
     agreement: { ...snapshot.agreement, contractType: null, contractModel: null, contractValue: null, paymentDetailsAuthorized: false, selectedServices: [] },
-    contractors: { rows: [], totalContractValue: 0, totalPaid: 0, totalRemaining: 0 },
-    suppliers: {
-      agreementSuppliers: [],
-      agreementQuantityBill: { rows: [], total: 0 },
-      projectStageBoq: { rows: [], total: 0 },
-      purchaseOrders: { rows: [], total: 0 },
-    },
     financial: {
       ...snapshot.financial,
       authorized: false,
@@ -437,10 +389,10 @@ export function buildDemoSnapshotPartialFailure(): ProjectReportSnapshot {
       drillingQuantity: null,
     },
     scope: { areas: [], milestones: [] },
-    risks: {
-      ...snapshot.risks,
-      missingDataNotes: [
-        ...snapshot.risks.missingDataNotes,
+    executiveSummary: {
+      ...snapshot.executiveSummary,
+      risks: [
+        ...snapshot.executiveSummary.risks,
         'Agreement data could not be loaded for this report.',
         'AgreementAttachments data could not be loaded for this report.',
       ],

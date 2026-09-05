@@ -24,10 +24,7 @@ export interface LoadProjectReportOptions {
 }
 
 const AGREEMENT_LOOKUPS: LookupType[] = [
-  LookupType.Material,
   LookupType.Unit,
-  LookupType.Constructor,
-  LookupType.Supplier,
   LookupType.Annex,
   LookupType.Country,
   LookupType.City,
@@ -146,7 +143,6 @@ export class ProjectReportDataService {
       canViewFinancial: this.authService.hasAnyPermission(REPORT_FINANCIAL_VIEW_PERMISSIONS),
       canViewAgreementPayments: this.authService.hasPermission(Permissions.Agreements.ViewPaymentDetails),
       canViewPaymentClaims: this.authService.hasPermission(Permissions.PaymentClaims.Print),
-      canViewContractors: this.authService.hasPermission(Permissions.MilestoneTabs.ProjectMainContractor),
       canViewDocuments: this.authService.hasAnyPermission(REPORT_DOCUMENTS_VIEW_PERMISSIONS),
     };
   }
@@ -167,11 +163,9 @@ export class ProjectReportDataService {
       first: step(1),
       milestones: step(3),
       areas: step(4),
-      supplierServices: step(6),
-      quantityBill: step(7),
       payment: canViewPayments ? step(2) : of(null),
     }).pipe(
-      map(({ first, milestones, areas, supplierServices, quantityBill, payment }) => {
+      map(({ first, milestones, areas, payment }) => {
         if (!first?.firstStepDto) {
           failedDomains.push('Agreement');
           return null;
@@ -183,8 +177,6 @@ export class ProjectReportDataService {
           landInformationDto: first.firstStepDto.landInformationDto ?? null,
           milestones: milestones?.mileStonesStepDto?.mileStonesDto?.filter((m) => !m.isDeleted) ?? null,
           areas: areas?.thirdStepDto?.projectAreaUnitDto?.filter((a) => !a.isDeleted) ?? null,
-          supplierServices: supplierServices?.fifthStepDto?.supplierServiceDto?.filter((s) => !s.isDeleted) ?? null,
-          quantityBill: quantityBill?.sixthStepDto?.quantityBillDto?.filter((q) => !q.isDeleted) ?? null,
           payment: canViewPayments ? payment?.secondStepDto?.agreementPaymentDto ?? null : null,
           selectedServiceIds: canViewPayments
             ? payment?.secondStepDto?.agreementServiceDto?.map((s) => s.serviceId).filter((id): id is number => id !== undefined) ?? null

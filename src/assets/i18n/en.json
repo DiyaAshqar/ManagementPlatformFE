@@ -1713,13 +1713,10 @@
       "executiveSummary": "Executive Summary",
       "agreement": "Agreement & Contract Information",
       "scope": "Scope, Areas & Milestones",
-      "contractors": "Contractors",
-      "suppliers": "Suppliers, Materials & Procurement",
       "financial": "Financial Report",
       "schedule": "Schedule & Progress",
       "siteActivities": "Site Activities & Inspections",
       "documents": "Documents & Progress Photos",
-      "risks": "Risks, Issues & Missing Information",
       "signatures": "Final Summary & Signatures"
     },
     "cover": {
@@ -1798,50 +1795,6 @@
       "stageLinked": "In progress / linked to a project stage",
       "stageNotLinked": "Not yet linked to a project stage"
     },
-    "contractors": {
-      "contractValue": "Contract Value",
-      "paid": "Paid",
-      "remaining": "Remaining",
-      "totalContractValue": "Total Contract Value",
-      "totalPaid": "Total Paid",
-      "totalRemaining": "Total Remaining",
-      "dutyType": "Duty",
-      "responsibility": "Responsibility",
-      "unit": "Unit",
-      "quantity": "Quantity",
-      "price": "Price",
-      "subTotal": "Subtotal",
-      "noDuties": "No duties recorded for this contractor.",
-      "paymentDate": "Date",
-      "paymentAmount": "Amount",
-      "paymentReference": "Reference",
-      "noPayments": "No payments recorded for this contractor.",
-      "classification": {
-        "mainContractor": "Main Contractor",
-        "subContractor": "Subcontractor"
-      }
-    },
-    "suppliers": {
-      "agreementSuppliers": "Agreement Suppliers",
-      "supplier": "Supplier",
-      "material": "Material",
-      "representative": "Representative",
-      "agreementQuantityBill": "Agreement Quantity Bill",
-      "quantityBillNote": "Contracted quantities and prices at agreement stage — a separate ledger from the project-stage BOQ below; the two are never summed together.",
-      "projectStageBoq": "Project-Stage Bill of Quantities",
-      "boqNote": "Actual execution-level quantities recorded per project stage.",
-      "quantity": "Quantity",
-      "expectedQuantity": "Expected Qty",
-      "actualQuantity": "Actual Qty",
-      "price": "Price",
-      "subTotal": "Subtotal",
-      "milestone": "Milestone",
-      "stage": "Stage",
-      "purchaseOrders": "Purchase Orders",
-      "poNumber": "PO Number",
-      "description": "Description",
-      "status": "Status"
-    },
     "financial": {
       "contractAndBudget": "Contract & Budget",
       "contractValue": "Contract Value",
@@ -1866,8 +1819,7 @@
       "paymentClaimEstimateNote": "A computed estimate for reference only — not a stored payment-claim record.",
       "notes": {
         "engineeringFeeExcluded": "The agreement's engineering office fee is expressed as a percentage or monthly fee and is not included in this estimate.",
-        "ledgersAreSeparate": "Each figure above is an independent ledger and is not summed into the others — treat them as distinct totals, not a single running balance.",
-        "quantityBillVsBoq": "The agreement Quantity Bill and the project-stage BOQ are tracked separately (see Suppliers section) and are never double-counted."
+        "ledgersAreSeparate": "Each figure above is an independent ledger and is not summed into the others — treat them as distinct totals, not a single running balance."
       }
     },
     "schedule": {
@@ -1884,8 +1836,6 @@
       "stages": "Project Stages",
       "stageName": "Stage",
       "stageType": "Type",
-      "stageStatus": "Status",
-      "completedWork": "Completed Work",
       "inProgressWork": "Work In Progress",
       "upcomingWork": "Planned / Upcoming Work"
     },
@@ -1907,36 +1857,13 @@
     "documents": {
       "photos": "Progress Photos",
       "noPhotos": "No progress photos are available for this project.",
-      "morePhotosOmitted": "{{count}} additional photo(s) are recorded but not shown here.",
-      "register": "Document Register",
-      "fileName": "File Name",
-      "type": "Type",
-      "relatedTo": "Related To",
-      "noDocuments": "No documents are recorded for this project."
-    },
-    "risks": {
-      "noTrackedRisks": "No risks or issues are tracked for this project in the current system.",
-      "missingData": "Data Not Available In The Current System"
+      "morePhotosOmitted": "{{count}} additional photo(s) are recorded but not shown here."
     },
     "signatures": {
       "preparedBy": "Prepared By",
       "reviewedBy": "Reviewed By",
       "approvedBy": "Approved By",
       "date": "Date: ____________"
-    },
-    "purchaseOrders": {
-      "status": {
-        "approved": "Approved",
-        "pending": "Pending",
-        "rejected": "Rejected"
-      }
-    },
-    "surveyingVisits": {
-      "status": {
-        "inProgress": "In Progress",
-        "scheduled": "Scheduled",
-        "completed": "Completed"
-      }
     },
     "responsibility": {
       "internal": "Internal",

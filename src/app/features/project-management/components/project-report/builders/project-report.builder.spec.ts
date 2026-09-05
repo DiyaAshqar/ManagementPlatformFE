@@ -76,13 +76,6 @@ function baseSnapshot(overrides: Partial<ProjectReportSnapshot> = {}): ProjectRe
       drillingQuantity: null,
     },
     scope: { areas: [], milestones: [] },
-    contractors: { rows: [], totalContractValue: 0, totalPaid: 0, totalRemaining: 0 },
-    suppliers: {
-      agreementSuppliers: [],
-      agreementQuantityBill: { rows: [], total: 0 },
-      projectStageBoq: { rows: [], total: 0 },
-      purchaseOrders: { rows: [], total: 0 },
-    },
     financial: {
       authorized: true,
       currencyLabel: null,
@@ -112,13 +105,11 @@ function baseSnapshot(overrides: Partial<ProjectReportSnapshot> = {}): ProjectRe
       daysRemaining: 90,
       taskCounts: { todo: 2, inProgress: 3, review: 1, completed: 4 },
       stages: [],
-      completedWork: [],
       inProgressWork: [],
       upcomingWork: [],
     },
     siteActivities: { tasks: [], surveyingVisits: [] },
-    documents: { photos: [], photosOmittedCount: 0, documents: [] },
-    risks: { items: [], missingDataNotes: [] },
+    documents: { photos: [], photosOmittedCount: 0 },
     signatures: { preparedByLabel: 'Prepared By', reviewedByLabel: 'Reviewed By', approvedByLabel: 'Approved By' },
     ...overrides,
   };
@@ -129,13 +120,10 @@ const ALL_SECTIONS: Set<ProjectReportSectionKey> = new Set([
   'executiveSummary',
   'agreement',
   'scope',
-  'contractors',
-  'suppliers',
   'financial',
   'schedule',
   'siteActivities',
   'documents',
-  'risks',
   'signatures',
 ]);
 
@@ -170,11 +158,11 @@ describe('project-report.builder', () => {
 
   describe('section selection', () => {
     it('renders only the sections present in the sections set', () => {
-      const html = buildProjectReportHtml(baseSnapshot(), baseConfig(), new Set(['cover', 'risks']), fakeTranslate);
+      const html = buildProjectReportHtml(baseSnapshot(), baseConfig(), new Set(['cover', 'documents']), fakeTranslate);
       expect(html).toContain('cover-page');
-      expect(html).toContain('id="risks"');
+      expect(html).toContain('id="documents"');
       expect(html).not.toContain('id="financial"');
-      expect(html).not.toContain('id="contractors"');
+      expect(html).not.toContain('id="schedule"');
     });
 
     it('renders an empty document body (no sections) when the set is empty, without throwing', () => {

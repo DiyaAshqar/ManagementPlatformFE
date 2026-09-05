@@ -51,13 +51,10 @@ const SECTION_LABELS_AR: Record<ProjectReportSectionKey, string> = {
   executiveSummary: 'الملخص التنفيذي',
   agreement: 'معلومات الاتفاقية والعقد',
   scope: 'النطاق والمناطق والمراحل',
-  contractors: 'المقاولون',
-  suppliers: 'الموردون والمواد والمشتريات',
   financial: 'التقرير المالي',
   schedule: 'الجدول الزمني والتقدم',
   siteActivities: 'أنشطة الموقع والمعاينات',
   documents: 'المستندات وصور سير العمل',
-  risks: 'المخاطر والمشكلات والمعلومات الناقصة',
   signatures: 'الملخص الختامي والتوقيعات',
 };
 

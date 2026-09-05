@@ -26,7 +26,6 @@ describe('project-report-sections.util', () => {
       expect(sections.has('cover')).toBeTrue();
       expect(sections.has('executiveSummary')).toBeTrue();
       expect(sections.has('financial')).toBeTrue();
-      expect(sections.has('contractors')).toBeFalse();
       expect(sections.has('siteActivities')).toBeFalse();
     });
 
@@ -36,23 +35,21 @@ describe('project-report-sections.util', () => {
       expect(sections.has('siteActivities')).toBeTrue();
       expect(sections.has('documents')).toBeTrue();
       expect(sections.has('financial')).toBeFalse();
-      expect(sections.has('contractors')).toBeFalse();
     });
 
     it('limits the financial report to money-relevant sections', () => {
       const sections = resolveReportSections(config({ type: 'financial' }));
       expect(sections.has('financial')).toBeTrue();
-      expect(sections.has('contractors')).toBeTrue();
-      expect(sections.has('suppliers')).toBeTrue();
+      expect(sections.has('agreement')).toBeTrue();
       expect(sections.has('schedule')).toBeFalse();
       expect(sections.has('siteActivities')).toBeFalse();
     });
 
     it('uses exactly the caller-selected sections for custom, nothing more', () => {
-      const sections = resolveReportSections(config({ type: 'custom', customSections: ['cover', 'risks'] }));
+      const sections = resolveReportSections(config({ type: 'custom', customSections: ['cover', 'documents'] }));
       expect(sections.size).toBe(2);
       expect(sections.has('cover')).toBeTrue();
-      expect(sections.has('risks')).toBeTrue();
+      expect(sections.has('documents')).toBeTrue();
       expect(sections.has('financial')).toBeFalse();
     });
 

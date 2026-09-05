@@ -7,7 +7,6 @@ import {
   ProjectReportDto,
   ProjectStageType,
   ProjectStatus,
-  QuantityBillDto,
   StatusTask,
 } from '../../../../../../nswag/api-client';
 import { buildProjectReportSnapshot, RawProjectReportInputs, ReportPermissionFlags } from './project-report-mapper.util';
@@ -20,7 +19,6 @@ const FULL_PERMISSIONS: ReportPermissionFlags = {
   canViewFinancial: true,
   canViewAgreementPayments: true,
   canViewPaymentClaims: true,
-  canViewContractors: true,
   canViewDocuments: true,
 };
 
@@ -101,39 +99,12 @@ function baseInput(overrides: Partial<RawProjectReportInputs> = {}): RawProjectR
 
 describe('project-report-mapper.util', () => {
   describe('financial totals and double-counting prevention', () => {
-    it('keeps the agreement Quantity Bill and the project-stage BOQ as two independent ledgers', () => {
-      const input = baseInput({
-        agreement: {
-          agreementId: 10,
-          agreementDto: null,
-          clientDto: null,
-          landInformationDto: null,
-          milestones: [{ id: 1, name: 'Foundation', order: 1 }] as unknown as MileStonesDto[],
-          areas: null,
-          supplierServices: null,
-          quantityBill: [
-            { id: 1, materialId: 1, unitId: 1, quantity: 3, price: 200, mileStoneId: 1 },
-          ] as unknown as QuantityBillDto[],
-          payment: null,
-          selectedServiceIds: null,
-        },
-      });
-      const snapshot = buildProjectReportSnapshot(input);
-
-      // BOQ total (execution-level, from ReportClient) is independent of the agreement Quantity Bill total.
-      expect(snapshot.suppliers.projectStageBoq.total).toBe(3000); // 1000 + 2000 from baseReport boqs
-      expect(snapshot.suppliers.agreementQuantityBill.total).toBe(600); // 3 * 200
-      expect(snapshot.financial.boqTotal).toBe(3000);
-      // The financial section never derives a figure by adding these two together.
-      expect(snapshot.financial.boqTotal).not.toBe(snapshot.financial.boqTotal + snapshot.suppliers.agreementQuantityBill.total);
-    });
-
     it('computes contractor commitments, paid, and remaining without conflating them with BOQ', () => {
       const snapshot = buildProjectReportSnapshot(baseInput());
+      expect(snapshot.financial.boqTotal).toBe(3000); // 1000 + 2000 from baseReport boqs
       expect(snapshot.financial.contractorCommitments).toBe(20000);
       expect(snapshot.financial.contractorPaid).toBe(8000);
       expect(snapshot.financial.contractorRemaining).toBe(12000);
-      expect(snapshot.contractors.rows[0].remainingBalance).toBe(12000);
     });
 
     it('buckets variation orders by status instead of a single blended total', () => {
@@ -166,7 +137,6 @@ describe('project-report-mapper.util', () => {
     it('financial ledgers are a genuine 0 (not null) when the report has no matching rows', () => {
       const snapshot = buildProjectReportSnapshot(baseInput({ report: baseReport({ boqs: [] }) }));
       expect(snapshot.financial.boqTotal).toBe(0);
-      expect(snapshot.suppliers.projectStageBoq.total).toBe(0);
     });
   });
 
@@ -181,8 +151,6 @@ describe('project-report-mapper.util', () => {
             landInformationDto: null,
             milestones: [],
             areas: null,
-            supplierServices: null,
-            quantityBill: null,
             payment: { id: 1, monthlyPaymentDto: { amount: 15000 } } as unknown as AgreementPaymentDto,
             selectedServiceIds: null,
           },
@@ -203,8 +171,6 @@ describe('project-report-mapper.util', () => {
           landInformationDto: null,
           milestones: [],
           areas: null,
-          supplierServices: null,
-          quantityBill: null,
           payment: { id: 1, monthlyPaymentDto: { amount: 15000 } } as unknown as AgreementPaymentDto,
           selectedServiceIds: [1, 2],
         },
@@ -217,21 +183,12 @@ describe('project-report-mapper.util', () => {
       expect(snapshot.financial.contractValue).toBeNull();
     });
 
-    it('empties the contractors section without MilestoneTabs.ProjectMainContractor view rights', () => {
-      const snapshot = buildProjectReportSnapshot(
-        baseInput({ permissions: { ...FULL_PERMISSIONS, canViewContractors: false } })
-      );
-      expect(snapshot.contractors.rows).toEqual([]);
-    });
-
-    it('zeroes the financial ledgers and empties supplier/BOQ rows without financial view rights', () => {
+    it('zeroes the financial ledgers without financial view rights', () => {
       const snapshot = buildProjectReportSnapshot(
         baseInput({ permissions: { ...FULL_PERMISSIONS, canViewFinancial: false } })
       );
       expect(snapshot.financial.authorized).toBeFalse();
       expect(snapshot.financial.boqTotal).toBe(0);
-      expect(snapshot.suppliers.projectStageBoq.rows).toEqual([]);
-      expect(snapshot.suppliers.purchaseOrders.rows).toEqual([]);
     });
 
     it('excludes the payment-claim estimate without PaymentClaims.Print even when financial is authorized', () => {
@@ -247,7 +204,6 @@ describe('project-report-mapper.util', () => {
         baseInput({ permissions: { ...FULL_PERMISSIONS, canViewDocuments: false } })
       );
       expect(snapshot.documents.photos).toEqual([]);
-      expect(snapshot.documents.documents).toEqual([]);
     });
   });
 
@@ -266,7 +222,6 @@ describe('project-report-mapper.util', () => {
     it('degrades gracefully to an empty financial picture when the report bundle itself failed', () => {
       const snapshot = buildProjectReportSnapshot(baseInput({ report: null, failedDomains: ['ProjectReport'] }));
       expect(snapshot.financial.boqTotal).toBe(0);
-      expect(snapshot.contractors.rows).toEqual([]);
       expect(snapshot.meta.failedSections).toContain('ProjectReport');
     });
   });
@@ -297,8 +252,6 @@ describe('project-report-mapper.util', () => {
             landInformationDto: null,
             milestones: [{ id: 1, name: 'Foundation', order: 1 }] as unknown as MileStonesDto[],
             areas: null,
-            supplierServices: null,
-            quantityBill: null,
             payment: null,
             selectedServiceIds: null,
           },
@@ -309,7 +262,7 @@ describe('project-report-mapper.util', () => {
 
     it('flags that blocked-task tracking is unavailable rather than reporting a fabricated 0', () => {
       const snapshot = buildProjectReportSnapshot(baseInput());
-      expect(snapshot.risks.missingDataNotes).toContain('projectReport.missingData.blockedTasks');
+      expect(snapshot.executiveSummary.risks).toContain('projectReport.missingData.blockedTasks');
     });
   });
 });

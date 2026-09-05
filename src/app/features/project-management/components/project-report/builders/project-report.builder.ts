@@ -1,10 +1,5 @@
 import { escapeHtml } from '../../../../reporting/utilities/report-html.utils';
-import {
-  ProjectReportConfig,
-  ProjectReportSectionKey,
-  ProjectReportSnapshot,
-  ReportContractorRow,
-} from '../models/project-report.model';
+import { ProjectReportConfig, ProjectReportSectionKey, ProjectReportSnapshot } from '../models/project-report.model';
 import { formatReportDate, formatReportNumber, formatReportPercent } from '../utilities/project-report-calculations.util';
 
 export type Translate = (key: string, params?: Record<string, unknown>) => string;
@@ -243,159 +238,6 @@ function buildScope(snapshot: ProjectReportSnapshot, t: Translate): string {
   );
 }
 
-function buildContractorCard(c: ReportContractorRow, config: ProjectReportConfig, t: Translate): string {
-  const dutyRows = c.duties.map((d) => [cell(d.dutyType), cell(d.responsibility), cell(d.unit), num(d.quantity), num(d.price), num(d.subTotal)]);
-  const dutiesTable = table(
-    [
-      { text: t('projectReport.contractors.dutyType') },
-      { text: t('projectReport.contractors.responsibility') },
-      { text: t('projectReport.contractors.unit') },
-      { text: t('projectReport.contractors.quantity'), align: 'end' },
-      { text: t('projectReport.contractors.price'), align: 'end' },
-      { text: t('projectReport.contractors.subTotal'), align: 'end' },
-    ],
-    dutyRows,
-    t('projectReport.contractors.noDuties')
-  );
-
-  const paymentRows = c.payments.map((p) => [date(p.date, config.language), num(p.amount), cell(p.reference)]);
-  const paymentsTable = table(
-    [
-      { text: t('projectReport.contractors.paymentDate') },
-      { text: t('projectReport.contractors.paymentAmount'), align: 'end' },
-      { text: t('projectReport.contractors.paymentReference') },
-    ],
-    paymentRows,
-    t('projectReport.contractors.noPayments')
-  );
-
-  return `<div class="card">
-    <div class="card-header">
-      <div>
-        <div class="card-title">${esc(c.name)}</div>
-        <div class="card-subtitle">${cell(c.classification)} · ${cell(c.contractorType)} · ${cell(c.stageName)}</div>
-      </div>
-      <div class="card-figures">
-        <div><span class="figure-label">${esc(t('projectReport.contractors.contractValue'))}</span><span class="figure-value">${num(c.contractValue)}</span></div>
-        <div><span class="figure-label">${esc(t('projectReport.contractors.paid'))}</span><span class="figure-value">${num(c.totalPaid)}</span></div>
-        <div><span class="figure-label">${esc(t('projectReport.contractors.remaining'))}</span><span class="figure-value">${num(c.remainingBalance)}</span></div>
-      </div>
-    </div>
-    <div class="card-meta">${date(c.startDate, config.language)} — ${date(c.endDate, config.language)}</div>
-    ${dutiesTable}
-    ${paymentsTable}
-  </div>`;
-}
-
-function buildContractors(snapshot: ProjectReportSnapshot, config: ProjectReportConfig, t: Translate): string {
-  const { contractors } = snapshot;
-  if (contractors.rows.length === 0) {
-    return section('contractors', t('projectReport.sections.contractors'), `<p class="empty-state">${esc(t('projectReport.common.noDataOrRestricted'))}</p>`);
-  }
-  const totals = `<div class="kpi-grid">
-    ${kpiCard(t('projectReport.contractors.totalContractValue'), num(contractors.totalContractValue))}
-    ${kpiCard(t('projectReport.contractors.totalPaid'), num(contractors.totalPaid))}
-    ${kpiCard(t('projectReport.contractors.totalRemaining'), num(contractors.totalRemaining))}
-  </div>`;
-  const cards = contractors.rows.map((c) => buildContractorCard(c, config, t)).join('');
-  return section('contractors', t('projectReport.sections.contractors'), `${totals}${cards}`);
-}
-
-function buildSuppliers(snapshot: ProjectReportSnapshot, t: Translate): string {
-  const { suppliers } = snapshot;
-
-  const agreementSuppliersRows = suppliers.agreementSuppliers.map((s) => [cell(s.supplierName), cell(s.materialOrService), cell(s.representativeName)]);
-  const agreementSuppliersTable = table(
-    [
-      { text: t('projectReport.suppliers.supplier') },
-      { text: t('projectReport.suppliers.material') },
-      { text: t('projectReport.suppliers.representative') },
-    ],
-    agreementSuppliersRows,
-    t('projectReport.common.noDataOrRestricted')
-  );
-
-  const qbRows = suppliers.agreementQuantityBill.rows.map((r) => [
-    cell(r.material),
-    cell(r.unit),
-    num(r.quantity),
-    num(r.price),
-    num(r.subTotal),
-    cell(r.milestoneName),
-  ]);
-  const qbTable = table(
-    [
-      { text: t('projectReport.suppliers.material') },
-      { text: t('projectReport.suppliers.unit') },
-      { text: t('projectReport.suppliers.quantity'), align: 'end' },
-      { text: t('projectReport.suppliers.price'), align: 'end' },
-      { text: t('projectReport.suppliers.subTotal'), align: 'end' },
-      { text: t('projectReport.suppliers.milestone') },
-    ],
-    qbRows,
-    t('projectReport.common.noDataOrRestricted')
-  );
-
-  const boqRows = suppliers.projectStageBoq.rows.map((r) => [
-    cell(r.material),
-    cell(r.unit),
-    num(r.expectedQuantity),
-    num(r.actualQuantity),
-    num(r.actualPrice ?? r.expectedPrice),
-    num(r.subTotal),
-    cell(r.stageName),
-  ]);
-  const boqTable = table(
-    [
-      { text: t('projectReport.suppliers.material') },
-      { text: t('projectReport.suppliers.unit') },
-      { text: t('projectReport.suppliers.expectedQuantity'), align: 'end' },
-      { text: t('projectReport.suppliers.actualQuantity'), align: 'end' },
-      { text: t('projectReport.suppliers.price'), align: 'end' },
-      { text: t('projectReport.suppliers.subTotal'), align: 'end' },
-      { text: t('projectReport.suppliers.stage') },
-    ],
-    boqRows,
-    t('projectReport.common.noDataOrRestricted')
-  );
-
-  const poRows = suppliers.purchaseOrders.rows.map((r) => [
-    cell(r.poNumber),
-    cell(r.supplierName),
-    cell(r.description),
-    num(r.subTotal),
-    cell(r.statusLabel),
-    cell(r.stageName),
-  ]);
-  const poTable = table(
-    [
-      { text: t('projectReport.suppliers.poNumber') },
-      { text: t('projectReport.suppliers.supplier') },
-      { text: t('projectReport.suppliers.description') },
-      { text: t('projectReport.suppliers.subTotal'), align: 'end' },
-      { text: t('projectReport.suppliers.status') },
-      { text: t('projectReport.suppliers.stage') },
-    ],
-    poRows,
-    t('projectReport.common.noDataOrRestricted')
-  );
-
-  return section(
-    'suppliers',
-    t('projectReport.sections.suppliers'),
-    `<h3>${esc(t('projectReport.suppliers.agreementSuppliers'))}</h3>
-     ${agreementSuppliersTable}
-     <h3>${esc(t('projectReport.suppliers.agreementQuantityBill'))} <span class="section-total">${num(suppliers.agreementQuantityBill.total)}</span></h3>
-     <p class="note">${esc(t('projectReport.suppliers.quantityBillNote'))}</p>
-     ${qbTable}
-     <h3>${esc(t('projectReport.suppliers.projectStageBoq'))} <span class="section-total">${num(suppliers.projectStageBoq.total)}</span></h3>
-     <p class="note">${esc(t('projectReport.suppliers.boqNote'))}</p>
-     ${boqTable}
-     <h3>${esc(t('projectReport.suppliers.purchaseOrders'))} <span class="section-total">${num(suppliers.purchaseOrders.total)}</span></h3>
-     ${poTable}`
-  );
-}
-
 function buildFinancial(snapshot: ProjectReportSnapshot, t: Translate): string {
   const f = snapshot.financial;
   if (!f.authorized) {
@@ -469,12 +311,11 @@ function buildSchedule(snapshot: ProjectReportSnapshot, config: ProjectReportCon
   </div>
   <p class="note">${esc(t('projectReport.schedule.blockedNotTracked'))}</p>`;
 
-  const stageRows = s.stages.map((st) => [cell(st.name), cell(st.typeLabel), cell(st.statusLabel)]);
+  const stageRows = s.stages.map((st) => [cell(st.name), cell(st.typeLabel)]);
   const stagesTable = table(
     [
       { text: t('projectReport.schedule.stageName') },
       { text: t('projectReport.schedule.stageType') },
-      { text: t('projectReport.schedule.stageStatus') },
     ],
     stageRows,
     t('projectReport.common.noData')
@@ -493,7 +334,6 @@ function buildSchedule(snapshot: ProjectReportSnapshot, config: ProjectReportCon
     `${cards}${taskCards}
      <h3>${esc(t('projectReport.schedule.stages'))}</h3>
      ${stagesTable}
-     ${workList(t('projectReport.schedule.completedWork'), s.completedWork)}
      ${workList(t('projectReport.schedule.inProgressWork'), s.inProgressWork)}
      ${workList(t('projectReport.schedule.upcomingWork'), s.upcomingWork)}`
   );
@@ -524,13 +364,12 @@ function buildSiteActivities(snapshot: ProjectReportSnapshot, config: ProjectRep
     t('projectReport.common.noData')
   );
 
-  const visitRows = s.surveyingVisits.map((v) => [date(v.date, config.language), cell(v.surveyor), cell(v.purpose), cell(v.statusLabel), num(v.subTotal)]);
+  const visitRows = s.surveyingVisits.map((v) => [date(v.date, config.language), cell(v.surveyor), cell(v.purpose), num(v.subTotal)]);
   const visitsTable = table(
     [
       { text: t('projectReport.siteActivities.visitDate') },
       { text: t('projectReport.siteActivities.surveyor') },
       { text: t('projectReport.siteActivities.purpose') },
-      { text: t('projectReport.siteActivities.status') },
       { text: t('projectReport.siteActivities.subTotal'), align: 'end' },
     ],
     visitRows,
@@ -550,7 +389,6 @@ function buildSiteActivities(snapshot: ProjectReportSnapshot, config: ProjectRep
 function buildDocuments(snapshot: ProjectReportSnapshot, config: ProjectReportConfig, t: Translate): string {
   const d = snapshot.documents;
   const showPhotos = config.includePhotos;
-  const showDocs = config.includeDocuments;
 
   const photosBlock = showPhotos
     ? d.photos.length > 0
@@ -569,44 +407,10 @@ function buildDocuments(snapshot: ProjectReportSnapshot, config: ProjectReportCo
       : `<p class="empty-state">${esc(t('projectReport.documents.noPhotos'))}</p>`
     : '';
 
-  const docRows = d.documents.map((doc) => [cell(doc.fileName), cell(doc.typeLabel), cell(doc.relatedTo)]);
-  const docsBlock = showDocs
-    ? table(
-        [
-          { text: t('projectReport.documents.fileName') },
-          { text: t('projectReport.documents.type') },
-          { text: t('projectReport.documents.relatedTo') },
-        ],
-        docRows,
-        t('projectReport.documents.noDocuments')
-      )
-    : '';
-
   return section(
     'documents',
     t('projectReport.sections.documents'),
-    `${showPhotos ? `<h3>${esc(t('projectReport.documents.photos'))}</h3>${photosBlock}` : ''}
-     ${showDocs ? `<h3>${esc(t('projectReport.documents.register'))}</h3>${docsBlock}` : ''}`
-  );
-}
-
-function buildRisks(snapshot: ProjectReportSnapshot, t: Translate): string {
-  const r = snapshot.risks;
-  const items =
-    r.items.length > 0
-      ? `<ul class="notes-list">${r.items.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`
-      : `<p class="empty-state">${esc(t('projectReport.risks.noTrackedRisks'))}</p>`;
-  const missing =
-    r.missingDataNotes.length > 0
-      ? `<ul class="notes-list muted">${r.missingDataNotes.map((i) => `<li>${esc(i)}</li>`).join('')}</ul>`
-      : '';
-
-  return section(
-    'risks',
-    t('projectReport.sections.risks'),
-    `${items}
-     <h3>${esc(t('projectReport.risks.missingData'))}</h3>
-     ${missing}`
+    `${showPhotos ? `<h3>${esc(t('projectReport.documents.photos'))}</h3>${photosBlock}` : ''}`
   );
 }
 
@@ -650,7 +454,7 @@ function buildStyles(): string {
     .facts-table th { width: 32%; background: #fff; border: none; color: #64748b; font-weight: 500; }
     .facts-table td { border: none; border-bottom: 1px solid #f1f5f9; }
 
-    .cover-page { min-height: 240mm; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; page-break-after: always; }
+    .cover-page { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 24mm 0; page-break-after: always; }
     .cover-header { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
     .cover-logo { max-height: 56px; max-width: 200px; }
     .cover-company { font-size: 14px; font-weight: 700; color: #0f2f5f; }
@@ -670,15 +474,6 @@ function buildStyles(): string {
     .chip-list { display: flex; flex-wrap: wrap; gap: 6px; }
     .chip { background: #eff6ff; color: #1d4ed8; border-radius: 12px; padding: 3px 10px; font-size: 10px; }
 
-    .card { border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; page-break-inside: avoid; }
-    .card-header { display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 8px; }
-    .card-title { font-size: 12px; font-weight: 700; }
-    .card-subtitle { font-size: 10px; color: #64748b; }
-    .card-meta { font-size: 10px; color: #94a3b8; margin: 4px 0 6px; }
-    .card-figures { display: flex; gap: 14px; }
-    .card-figures .figure-label { display: block; font-size: 9px; color: #64748b; }
-    .card-figures .figure-value { font-weight: 700; }
-
     .ledger-grid { display: flex; flex-wrap: wrap; gap: 12px; }
     .ledger-block { flex: 1 1 220px; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px 12px; page-break-inside: avoid; }
     .ledger-row { display: flex; justify-content: space-between; padding: 3px 0; border-bottom: 1px dashed #f1f5f9; }
@@ -686,8 +481,6 @@ function buildStyles(): string {
     .claim-block { border-color: #1d4ed8; background: #eff6ff; }
 
     .notes-list { margin: 4px 0; padding-inline-start: 18px; }
-    .notes-list.muted { color: #64748b; }
-    .section-total { color: #1d4ed8; font-weight: 700; font-size: 12px; }
 
     .photo-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
     .photo-card { border: 1px solid #e2e8f0; border-radius: 6px; padding: 4px; margin: 0; page-break-inside: avoid; }
@@ -723,13 +516,10 @@ export function buildProjectReportHtml(
     executiveSummary: () => buildExecutiveSummary(snapshot, config, t),
     agreement: () => buildAgreement(snapshot, config, t),
     scope: () => buildScope(snapshot, t),
-    contractors: () => buildContractors(snapshot, config, t),
-    suppliers: () => buildSuppliers(snapshot, t),
     financial: () => (config.includeFinancial ? buildFinancial(snapshot, t) : ''),
     schedule: () => buildSchedule(snapshot, config, t),
     siteActivities: () => buildSiteActivities(snapshot, config, t),
-    documents: () => (config.includeDocuments || config.includePhotos ? buildDocuments(snapshot, config, t) : ''),
-    risks: () => buildRisks(snapshot, t),
+    documents: () => (config.includePhotos ? buildDocuments(snapshot, config, t) : ''),
     signatures: () => buildSignatures(snapshot, config, t),
   };
 
@@ -738,13 +528,10 @@ export function buildProjectReportHtml(
     'executiveSummary',
     'agreement',
     'scope',
-    'contractors',
-    'suppliers',
     'financial',
     'schedule',
     'siteActivities',
     'documents',
-    'risks',
     'signatures',
   ];
 

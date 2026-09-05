@@ -12,10 +12,8 @@ import {
   ProjectReportDto,
   ProjectReportStageDto,
   ProjectStageType,
-  QuantityBillDto,
   Responsibility,
   StatusTask,
-  SupplierServiceDto,
 } from '../../../../../../nswag/api-client';
 import { AttachmentMetaData } from '../../../../../shared/services/attachment.service';
 import { getLookupData } from '../../../../../shared/utils/lookup.util';
@@ -23,22 +21,12 @@ import {
   Maybe,
   ProjectReportLanguage,
   ProjectReportSnapshot,
-  ReportContractorRow,
-  ReportDocumentRow,
   ReportFinancialSection,
   ReportPhoto,
-  ReportPurchaseOrderRow,
-  ReportQuantityBillRow,
   ReportSiteActivityTaskRow,
   ReportSurveyingVisitRow,
 } from '../models/project-report.model';
-import {
-  clampPercent,
-  computeElapsedRemaining,
-  computeRemainingBalance,
-  formatReportDate,
-  sumBy,
-} from './project-report-calculations.util';
+import { clampPercent, computeElapsedRemaining, formatReportDate, sumBy } from './project-report-calculations.util';
 
 /** Raw dictionary exactly as returned by `LookupClient.getAllLookups` (`StringLookupDtoListDictionaryResponse.data`). */
 export type LookupDictionary = { [key: string]: LookupDto[] } | undefined;
@@ -51,8 +39,6 @@ export interface RawAgreementBundle {
   landInformationDto: LandInformationDto | null;
   milestones: MileStonesDto[] | null;
   areas: ProjectAreaUnitDto[] | null;
-  supplierServices: SupplierServiceDto[] | null;
-  quantityBill: QuantityBillDto[] | null;
   /** Only populated when the caller holds `Agreements.ViewPaymentDetails` and the fetch succeeded. */
   payment: AgreementPaymentDto | null;
   selectedServiceIds: number[] | null;
@@ -65,8 +51,6 @@ export interface ReportPermissionFlags {
   canViewAgreementPayments: boolean;
   /** `Permissions.PaymentClaims.Print` — the computed payment-claim estimate figure. */
   canViewPaymentClaims: boolean;
-  /** `Permissions.MilestoneTabs.ProjectMainContractor` — contractor identities, contracts, payments. */
-  canViewContractors: boolean;
   /** `Permissions.Documents.View` (or project documents tab) — document register and photos. */
   canViewDocuments: boolean;
 }
@@ -118,34 +102,6 @@ function toMaybeString(value: string | undefined | null): Maybe<string> {
 /** Some generated DTO fields (phone/plot/basin/floor numbers) are typed as `number`, not `string`. */
 function toMaybeStringFromNumber(value: number | undefined | null): Maybe<string> {
   return value === undefined || value === null ? null : String(value);
-}
-
-/** Local mirror of the frontend-only PO status codes (`purchase-orders-tab.component.ts`) — not a backend enum. */
-function mapPurchaseOrderStatus(status: number | undefined, translate: RawProjectReportInputs['translate']): Maybe<string> {
-  switch (status) {
-    case 1:
-      return translate('projectReport.purchaseOrders.status.approved');
-    case 2:
-      return translate('projectReport.purchaseOrders.status.pending');
-    case 3:
-      return translate('projectReport.purchaseOrders.status.rejected');
-    default:
-      return null;
-  }
-}
-
-/** Local mirror of the frontend-only surveying-visit status codes (`surveying-visits-tab.component.ts`). */
-function mapVisitStatus(status: number | undefined, translate: RawProjectReportInputs['translate']): Maybe<string> {
-  switch (status) {
-    case 0:
-      return translate('projectReport.surveyingVisits.status.inProgress');
-    case 1:
-      return translate('projectReport.surveyingVisits.status.scheduled');
-    case 2:
-      return translate('projectReport.surveyingVisits.status.completed');
-    default:
-      return null;
-  }
 }
 
 function mapTaskStatus(status: StatusTask | undefined, translate: RawProjectReportInputs['translate']): string {
@@ -249,10 +205,7 @@ function buildFinancialSection(input: RawProjectReportInputs): ReportFinancialSe
   }
 
   if (authorized) {
-    notes.push(
-      translate('projectReport.financial.notes.ledgersAreSeparate'),
-      translate('projectReport.financial.notes.quantityBillVsBoq')
-    );
+    notes.push(translate('projectReport.financial.notes.ledgersAreSeparate'));
   }
 
   return {
@@ -278,103 +231,6 @@ function buildFinancialSection(input: RawProjectReportInputs): ReportFinancialSe
   };
 }
 
-function buildContractorRows(input: RawProjectReportInputs): ReportContractorRow[] {
-  const { report, permissions, translate } = input;
-  if (!permissions.canViewContractors || !report?.mainContractors) {
-    return [];
-  }
-  return report.mainContractors.map((c) => {
-    const totalPaid = c.totalPayments ?? sumBy(c.payments ?? [], (p) => p.paidAmount);
-    const contractValue = toMaybeNumber(c.amount);
-    return {
-      name: c.constructorName ?? translate('projectReport.common.notAvailable'),
-      classification: c.classification ? translate(`projectReport.contractors.classification.${c.classification}`) : null,
-      contractorType: toMaybeString(c.contractorTypeName),
-      stageName: findStageName(report.stages, c.projectStageId, translate),
-      contractValue,
-      startDate: toMaybeDate(c.startDate),
-      endDate: toMaybeDate(c.endDate),
-      totalPaid,
-      remainingBalance: computeRemainingBalance(contractValue, totalPaid),
-      duties: (c.duties ?? []).map((d) => ({
-        dutyType: toMaybeString(d.dutyTypeName),
-        responsibility: toMaybeString(d.dutyResponsibilityName),
-        unit: toMaybeString(d.unitName),
-        quantity: toMaybeNumber(d.quantity),
-        price: toMaybeNumber(d.price),
-        subTotal: toMaybeNumber(d.subTotal),
-      })),
-      payments: (c.payments ?? []).map((p) => ({
-        date: toMaybeDate(p.paymentDate),
-        amount: p.paidAmount ?? 0,
-        method: null,
-        reference: toMaybeString(p.receiptNo ?? p.chequeNo ?? p.transferReferenceNumber),
-      })),
-    };
-  });
-}
-
-function buildQuantityBillRows(input: RawProjectReportInputs): { rows: ReportQuantityBillRow[]; total: number } {
-  const { agreement, lookups, permissions } = input;
-  if (!permissions.canViewFinancial || !agreement?.quantityBill) {
-    return { rows: [], total: 0 };
-  }
-  const milestoneById = new Map((agreement.milestones ?? []).map((m) => [m.id, m.name]));
-  const rows: ReportQuantityBillRow[] = agreement.quantityBill.map((q) => {
-    const quantity = q.quantity ?? 0;
-    const price = q.price ?? 0;
-    return {
-      material: lookupName(lookups, LookupType.Material, q.materialId),
-      unit: lookupName(lookups, LookupType.Unit, q.unitId),
-      quantity: toMaybeNumber(q.quantity),
-      price: toMaybeNumber(q.price),
-      subTotal: quantity * price,
-      constructorName: lookupName(lookups, LookupType.Constructor, q.constructorId),
-      supplierName: lookupName(lookups, LookupType.Supplier, q.supplierId),
-      milestoneName: q.mileStoneId ? toMaybeString(milestoneById.get(q.mileStoneId)) : null,
-    };
-  });
-  return { rows, total: sumBy(rows, (r) => r.subTotal) };
-}
-
-function buildBoqRows(input: RawProjectReportInputs) {
-  const { report, permissions, translate } = input;
-  if (!permissions.canViewFinancial || !report?.boqs) {
-    return { rows: [], total: 0 };
-  }
-  const rows = report.boqs.map((b) => ({
-    material: toMaybeString(b.materialName),
-    unit: toMaybeString(b.unitName),
-    expectedQuantity: toMaybeNumber(b.expectedQuantity),
-    actualQuantity: toMaybeNumber(b.actualQuantity),
-    expectedPrice: toMaybeNumber(b.expectedPrice),
-    actualPrice: toMaybeNumber(b.actualPrice),
-    subTotal: b.subTotal ?? 0,
-    supplierName: toMaybeString(b.supplierName),
-    constructorName: toMaybeString(b.constructorName),
-    stageName: findStageName(report.stages, b.projectStageId, translate),
-  }));
-  return { rows, total: sumBy(rows, (r) => r.subTotal) };
-}
-
-function buildPurchaseOrderRows(input: RawProjectReportInputs): { rows: ReportPurchaseOrderRow[]; total: number } {
-  const { report, permissions, translate } = input;
-  if (!permissions.canViewFinancial || !report?.purchaseOrders) {
-    return { rows: [], total: 0 };
-  }
-  const rows: ReportPurchaseOrderRow[] = report.purchaseOrders.map((po) => ({
-    poNumber: toMaybeString(po.poNumber),
-    supplierName: toMaybeString(po.supplierName),
-    description: toMaybeString(po.description),
-    unit: toMaybeString(po.unitName),
-    price: toMaybeNumber(po.price),
-    subTotal: po.subTotal ?? 0,
-    statusLabel: mapPurchaseOrderStatus(po.status, translate),
-    stageName: findStageName(report.stages, po.projectStageId, translate),
-  }));
-  return { rows, total: sumBy(rows, (r) => r.subTotal) };
-}
-
 function buildSiteActivityTasks(input: RawProjectReportInputs): ReportSiteActivityTaskRow[] {
   const { report, translate } = input;
   return (report?.tasks ?? []).map((t) => ({
@@ -389,12 +245,11 @@ function buildSiteActivityTasks(input: RawProjectReportInputs): ReportSiteActivi
 }
 
 function buildSurveyingVisits(input: RawProjectReportInputs): ReportSurveyingVisitRow[] {
-  const { report, translate } = input;
+  const { report } = input;
   return (report?.surveyingVisits ?? []).map((v) => ({
     date: toMaybeDate(v.visitDate),
     surveyor: toMaybeString(v.surveyor),
     purpose: toMaybeString(v.purpose),
-    statusLabel: mapVisitStatus(v.status, translate),
     subTotal: toMaybeNumber(v.subTotal),
   }));
 }
@@ -402,30 +257,23 @@ function buildSurveyingVisits(input: RawProjectReportInputs): ReportSurveyingVis
 const PHOTO_LIMIT = 24;
 
 function buildDocumentsSection(input: RawProjectReportInputs) {
-  const { report, agreement, agreementAttachments, permissions, photoDataUrls, translate } = input;
+  const { report, agreementAttachments, permissions, photoDataUrls, translate } = input;
   if (!permissions.canViewDocuments) {
-    return { photos: [] as ReportPhoto[], photosOmittedCount: 0, documents: [] as ReportDocumentRow[] };
+    return { photos: [] as ReportPhoto[], photosOmittedCount: 0 };
   }
 
   const photos: ReportPhoto[] = [];
-  const documents: ReportDocumentRow[] = [];
   let photosOmittedCount = 0;
 
   for (const doc of report?.documents ?? []) {
-    const fileName = doc.originalName || doc.fileName || translate('projectReport.common.notAvailable');
     const dataUrl = doc.id !== undefined ? photoDataUrls[doc.id] : undefined;
     if (dataUrl) {
+      const fileName = doc.originalName || doc.fileName || translate('projectReport.common.notAvailable');
       if (photos.length < PHOTO_LIMIT) {
         photos.push({ fileName, dataUrl, relatedTo: findStageName(report?.stages, doc.relationshipId, translate) });
       } else {
         photosOmittedCount += 1;
       }
-    } else {
-      documents.push({
-        fileName,
-        typeLabel: translate(`projectReport.attachmentType.${doc.attachmentType ?? 'other'}`),
-        relatedTo: findStageName(report?.stages, doc.relationshipId, translate),
-      });
     }
   }
 
@@ -437,16 +285,10 @@ function buildDocumentsSection(input: RawProjectReportInputs) {
       } else {
         photosOmittedCount += 1;
       }
-    } else {
-      documents.push({
-        fileName: att.fileName,
-        typeLabel: translate('projectReport.attachmentType.agreement'),
-        relatedTo: agreement?.agreementDto?.projectName ? toMaybeString(agreement.agreementDto.projectName) : null,
-      });
     }
   }
 
-  return { photos, photosOmittedCount, documents };
+  return { photos, photosOmittedCount };
 }
 
 /**
@@ -467,10 +309,6 @@ export function buildProjectReportSnapshot(input: RawProjectReportInputs): Proje
   const progressPercent = totalTaskCount > 0 ? clampPercent(((project.countCompleted ?? 0) / totalTaskCount) * 100) : 0;
 
   const financial = buildFinancialSection(input);
-  const contractorRows = buildContractorRows(input);
-  const quantityBill = buildQuantityBillRows(input);
-  const boq = buildBoqRows(input);
-  const purchaseOrders = buildPurchaseOrderRows(input);
   const siteActivityTasks = buildSiteActivityTasks(input);
   const rawTasks = report?.tasks ?? [];
 
@@ -586,24 +424,6 @@ export function buildProjectReportSnapshot(input: RawProjectReportInputs): Proje
           stageLinked: !!report?.stages?.some((s) => s.milestoneId === m.id),
         })),
     },
-    contractors: {
-      rows: contractorRows,
-      totalContractValue: sumBy(contractorRows, (r) => r.contractValue),
-      totalPaid: sumBy(contractorRows, (r) => r.totalPaid),
-      totalRemaining: sumBy(contractorRows, (r) => r.remainingBalance),
-    },
-    suppliers: {
-      agreementSuppliers: financial.authorized
-        ? (agreement?.supplierServices ?? []).map((s) => ({
-            supplierName: lookupName(lookups, LookupType.Supplier, s.supplierId),
-            materialOrService: lookupName(lookups, LookupType.Material, s.materialId),
-            representativeName: toMaybeString(s.representativeName),
-          }))
-        : [],
-      agreementQuantityBill: quantityBill,
-      projectStageBoq: boq,
-      purchaseOrders,
-    },
     financial,
     schedule: {
       plannedStart: startDate,
@@ -620,9 +440,7 @@ export function buildProjectReportSnapshot(input: RawProjectReportInputs): Proje
       stages: (report?.stages ?? []).map((s) => ({
         name: stageDisplayName(s, translate),
         typeLabel: translate(`projectReport.stageType.${s.stageType}`),
-        statusLabel: translate('projectReport.missingData.milestoneStatusShort'),
       })),
-      completedWork: rawTasks.filter((t) => t.status === StatusTask.Completed).map((t) => t.title ?? translate('projectReport.common.notAvailable')),
       inProgressWork: rawTasks.filter((t) => t.status === StatusTask.InProgress).map((t) => t.title ?? translate('projectReport.common.notAvailable')),
       upcomingWork: rawTasks.filter((t) => t.status === StatusTask.ToDO).map((t) => t.title ?? translate('projectReport.common.notAvailable')),
     },
@@ -631,10 +449,6 @@ export function buildProjectReportSnapshot(input: RawProjectReportInputs): Proje
       surveyingVisits: buildSurveyingVisits(input),
     },
     documents: buildDocumentsSection(input),
-    risks: {
-      items: [],
-      missingDataNotes,
-    },
     signatures: {
       preparedByLabel: translate('projectReport.signatures.preparedBy'),
       reviewedByLabel: translate('projectReport.signatures.reviewedBy'),

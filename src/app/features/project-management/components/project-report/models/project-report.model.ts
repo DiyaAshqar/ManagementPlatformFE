@@ -14,13 +14,10 @@ export type ProjectReportSectionKey =
   | 'executiveSummary'
   | 'agreement'
   | 'scope'
-  | 'contractors'
-  | 'suppliers'
   | 'financial'
   | 'schedule'
   | 'siteActivities'
   | 'documents'
-  | 'risks'
   | 'signatures';
 
 export const PROJECT_REPORT_SECTION_KEYS: readonly ProjectReportSectionKey[] = [
@@ -28,13 +25,10 @@ export const PROJECT_REPORT_SECTION_KEYS: readonly ProjectReportSectionKey[] = [
   'executiveSummary',
   'agreement',
   'scope',
-  'contractors',
-  'suppliers',
   'financial',
   'schedule',
   'siteActivities',
   'documents',
-  'risks',
   'signatures',
 ];
 
@@ -154,91 +148,6 @@ export interface ReportScopeSection {
   milestones: ReportMilestoneRow[];
 }
 
-export interface ReportContractorDutyRow {
-  dutyType: Maybe<string>;
-  responsibility: Maybe<string>;
-  unit: Maybe<string>;
-  quantity: Maybe<number>;
-  price: Maybe<number>;
-  subTotal: Maybe<number>;
-}
-
-export interface ReportContractorPaymentRow {
-  date: Maybe<Date>;
-  amount: number;
-  method: Maybe<string>;
-  reference: Maybe<string>;
-}
-
-export interface ReportContractorRow {
-  name: string;
-  classification: Maybe<string>;
-  contractorType: Maybe<string>;
-  stageName: Maybe<string>;
-  contractValue: Maybe<number>;
-  startDate: Maybe<Date>;
-  endDate: Maybe<Date>;
-  totalPaid: number;
-  remainingBalance: Maybe<number>;
-  duties: ReportContractorDutyRow[];
-  payments: ReportContractorPaymentRow[];
-}
-
-export interface ReportContractorsSection {
-  rows: ReportContractorRow[];
-  totalContractValue: number;
-  totalPaid: number;
-  totalRemaining: number;
-}
-
-export interface ReportSupplierAgreementRow {
-  supplierName: Maybe<string>;
-  materialOrService: Maybe<string>;
-  representativeName: Maybe<string>;
-}
-
-export interface ReportQuantityBillRow {
-  material: Maybe<string>;
-  unit: Maybe<string>;
-  quantity: Maybe<number>;
-  price: Maybe<number>;
-  subTotal: number;
-  constructorName: Maybe<string>;
-  supplierName: Maybe<string>;
-  milestoneName: Maybe<string>;
-}
-
-export interface ReportBoqRow {
-  material: Maybe<string>;
-  unit: Maybe<string>;
-  expectedQuantity: Maybe<number>;
-  actualQuantity: Maybe<number>;
-  expectedPrice: Maybe<number>;
-  actualPrice: Maybe<number>;
-  subTotal: number;
-  supplierName: Maybe<string>;
-  constructorName: Maybe<string>;
-  stageName: Maybe<string>;
-}
-
-export interface ReportPurchaseOrderRow {
-  poNumber: Maybe<string>;
-  supplierName: Maybe<string>;
-  description: Maybe<string>;
-  unit: Maybe<string>;
-  price: Maybe<number>;
-  subTotal: number;
-  statusLabel: Maybe<string>;
-  stageName: Maybe<string>;
-}
-
-export interface ReportSuppliersSection {
-  agreementSuppliers: ReportSupplierAgreementRow[];
-  agreementQuantityBill: { rows: ReportQuantityBillRow[]; total: number };
-  projectStageBoq: { rows: ReportBoqRow[]; total: number };
-  purchaseOrders: { rows: ReportPurchaseOrderRow[]; total: number };
-}
-
 export interface ReportFinancialSection {
   authorized: boolean;
   currencyLabel: Maybe<string>;
@@ -272,7 +181,6 @@ export interface ReportTaskCounts {
 export interface ReportStageRow {
   name: string;
   typeLabel: string;
-  statusLabel: string;
 }
 
 export interface ReportScheduleSection {
@@ -283,7 +191,6 @@ export interface ReportScheduleSection {
   daysRemaining: Maybe<number>;
   taskCounts: ReportTaskCounts;
   stages: ReportStageRow[];
-  completedWork: string[];
   inProgressWork: string[];
   upcomingWork: string[];
 }
@@ -302,7 +209,6 @@ export interface ReportSurveyingVisitRow {
   date: Maybe<Date>;
   surveyor: Maybe<string>;
   purpose: Maybe<string>;
-  statusLabel: Maybe<string>;
   subTotal: Maybe<number>;
 }
 
@@ -317,21 +223,9 @@ export interface ReportPhoto {
   relatedTo: Maybe<string>;
 }
 
-export interface ReportDocumentRow {
-  fileName: string;
-  typeLabel: string;
-  relatedTo: Maybe<string>;
-}
-
 export interface ReportDocumentsSection {
   photos: ReportPhoto[];
   photosOmittedCount: number;
-  documents: ReportDocumentRow[];
-}
-
-export interface ReportRisksSection {
-  items: string[];
-  missingDataNotes: string[];
 }
 
 export interface ReportSignaturesSection {
@@ -347,12 +241,9 @@ export interface ProjectReportSnapshot {
   executiveSummary: ReportExecutiveSummary;
   agreement: ReportAgreementInfo;
   scope: ReportScopeSection;
-  contractors: ReportContractorsSection;
-  suppliers: ReportSuppliersSection;
   financial: ReportFinancialSection;
   schedule: ReportScheduleSection;
   siteActivities: ReportSiteActivitiesSection;
   documents: ReportDocumentsSection;
-  risks: ReportRisksSection;
   signatures: ReportSignaturesSection;
 }
