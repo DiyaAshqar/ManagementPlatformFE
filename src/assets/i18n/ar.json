@@ -1707,10 +1707,8 @@
     "sections": {
       "cover": "صفحة الغلاف",
       "executiveSummary": "الملخص التنفيذي",
-      "agreement": "معلومات الاتفاقية والعقد",
-      "scope": "النطاق والمناطق والمراحل",
+      "agreement": "تفاصيل الاتفاقية",
       "financial": "التقرير المالي",
-      "siteActivities": "أنشطة الموقع والمعاينات",
       "documents": "المستندات وصور سير العمل",
       "signatures": "الملخص الختامي والتوقيعات"
     },
@@ -1744,44 +1742,51 @@
       "actualExpenditure": "المصروفات الفعلية",
       "committedAmount": "المبالغ الملتزم بها",
       "milestonesTotal": "إجمالي عدد المراحل",
-      "milestonesCompleted": "المراحل المكتملة",
-      "keyMilestones": "أهم المراحل الرئيسية",
-      "milestoneOrder": "#",
-      "milestoneName": "المرحلة",
-      "milestoneStatus": "الحالة",
-      "risksAndNotes": "المخاطر والمعوقات والبيانات الناقصة",
-      "noRisks": "لا توجد مخاطر أو ملاحظات ناقصة مسجلة."
+      "milestonesCompleted": "المراحل المكتملة"
     },
     "agreement": {
-      "number": "رقم الاتفاقية",
-      "date": "تاريخ الاتفاقية",
-      "type": "نوع الاتفاقية",
-      "projectName": "اسم المشروع",
+      "agreementDate": "تاريخ الاتفاقية",
       "businessSector": "القطاع",
-      "estimatedStart": "تاريخ البدء المتوقع",
-      "estimatedEnd": "تاريخ الانتهاء المتوقع",
-      "contractType": "نوع العقد",
-      "contractModel": "نموذج العقد",
-      "contractValue": "قيمة العقد",
-      "country": "الدولة",
-      "city": "المدينة",
-      "basin": "الحوض",
-      "village": "القرية",
-      "directorate": "المديرية",
-      "plotNumber": "رقم القطعة",
-      "floorNumber": "رقم الطابق",
-      "projectArea": "مساحة المشروع (م²)",
       "drillingQuantity": "كمية الحفر",
-      "client": "العميل والممثل",
-      "contactPerson": "الشخص المسؤول",
-      "representative": "الممثل",
-      "services": "الخدمات المختارة"
-    },
-    "scope": {
-      "areas": "مناطق المشروع والملاحق",
-      "annex": "الملحق",
-      "amount": "الكمية",
-      "unit": "الوحدة"
+      "description": "الوصف",
+      "client": {
+        "title": "معلومات العميل",
+        "contactPerson": "الشخص المسؤول",
+        "contactPersonPhone": "رقم هاتف الشخص المسؤول",
+        "representerName": "اسم الممثل",
+        "representerPhone": "رقم هاتف الممثل"
+      },
+      "land": {
+        "title": "معلومات الأرض",
+        "plotNumber": "رقم القطعة",
+        "directorate": "المديرية",
+        "village": "القرية",
+        "basinName": "اسم الحوض",
+        "basinNumber": "رقم الحوض",
+        "floorNumber": "رقم الطابق"
+      },
+      "contract": {
+        "title": "العقد والدفعات",
+        "contractType": "نوع العقد",
+        "contractModel": "نموذج التعاقد",
+        "monthlyFees": "الرسوم الشهرية",
+        "percentageFees": "نسبة الأتعاب"
+      },
+      "services": "الخدمات",
+      "areas": "مساحات المشروع",
+      "noAreas": "لا تتوفر مساحات مسجلة لهذه الاتفاقية.",
+      "areaColumns": {
+        "annex": "الطابق / الملحق",
+        "amount": "المساحة",
+        "unit": "الوحدة"
+      },
+      "milestones": "المراحل",
+      "noMilestones": "لا تتوفر مراحل مسجلة لهذه الاتفاقية.",
+      "milestoneColumns": {
+        "order": "#",
+        "name": "الاسم",
+        "description": "الوصف"
+      }
     },
     "financial": {
       "contractAndBudget": "العقد والميزانية",
@@ -1809,16 +1814,6 @@
         "engineeringFeeExcluded": "أتعاب مكتب الإشراف الهندسي محسوبة كنسبة مئوية أو رسم شهري ولم تُدرج ضمن هذا التقدير.",
         "ledgersAreSeparate": "كل رقم أعلاه يمثل سجلاً مستقلاً ولا يُجمع مع غيره — تعامل معها كإجماليات منفصلة وليست رصيدًا تراكميًا واحدًا."
       }
-    },
-    "siteActivities": {
-      "tasks": "المهام",
-      "task": "المهمة",
-      "status": "الحالة",
-      "type": "النوع",
-      "responsibility": "المسؤولية",
-      "startDate": "تاريخ البدء",
-      "endDate": "تاريخ الانتهاء",
-      "subtasks": "المهام الفرعية"
     },
     "documents": {
       "photos": "صور سير العمل",
@@ -1870,7 +1865,6 @@
     "missingData": {
       "noAgreement": "هذا المشروع غير مرتبط باتفاقية، أو تعذّر تحميل بيانات الاتفاقية — الأقسام المشتقة من الاتفاقية غير متوفرة.",
       "milestoneStatus": "حالة تنفيذ كل مرحلة على حدة غير متاحة حاليًا في النظام؛ يتم عرض اسم المرحلة وترتيبها فقط.",
-      "milestoneStatusShort": "غير متتبعة",
       "blockedTasks": "تتبع حالة \"معلّقة\" للمهام غير متوفر حاليًا في النظام.",
       "domainFailed": "تعذّر تحميل بيانات {{domain}} لهذا التقرير."
     },

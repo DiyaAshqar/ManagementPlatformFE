@@ -99,11 +99,6 @@ function toMaybeString(value: string | undefined | null): Maybe<string> {
   return value ? value : null;
 }
 
-/** Some generated DTO fields (phone/plot/basin/floor numbers) are typed as `number`, not `string`. */
-function toMaybeStringFromNumber(value: number | undefined | null): Maybe<string> {
-  return value === undefined || value === null ? null : String(value);
-}
-
 function mapTaskStatus(status: StatusTask | undefined, translate: RawProjectReportInputs['translate']): string {
   if (!status) {
     return translate('projectReport.common.notAvailable');
@@ -360,52 +355,40 @@ export function buildProjectReportSnapshot(input: RawProjectReportInputs): Proje
       committedAmount,
       milestonesTotal: milestoneStages.length || (agreement?.milestones?.length ?? 0),
       milestonesCompleted: null,
-      keyMilestones: (agreement?.milestones ?? [])
-        .slice()
-        .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
-        .slice(0, 8)
-        .map((m) => ({
-          order: m.order ?? 0,
-          name: m.name ?? translate('projectReport.common.notAvailable'),
-          statusLabel: translate('projectReport.missingData.milestoneStatusShort'),
-        })),
       risks: missingDataNotes,
     },
     agreement: {
-      available: !!agreement,
-      agreementNumber: toMaybeString(agreement?.agreementDto?.projectNumber),
       agreementDate: toMaybeDate(agreement?.agreementDto?.agreementDate),
-      agreementType: lookupName(lookups, LookupType.AgreementType, agreement?.agreementDto?.agreementTypeId),
-      projectName: toMaybeString(agreement?.agreementDto?.projectName),
-      description: toMaybeString(agreement?.agreementDto?.description),
       businessSector: toMaybeString(agreement?.agreementDto?.businessSector),
-      estimatedStartDate: toMaybeDate(agreement?.agreementDto?.estimatedStartDate),
-      estimatedEndDate: toMaybeDate(agreement?.agreementDto?.estimatedEndDate),
-      contractType: permissions.canViewAgreementPayments ? lookupName(lookups, LookupType.ContractType, agreement?.payment?.contractTypeId) : null,
-      contractModel: permissions.canViewAgreementPayments ? lookupName(lookups, LookupType.ContractModel, agreement?.payment?.contractModelId) : null,
-      contractValue: financial.contractValue,
-      paymentDetailsAuthorized: permissions.canViewAgreementPayments,
-      selectedServices: permissions.canViewAgreementPayments
+      description: toMaybeString(agreement?.agreementDto?.description),
+      drillingQuantity: toMaybeNumber(agreement?.agreementDto?.drillingQuantity),
+      client: {
+        contactPerson: toMaybeString(agreement?.clientDto?.contactPerson),
+        contactPersonPhone: agreement?.clientDto?.contactPersonNumber != null ? String(agreement.clientDto.contactPersonNumber) : null,
+        representerName: toMaybeString(agreement?.clientDto?.representerName),
+        representerPhone: agreement?.clientDto?.representerNameNumber != null ? String(agreement.clientDto.representerNameNumber) : null,
+      },
+      land: {
+        plotNumber: toMaybeNumber(agreement?.landInformationDto?.plotNumber),
+        directorate: toMaybeString(agreement?.landInformationDto?.directorate),
+        village: toMaybeString(agreement?.landInformationDto?.village),
+        basinName: toMaybeString(agreement?.landInformationDto?.basinName),
+        basinNumber: toMaybeNumber(agreement?.landInformationDto?.basinNumber),
+        floorNumber: toMaybeNumber(agreement?.landInformationDto?.floorNumber),
+      },
+      contract: permissions.canViewAgreementPayments
+        ? {
+            contractTypeLabel: lookupName(lookups, LookupType.ContractType, agreement?.payment?.contractTypeId),
+            contractModelLabel: lookupName(lookups, LookupType.ContractModel, agreement?.payment?.contractModelId),
+            monthlyFees: toMaybeNumber(agreement?.payment?.monthlyPaymentDto?.monthlyFees),
+            percentageFees: toMaybeNumber(agreement?.payment?.monthlyPaymentDto?.percentageFees),
+          }
+        : { contractTypeLabel: null, contractModelLabel: null, monthlyFees: null, percentageFees: null },
+      services: permissions.canViewAgreementPayments
         ? (agreement?.selectedServiceIds ?? [])
             .map((id) => lookupName(lookups, LookupType.Service, id))
             .filter((name): name is string => !!name)
         : [],
-      client: {
-        contactPerson: toMaybeString(agreement?.clientDto?.contactPerson),
-        contactPersonPhone: toMaybeStringFromNumber(agreement?.clientDto?.contactPersonNumber),
-        representerName: toMaybeString(agreement?.clientDto?.representerName),
-        representerPhone: toMaybeStringFromNumber(agreement?.clientDto?.representerNameNumber),
-      },
-      country: lookupName(lookups, LookupType.Country, agreement?.agreementDto?.countryId),
-      city: lookupName(lookups, LookupType.City, agreement?.agreementDto?.cityId),
-      basinName: toMaybeString(agreement?.landInformationDto?.basinName),
-      basinNumber: toMaybeStringFromNumber(agreement?.landInformationDto?.basinNumber),
-      village: toMaybeString(agreement?.landInformationDto?.village),
-      directorate: toMaybeString(agreement?.landInformationDto?.directorate),
-      plotNumber: toMaybeStringFromNumber(agreement?.landInformationDto?.plotNumber),
-      floorNumber: toMaybeStringFromNumber(agreement?.landInformationDto?.floorNumber),
-      projectArea: toMaybeNumber(agreement?.agreementDto?.projectArea),
-      drillingQuantity: toMaybeNumber(agreement?.agreementDto?.drillingQuantity),
     },
     scope: {
       areas: (agreement?.areas ?? []).map((a) => ({

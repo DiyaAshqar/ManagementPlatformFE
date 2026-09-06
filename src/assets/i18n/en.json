@@ -1711,10 +1711,8 @@
     "sections": {
       "cover": "Cover Page",
       "executiveSummary": "Executive Summary",
-      "agreement": "Agreement & Contract Information",
-      "scope": "Scope, Areas & Milestones",
+      "agreement": "Agreement Details",
       "financial": "Financial Report",
-      "siteActivities": "Site Activities & Inspections",
       "documents": "Documents & Progress Photos",
       "signatures": "Final Summary & Signatures"
     },
@@ -1748,44 +1746,51 @@
       "actualExpenditure": "Actual Expenditure",
       "committedAmount": "Committed Amount",
       "milestonesTotal": "Total Milestones",
-      "milestonesCompleted": "Milestones Completed",
-      "keyMilestones": "Key Milestones",
-      "milestoneOrder": "#",
-      "milestoneName": "Milestone",
-      "milestoneStatus": "Status",
-      "risksAndNotes": "Risks, Blockers & Missing Data",
-      "noRisks": "No risks or missing-data notes recorded."
+      "milestonesCompleted": "Milestones Completed"
     },
     "agreement": {
-      "number": "Agreement Number",
-      "date": "Agreement Date",
-      "type": "Agreement Type",
-      "projectName": "Project Name",
+      "agreementDate": "Agreement Date",
       "businessSector": "Business Sector",
-      "estimatedStart": "Estimated Start Date",
-      "estimatedEnd": "Estimated End Date",
-      "contractType": "Contract Type",
-      "contractModel": "Contract Model",
-      "contractValue": "Contract Value",
-      "country": "Country",
-      "city": "City",
-      "basin": "Basin",
-      "village": "Village",
-      "directorate": "Directorate",
-      "plotNumber": "Plot Number",
-      "floorNumber": "Floor Number",
-      "projectArea": "Project Area (m²)",
-      "drillingQuantity": "Drilling Quantity",
-      "client": "Client & Representative",
-      "contactPerson": "Contact Person",
-      "representative": "Representative",
-      "services": "Selected Services"
-    },
-    "scope": {
-      "areas": "Project Areas & Annexes",
-      "annex": "Annex",
-      "amount": "Amount",
-      "unit": "Unit"
+      "drillingQuantity": "Excavation Quantity",
+      "description": "Description",
+      "client": {
+        "title": "Client Information",
+        "contactPerson": "Contact Person",
+        "contactPersonPhone": "Contact Person Phone",
+        "representerName": "Representative Name",
+        "representerPhone": "Representative Phone"
+      },
+      "land": {
+        "title": "Land Information",
+        "plotNumber": "Plot Number",
+        "directorate": "Directorate",
+        "village": "Village",
+        "basinName": "Basin Name",
+        "basinNumber": "Basin Number",
+        "floorNumber": "Floor Number"
+      },
+      "contract": {
+        "title": "Contract & Payment",
+        "contractType": "Contract Type",
+        "contractModel": "Type of Contracting",
+        "monthlyFees": "Monthly Fees",
+        "percentageFees": "Percentage Fees"
+      },
+      "services": "Services",
+      "areas": "Project Areas",
+      "noAreas": "No project areas are recorded for this agreement.",
+      "areaColumns": {
+        "annex": "Floor / Annex",
+        "amount": "Amount",
+        "unit": "Unit"
+      },
+      "milestones": "Milestones",
+      "noMilestones": "No milestones are recorded for this agreement.",
+      "milestoneColumns": {
+        "order": "#",
+        "name": "Name",
+        "description": "Description"
+      }
     },
     "financial": {
       "contractAndBudget": "Contract & Budget",
@@ -1813,16 +1818,6 @@
         "engineeringFeeExcluded": "The agreement's engineering office fee is expressed as a percentage or monthly fee and is not included in this estimate.",
         "ledgersAreSeparate": "Each figure above is an independent ledger and is not summed into the others — treat them as distinct totals, not a single running balance."
       }
-    },
-    "siteActivities": {
-      "tasks": "Tasks",
-      "task": "Task",
-      "status": "Status",
-      "type": "Type",
-      "responsibility": "Responsibility",
-      "startDate": "Start Date",
-      "endDate": "End Date",
-      "subtasks": "Subtasks"
     },
     "documents": {
       "photos": "Progress Photos",
@@ -1874,7 +1869,6 @@
     "missingData": {
       "noAgreement": "This project is not linked to an agreement, or the agreement could not be loaded — agreement-derived sections are unavailable.",
       "milestoneStatus": "Per-milestone execution status is not currently exposed by the system; only milestone names and order are shown.",
-      "milestoneStatusShort": "Not tracked",
       "blockedTasks": "\"Blocked\" task/status tracking is not currently available in the system.",
       "domainFailed": "{{domain}} data could not be loaded for this report."
     },

@@ -45,35 +45,17 @@ function baseSnapshot(overrides: Partial<ProjectReportSnapshot> = {}): ProjectRe
       committedAmount: 0,
       milestonesTotal: 3,
       milestonesCompleted: null,
-      keyMilestones: [{ order: 1, name: 'Foundation', statusLabel: 'Not tracked' }],
       risks: ['No agreement linked'],
     },
     agreement: {
-      available: false,
-      agreementNumber: null,
       agreementDate: null,
-      agreementType: null,
-      projectName: null,
-      description: null,
       businessSector: null,
-      estimatedStartDate: null,
-      estimatedEndDate: null,
-      contractType: null,
-      contractModel: null,
-      contractValue: null,
-      paymentDetailsAuthorized: false,
-      selectedServices: [],
-      client: { contactPerson: null, contactPersonPhone: null, representerName: null, representerPhone: null },
-      country: null,
-      city: null,
-      basinName: null,
-      basinNumber: null,
-      village: null,
-      directorate: null,
-      plotNumber: null,
-      floorNumber: null,
-      projectArea: null,
+      description: null,
       drillingQuantity: null,
+      client: { contactPerson: null, contactPersonPhone: null, representerName: null, representerPhone: null },
+      land: { plotNumber: null, directorate: null, village: null, basinName: null, basinNumber: null, floorNumber: null },
+      contract: { contractTypeLabel: null, contractModelLabel: null, monthlyFees: null, percentageFees: null },
+      services: [],
     },
     scope: { areas: [], milestones: [] },
     financial: {
@@ -119,9 +101,7 @@ const ALL_SECTIONS: Set<ProjectReportSectionKey> = new Set([
   'cover',
   'executiveSummary',
   'agreement',
-  'scope',
   'financial',
-  'siteActivities',
   'documents',
   'signatures',
 ]);
@@ -169,6 +149,41 @@ describe('project-report.builder', () => {
       const html = buildProjectReportHtml(baseSnapshot(), baseConfig(), new Set(), fakeTranslate);
       // The stylesheet always defines `.cover-page` — assert the *element* is absent, not the class name.
       expect(html).not.toContain('<div class="cover-page">');
+    });
+  });
+
+  describe('agreement section', () => {
+    it('renders agreement facts and the scope areas/milestones tables', () => {
+      const snapshot = baseSnapshot({
+        agreement: {
+          agreementDate: new Date(2026, 4, 4),
+          businessSector: 'Residential',
+          description: 'A 3-storey villa',
+          drillingQuantity: 1000,
+          client: { contactPerson: 'John Doe', contactPersonPhone: '5551234', representerName: null, representerPhone: null },
+          land: { plotNumber: 2553, directorate: 'North Amman', village: 'Jubaiha', basinName: null, basinNumber: null, floorNumber: 4 },
+          contract: { contractTypeLabel: 'Management', contractModelLabel: 'Cost Plus', monthlyFees: 0, percentageFees: 8.9 },
+          services: ['Excavation', 'Construction'],
+        },
+        scope: {
+          areas: [{ annexName: 'Roof Floor', amount: 200, unitName: 'm²' }],
+          milestones: [{ order: 1, name: 'Prep', description: null, statusLabel: null, stageLinked: true }],
+        },
+      });
+      const html = buildProjectReportHtml(snapshot, baseConfig(), ALL_SECTIONS, fakeTranslate);
+      expect(html).toContain('id="agreement"');
+      expect(html).toContain('Residential');
+      expect(html).toContain('John Doe');
+      expect(html).toContain('2553');
+      expect(html).toContain('Cost Plus');
+      expect(html).toContain('Excavation');
+      expect(html).toContain('Roof Floor');
+      expect(html).toContain('Prep');
+    });
+
+    it('omits the agreement section when not selected', () => {
+      const html = buildProjectReportHtml(baseSnapshot(), baseConfig(), new Set(['cover']), fakeTranslate);
+      expect(html).not.toContain('id="agreement"');
     });
   });
 

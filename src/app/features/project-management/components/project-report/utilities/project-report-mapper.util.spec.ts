@@ -157,7 +157,6 @@ describe('project-report-mapper.util', () => {
         })
       );
       expect(snapshot.financial.contractValue).toBe(15000);
-      expect(snapshot.agreement.contractValue).toBe(15000);
     });
   });
 
@@ -177,9 +176,6 @@ describe('project-report-mapper.util', () => {
         permissions: { ...FULL_PERMISSIONS, canViewAgreementPayments: false },
       });
       const snapshot = buildProjectReportSnapshot(input);
-      expect(snapshot.agreement.contractValue).toBeNull();
-      expect(snapshot.agreement.paymentDetailsAuthorized).toBeFalse();
-      expect(snapshot.agreement.selectedServices).toEqual([]);
       expect(snapshot.financial.contractValue).toBeNull();
     });
 
@@ -213,7 +209,7 @@ describe('project-report-mapper.util', () => {
         baseInput({ agreement: null, failedDomains: ['Agreement'] })
       );
       expect(snapshot.meta.failedSections).toContain('Agreement');
-      expect(snapshot.agreement.available).toBeFalse();
+      expect(snapshot.executiveSummary.risks).toContain('projectReport.missingData.noAgreement');
       // Project-level data (fetched independently) is still present.
       expect(snapshot.cover.projectName).toBe('Villa Construction');
       expect(snapshot.financial.boqTotal).toBe(3000);

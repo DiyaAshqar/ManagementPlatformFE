@@ -49,10 +49,8 @@ const REPORT_TYPE_LABELS_AR: Record<ProjectReportType, string> = {
 const SECTION_LABELS_AR: Record<ProjectReportSectionKey, string> = {
   cover: 'صفحة الغلاف',
   executiveSummary: 'الملخص التنفيذي',
-  agreement: 'معلومات الاتفاقية والعقد',
-  scope: 'النطاق والمناطق والمراحل',
+  agreement: 'تفاصيل الاتفاقية',
   financial: 'التقرير المالي',
-  siteActivities: 'أنشطة الموقع والمعاينات',
   documents: 'المستندات وصور سير العمل',
   signatures: 'الملخص الختامي والتوقيعات',
 };
@@ -184,20 +182,33 @@ export class ProjectReportDemoPageComponent {
 
   /**
    * Splices the color-coded raw-data tables (BOQ/PMC/PO/SV/VO/EXP/ADV) for
-   * the demo's one real Milestone Stage right after the Agreement section,
-   * so they read as part of the normal report flow instead of a disconnected
-   * block bolted onto the front. Falls back to right after `<body>` when the
-   * Agreement section itself is excluded from the current report type/custom
-   * selection (its `id="agreement"` marker won't be present).
+   * the demo's one real Milestone Stage right before the signatures/documents
+   * sections — i.e. after the cover/summary/agreement content but before the
+   * report's closing sections, so those closing sections stay last on the
+   * page. Falls back to right before the footer, then right before
+   * `</body>`, on the (should-never-happen) chance neither the signatures nor
+   * documents section is present. Wrapped in its own bordered, labeled block
+   * so it reads as clearly separate from the report content around it, not a
+   * continuation of the report.
    */
   private injectStageDataTables(html: string): string {
-    const fragment = buildStageDataTablesHtml(REAL_STAGE_NAME);
-    const agreementStart = html.indexOf('id="agreement"');
-    if (agreementStart === -1) {
-      return html.replace('<body>', `<body>\n${fragment}`);
+    const rawFragment = buildStageDataTablesHtml(REAL_STAGE_NAME);
+    const fragment = `<div style="margin-top:36px;padding-top:22px;border-top:3px dashed #cbd5e1;">
+      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;margin-bottom:10px;">بيانات تحقّق إضافية (خارج التقرير الرسمي) — Demo Only</div>
+      ${rawFragment}
+    </div>`;
+    const signaturesStart = html.indexOf('<section class="report-section" id="signatures"');
+    const documentsStart = html.indexOf('<section class="report-section" id="documents"');
+    const candidates = [signaturesStart, documentsStart].filter((i) => i !== -1);
+    const insertStart = candidates.length > 0 ? Math.min(...candidates) : -1;
+    if (insertStart !== -1) {
+      return `${html.slice(0, insertStart)}${fragment}\n${html.slice(insertStart)}`;
     }
-    const sectionEnd = html.indexOf('</section>', agreementStart) + '</section>'.length;
-    return `${html.slice(0, sectionEnd)}\n${fragment}${html.slice(sectionEnd)}`;
+    const footerStart = html.indexOf('<div class="report-footer">');
+    if (footerStart === -1) {
+      return html.replace('</body>', `${fragment}\n</body>`);
+    }
+    return `${html.slice(0, footerStart)}${fragment}\n${html.slice(footerStart)}`;
   }
 
   private resolveSnapshot(): ProjectReportSnapshot {

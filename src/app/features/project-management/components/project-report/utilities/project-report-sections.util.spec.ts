@@ -16,23 +16,22 @@ describe('project-report-sections.util', () => {
       const sections = resolveReportSections(config({ type: 'full' }));
       expect(sections.has('cover')).toBeTrue();
       expect(sections.has('financial')).toBeTrue();
-      expect(sections.has('siteActivities')).toBeTrue();
       expect(sections.has('documents')).toBeTrue();
       expect(sections.has('signatures')).toBeTrue();
     });
 
-    it('limits the summary report to cover/executive/agreement/scope/financial/signatures', () => {
+    it('limits the summary report to cover/executive/financial/signatures', () => {
       const sections = resolveReportSections(config({ type: 'summary' }));
       expect(sections.has('cover')).toBeTrue();
       expect(sections.has('executiveSummary')).toBeTrue();
       expect(sections.has('financial')).toBeTrue();
-      expect(sections.has('siteActivities')).toBeFalse();
+      expect(sections.has('documents')).toBeFalse();
     });
 
-    it('limits the progress report to scope/site-activity concerns', () => {
+    it('limits the progress report to cover/executive-summary/documents', () => {
       const sections = resolveReportSections(config({ type: 'progress' }));
-      expect(sections.has('scope')).toBeTrue();
-      expect(sections.has('siteActivities')).toBeTrue();
+      expect(sections.has('cover')).toBeTrue();
+      expect(sections.has('executiveSummary')).toBeTrue();
       expect(sections.has('documents')).toBeTrue();
       expect(sections.has('financial')).toBeFalse();
     });
@@ -40,8 +39,7 @@ describe('project-report-sections.util', () => {
     it('limits the financial report to money-relevant sections', () => {
       const sections = resolveReportSections(config({ type: 'financial' }));
       expect(sections.has('financial')).toBeTrue();
-      expect(sections.has('agreement')).toBeTrue();
-      expect(sections.has('siteActivities')).toBeFalse();
+      expect(sections.has('documents')).toBeFalse();
     });
 
     it('uses exactly the caller-selected sections for custom, nothing more', () => {

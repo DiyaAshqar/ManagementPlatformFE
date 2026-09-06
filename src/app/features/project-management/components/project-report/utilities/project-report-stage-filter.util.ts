@@ -66,11 +66,6 @@ export function filterSnapshotByStage(snapshot: ProjectReportSnapshot, stageId: 
     executiveSummary: {
       ...snapshot.executiveSummary,
       milestonesTotal: milestones.length,
-      keyMilestones: milestones.map((milestone) => ({
-        order: milestone.order,
-        name: milestone.name,
-        statusLabel: milestone.statusLabel ?? snapshot.executiveSummary.keyMilestones.find((k) => k.name === milestone.name)?.statusLabel ?? '—',
-      })),
     },
   };
 }

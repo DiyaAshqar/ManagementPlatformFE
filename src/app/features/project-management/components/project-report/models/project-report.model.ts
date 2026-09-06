@@ -13,9 +13,7 @@ export type ProjectReportSectionKey =
   | 'cover'
   | 'executiveSummary'
   | 'agreement'
-  | 'scope'
   | 'financial'
-  | 'siteActivities'
   | 'documents'
   | 'signatures';
 
@@ -23,9 +21,7 @@ export const PROJECT_REPORT_SECTION_KEYS: readonly ProjectReportSectionKey[] = [
   'cover',
   'executiveSummary',
   'agreement',
-  'scope',
   'financial',
-  'siteActivities',
   'documents',
   'signatures',
 ];
@@ -66,12 +62,6 @@ export interface ReportCoverData {
   asOfDate: Date;
 }
 
-export interface ReportKeyMilestone {
-  order: number;
-  name: string;
-  statusLabel: string;
-}
-
 export interface ReportExecutiveSummary {
   statusLabel: string;
   progressPercent: number;
@@ -86,45 +76,8 @@ export interface ReportExecutiveSummary {
   milestonesTotal: number;
   /** `null` — the backend does not currently expose per-milestone completion status; never fabricated as 0. */
   milestonesCompleted: Maybe<number>;
-  keyMilestones: ReportKeyMilestone[];
   /** Plain-text risk/blocker/missing-data notes, already localized. */
   risks: string[];
-}
-
-export interface ReportAgreementClientInfo {
-  contactPerson: Maybe<string>;
-  contactPersonPhone: Maybe<string>;
-  representerName: Maybe<string>;
-  representerPhone: Maybe<string>;
-}
-
-export interface ReportAgreementInfo {
-  available: boolean;
-  agreementNumber: Maybe<string>;
-  agreementDate: Maybe<Date>;
-  agreementType: Maybe<string>;
-  projectName: Maybe<string>;
-  description: Maybe<string>;
-  businessSector: Maybe<string>;
-  estimatedStartDate: Maybe<Date>;
-  estimatedEndDate: Maybe<Date>;
-  contractType: Maybe<string>;
-  contractModel: Maybe<string>;
-  /** `null` when unavailable OR when the current user lacks `Agreements.ViewPaymentDetails`. */
-  contractValue: Maybe<number>;
-  paymentDetailsAuthorized: boolean;
-  selectedServices: string[];
-  client: ReportAgreementClientInfo;
-  country: Maybe<string>;
-  city: Maybe<string>;
-  basinName: Maybe<string>;
-  basinNumber: Maybe<string>;
-  village: Maybe<string>;
-  directorate: Maybe<string>;
-  plotNumber: Maybe<string>;
-  floorNumber: Maybe<string>;
-  projectArea: Maybe<number>;
-  drillingQuantity: Maybe<number>;
 }
 
 export interface ReportAreaUnitRow {
@@ -144,6 +97,41 @@ export interface ReportMilestoneRow {
 export interface ReportScopeSection {
   areas: ReportAreaUnitRow[];
   milestones: ReportMilestoneRow[];
+}
+
+export interface ReportAgreementClientInfo {
+  contactPerson: Maybe<string>;
+  contactPersonPhone: Maybe<string>;
+  representerName: Maybe<string>;
+  representerPhone: Maybe<string>;
+}
+
+export interface ReportAgreementLandInfo {
+  plotNumber: Maybe<number>;
+  directorate: Maybe<string>;
+  village: Maybe<string>;
+  basinName: Maybe<string>;
+  basinNumber: Maybe<number>;
+  floorNumber: Maybe<number>;
+}
+
+export interface ReportAgreementContractInfo {
+  contractTypeLabel: Maybe<string>;
+  contractModelLabel: Maybe<string>;
+  monthlyFees: Maybe<number>;
+  percentageFees: Maybe<number>;
+}
+
+/** The agreement's own facts (wizard steps 1-2) — areas/milestones (steps 3-4) live in `ReportScopeSection`. */
+export interface ReportAgreementSection {
+  agreementDate: Maybe<Date>;
+  businessSector: Maybe<string>;
+  description: Maybe<string>;
+  drillingQuantity: Maybe<number>;
+  client: ReportAgreementClientInfo;
+  land: ReportAgreementLandInfo;
+  contract: ReportAgreementContractInfo;
+  services: string[];
 }
 
 export interface ReportFinancialSection {
@@ -237,7 +225,7 @@ export interface ProjectReportSnapshot {
   meta: ReportMetaInfo;
   cover: ReportCoverData;
   executiveSummary: ReportExecutiveSummary;
-  agreement: ReportAgreementInfo;
+  agreement: ReportAgreementSection;
   scope: ReportScopeSection;
   financial: ReportFinancialSection;
   schedule: ReportScheduleSection;

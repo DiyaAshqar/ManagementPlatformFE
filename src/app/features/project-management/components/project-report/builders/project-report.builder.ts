@@ -22,28 +22,6 @@ function date(value: Date | null | undefined, language: ProjectReportConfig['lan
   return value ? formatReportDate(value, language) : DASH;
 }
 
-interface TableColumn {
-  text: string;
-  align?: 'start' | 'center' | 'end';
-}
-
-/** Renders a semantic `<table>` with a repeating `<thead>` — browsers natively repeat `<thead>` rows across printed pages. */
-function table(columns: TableColumn[], rows: string[][], emptyLabel: string): string {
-  if (rows.length === 0) {
-    return `<p class="empty-state">${esc(emptyLabel)}</p>`;
-  }
-  const head = `<thead><tr>${columns
-    .map((c) => `<th style="text-align:${c.align ?? 'start'}">${esc(c.text)}</th>`)
-    .join('')}</tr></thead>`;
-  const body = `<tbody>${rows
-    .map(
-      (row) =>
-        `<tr>${row.map((value, i) => `<td style="text-align:${columns[i]?.align ?? 'start'}">${value}</td>`).join('')}</tr>`
-    )
-    .join('')}</tbody>`;
-  return `<table>${head}${body}</table>`;
-}
-
 function section(id: string, title: string, body: string): string {
   return `<section class="report-section" id="${id}"><h2>${esc(title)}</h2>${body}</section>`;
 }
@@ -56,18 +34,31 @@ function kpiCard(label: string, value: string): string {
   return `<div class="kpi-card"><span class="kpi-label">${esc(label)}</span><span class="kpi-value">${value}</span></div>`;
 }
 
+function factsTable(rows: Array<[string, string]>): string {
+  return `<table class="facts-table">${rows
+    .map(([label, value]) => `<tr><th style="text-align:start">${esc(label)}</th><td>${value}</td></tr>`)
+    .join('')}</table>`;
+}
+
 // ── Section builders ─────────────────────────────────────────────────────────
 
-function buildCover(snapshot: ProjectReportSnapshot, config: ProjectReportConfig, t: Translate): string {
-  const { cover } = snapshot;
-  const confidentialBadge = config.confidential
-    ? `<div class="confidential-badge">${esc(t('projectReport.cover.confidential'))}</div>`
-    : '';
+/** The company logo/name masthead — rendered ahead of the Executive Summary, before the rest of the cover page. */
+function buildCoverHeader(config: ProjectReportConfig, t: Translate): string {
   const logo =
     config.includeCompanyHeader && config.companyLogoDataUrl
       ? `<img class="cover-logo" src="${esc(config.companyLogoDataUrl)}" alt="" />`
       : '';
   const companyName = config.includeCompanyHeader ? `<div class="cover-company">${esc(t('projectReport.cover.companyName'))}</div>` : '';
+
+  return `<div class="cover-header-page"><div class="cover-header">${logo}${companyName}</div></div>`;
+}
+
+/** The rest of the cover page (title, project name, report type, meta table) — rendered after the Executive Summary. */
+function buildCoverBody(snapshot: ProjectReportSnapshot, config: ProjectReportConfig, t: Translate): string {
+  const { cover } = snapshot;
+  const confidentialBadge = config.confidential
+    ? `<div class="confidential-badge">${esc(t('projectReport.cover.confidential'))}</div>`
+    : '';
 
   const rows: Array<[string, string]> = [
     [t('projectReport.cover.projectNumber'), cell(cover.projectNumber)],
@@ -79,7 +70,6 @@ function buildCover(snapshot: ProjectReportSnapshot, config: ProjectReportConfig
   ];
 
   return `<div class="cover-page">
-    <div class="cover-header">${logo}${companyName}</div>
     ${confidentialBadge}
     <h1 class="cover-title">${esc(t('projectReport.cover.title'))}</h1>
     <h2 class="cover-project-name">${esc(cover.projectName)}</h2>
@@ -107,115 +97,101 @@ function buildExecutiveSummary(snapshot: ProjectReportSnapshot, config: ProjectR
     kpiCard(t('projectReport.summary.milestonesCompleted'), s.milestonesCompleted === null ? DASH : String(s.milestonesCompleted)),
   ].join('');
 
-  const milestonesRows = s.keyMilestones.map((m) => [String(m.order), cell(m.name), cell(m.statusLabel)]);
-  const milestonesTable = table(
-    [
-      { text: t('projectReport.summary.milestoneOrder'), align: 'center' },
-      { text: t('projectReport.summary.milestoneName') },
-      { text: t('projectReport.summary.milestoneStatus') },
-    ],
-    milestonesRows,
-    t('projectReport.common.noData')
-  );
-
-  const risks =
-    s.risks.length > 0
-      ? `<ul class="notes-list">${s.risks.map((r) => `<li>${esc(r)}</li>`).join('')}</ul>`
-      : `<p class="empty-state">${esc(t('projectReport.summary.noRisks'))}</p>`;
-
   return section(
     'executive-summary',
     t('projectReport.sections.executiveSummary'),
-    `<div class="kpi-grid">${cards}</div>
-     <h3>${esc(t('projectReport.summary.keyMilestones'))}</h3>
-     ${milestonesTable}
-     <h3>${esc(t('projectReport.summary.risksAndNotes'))}</h3>
-     ${risks}`
+    `<div class="kpi-grid">${cards}</div>`
   );
 }
 
+/** Renders the agreement's own facts (steps 1-2 of the wizard) plus the scope areas/milestones (steps 3-4). */
 function buildAgreement(snapshot: ProjectReportSnapshot, config: ProjectReportConfig, t: Translate): string {
   const a = snapshot.agreement;
-  if (!a.available) {
-    return section('agreement', t('projectReport.sections.agreement'), `<p class="empty-state">${esc(t('projectReport.missingData.noAgreement'))}</p>`);
-  }
+  const { areas, milestones } = snapshot.scope;
 
-  const facts: Array<[string, string]> = [
-    [t('projectReport.agreement.number'), cell(a.agreementNumber)],
-    [t('projectReport.agreement.date'), date(a.agreementDate, config.language)],
-    [t('projectReport.agreement.type'), cell(a.agreementType)],
-    [t('projectReport.agreement.projectName'), cell(a.projectName)],
+  const facts = factsTable([
+    [t('projectReport.agreement.agreementDate'), date(a.agreementDate, config.language)],
     [t('projectReport.agreement.businessSector'), cell(a.businessSector)],
-    [t('projectReport.agreement.estimatedStart'), date(a.estimatedStartDate, config.language)],
-    [t('projectReport.agreement.estimatedEnd'), date(a.estimatedEndDate, config.language)],
-    [t('projectReport.agreement.country'), cell(a.country)],
-    [t('projectReport.agreement.city'), cell(a.city)],
-    [t('projectReport.agreement.basin'), a.basinName || a.basinNumber ? `${cell(a.basinName)} ${cell(a.basinNumber)}` : DASH],
-    [t('projectReport.agreement.village'), cell(a.village)],
-    [t('projectReport.agreement.directorate'), cell(a.directorate)],
-    [t('projectReport.agreement.plotNumber'), cell(a.plotNumber)],
-    [t('projectReport.agreement.floorNumber'), cell(a.floorNumber)],
-    [t('projectReport.agreement.projectArea'), num(a.projectArea)],
     [t('projectReport.agreement.drillingQuantity'), num(a.drillingQuantity)],
-  ];
+    [t('projectReport.agreement.description'), cell(a.description)],
+  ]);
 
-  const paymentFacts = a.paymentDetailsAuthorized
-    ? [
-        [t('projectReport.agreement.contractType'), cell(a.contractType)],
-        [t('projectReport.agreement.contractModel'), cell(a.contractModel)],
-        [t('projectReport.agreement.contractValue'), num(a.contractValue)],
-      ]
-    : [[t('projectReport.agreement.contractValue'), t('projectReport.common.restricted')]];
+  const infoGrid = `<div class="ledger-grid">
+    <div class="ledger-block">
+      <h3>${esc(t('projectReport.agreement.client.title'))}</h3>
+      ${factsTable([
+        [t('projectReport.agreement.client.contactPerson'), cell(a.client.contactPerson)],
+        [t('projectReport.agreement.client.contactPersonPhone'), cell(a.client.contactPersonPhone)],
+        [t('projectReport.agreement.client.representerName'), cell(a.client.representerName)],
+        [t('projectReport.agreement.client.representerPhone'), cell(a.client.representerPhone)],
+      ])}
+    </div>
+    <div class="ledger-block">
+      <h3>${esc(t('projectReport.agreement.land.title'))}</h3>
+      ${factsTable([
+        [t('projectReport.agreement.land.plotNumber'), a.land.plotNumber === null ? DASH : String(a.land.plotNumber)],
+        [t('projectReport.agreement.land.directorate'), cell(a.land.directorate)],
+        [t('projectReport.agreement.land.village'), cell(a.land.village)],
+        [t('projectReport.agreement.land.basinName'), cell(a.land.basinName)],
+        [t('projectReport.agreement.land.basinNumber'), a.land.basinNumber === null ? DASH : String(a.land.basinNumber)],
+        [t('projectReport.agreement.land.floorNumber'), a.land.floorNumber === null ? DASH : String(a.land.floorNumber)],
+      ])}
+    </div>
+    <div class="ledger-block">
+      <h3>${esc(t('projectReport.agreement.contract.title'))}</h3>
+      ${factsTable([
+        [t('projectReport.agreement.contract.contractType'), cell(a.contract.contractTypeLabel)],
+        [t('projectReport.agreement.contract.contractModel'), cell(a.contract.contractModelLabel)],
+        [t('projectReport.agreement.contract.monthlyFees'), num(a.contract.monthlyFees)],
+        [
+          t('projectReport.agreement.contract.percentageFees'),
+          a.contract.percentageFees === null ? DASH : `${formatReportNumber(a.contract.percentageFees)}%`,
+        ],
+      ])}
+    </div>
+  </div>`;
 
-  const factsTable = `<table class="facts-table">${[...facts, ...paymentFacts]
-    .map(([label, value]) => `<tr><th style="text-align:start">${esc(label)}</th><td>${value}</td></tr>`)
-    .join('')}</table>`;
+  const servicesBlock =
+    a.services.length > 0
+      ? `<h3>${esc(t('projectReport.agreement.services'))}</h3><div class="chip-list">${a.services
+          .map((s) => `<span class="chip">${esc(s)}</span>`)
+          .join('')}</div>`
+      : '';
 
-  const description = a.description
-    ? `<p class="description">${esc(a.description)}</p>`
-    : '';
+  const areasBlock =
+    areas.length > 0
+      ? `<h3>${esc(t('projectReport.agreement.areas'))}</h3><table>
+        <thead><tr>
+          <th>${esc(t('projectReport.agreement.areaColumns.annex'))}</th>
+          <th>${esc(t('projectReport.agreement.areaColumns.amount'))}</th>
+          <th>${esc(t('projectReport.agreement.areaColumns.unit'))}</th>
+        </tr></thead>
+        <tbody>${areas
+          .map((row) => `<tr><td>${esc(row.annexName)}</td><td>${num(row.amount)}</td><td>${cell(row.unitName)}</td></tr>`)
+          .join('')}</tbody>
+      </table>`
+      : `<h3>${esc(t('projectReport.agreement.areas'))}</h3><p class="empty-state">${esc(t('projectReport.agreement.noAreas'))}</p>`;
 
-  const services =
-    a.selectedServices.length > 0
-      ? `<div class="chip-list">${a.selectedServices.map((sName) => `<span class="chip">${esc(sName)}</span>`).join('')}</div>`
-      : `<p class="empty-state">${esc(t('projectReport.common.noData'))}</p>`;
-
-  const client = a.client;
-  const clientTable = `<table class="facts-table">
-    <tr><th style="text-align:start">${esc(t('projectReport.agreement.contactPerson'))}</th><td>${cell(client.contactPerson)}${client.contactPersonPhone ? ` — ${cell(client.contactPersonPhone)}` : ''}</td></tr>
-    <tr><th style="text-align:start">${esc(t('projectReport.agreement.representative'))}</th><td>${cell(client.representerName)}${client.representerPhone ? ` — ${cell(client.representerPhone)}` : ''}</td></tr>
-  </table>`;
+  const milestonesBlock =
+    milestones.length > 0
+      ? `<h3>${esc(t('projectReport.agreement.milestones'))}</h3><table>
+        <thead><tr>
+          <th>${esc(t('projectReport.agreement.milestoneColumns.order'))}</th>
+          <th>${esc(t('projectReport.agreement.milestoneColumns.name'))}</th>
+          <th>${esc(t('projectReport.agreement.milestoneColumns.description'))}</th>
+        </tr></thead>
+        <tbody>${milestones
+          .slice()
+          .sort((x, y) => x.order - y.order)
+          .map((row) => `<tr><td>${row.order}</td><td>${esc(row.name)}</td><td>${cell(row.description)}</td></tr>`)
+          .join('')}</tbody>
+      </table>`
+      : `<h3>${esc(t('projectReport.agreement.milestones'))}</h3><p class="empty-state">${esc(t('projectReport.agreement.noMilestones'))}</p>`;
 
   return section(
     'agreement',
     t('projectReport.sections.agreement'),
-    `${description}
-     ${factsTable}
-     <h3>${esc(t('projectReport.agreement.client'))}</h3>
-     ${clientTable}
-     <h3>${esc(t('projectReport.agreement.services'))}</h3>
-     ${services}`
-  );
-}
-
-function buildScope(snapshot: ProjectReportSnapshot, t: Translate): string {
-  const { scope } = snapshot;
-  const areaRows = scope.areas.map((a) => [cell(a.annexName), num(a.amount), cell(a.unitName)]);
-  const areasTable = table(
-    [
-      { text: t('projectReport.scope.annex') },
-      { text: t('projectReport.scope.amount'), align: 'end' },
-      { text: t('projectReport.scope.unit') },
-    ],
-    areaRows,
-    t('projectReport.common.noData')
-  );
-
-  return section(
-    'scope',
-    t('projectReport.sections.scope'),
-    `<h3>${esc(t('projectReport.scope.areas'))}</h3>
-     ${areasTable}`
+    `${facts}${infoGrid}${servicesBlock}${areasBlock}${milestonesBlock}`
   );
 }
 
@@ -272,39 +248,6 @@ function buildFinancial(snapshot: ProjectReportSnapshot, t: Translate): string {
       : '';
 
   return section('financial', t('projectReport.sections.financial'), `${ledgers}${claimBlock}${notes}`);
-}
-
-function buildSiteActivities(snapshot: ProjectReportSnapshot, config: ProjectReportConfig, t: Translate): string {
-  const s = snapshot.siteActivities;
-  const taskRows = s.tasks.map((task) => [
-    cell(task.title),
-    cell(task.statusLabel),
-    cell(task.typeLabel),
-    cell(task.responsibility),
-    date(task.startDate, config.language),
-    date(task.endDate, config.language),
-    String(task.subtaskCount),
-  ]);
-  const tasksTable = table(
-    [
-      { text: t('projectReport.siteActivities.task') },
-      { text: t('projectReport.siteActivities.status') },
-      { text: t('projectReport.siteActivities.type') },
-      { text: t('projectReport.siteActivities.responsibility') },
-      { text: t('projectReport.siteActivities.startDate') },
-      { text: t('projectReport.siteActivities.endDate') },
-      { text: t('projectReport.siteActivities.subtasks'), align: 'center' },
-    ],
-    taskRows,
-    t('projectReport.common.noData')
-  );
-
-  return section(
-    'site-activities',
-    t('projectReport.sections.siteActivities'),
-    `<h3>${esc(t('projectReport.siteActivities.tasks'))}</h3>
-     ${tasksTable}`
-  );
 }
 
 function buildDocuments(snapshot: ProjectReportSnapshot, config: ProjectReportConfig, t: Translate): string {
@@ -375,7 +318,8 @@ function buildStyles(): string {
     .facts-table th { width: 32%; background: #fff; border: none; color: #64748b; font-weight: 500; }
     .facts-table td { border: none; border-bottom: 1px solid #f1f5f9; }
 
-    .cover-page { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 24mm 0; page-break-after: always; }
+    .cover-page { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 12mm 0 24mm; page-break-after: always; }
+    .cover-header-page { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 24mm 0 0; }
     .cover-header { display: flex; align-items: center; gap: 10px; margin-bottom: 24px; }
     .cover-logo { max-height: 56px; max-width: 200px; }
     .cover-company { font-size: 14px; font-weight: 700; color: #0f2f5f; }
@@ -432,32 +376,26 @@ export function buildProjectReportHtml(
 ): string {
   const dir = config.language === 'ar' ? 'rtl' : 'ltr';
 
-  const builders: Partial<Record<ProjectReportSectionKey, () => string>> = {
-    cover: () => buildCover(snapshot, config, t),
-    executiveSummary: () => buildExecutiveSummary(snapshot, config, t),
-    agreement: () => buildAgreement(snapshot, config, t),
-    scope: () => buildScope(snapshot, t),
-    // financial: () => (config.includeFinancial ? buildFinancial(snapshot, t) : ''), // disabled: commented out, not removed — re-enable when ready
-    siteActivities: () => buildSiteActivities(snapshot, config, t),
-    documents: () => (config.includePhotos ? buildDocuments(snapshot, config, t) : ''),
-    signatures: () => buildSignatures(snapshot, config, t),
-  };
+  const parts: string[] = [];
+  if (sections.has('cover')) {
+    parts.push(buildCoverHeader(config, t));
+    parts.push(buildCoverBody(snapshot, config, t));
+  }
+  if (sections.has('executiveSummary')) {
+    parts.push(buildExecutiveSummary(snapshot, config, t));
+  }
+  if (sections.has('agreement')) {
+    parts.push(buildAgreement(snapshot, config, t));
+  }
+  // financial: (config.includeFinancial ? buildFinancial(snapshot, t) : '') — disabled: commented out, not removed — re-enable when ready
+  if (sections.has('documents') && config.includePhotos) {
+    parts.push(buildDocuments(snapshot, config, t));
+  }
+  if (sections.has('signatures')) {
+    parts.push(buildSignatures(snapshot, config, t));
+  }
 
-  const orderedKeys: ProjectReportSectionKey[] = [
-    'cover',
-    'executiveSummary',
-    'agreement',
-    'scope',
-    'financial',
-    'siteActivities',
-    'documents',
-    'signatures',
-  ];
-
-  const body = orderedKeys
-    .filter((key) => sections.has(key))
-    .map((key) => builders[key]?.() ?? '')
-    .join('\n');
+  const body = parts.join('\n');
 
   const footer = `<div class="report-footer">${esc(
     t('projectReport.footer.generated', {
