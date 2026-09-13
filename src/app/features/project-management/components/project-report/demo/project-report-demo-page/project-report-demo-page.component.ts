@@ -108,6 +108,7 @@ export class ProjectReportDemoPageComponent {
   includeDocuments = true;
   includePhotos = true;
   includeSignatures = true;
+  includePercentageFees = true;
   confidential = false;
   customSections: ProjectReportSectionKey[] = [...PROJECT_REPORT_SECTION_KEYS];
 
@@ -153,6 +154,7 @@ export class ProjectReportDemoPageComponent {
       includeDocuments: this.includeDocuments,
       includePhotos: this.includePhotos,
       includeSignatures: this.includeSignatures,
+      includePercentageFees: this.includePercentageFees,
       confidential: this.confidential,
       customSections: this.customSections,
       companyLogoDataUrl: undefined,
@@ -187,14 +189,11 @@ export class ProjectReportDemoPageComponent {
    * report's closing sections, so those closing sections stay last on the
    * page. Falls back to right before the footer, then right before
    * `</body>`, on the (should-never-happen) chance neither the signatures nor
-   * documents section is present. Wrapped in its own bordered, labeled block
-   * so it reads as clearly separate from the report content around it, not a
-   * continuation of the report.
+   * documents section is present.
    */
   private injectStageDataTables(html: string): string {
     const rawFragment = buildStageDataTablesHtml(REAL_STAGE_NAME);
-    const fragment = `<div style="margin-top:36px;padding-top:22px;border-top:3px dashed #cbd5e1;">
-      <div style="font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#94a3b8;margin-bottom:10px;">بيانات تحقّق إضافية (خارج التقرير الرسمي) — Demo Only</div>
+    const fragment = `<div style="margin-top:36px;padding-top:22px;">
       ${rawFragment}
     </div>`;
     const signaturesStart = html.indexOf('<section class="report-section" id="signatures"');

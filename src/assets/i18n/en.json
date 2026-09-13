@@ -566,6 +566,7 @@
       "includeDocuments": "Include documents",
       "includePhotos": "Include progress photos",
       "includeSignatures": "Include signatures",
+      "includePercentageFees": "Show percentage fees",
       "confidential": "Mark as confidential",
       "customSections": "Sections to include",
       "generating": "Generating report…",
@@ -1749,8 +1750,16 @@
       "milestonesCompleted": "Milestones Completed"
     },
     "agreement": {
+      "projectNumber": "Project Number",
+      "projectName": "Project Name",
       "agreementDate": "Agreement Date",
+      "agreementType": "Agreement Type",
       "businessSector": "Business Sector",
+      "estimatedStartDate": "Estimated Start Date",
+      "estimatedEndDate": "Estimated End Date",
+      "country": "Country",
+      "city": "City",
+      "projectArea": "Project Area",
       "drillingQuantity": "Excavation Quantity",
       "description": "Description",
       "client": {

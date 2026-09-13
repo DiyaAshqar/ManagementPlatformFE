@@ -92,6 +92,10 @@
         <label for="demoSignatures">تضمين التوقيعات</label>
       </div>
       <div class="toggle-item">
+        <p-checkbox [(ngModel)]="includePercentageFees" [binary]="true" inputId="demoPercentageFees" (onChange)="refresh()"></p-checkbox>
+        <label for="demoPercentageFees">إظهار نسبة الأتعاب</label>
+      </div>
+      <div class="toggle-item">
         <p-checkbox [(ngModel)]="confidential" [binary]="true" inputId="demoConfidential" (onChange)="refresh()"></p-checkbox>
         <label for="demoConfidential">تصنيف كوثيقة سرية</label>
       </div>

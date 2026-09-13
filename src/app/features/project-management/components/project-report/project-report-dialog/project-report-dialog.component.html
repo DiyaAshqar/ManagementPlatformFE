@@ -80,6 +80,10 @@
       <label for="rptSignatures">{{ 'projectDetail.printDialog.includeSignatures' | translate }}</label>
     </div>
     <div class="toggle-item">
+      <p-checkbox [(ngModel)]="includePercentageFees" [binary]="true" inputId="rptPercentageFees"></p-checkbox>
+      <label for="rptPercentageFees">{{ 'projectDetail.printDialog.includePercentageFees' | translate }}</label>
+    </div>
+    <div class="toggle-item">
       <p-checkbox [(ngModel)]="confidential" [binary]="true" inputId="rptConfidential"></p-checkbox>
       <label for="rptConfidential">{{ 'projectDetail.printDialog.confidential' | translate }}</label>
     </div>

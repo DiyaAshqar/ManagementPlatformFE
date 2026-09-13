@@ -201,8 +201,16 @@ export function buildDemoSnapshot(): ProjectReportSnapshot {
     // (step 1), agreementPaymentDto + services (step 2, lookups joined), and mileStonesDto (step 3), sourced
     // verbatim from live backend responses.
     agreement: {
+      projectNumber: 'PRJ-2026-014',
+      projectName: 'فيلا محمد العساف',
       agreementDate: new Date(2026, 4, 4),
+      agreementTypeLabel: 'Management',
       businessSector: 'سكني',
+      estimatedStartDate: new Date(2026, 4, 9),
+      estimatedEndDate: new Date(2027, 8, 30),
+      country: 'Jordan',
+      city: 'Amman',
+      projectArea: 1250,
       description: 'فيلا سكنية 3 طوابق وررف وأعمال لاندسكيب وتشطيبات داخلية',
       drillingQuantity: 1000,
       client: {
@@ -363,8 +371,16 @@ export function buildDemoSnapshotPartialFailure(): ProjectReportSnapshot {
     ...snapshot,
     meta: { ...snapshot.meta, failedSections: ['Agreement', 'AgreementAttachments'] },
     agreement: {
+      projectNumber: null,
+      projectName: null,
       agreementDate: null,
+      agreementTypeLabel: null,
       businessSector: null,
+      estimatedStartDate: null,
+      estimatedEndDate: null,
+      country: null,
+      city: null,
+      projectArea: null,
       description: null,
       drillingQuantity: null,
       client: { contactPerson: null, contactPersonPhone: null, representerName: null, representerPhone: null },

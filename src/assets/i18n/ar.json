@@ -562,6 +562,7 @@
       "includeDocuments": "تضمين المستندات",
       "includePhotos": "تضمين صور سير العمل",
       "includeSignatures": "تضمين التوقيعات",
+      "includePercentageFees": "إظهار نسبة الأتعاب",
       "confidential": "تصنيف كوثيقة سرية",
       "customSections": "الأقسام المطلوب تضمينها",
       "generating": "جارٍ إعداد التقرير…",
@@ -1745,8 +1746,16 @@
       "milestonesCompleted": "المراحل المكتملة"
     },
     "agreement": {
+      "projectNumber": "رقم المشروع",
+      "projectName": "اسم المشروع",
       "agreementDate": "تاريخ الاتفاقية",
+      "agreementType": "نوع الاتفاقية",
       "businessSector": "القطاع",
+      "estimatedStartDate": "تاريخ البدء المتوقع",
+      "estimatedEndDate": "تاريخ الانتهاء المتوقع",
+      "country": "الدولة",
+      "city": "المدينة",
+      "projectArea": "مساحة المشروع",
       "drillingQuantity": "كمية الحفر",
       "description": "الوصف",
       "client": {

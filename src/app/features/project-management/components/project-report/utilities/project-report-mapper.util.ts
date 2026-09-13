@@ -358,8 +358,16 @@ export function buildProjectReportSnapshot(input: RawProjectReportInputs): Proje
       risks: missingDataNotes,
     },
     agreement: {
+      projectNumber: toMaybeString(agreement?.agreementDto?.projectNumber),
+      projectName: toMaybeString(agreement?.agreementDto?.projectName),
       agreementDate: toMaybeDate(agreement?.agreementDto?.agreementDate),
+      agreementTypeLabel: lookupName(lookups, LookupType.AgreementType, agreement?.agreementDto?.agreementTypeId),
       businessSector: toMaybeString(agreement?.agreementDto?.businessSector),
+      estimatedStartDate: toMaybeDate(agreement?.agreementDto?.estimatedStartDate),
+      estimatedEndDate: toMaybeDate(agreement?.agreementDto?.estimatedEndDate),
+      country: lookupName(lookups, LookupType.Country, agreement?.agreementDto?.countryId),
+      city: lookupName(lookups, LookupType.City, agreement?.agreementDto?.cityId),
+      projectArea: toMaybeNumber(agreement?.agreementDto?.projectArea),
       description: toMaybeString(agreement?.agreementDto?.description),
       drillingQuantity: toMaybeNumber(agreement?.agreementDto?.drillingQuantity),
       client: {

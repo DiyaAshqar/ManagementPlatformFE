@@ -80,6 +80,7 @@ export class ProjectReportDialogComponent implements OnChanges {
   includeDocuments = true;
   includePhotos = true;
   includeSignatures = true;
+  includePercentageFees = true;
   confidential = false;
   customSections: ProjectReportSectionKey[] = [...PROJECT_REPORT_SECTION_KEYS];
 
@@ -132,6 +133,7 @@ export class ProjectReportDialogComponent implements OnChanges {
     this.includeDocuments = this.canViewDocuments;
     this.includePhotos = this.canViewDocuments;
     this.includeSignatures = true;
+    this.includePercentageFees = true;
     this.confidential = false;
     this.customSections = [...PROJECT_REPORT_SECTION_KEYS];
     this.errorMessage.set(null);
@@ -175,6 +177,7 @@ export class ProjectReportDialogComponent implements OnChanges {
       includeDocuments: this.includeDocuments && this.canViewDocuments,
       includePhotos: this.includePhotos && this.canViewDocuments,
       includeSignatures: this.includeSignatures,
+      includePercentageFees: this.includePercentageFees,
       confidential: this.confidential,
       customSections: this.customSections,
     };

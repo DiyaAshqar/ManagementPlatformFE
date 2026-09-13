@@ -487,6 +487,265 @@ function buildTask(): string {
   );
 }
 
+/**
+ * "مساحة الاهتمام" — a flat list of scope-of-interest items agreed on with
+ * contractors/suppliers at the agreement stage. Each numbered item in the
+ * source document is one row; the columns below are the shape this data
+ * will take once it is wired to a real backend endpoint: start/end dates,
+ * title, description, the assignee's name, the task-type name, the
+ * responsibility side, and the main contractor's name.
+ */
+function buildAreasOfInterest(): string {
+  interface AreaOfInterestRow {
+    title: string;
+    description: string;
+    assignedToName: string | null;
+    taskTypeName: string;
+    responsibility: string | null;
+    mainContractorName: string | null;
+    startDate: Date;
+    endDate: Date;
+  }
+
+  const items: AreaOfInterestRow[] = [
+    {
+      title: 'تجهيزات لوجستية',
+      description: 'تجهيزات لوجستية للمشروع, كرفان, غرفة عمال وحارس, تنكات مياه, كهرباء للمشروع..الخ.',
+      assignedToName: 'Eng. Rami Salameh',
+      taskTypeName: 'تجهيزات',
+      responsibility: 'contractor',
+      mainContractorName: 'شركة محمد ثلجي وشركاؤه',
+      startDate: new Date(2026, 4, 4),
+      endDate: new Date(2026, 4, 9),
+    },
+    {
+      title: 'رخصة المساح',
+      description: 'الاتفاق مع مساح مرخص لتنزيل حدود البناء والحفر والقواعد ومحاور الأعمدة وكل ما يلزم لإنجاز أعمال العظم بدقة.',
+      assignedToName: 'ibrahim',
+      taskTypeName: 'مساحة',
+      responsibility: 'consultant',
+      mainContractorName: null,
+      startDate: new Date(2026, 4, 9),
+      endDate: new Date(2026, 4, 10),
+    },
+    {
+      title: 'اتفاق مقاول الحفر',
+      description: 'اتفاق الحفر مع مقاول الحفر.',
+      assignedToName: null,
+      taskTypeName: 'حفر',
+      responsibility: 'contractor',
+      mainContractorName: 'شركة محمد ثلجي وشركاؤه',
+      startDate: new Date(2026, 4, 10),
+      endDate: new Date(2026, 4, 17),
+    },
+    {
+      title: 'عقد مقاول العظم الرئيسي',
+      description: 'الاتفاق مع مقاول العظم الرئيسي (مصانعة), وقيمة عقده الأولية 80,000 دينار أردني.',
+      assignedToName: 'Eng. Rami Salameh',
+      taskTypeName: 'عقد مقاولة',
+      responsibility: 'contractor',
+      mainContractorName: 'شركة محمد ثلجي وشركاؤه',
+      startDate: new Date(2026, 4, 17),
+      endDate: new Date(2027, 2, 1),
+    },
+    {
+      title: 'عقد حفر المبنى الخارجي',
+      description: 'الاتفاق مع مقاول حفر لأعمال المبنى الخارجية وقيمة عقده 2000 دينار أردني.',
+      assignedToName: null,
+      taskTypeName: 'حفر',
+      responsibility: 'contractor',
+      mainContractorName: 'جهاد الشويكي.',
+      startDate: new Date(2026, 5, 24),
+      endDate: new Date(2026, 5, 23),
+    },
+    {
+      title: 'عقد أعمال العزل',
+      description: 'الاتفاق مع مقاول أعمال العزل للمشروع.',
+      assignedToName: null,
+      taskTypeName: 'عزل',
+      responsibility: 'contractor',
+      mainContractorName: null,
+      startDate: new Date(2026, 6, 1),
+      endDate: new Date(2026, 6, 15),
+    },
+    {
+      title: 'تأسيس وتنفيذ MEP للسباحة',
+      description: 'الاتفاق مع مقاول لتنفيذ وتأسيس اعمال MEP لبركة السباحة وقيمة عقده 2100 دينار أردني.',
+      assignedToName: 'werwe',
+      taskTypeName: 'MEP',
+      responsibility: 'contractor',
+      mainContractorName: null,
+      startDate: new Date(2026, 6, 20),
+      endDate: new Date(2026, 7, 10),
+    },
+    {
+      title: 'توريد الباطون الجاهز',
+      description: 'اتفاق مع مورد الباطون: شركة المملكة للباطون الجاهز, على سعر المتر المكعب الواحد كسر 150 بسعر 46 دينار, وكسر 210 بسعر 48 دينار أردني, وكسر 250 بسعر 50 دينار, وكسر 300 بسعر 53 دينار.',
+      assignedToName: null,
+      taskTypeName: 'توريد مواد',
+      responsibility: 'supplier',
+      mainContractorName: null,
+      startDate: new Date(2026, 4, 9),
+      endDate: new Date(2027, 2, 1),
+    },
+    {
+      title: 'توريد الحديد',
+      description: 'الاتفاق مع مورد الحديد " شركة الدميسي ".',
+      assignedToName: null,
+      taskTypeName: 'توريد مواد',
+      responsibility: 'supplier',
+      mainContractorName: null,
+      startDate: new Date(2026, 4, 9),
+      endDate: new Date(2027, 2, 1),
+    },
+    {
+      title: 'توريد الطوب',
+      description: 'الاتفاق مع شركة المتأهب للطوب الحديث لتوريد كميات الطوب للفيلا كاملة.',
+      assignedToName: null,
+      taskTypeName: 'توريد مواد',
+      responsibility: 'supplier',
+      mainContractorName: null,
+      startDate: new Date(2026, 4, 14),
+      endDate: new Date(2027, 2, 1),
+    },
+    {
+      title: 'عقد MEP الكامل',
+      description: 'الاتفاق مع شركة ريتال للمقاولات لتنفيذ اعمال MEP للفيلا كاملة بقيمة تعاقدية أولية 108265 دينار أردني.',
+      assignedToName: 'Eng. Rami Salameh',
+      taskTypeName: 'عقد مقاولة',
+      responsibility: 'contractor',
+      mainContractorName: 'ريتال للمقاولات',
+      startDate: new Date(2026, 6, 8),
+      endDate: new Date(2027, 5, 1),
+    },
+    {
+      title: 'توريد حجر المحسيري',
+      description: 'الاتفاق مع مورد الحجر لتوريد حجر "نشأت المحسيري" معان نخب أول معدل تربيعه ارتفاع 51,5سم نوع مطبة خشن+كرانيش حجر معان نخب أول لكامل الفيلا وبقيمة تعاقدية أولية للمبنى: 116000 دينار, على أن تكيف الأعمال للمبنى على الراكب كل نهاية عقدة.',
+      assignedToName: null,
+      taskTypeName: 'توريد مواد',
+      responsibility: 'supplier',
+      mainContractorName: null,
+      startDate: new Date(2026, 6, 21),
+      endDate: new Date(2027, 5, 30),
+    },
+  ];
+
+  const rows = items.map((item, index) => [
+    String(index + 1),
+    esc(item.title),
+    esc(item.description),
+    item.assignedToName ? esc(item.assignedToName) : '—',
+    esc(item.taskTypeName),
+    item.responsibility ? esc(TASK_RESPONSIBILITY_LABELS[item.responsibility] ?? item.responsibility) : '—',
+    item.mainContractorName ? esc(item.mainContractorName) : '—',
+    `${d(item.startDate)} → ${d(item.endDate)}`,
+  ]);
+
+  return tableBlock(
+    '#0891b2',
+    'AOI',
+    'مساحة الاهتمام — Areas of Interest',
+    `بنود نطاق العمل المتفق عليها مع المقاولين والموردين (${items.length} عنصر)`,
+    [
+      { text: '#', align: 'center' },
+      { text: 'العنوان' },
+      { text: 'الوصف' },
+      { text: 'المكلّف' },
+      { text: 'نوع البند' },
+      { text: 'المسؤولية' },
+      { text: 'المقاول الرئيسي' },
+      { text: 'الفترة' },
+    ],
+    rows,
+    'إجمالي البنود',
+    String(items.length)
+  );
+}
+
+/**
+ * "بند التوفير" — savings/cost-avoidance line items recorded at the
+ * agreement stage (e.g. work the client no longer needs to pay for because
+ * it was avoided). Each bullet in the source document is one row: an item
+ * description paired with its saved amount.
+ */
+function buildSavingsItems(): string {
+  interface SavingsRow {
+    description: string;
+    amount: number;
+  }
+
+  const items: SavingsRow[] = [
+    { description: 'توفير عدم ازالة الطمم', amount: 3000 },
+    { description: 'توفير عدم جلب طمم جديد', amount: 2400 },
+  ];
+
+  const rows = items.map((item, index) => [String(index + 1), esc(item.description), `<b>${n(item.amount)}</b>`]);
+
+  return tableBlock(
+    '#65a30d',
+    'SAVE',
+    'بند التوفير — Savings Items',
+    `بنود التوفير المسجّلة لهذه الاتفاقية (${items.length} عنصر)`,
+    [
+      { text: '#', align: 'center' },
+      { text: 'البند' },
+      { text: 'المبلغ الموفَّر', align: 'end' },
+    ],
+    rows,
+    'إجمالي التوفير',
+    n(items.reduce((total, item) => total + item.amount, 0))
+  );
+}
+
+/**
+ * "WIR check list" — a literal transcription of a real `PaymentFlows`
+ * response (owner cash payments), pending the dedicated WIR endpoint. Each
+ * record in `data.data` is one row.
+ */
+function buildWirChecklist(): string {
+  interface WirRow {
+    cash: number;
+    paymentMethodName: string;
+    currencyAbb: string;
+    notes: string | null;
+    createdAt: Date;
+  }
+
+  const items: WirRow[] = [
+    { cash: 55555.0, paymentMethodName: 'Cash', currencyAbb: 'JOD', notes: null, createdAt: new Date('2026-07-05T21:02:54.053') },
+    { cash: 40000.0, paymentMethodName: 'Bank Transfer', currencyAbb: 'JOD', notes: 'الدفعة الثانية من أعمال تنفيذ مشروع الفيلا', createdAt: new Date('2026-06-14T21:00:00') },
+    { cash: 30000.0, paymentMethodName: 'Bank Transfer', currencyAbb: 'JOD', notes: 'second payment', createdAt: new Date('2026-05-17T18:44:37.36') },
+    { cash: 20000.0, paymentMethodName: 'Bank Transfer', currencyAbb: 'JOD', notes: 'first payment', createdAt: new Date('2026-05-10T21:00:00') },
+  ];
+
+  const rows = items.map((item, index) => [
+    String(index + 1),
+    `<b>${n(item.cash)}</b>`,
+    esc(item.currencyAbb),
+    esc(item.paymentMethodName),
+    item.notes ? esc(item.notes) : '—',
+    d(item.createdAt),
+  ]);
+
+  return tableBlock(
+    '#7c3aed',
+    'WIR',
+    'قائمة فحص WIR — WIR Check List',
+    `سجلات الدفع المرتبطة بهذه القائمة (${items.length} عنصر)`,
+    [
+      { text: '#', align: 'center' },
+      { text: 'المبلغ', align: 'end' },
+      { text: 'العملة' },
+      { text: 'طريقة الدفع' },
+      { text: 'ملاحظات' },
+      { text: 'تاريخ الإنشاء' },
+    ],
+    rows,
+    'الإجمالي',
+    n(items.reduce((total, item) => total + item.cash, 0))
+  );
+}
+
 const STYLES = `
 .sdt-wrap { margin: 0 0 18px; }
 .sdt-wrap h1 { font-size: 16px; color: #0f2f5f; margin: 0 0 2px; }
@@ -537,5 +796,8 @@ export function buildStageDataTablesHtml(stageName: string): string {
     ${buildVo()}
     ${buildExp()}
     ${buildTask()}
+    ${buildAreasOfInterest()}
+    ${buildSavingsItems()}
+    ${buildWirChecklist()}
   </div>`;
 }

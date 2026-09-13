@@ -37,6 +37,8 @@ export interface ProjectReportConfig {
   includeDocuments: boolean;
   includePhotos: boolean;
   includeSignatures: boolean;
+  /** Shows/hides the contract's percentage-fees figure within the Agreement Details section. */
+  includePercentageFees: boolean;
   confidential: boolean;
   /** Only consulted when `type === 'custom'`. */
   customSections: ProjectReportSectionKey[];
@@ -124,8 +126,16 @@ export interface ReportAgreementContractInfo {
 
 /** The agreement's own facts (wizard steps 1-2) — areas/milestones (steps 3-4) live in `ReportScopeSection`. */
 export interface ReportAgreementSection {
+  projectNumber: Maybe<string>;
+  projectName: Maybe<string>;
   agreementDate: Maybe<Date>;
+  agreementTypeLabel: Maybe<string>;
   businessSector: Maybe<string>;
+  estimatedStartDate: Maybe<Date>;
+  estimatedEndDate: Maybe<Date>;
+  country: Maybe<string>;
+  city: Maybe<string>;
+  projectArea: Maybe<number>;
   description: Maybe<string>;
   drillingQuantity: Maybe<number>;
   client: ReportAgreementClientInfo;

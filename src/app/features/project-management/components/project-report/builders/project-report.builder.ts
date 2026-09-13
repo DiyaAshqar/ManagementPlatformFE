@@ -110,8 +110,16 @@ function buildAgreement(snapshot: ProjectReportSnapshot, config: ProjectReportCo
   const { areas, milestones } = snapshot.scope;
 
   const facts = factsTable([
+    [t('projectReport.agreement.projectNumber'), cell(a.projectNumber)],
+    [t('projectReport.agreement.projectName'), cell(a.projectName)],
     [t('projectReport.agreement.agreementDate'), date(a.agreementDate, config.language)],
+    [t('projectReport.agreement.agreementType'), cell(a.agreementTypeLabel)],
     [t('projectReport.agreement.businessSector'), cell(a.businessSector)],
+    [t('projectReport.agreement.estimatedStartDate'), date(a.estimatedStartDate, config.language)],
+    [t('projectReport.agreement.estimatedEndDate'), date(a.estimatedEndDate, config.language)],
+    [t('projectReport.agreement.country'), cell(a.country)],
+    [t('projectReport.agreement.city'), cell(a.city)],
+    [t('projectReport.agreement.projectArea'), num(a.projectArea)],
     [t('projectReport.agreement.drillingQuantity'), num(a.drillingQuantity)],
     [t('projectReport.agreement.description'), cell(a.description)],
   ]);
@@ -143,10 +151,14 @@ function buildAgreement(snapshot: ProjectReportSnapshot, config: ProjectReportCo
         [t('projectReport.agreement.contract.contractType'), cell(a.contract.contractTypeLabel)],
         [t('projectReport.agreement.contract.contractModel'), cell(a.contract.contractModelLabel)],
         [t('projectReport.agreement.contract.monthlyFees'), num(a.contract.monthlyFees)],
-        [
-          t('projectReport.agreement.contract.percentageFees'),
-          a.contract.percentageFees === null ? DASH : `${formatReportNumber(a.contract.percentageFees)}%`,
-        ],
+        ...(config.includePercentageFees
+          ? ([
+              [
+                t('projectReport.agreement.contract.percentageFees'),
+                a.contract.percentageFees === null ? DASH : `${formatReportNumber(a.contract.percentageFees)}%`,
+              ],
+            ] as Array<[string, string]>)
+          : []),
       ])}
     </div>
   </div>`;
