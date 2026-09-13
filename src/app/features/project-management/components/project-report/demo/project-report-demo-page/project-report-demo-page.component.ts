@@ -27,7 +27,7 @@ import {
 } from '../../utilities/project-report-stage-filter.util';
 import { resolveTranslationKey } from '../../utilities/project-report-translate.util';
 import { buildDemoSnapshot, buildDemoSnapshotPartialFailure, buildDemoSnapshotRestricted, REAL_STAGE_NAME } from '../project-report-demo-data';
-import { buildStageDataTablesHtml } from '../project-report-demo-stage-tables';
+import { buildStageDataTablesHtml, StageDataTableKey, StageDataTableOption, STAGE_DATA_TABLE_OPTIONS } from '../project-report-demo-stage-tables';
 
 interface Option<V> {
   label: string;
@@ -35,6 +35,30 @@ interface Option<V> {
 }
 
 type DemoScenario = 'rich' | 'restricted' | 'partialFailure';
+
+/** The 10 extra raw-data tables plus the official report's Documents/Photos section — the full set of toggleable data-type cards. */
+type DataTypeCardKey = StageDataTableKey | 'photos';
+
+interface DataTypeCard {
+  key: DataTypeCardKey;
+  badge: string;
+  color: string;
+  icon: string;
+  titleAr: string;
+  subtitleAr: string;
+  descriptionAr: string;
+}
+
+/** Synthetic card for the official report's Documents/Photos section — toggles `includePhotos` like the other data-type cards. */
+const PHOTOS_CARD: DataTypeCard = {
+  key: 'photos',
+  badge: 'IMG',
+  color: '#e11d48',
+  icon: 'pi-images',
+  titleAr: 'صور سير العمل',
+  subtitleAr: 'Progress Photos',
+  descriptionAr: 'صور توثيق تنفيذ الأعمال',
+};
 
 /** Arabic labels for the report-type select — hardcoded (not `| translate`) so this demo page always renders in Arabic regardless of the app's active UI language. */
 const REPORT_TYPE_LABELS_AR: Record<ProjectReportType, string> = {
@@ -96,6 +120,10 @@ export class ProjectReportDemoPageComponent {
     value,
   }));
 
+  readonly dataTypeCards: DataTypeCard[] = [...STAGE_DATA_TABLE_OPTIONS, PHOTOS_CARD];
+  /** Which of the extra raw-data tables render in the preview (photos is tracked separately via `includePhotos`) — all enabled by default. */
+  enabledStageTables = new Set<StageDataTableKey>(STAGE_DATA_TABLE_OPTIONS.map((o) => o.key));
+
   stageOptions: Option<string>[] = [];
 
   scenario: DemoScenario = 'rich';
@@ -122,6 +150,21 @@ export class ProjectReportDemoPageComponent {
 
   get isCustom(): boolean {
     return this.selectedType === 'custom';
+  }
+
+  isCardSelected(key: DataTypeCardKey): boolean {
+    return key === 'photos' ? this.includePhotos : this.enabledStageTables.has(key);
+  }
+
+  toggleCard(key: DataTypeCardKey): void {
+    if (key === 'photos') {
+      this.includePhotos = !this.includePhotos;
+    } else if (this.enabledStageTables.has(key)) {
+      this.enabledStageTables.delete(key);
+    } else {
+      this.enabledStageTables.add(key);
+    }
+    this.refresh();
   }
 
   /** Rebuilds the Milestone Stage picker from whichever scenario is currently selected, resetting the selection if it no longer exists. */
@@ -192,7 +235,7 @@ export class ProjectReportDemoPageComponent {
    * documents section is present.
    */
   private injectStageDataTables(html: string): string {
-    const rawFragment = buildStageDataTablesHtml(REAL_STAGE_NAME);
+    const rawFragment = buildStageDataTablesHtml(REAL_STAGE_NAME, this.enabledStageTables);
     const fragment = `<div style="margin-top:36px;padding-top:22px;">
       ${rawFragment}
     </div>`;

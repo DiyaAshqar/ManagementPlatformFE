@@ -777,27 +777,61 @@ const STYLES = `
 .sdt-lock { display: inline-block; margin-inline-start: 4px; background: #fee2e2; color: #991b1b; border-radius: 4px; padding: 1px 5px; font-size: 8px; font-weight: 700; }
 `;
 
+export type StageDataTableKey = 'boq' | 'pmc' | 'po' | 'sv' | 'vo' | 'exp' | 'task' | 'aoi' | 'save' | 'wir';
+
+/** Card metadata for the data-type picker (icon/badge/color/labels) — drives the demo page's selection UI. */
+export interface StageDataTableOption {
+  key: StageDataTableKey;
+  badge: string;
+  color: string;
+  icon: string;
+  titleAr: string;
+  subtitleAr: string;
+  descriptionAr: string;
+}
+
+export const STAGE_DATA_TABLE_OPTIONS: StageDataTableOption[] = [
+  { key: 'boq', badge: 'BOQ', color: '#2563eb', icon: 'pi-list', titleAr: 'كشف الكميات', subtitleAr: 'Bill of Quantities', descriptionAr: 'المواد والكميات' },
+  { key: 'pmc', badge: 'PMC', color: '#16a34a', icon: 'pi-building', titleAr: 'المقاولون الرئيسيون', subtitleAr: 'Main Contractors', descriptionAr: 'عقود المشروع الرئيسية' },
+  { key: 'po', badge: 'PO', color: '#d97706', icon: 'pi-shopping-cart', titleAr: 'أوامر الشراء', subtitleAr: 'Purchase Orders', descriptionAr: 'أوامر الشراء الصادرة' },
+  { key: 'sv', badge: 'SV', color: '#9333ea', icon: 'pi-map-marker', titleAr: 'زيارات المساحة', subtitleAr: 'Surveying Visits', descriptionAr: 'سجلات زيارات الموقع' },
+  { key: 'vo', badge: 'VO', color: '#db2777', icon: 'pi-file-edit', titleAr: 'أوامر التغيير', subtitleAr: 'Variation Orders', descriptionAr: 'أوامر التغيير المعتمدة' },
+  { key: 'exp', badge: 'EXP', color: '#dc2626', icon: 'pi-wallet', titleAr: 'المصروفات', subtitleAr: 'Expenses', descriptionAr: 'مصروفات المشروع' },
+  { key: 'task', badge: 'TASK', color: '#0d9488', icon: 'pi-check-square', titleAr: 'المهام', subtitleAr: 'Tasks', descriptionAr: 'مهام المرحلة' },
+  { key: 'aoi', badge: 'AOI', color: '#0891b2', icon: 'pi-star', titleAr: 'مساحة الاهتمام', subtitleAr: 'Areas of Interest', descriptionAr: 'بنود نطاق العمل' },
+  { key: 'save', badge: 'SAVE', color: '#65a30d', icon: 'pi-percentage', titleAr: 'بند التوفير', subtitleAr: 'Savings Items', descriptionAr: 'بنود التوفير المتفق عليها' },
+  { key: 'wir', badge: 'WIR', color: '#7c3aed', icon: 'pi-verified', titleAr: 'قائمة فحص WIR', subtitleAr: 'WIR Check List', descriptionAr: 'سجلات فحص/دفع مرتبطة' },
+];
+
+const TABLE_BUILDERS: Record<StageDataTableKey, () => string> = {
+  boq: buildBoq,
+  pmc: buildPmc,
+  po: buildPo,
+  sv: buildSv,
+  vo: buildVo,
+  exp: buildExp,
+  task: buildTask,
+  aoi: buildAreasOfInterest,
+  save: buildSavingsItems,
+  wir: buildWirChecklist,
+};
+
 /**
  * Full raw-data breakdown for the demo's one real Milestone Stage, as
- * color-coded stacked tables — BOQ, Main Contractors, Purchase Orders,
- * Surveying Visits, Variation Orders, Expenses, then Tasks, in that
- * order. Returned as a self-contained fragment (its own `<style>` plus a
- * wrapper `<div>`) meant to be spliced into the generated report HTML.
+ * color-coded stacked tables. Only the tables whose key is present in
+ * `enabledKeys` are rendered, in `STAGE_DATA_TABLE_OPTIONS` order.
+ * Returned as a self-contained fragment (its own `<style>` plus a wrapper
+ * `<div>`) meant to be spliced into the generated report HTML.
  */
-export function buildStageDataTablesHtml(stageName: string): string {
+export function buildStageDataTablesHtml(stageName: string, enabledKeys: ReadonlySet<StageDataTableKey>): string {
+  const blocks = STAGE_DATA_TABLE_OPTIONS.filter((option) => enabledKeys.has(option.key))
+    .map((option) => TABLE_BUILDERS[option.key]())
+    .join('');
+
   return `<style>${STYLES}</style>
   <div class="sdt-wrap">
     <h1>بيانات مرحلة "${esc(stageName)}" الكاملة — كل الأقسام</h1>
     <p class="sdt-wrap-subtitle">نقل حرفي للبيانات الحقيقية من الخادم لمرحلة المشروع رقم 48، مقسّمة كجداول ملوّنة لكل تبويب على حدة.</p>
-    ${buildBoq()}
-    ${buildPmc()}
-    ${buildPo()}
-    ${buildSv()}
-    ${buildVo()}
-    ${buildExp()}
-    ${buildTask()}
-    ${buildAreasOfInterest()}
-    ${buildSavingsItems()}
-    ${buildWirChecklist()}
+    ${blocks}
   </div>`;
 }

@@ -107,6 +107,26 @@
     </div>
   </p-card>
 
+  <p-card styleClass="mt-3">
+    <ng-template pTemplate="title">اختر أقسام البيانات المطلوب تضمينها</ng-template>
+    <div class="data-type-grid">
+      @for (card of dataTypeCards; track card.key) {
+        <button
+          type="button"
+          class="data-type-card"
+          [class.selected]="isCardSelected(card.key)"
+          (click)="toggleCard(card.key)">
+          <span class="data-type-icon" [style.background]="card.color + '26'" [style.color]="card.color">
+            <i class="pi" [class]="card.icon"></i>
+          </span>
+          <span class="data-type-badge">{{ card.badge }}</span>
+          <span class="data-type-subtitle">{{ card.subtitleAr }}</span>
+          <span class="data-type-description">{{ card.descriptionAr }}</span>
+        </button>
+      }
+    </div>
+  </p-card>
+
   <p-card styleClass="mt-3 preview-card">
     <ng-template pTemplate="title">معاينة حية</ng-template>
     <div class="preview-frame-wrap">

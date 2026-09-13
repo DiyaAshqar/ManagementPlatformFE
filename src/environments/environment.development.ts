@@ -1,7 +1,7 @@
 export const environment = {
   production: false,
-  apiUrl: 'http://62.84.178.178:8102/api',
-  nSwagUrl: 'http://62.84.178.178:8102',
+  apiUrl: 'https://neuro-code.omaralsaheb.com/api',
+  nSwagUrl: 'https://neuro-code.omaralsaheb.com',
   appName: 'Construction',
   version: '1.0.0-dev',
   enableLogging: true,
