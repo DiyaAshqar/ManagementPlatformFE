@@ -698,12 +698,11 @@ function buildSavingsItems(): string {
 }
 
 /**
- * "WIR check list" — a literal transcription of a real `PaymentFlows`
- * response (owner cash payments), pending the dedicated WIR endpoint. Each
- * record in `data.data` is one row.
+ * "Owner Payment" — a literal transcription of a real `PaymentFlows`
+ * response (owner cash payments). Each record in `data.data` is one row.
  */
-function buildWirChecklist(): string {
-  interface WirRow {
+function buildOwnerPayments(): string {
+  interface OwnerPaymentRow {
     cash: number;
     paymentMethodName: string;
     currencyAbb: string;
@@ -711,7 +710,7 @@ function buildWirChecklist(): string {
     createdAt: Date;
   }
 
-  const items: WirRow[] = [
+  const items: OwnerPaymentRow[] = [
     { cash: 55555.0, paymentMethodName: 'Cash', currencyAbb: 'JOD', notes: null, createdAt: new Date('2026-07-05T21:02:54.053') },
     { cash: 40000.0, paymentMethodName: 'Bank Transfer', currencyAbb: 'JOD', notes: 'الدفعة الثانية من أعمال تنفيذ مشروع الفيلا', createdAt: new Date('2026-06-14T21:00:00') },
     { cash: 30000.0, paymentMethodName: 'Bank Transfer', currencyAbb: 'JOD', notes: 'second payment', createdAt: new Date('2026-05-17T18:44:37.36') },
@@ -729,8 +728,8 @@ function buildWirChecklist(): string {
 
   return tableBlock(
     '#7c3aed',
-    'WIR',
-    'قائمة فحص WIR — WIR Check List',
+    'OWN',
+    'دفعات المالك — Owner Payment',
     `سجلات الدفع المرتبطة بهذه القائمة (${items.length} عنصر)`,
     [
       { text: '#', align: 'center' },
@@ -777,7 +776,7 @@ const STYLES = `
 .sdt-lock { display: inline-block; margin-inline-start: 4px; background: #fee2e2; color: #991b1b; border-radius: 4px; padding: 1px 5px; font-size: 8px; font-weight: 700; }
 `;
 
-export type StageDataTableKey = 'boq' | 'pmc' | 'po' | 'sv' | 'vo' | 'exp' | 'task' | 'aoi' | 'save' | 'wir';
+export type StageDataTableKey = 'boq' | 'pmc' | 'po' | 'sv' | 'vo' | 'exp' | 'task' | 'aoi' | 'save' | 'ownerPayment';
 
 /** Card metadata for the data-type picker (icon/badge/color/labels) — drives the demo page's selection UI. */
 export interface StageDataTableOption {
@@ -800,7 +799,7 @@ export const STAGE_DATA_TABLE_OPTIONS: StageDataTableOption[] = [
   { key: 'task', badge: 'TASK', color: '#0d9488', icon: 'pi-check-square', titleAr: 'المهام', subtitleAr: 'Tasks', descriptionAr: 'مهام المرحلة' },
   { key: 'aoi', badge: 'AOI', color: '#0891b2', icon: 'pi-star', titleAr: 'مساحة الاهتمام', subtitleAr: 'Areas of Interest', descriptionAr: 'بنود نطاق العمل' },
   { key: 'save', badge: 'SAVE', color: '#65a30d', icon: 'pi-percentage', titleAr: 'بند التوفير', subtitleAr: 'Savings Items', descriptionAr: 'بنود التوفير المتفق عليها' },
-  { key: 'wir', badge: 'WIR', color: '#7c3aed', icon: 'pi-verified', titleAr: 'قائمة فحص WIR', subtitleAr: 'WIR Check List', descriptionAr: 'سجلات فحص/دفع مرتبطة' },
+  { key: 'ownerPayment', badge: 'OWN', color: '#7c3aed', icon: 'pi-wallet', titleAr: 'دفعات المالك', subtitleAr: 'Owner Payment', descriptionAr: 'سجلات دفعات المالك' },
 ];
 
 const TABLE_BUILDERS: Record<StageDataTableKey, () => string> = {
@@ -813,7 +812,7 @@ const TABLE_BUILDERS: Record<StageDataTableKey, () => string> = {
   task: buildTask,
   aoi: buildAreasOfInterest,
   save: buildSavingsItems,
-  wir: buildWirChecklist,
+  ownerPayment: buildOwnerPayments,
 };
 
 /**

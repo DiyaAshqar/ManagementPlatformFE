@@ -953,6 +953,62 @@ export class AttachmentClient {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    downloadAttachments(body: DownloadAttachmentsCommand | undefined): Observable<AttachmentDownloadBatchDtoResponse> {
+        let url_ = this.baseUrl + "/api/Attachment/download";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processDownloadAttachments(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processDownloadAttachments(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AttachmentDownloadBatchDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AttachmentDownloadBatchDtoResponse>;
+        }));
+    }
+
+    protected processDownloadAttachments(response: HttpResponseBase): Observable<AttachmentDownloadBatchDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AttachmentDownloadBatchDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -6906,6 +6962,123 @@ export class ReportClient {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param projectId (optional) 
+     * @param projectStageId (optional) 
+     * @return OK
+     */
+    getProjectStageDetails(projectId: number | undefined, projectStageId: number | undefined): Observable<AgreementDetailsDtoResponse> {
+        let url_ = this.baseUrl + "/api/Report/project-stage-details?";
+        if (projectId === null)
+            throw new globalThis.Error("The parameter 'projectId' cannot be null.");
+        else if (projectId !== undefined)
+            url_ += "ProjectId=" + encodeURIComponent("" + projectId) + "&";
+        if (projectStageId === null)
+            throw new globalThis.Error("The parameter 'projectStageId' cannot be null.");
+        else if (projectStageId !== undefined)
+            url_ += "ProjectStageId=" + encodeURIComponent("" + projectStageId) + "&";
+        url_ = url_.replace(/[?&]$/, "");
+
+        let options_ : any = {
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("get", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetProjectStageDetails(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetProjectStageDetails(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AgreementDetailsDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AgreementDetailsDtoResponse>;
+        }));
+    }
+
+    protected processGetProjectStageDetails(response: HttpResponseBase): Observable<AgreementDetailsDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AgreementDetailsDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    getProjectStagesDetails(body: GetProjectStagesDetailsQuery | undefined): Observable<AgreementDetailsDtoResponse> {
+        let url_ = this.baseUrl + "/api/Report/project-stages-details";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetProjectStagesDetails(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetProjectStagesDetails(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AgreementDetailsDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AgreementDetailsDtoResponse>;
+        }));
+    }
+
+    protected processGetProjectStagesDetails(response: HttpResponseBase): Observable<AgreementDetailsDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AgreementDetailsDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -9367,6 +9540,7 @@ export class Agreement implements IAgreement {
     city?: City;
     drillingQuantity?: number;
     projectArea?: number;
+    landscapeArea?: number | undefined;
     isSubmitted?: boolean;
     agreementTypeId?: number;
     agreementType?: AgreementType;
@@ -9412,6 +9586,7 @@ export class Agreement implements IAgreement {
             this.city = _data["city"] ? City.fromJS(_data["city"]) : undefined as any;
             this.drillingQuantity = _data["drillingQuantity"];
             this.projectArea = _data["projectArea"];
+            this.landscapeArea = _data["landscapeArea"];
             this.isSubmitted = _data["isSubmitted"];
             this.agreementTypeId = _data["agreementTypeId"];
             this.agreementType = _data["agreementType"] ? AgreementType.fromJS(_data["agreementType"]) : undefined as any;
@@ -9485,6 +9660,7 @@ export class Agreement implements IAgreement {
         data["city"] = this.city ? this.city.toJSON() : undefined as any;
         data["drillingQuantity"] = this.drillingQuantity;
         data["projectArea"] = this.projectArea;
+        data["landscapeArea"] = this.landscapeArea;
         data["isSubmitted"] = this.isSubmitted;
         data["agreementTypeId"] = this.agreementTypeId;
         data["agreementType"] = this.agreementType ? this.agreementType.toJSON() : undefined as any;
@@ -9551,6 +9727,7 @@ export interface IAgreement {
     city?: City;
     drillingQuantity?: number;
     projectArea?: number;
+    landscapeArea?: number | undefined;
     isSubmitted?: boolean;
     agreementTypeId?: number;
     agreementType?: AgreementType;
@@ -9567,6 +9744,462 @@ export interface IAgreement {
     mileStones?: MileStones[] | undefined;
 }
 
+export class AgreementClientDetailsDto implements IAgreementClientDetailsDto {
+    id?: number;
+    contactPerson?: string | undefined;
+    contactPersonNumber?: number;
+    contactPersonCountryCodeId?: number | undefined;
+    contactPersonCountryCodeName?: string | undefined;
+    contactPersonCountryCode?: string | undefined;
+    representerName?: string | undefined;
+    representerNameNumber?: number;
+    representerCountryCodeId?: number | undefined;
+    representerCountryCodeName?: string | undefined;
+    representerCountryCode?: string | undefined;
+
+    constructor(data?: IAgreementClientDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.contactPerson = _data["contactPerson"];
+            this.contactPersonNumber = _data["contactPersonNumber"];
+            this.contactPersonCountryCodeId = _data["contactPersonCountryCodeId"];
+            this.contactPersonCountryCodeName = _data["contactPersonCountryCodeName"];
+            this.contactPersonCountryCode = _data["contactPersonCountryCode"];
+            this.representerName = _data["representerName"];
+            this.representerNameNumber = _data["representerNameNumber"];
+            this.representerCountryCodeId = _data["representerCountryCodeId"];
+            this.representerCountryCodeName = _data["representerCountryCodeName"];
+            this.representerCountryCode = _data["representerCountryCode"];
+        }
+    }
+
+    static fromJS(data: any): AgreementClientDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementClientDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["contactPerson"] = this.contactPerson;
+        data["contactPersonNumber"] = this.contactPersonNumber;
+        data["contactPersonCountryCodeId"] = this.contactPersonCountryCodeId;
+        data["contactPersonCountryCodeName"] = this.contactPersonCountryCodeName;
+        data["contactPersonCountryCode"] = this.contactPersonCountryCode;
+        data["representerName"] = this.representerName;
+        data["representerNameNumber"] = this.representerNameNumber;
+        data["representerCountryCodeId"] = this.representerCountryCodeId;
+        data["representerCountryCodeName"] = this.representerCountryCodeName;
+        data["representerCountryCode"] = this.representerCountryCode;
+        return data;
+    }
+}
+
+export interface IAgreementClientDetailsDto {
+    id?: number;
+    contactPerson?: string | undefined;
+    contactPersonNumber?: number;
+    contactPersonCountryCodeId?: number | undefined;
+    contactPersonCountryCodeName?: string | undefined;
+    contactPersonCountryCode?: string | undefined;
+    representerName?: string | undefined;
+    representerNameNumber?: number;
+    representerCountryCodeId?: number | undefined;
+    representerCountryCodeName?: string | undefined;
+    representerCountryCode?: string | undefined;
+}
+
+export class AgreementContractorDutyDetailsDto implements IAgreementContractorDutyDetailsDto {
+    id?: number;
+    mainContractId?: number;
+    quantity?: number;
+    price?: number;
+    subTotal?: number;
+    unitId?: number;
+    unitName?: string | undefined;
+    dutyTypeId?: number;
+    dutyTypeName?: string | undefined;
+    dutyResponsibilityId?: number;
+    dutyResponsibilityName?: string | undefined;
+    supplierId?: number | undefined;
+    supplierName?: string | undefined;
+    materialId?: number | undefined;
+    materialName?: string | undefined;
+    autoPost?: boolean;
+    expenseId?: number | undefined;
+    expenseNumber?: string | undefined;
+
+    constructor(data?: IAgreementContractorDutyDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.mainContractId = _data["mainContractId"];
+            this.quantity = _data["quantity"];
+            this.price = _data["price"];
+            this.subTotal = _data["subTotal"];
+            this.unitId = _data["unitId"];
+            this.unitName = _data["unitName"];
+            this.dutyTypeId = _data["dutyTypeId"];
+            this.dutyTypeName = _data["dutyTypeName"];
+            this.dutyResponsibilityId = _data["dutyResponsibilityId"];
+            this.dutyResponsibilityName = _data["dutyResponsibilityName"];
+            this.supplierId = _data["supplierId"];
+            this.supplierName = _data["supplierName"];
+            this.materialId = _data["materialId"];
+            this.materialName = _data["materialName"];
+            this.autoPost = _data["autoPost"];
+            this.expenseId = _data["expenseId"];
+            this.expenseNumber = _data["expenseNumber"];
+        }
+    }
+
+    static fromJS(data: any): AgreementContractorDutyDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementContractorDutyDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["mainContractId"] = this.mainContractId;
+        data["quantity"] = this.quantity;
+        data["price"] = this.price;
+        data["subTotal"] = this.subTotal;
+        data["unitId"] = this.unitId;
+        data["unitName"] = this.unitName;
+        data["dutyTypeId"] = this.dutyTypeId;
+        data["dutyTypeName"] = this.dutyTypeName;
+        data["dutyResponsibilityId"] = this.dutyResponsibilityId;
+        data["dutyResponsibilityName"] = this.dutyResponsibilityName;
+        data["supplierId"] = this.supplierId;
+        data["supplierName"] = this.supplierName;
+        data["materialId"] = this.materialId;
+        data["materialName"] = this.materialName;
+        data["autoPost"] = this.autoPost;
+        data["expenseId"] = this.expenseId;
+        data["expenseNumber"] = this.expenseNumber;
+        return data;
+    }
+}
+
+export interface IAgreementContractorDutyDetailsDto {
+    id?: number;
+    mainContractId?: number;
+    quantity?: number;
+    price?: number;
+    subTotal?: number;
+    unitId?: number;
+    unitName?: string | undefined;
+    dutyTypeId?: number;
+    dutyTypeName?: string | undefined;
+    dutyResponsibilityId?: number;
+    dutyResponsibilityName?: string | undefined;
+    supplierId?: number | undefined;
+    supplierName?: string | undefined;
+    materialId?: number | undefined;
+    materialName?: string | undefined;
+    autoPost?: boolean;
+    expenseId?: number | undefined;
+    expenseNumber?: string | undefined;
+}
+
+export class AgreementDetailsDto implements IAgreementDetailsDto {
+    id?: number;
+    projectNumber?: string | undefined;
+    agreementDate?: Date;
+    projectName?: string | undefined;
+    businessSector?: string | undefined;
+    estimatedStartDate?: Date;
+    estimatedEndDate?: Date;
+    description?: string | undefined;
+    drillingQuantity?: number;
+    projectArea?: number;
+    landscapeArea?: number | undefined;
+    isSubmitted?: boolean;
+    countryId?: number;
+    countryName?: string | undefined;
+    cityId?: number;
+    cityName?: string | undefined;
+    agreementTypeId?: number;
+    agreementTypeName?: string | undefined;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    client?: AgreementClientDetailsDto;
+    landInformation?: AgreementLandInformationDetailsDto;
+    agreementPayment?: AgreementPaymentDetailsDto;
+    services?: AgreementServiceDetailsDto[] | undefined;
+    milestones?: AgreementMilestoneDetailsDto[] | undefined;
+    mainContracts?: AgreementMainContractDetailsDto[] | undefined;
+    projectAreaUnits?: AgreementProjectAreaUnitDetailsDto[] | undefined;
+    supplierServices?: AgreementSupplierServiceDetailsDto[] | undefined;
+    quantityBills?: AgreementQuantityBillDetailsDto[] | undefined;
+    images?: AttachmentImageDto[] | undefined;
+    project?: ProjectDetailsDto;
+
+    constructor(data?: IAgreementDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectNumber = _data["projectNumber"];
+            this.agreementDate = _data["agreementDate"] ? new Date(_data["agreementDate"].toString()) : undefined as any;
+            this.projectName = _data["projectName"];
+            this.businessSector = _data["businessSector"];
+            this.estimatedStartDate = _data["estimatedStartDate"] ? new Date(_data["estimatedStartDate"].toString()) : undefined as any;
+            this.estimatedEndDate = _data["estimatedEndDate"] ? new Date(_data["estimatedEndDate"].toString()) : undefined as any;
+            this.description = _data["description"];
+            this.drillingQuantity = _data["drillingQuantity"];
+            this.projectArea = _data["projectArea"];
+            this.landscapeArea = _data["landscapeArea"];
+            this.isSubmitted = _data["isSubmitted"];
+            this.countryId = _data["countryId"];
+            this.countryName = _data["countryName"];
+            this.cityId = _data["cityId"];
+            this.cityName = _data["cityName"];
+            this.agreementTypeId = _data["agreementTypeId"];
+            this.agreementTypeName = _data["agreementTypeName"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            this.client = _data["client"] ? AgreementClientDetailsDto.fromJS(_data["client"]) : undefined as any;
+            this.landInformation = _data["landInformation"] ? AgreementLandInformationDetailsDto.fromJS(_data["landInformation"]) : undefined as any;
+            this.agreementPayment = _data["agreementPayment"] ? AgreementPaymentDetailsDto.fromJS(_data["agreementPayment"]) : undefined as any;
+            if (Array.isArray(_data["services"])) {
+                this.services = [] as any;
+                for (let item of _data["services"])
+                    this.services!.push(AgreementServiceDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["milestones"])) {
+                this.milestones = [] as any;
+                for (let item of _data["milestones"])
+                    this.milestones!.push(AgreementMilestoneDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["mainContracts"])) {
+                this.mainContracts = [] as any;
+                for (let item of _data["mainContracts"])
+                    this.mainContracts!.push(AgreementMainContractDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["projectAreaUnits"])) {
+                this.projectAreaUnits = [] as any;
+                for (let item of _data["projectAreaUnits"])
+                    this.projectAreaUnits!.push(AgreementProjectAreaUnitDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["supplierServices"])) {
+                this.supplierServices = [] as any;
+                for (let item of _data["supplierServices"])
+                    this.supplierServices!.push(AgreementSupplierServiceDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["quantityBills"])) {
+                this.quantityBills = [] as any;
+                for (let item of _data["quantityBills"])
+                    this.quantityBills!.push(AgreementQuantityBillDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["images"])) {
+                this.images = [] as any;
+                for (let item of _data["images"])
+                    this.images!.push(AttachmentImageDto.fromJS(item));
+            }
+            this.project = _data["project"] ? ProjectDetailsDto.fromJS(_data["project"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): AgreementDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectNumber"] = this.projectNumber;
+        data["agreementDate"] = this.agreementDate ? formatDate(this.agreementDate) : undefined as any;
+        data["projectName"] = this.projectName;
+        data["businessSector"] = this.businessSector;
+        data["estimatedStartDate"] = this.estimatedStartDate ? formatDate(this.estimatedStartDate) : undefined as any;
+        data["estimatedEndDate"] = this.estimatedEndDate ? formatDate(this.estimatedEndDate) : undefined as any;
+        data["description"] = this.description;
+        data["drillingQuantity"] = this.drillingQuantity;
+        data["projectArea"] = this.projectArea;
+        data["landscapeArea"] = this.landscapeArea;
+        data["isSubmitted"] = this.isSubmitted;
+        data["countryId"] = this.countryId;
+        data["countryName"] = this.countryName;
+        data["cityId"] = this.cityId;
+        data["cityName"] = this.cityName;
+        data["agreementTypeId"] = this.agreementTypeId;
+        data["agreementTypeName"] = this.agreementTypeName;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        data["client"] = this.client ? this.client.toJSON() : undefined as any;
+        data["landInformation"] = this.landInformation ? this.landInformation.toJSON() : undefined as any;
+        data["agreementPayment"] = this.agreementPayment ? this.agreementPayment.toJSON() : undefined as any;
+        if (Array.isArray(this.services)) {
+            data["services"] = [];
+            for (let item of this.services)
+                data["services"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.milestones)) {
+            data["milestones"] = [];
+            for (let item of this.milestones)
+                data["milestones"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.mainContracts)) {
+            data["mainContracts"] = [];
+            for (let item of this.mainContracts)
+                data["mainContracts"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.projectAreaUnits)) {
+            data["projectAreaUnits"] = [];
+            for (let item of this.projectAreaUnits)
+                data["projectAreaUnits"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.supplierServices)) {
+            data["supplierServices"] = [];
+            for (let item of this.supplierServices)
+                data["supplierServices"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.quantityBills)) {
+            data["quantityBills"] = [];
+            for (let item of this.quantityBills)
+                data["quantityBills"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.images)) {
+            data["images"] = [];
+            for (let item of this.images)
+                data["images"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["project"] = this.project ? this.project.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAgreementDetailsDto {
+    id?: number;
+    projectNumber?: string | undefined;
+    agreementDate?: Date;
+    projectName?: string | undefined;
+    businessSector?: string | undefined;
+    estimatedStartDate?: Date;
+    estimatedEndDate?: Date;
+    description?: string | undefined;
+    drillingQuantity?: number;
+    projectArea?: number;
+    landscapeArea?: number | undefined;
+    isSubmitted?: boolean;
+    countryId?: number;
+    countryName?: string | undefined;
+    cityId?: number;
+    cityName?: string | undefined;
+    agreementTypeId?: number;
+    agreementTypeName?: string | undefined;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    client?: AgreementClientDetailsDto;
+    landInformation?: AgreementLandInformationDetailsDto;
+    agreementPayment?: AgreementPaymentDetailsDto;
+    services?: AgreementServiceDetailsDto[] | undefined;
+    milestones?: AgreementMilestoneDetailsDto[] | undefined;
+    mainContracts?: AgreementMainContractDetailsDto[] | undefined;
+    projectAreaUnits?: AgreementProjectAreaUnitDetailsDto[] | undefined;
+    supplierServices?: AgreementSupplierServiceDetailsDto[] | undefined;
+    quantityBills?: AgreementQuantityBillDetailsDto[] | undefined;
+    images?: AttachmentImageDto[] | undefined;
+    project?: ProjectDetailsDto;
+}
+
+export class AgreementDetailsDtoResponse implements IAgreementDetailsDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: AgreementDetailsDto;
+
+    constructor(data?: IAgreementDetailsDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? AgreementDetailsDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): AgreementDetailsDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementDetailsDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAgreementDetailsDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: AgreementDetailsDto;
+}
+
 export class AgreementDto implements IAgreementDto {
     id?: number | undefined;
     projectNumber?: string | undefined;
@@ -9580,6 +10213,7 @@ export class AgreementDto implements IAgreementDto {
     cityId?: number;
     drillingQuantity?: number;
     projectArea?: number;
+    landscapeArea?: number | undefined;
     isSubmitted?: boolean | undefined;
     clientId?: number | undefined;
     agreementTypeId?: number;
@@ -9608,6 +10242,7 @@ export class AgreementDto implements IAgreementDto {
             this.cityId = _data["cityId"];
             this.drillingQuantity = _data["drillingQuantity"];
             this.projectArea = _data["projectArea"];
+            this.landscapeArea = _data["landscapeArea"];
             this.isSubmitted = _data["isSubmitted"];
             this.clientId = _data["clientId"];
             this.agreementTypeId = _data["agreementTypeId"];
@@ -9636,6 +10271,7 @@ export class AgreementDto implements IAgreementDto {
         data["cityId"] = this.cityId;
         data["drillingQuantity"] = this.drillingQuantity;
         data["projectArea"] = this.projectArea;
+        data["landscapeArea"] = this.landscapeArea;
         data["isSubmitted"] = this.isSubmitted;
         data["clientId"] = this.clientId;
         data["agreementTypeId"] = this.agreementTypeId;
@@ -9657,6 +10293,7 @@ export interface IAgreementDto {
     cityId?: number;
     drillingQuantity?: number;
     projectArea?: number;
+    landscapeArea?: number | undefined;
     isSubmitted?: boolean | undefined;
     clientId?: number | undefined;
     agreementTypeId?: number;
@@ -9717,6 +10354,270 @@ export interface IAgreementFees {
     monthlyFees?: number | undefined;
     percentageFees?: number | undefined;
     agreementPayment?: AgreementPayment;
+}
+
+export class AgreementFeesDetailsDto implements IAgreementFeesDetailsDto {
+    id?: number;
+    amount?: number | undefined;
+    monthlyFees?: number | undefined;
+    percentageFees?: number | undefined;
+
+    constructor(data?: IAgreementFeesDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.amount = _data["amount"];
+            this.monthlyFees = _data["monthlyFees"];
+            this.percentageFees = _data["percentageFees"];
+        }
+    }
+
+    static fromJS(data: any): AgreementFeesDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementFeesDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["amount"] = this.amount;
+        data["monthlyFees"] = this.monthlyFees;
+        data["percentageFees"] = this.percentageFees;
+        return data;
+    }
+}
+
+export interface IAgreementFeesDetailsDto {
+    id?: number;
+    amount?: number | undefined;
+    monthlyFees?: number | undefined;
+    percentageFees?: number | undefined;
+}
+
+export class AgreementLandInformationDetailsDto implements IAgreementLandInformationDetailsDto {
+    id?: number;
+    plotNumber?: number;
+    directorate?: string | undefined;
+    village?: string | undefined;
+    basinName?: string | undefined;
+    basinNumber?: number;
+    floorNumber?: number;
+
+    constructor(data?: IAgreementLandInformationDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.plotNumber = _data["plotNumber"];
+            this.directorate = _data["directorate"];
+            this.village = _data["village"];
+            this.basinName = _data["basinName"];
+            this.basinNumber = _data["basinNumber"];
+            this.floorNumber = _data["floorNumber"];
+        }
+    }
+
+    static fromJS(data: any): AgreementLandInformationDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementLandInformationDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["plotNumber"] = this.plotNumber;
+        data["directorate"] = this.directorate;
+        data["village"] = this.village;
+        data["basinName"] = this.basinName;
+        data["basinNumber"] = this.basinNumber;
+        data["floorNumber"] = this.floorNumber;
+        return data;
+    }
+}
+
+export interface IAgreementLandInformationDetailsDto {
+    id?: number;
+    plotNumber?: number;
+    directorate?: string | undefined;
+    village?: string | undefined;
+    basinName?: string | undefined;
+    basinNumber?: number;
+    floorNumber?: number;
+}
+
+export class AgreementMainContractDetailsDto implements IAgreementMainContractDetailsDto {
+    id?: number;
+    total?: number;
+    startDate?: Date;
+    endDate?: Date;
+    constructorId?: number;
+    constructorName?: string | undefined;
+    mainContractorTypeId?: number | undefined;
+    mainContractorTypeName?: string | undefined;
+    milestoneId?: number;
+    milestoneName?: string | undefined;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    contractorDuties?: AgreementContractorDutyDetailsDto[] | undefined;
+
+    constructor(data?: IAgreementMainContractDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.total = _data["total"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.constructorId = _data["constructorId"];
+            this.constructorName = _data["constructorName"];
+            this.mainContractorTypeId = _data["mainContractorTypeId"];
+            this.mainContractorTypeName = _data["mainContractorTypeName"];
+            this.milestoneId = _data["milestoneId"];
+            this.milestoneName = _data["milestoneName"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            if (Array.isArray(_data["contractorDuties"])) {
+                this.contractorDuties = [] as any;
+                for (let item of _data["contractorDuties"])
+                    this.contractorDuties!.push(AgreementContractorDutyDetailsDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AgreementMainContractDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementMainContractDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["total"] = this.total;
+        data["startDate"] = this.startDate ? formatDate(this.startDate) : undefined as any;
+        data["endDate"] = this.endDate ? formatDate(this.endDate) : undefined as any;
+        data["constructorId"] = this.constructorId;
+        data["constructorName"] = this.constructorName;
+        data["mainContractorTypeId"] = this.mainContractorTypeId;
+        data["mainContractorTypeName"] = this.mainContractorTypeName;
+        data["milestoneId"] = this.milestoneId;
+        data["milestoneName"] = this.milestoneName;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        if (Array.isArray(this.contractorDuties)) {
+            data["contractorDuties"] = [];
+            for (let item of this.contractorDuties)
+                data["contractorDuties"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IAgreementMainContractDetailsDto {
+    id?: number;
+    total?: number;
+    startDate?: Date;
+    endDate?: Date;
+    constructorId?: number;
+    constructorName?: string | undefined;
+    mainContractorTypeId?: number | undefined;
+    mainContractorTypeName?: string | undefined;
+    milestoneId?: number;
+    milestoneName?: string | undefined;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    contractorDuties?: AgreementContractorDutyDetailsDto[] | undefined;
+}
+
+export class AgreementMilestoneDetailsDto implements IAgreementMilestoneDetailsDto {
+    id?: number;
+    name?: string | undefined;
+    description?: string | undefined;
+    order?: number;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
+
+    constructor(data?: IAgreementMilestoneDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.order = _data["order"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): AgreementMilestoneDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementMilestoneDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["order"] = this.order;
+        data["startDate"] = this.startDate ? formatDate(this.startDate) : undefined as any;
+        data["endDate"] = this.endDate ? formatDate(this.endDate) : undefined as any;
+        return data;
+    }
+}
+
+export interface IAgreementMilestoneDetailsDto {
+    id?: number;
+    name?: string | undefined;
+    description?: string | undefined;
+    order?: number;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
 }
 
 export class AgreementPayment implements IAgreementPayment {
@@ -9791,6 +10692,66 @@ export interface IAgreementPayment {
     agreement?: Agreement;
 }
 
+export class AgreementPaymentDetailsDto implements IAgreementPaymentDetailsDto {
+    id?: number;
+    contractTypeId?: number | undefined;
+    contractTypeName?: string | undefined;
+    contractModelId?: number | undefined;
+    contractModelName?: string | undefined;
+    monthlyPaymentId?: number | undefined;
+    monthlyPayment?: AgreementFeesDetailsDto;
+
+    constructor(data?: IAgreementPaymentDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.contractTypeId = _data["contractTypeId"];
+            this.contractTypeName = _data["contractTypeName"];
+            this.contractModelId = _data["contractModelId"];
+            this.contractModelName = _data["contractModelName"];
+            this.monthlyPaymentId = _data["monthlyPaymentId"];
+            this.monthlyPayment = _data["monthlyPayment"] ? AgreementFeesDetailsDto.fromJS(_data["monthlyPayment"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): AgreementPaymentDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementPaymentDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["contractTypeId"] = this.contractTypeId;
+        data["contractTypeName"] = this.contractTypeName;
+        data["contractModelId"] = this.contractModelId;
+        data["contractModelName"] = this.contractModelName;
+        data["monthlyPaymentId"] = this.monthlyPaymentId;
+        data["monthlyPayment"] = this.monthlyPayment ? this.monthlyPayment.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAgreementPaymentDetailsDto {
+    id?: number;
+    contractTypeId?: number | undefined;
+    contractTypeName?: string | undefined;
+    contractModelId?: number | undefined;
+    contractModelName?: string | undefined;
+    monthlyPaymentId?: number | undefined;
+    monthlyPayment?: AgreementFeesDetailsDto;
+}
+
 export class AgreementPaymentDto implements IAgreementPaymentDto {
     id?: number | undefined;
     contractTypeId?: number;
@@ -9847,6 +10808,146 @@ export interface IAgreementPaymentDto {
     monthlyPaymentDto?: MonthlyPaymentDto;
 }
 
+export class AgreementProjectAreaUnitDetailsDto implements IAgreementProjectAreaUnitDetailsDto {
+    id?: number;
+    annexId?: number;
+    annexName?: string | undefined;
+    amount?: number;
+    unitId?: number;
+    unitName?: string | undefined;
+
+    constructor(data?: IAgreementProjectAreaUnitDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.annexId = _data["annexId"];
+            this.annexName = _data["annexName"];
+            this.amount = _data["amount"];
+            this.unitId = _data["unitId"];
+            this.unitName = _data["unitName"];
+        }
+    }
+
+    static fromJS(data: any): AgreementProjectAreaUnitDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementProjectAreaUnitDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["annexId"] = this.annexId;
+        data["annexName"] = this.annexName;
+        data["amount"] = this.amount;
+        data["unitId"] = this.unitId;
+        data["unitName"] = this.unitName;
+        return data;
+    }
+}
+
+export interface IAgreementProjectAreaUnitDetailsDto {
+    id?: number;
+    annexId?: number;
+    annexName?: string | undefined;
+    amount?: number;
+    unitId?: number;
+    unitName?: string | undefined;
+}
+
+export class AgreementQuantityBillDetailsDto implements IAgreementQuantityBillDetailsDto {
+    id?: number;
+    materialId?: number;
+    materialName?: string | undefined;
+    unitId?: number;
+    unitName?: string | undefined;
+    ammount?: number;
+    price?: number;
+    mileStoneId?: number;
+    mileStoneName?: string | undefined;
+    constructorId?: number;
+    constructorName?: string | undefined;
+    supplierId?: number | undefined;
+    supplierName?: string | undefined;
+
+    constructor(data?: IAgreementQuantityBillDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.materialId = _data["materialId"];
+            this.materialName = _data["materialName"];
+            this.unitId = _data["unitId"];
+            this.unitName = _data["unitName"];
+            this.ammount = _data["ammount"];
+            this.price = _data["price"];
+            this.mileStoneId = _data["mileStoneId"];
+            this.mileStoneName = _data["mileStoneName"];
+            this.constructorId = _data["constructorId"];
+            this.constructorName = _data["constructorName"];
+            this.supplierId = _data["supplierId"];
+            this.supplierName = _data["supplierName"];
+        }
+    }
+
+    static fromJS(data: any): AgreementQuantityBillDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementQuantityBillDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["materialId"] = this.materialId;
+        data["materialName"] = this.materialName;
+        data["unitId"] = this.unitId;
+        data["unitName"] = this.unitName;
+        data["ammount"] = this.ammount;
+        data["price"] = this.price;
+        data["mileStoneId"] = this.mileStoneId;
+        data["mileStoneName"] = this.mileStoneName;
+        data["constructorId"] = this.constructorId;
+        data["constructorName"] = this.constructorName;
+        data["supplierId"] = this.supplierId;
+        data["supplierName"] = this.supplierName;
+        return data;
+    }
+}
+
+export interface IAgreementQuantityBillDetailsDto {
+    id?: number;
+    materialId?: number;
+    materialName?: string | undefined;
+    unitId?: number;
+    unitName?: string | undefined;
+    ammount?: number;
+    price?: number;
+    mileStoneId?: number;
+    mileStoneName?: string | undefined;
+    constructorId?: number;
+    constructorName?: string | undefined;
+    supplierId?: number | undefined;
+    supplierName?: string | undefined;
+}
+
 export class AgreementService implements IAgreementService {
     agreementId?: number;
     agreement?: Agreement;
@@ -9895,6 +10996,46 @@ export interface IAgreementService {
     service?: Service;
 }
 
+export class AgreementServiceDetailsDto implements IAgreementServiceDetailsDto {
+    serviceId?: number;
+    serviceName?: string | undefined;
+
+    constructor(data?: IAgreementServiceDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.serviceId = _data["serviceId"];
+            this.serviceName = _data["serviceName"];
+        }
+    }
+
+    static fromJS(data: any): AgreementServiceDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementServiceDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["serviceId"] = this.serviceId;
+        data["serviceName"] = this.serviceName;
+        return data;
+    }
+}
+
+export interface IAgreementServiceDetailsDto {
+    serviceId?: number;
+    serviceName?: string | undefined;
+}
+
 export class AgreementServiceDto implements IAgreementServiceDto {
     agreementId?: number;
     serviceId?: number;
@@ -9933,6 +11074,70 @@ export class AgreementServiceDto implements IAgreementServiceDto {
 export interface IAgreementServiceDto {
     agreementId?: number;
     serviceId?: number;
+}
+
+export class AgreementSupplierServiceDetailsDto implements IAgreementSupplierServiceDetailsDto {
+    id?: number;
+    representativeName?: string | undefined;
+    materialId?: number;
+    materialName?: string | undefined;
+    supplierId?: number;
+    supplierName?: string | undefined;
+    supplierPhoneNumber?: string | undefined;
+    supplierEmail?: string | undefined;
+
+    constructor(data?: IAgreementSupplierServiceDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.representativeName = _data["representativeName"];
+            this.materialId = _data["materialId"];
+            this.materialName = _data["materialName"];
+            this.supplierId = _data["supplierId"];
+            this.supplierName = _data["supplierName"];
+            this.supplierPhoneNumber = _data["supplierPhoneNumber"];
+            this.supplierEmail = _data["supplierEmail"];
+        }
+    }
+
+    static fromJS(data: any): AgreementSupplierServiceDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AgreementSupplierServiceDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["representativeName"] = this.representativeName;
+        data["materialId"] = this.materialId;
+        data["materialName"] = this.materialName;
+        data["supplierId"] = this.supplierId;
+        data["supplierName"] = this.supplierName;
+        data["supplierPhoneNumber"] = this.supplierPhoneNumber;
+        data["supplierEmail"] = this.supplierEmail;
+        return data;
+    }
+}
+
+export interface IAgreementSupplierServiceDetailsDto {
+    id?: number;
+    representativeName?: string | undefined;
+    materialId?: number;
+    materialName?: string | undefined;
+    supplierId?: number;
+    supplierName?: string | undefined;
+    supplierPhoneNumber?: string | undefined;
+    supplierEmail?: string | undefined;
 }
 
 export class AgreementType implements IAgreementType {
@@ -10231,6 +11436,222 @@ export interface IAttachment {
     expense?: Expense;
 }
 
+export class AttachmentBase64Dto implements IAttachmentBase64Dto {
+    id?: number;
+    fileName?: string | undefined;
+    originalName?: string | undefined;
+    contentType?: string | undefined;
+    attachmentType?: AttachmentType;
+    relationshipId?: number;
+    fileSize?: number;
+    base64Data?: string | undefined;
+
+    constructor(data?: IAttachmentBase64Dto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.fileName = _data["fileName"];
+            this.originalName = _data["originalName"];
+            this.contentType = _data["contentType"];
+            this.attachmentType = _data["attachmentType"];
+            this.relationshipId = _data["relationshipId"];
+            this.fileSize = _data["fileSize"];
+            this.base64Data = _data["base64Data"];
+        }
+    }
+
+    static fromJS(data: any): AttachmentBase64Dto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AttachmentBase64Dto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["fileName"] = this.fileName;
+        data["originalName"] = this.originalName;
+        data["contentType"] = this.contentType;
+        data["attachmentType"] = this.attachmentType;
+        data["relationshipId"] = this.relationshipId;
+        data["fileSize"] = this.fileSize;
+        data["base64Data"] = this.base64Data;
+        return data;
+    }
+}
+
+export interface IAttachmentBase64Dto {
+    id?: number;
+    fileName?: string | undefined;
+    originalName?: string | undefined;
+    contentType?: string | undefined;
+    attachmentType?: AttachmentType;
+    relationshipId?: number;
+    fileSize?: number;
+    base64Data?: string | undefined;
+}
+
+export class AttachmentDownloadBatchDto implements IAttachmentDownloadBatchDto {
+    files?: AttachmentBase64Dto[] | undefined;
+    failed?: AttachmentDownloadFailureDto[] | undefined;
+
+    constructor(data?: IAttachmentDownloadBatchDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["files"])) {
+                this.files = [] as any;
+                for (let item of _data["files"])
+                    this.files!.push(AttachmentBase64Dto.fromJS(item));
+            }
+            if (Array.isArray(_data["failed"])) {
+                this.failed = [] as any;
+                for (let item of _data["failed"])
+                    this.failed!.push(AttachmentDownloadFailureDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): AttachmentDownloadBatchDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AttachmentDownloadBatchDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.files)) {
+            data["files"] = [];
+            for (let item of this.files)
+                data["files"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.failed)) {
+            data["failed"] = [];
+            for (let item of this.failed)
+                data["failed"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IAttachmentDownloadBatchDto {
+    files?: AttachmentBase64Dto[] | undefined;
+    failed?: AttachmentDownloadFailureDto[] | undefined;
+}
+
+export class AttachmentDownloadBatchDtoResponse implements IAttachmentDownloadBatchDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: AttachmentDownloadBatchDto;
+
+    constructor(data?: IAttachmentDownloadBatchDtoResponse) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.succeeded = _data["succeeded"];
+            this.message = _data["message"];
+            if (Array.isArray(_data["errors"])) {
+                this.errors = [] as any;
+                for (let item of _data["errors"])
+                    this.errors!.push(item);
+            }
+            this.data = _data["data"] ? AttachmentDownloadBatchDto.fromJS(_data["data"]) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): AttachmentDownloadBatchDtoResponse {
+        data = typeof data === 'object' ? data : {};
+        let result = new AttachmentDownloadBatchDtoResponse();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["succeeded"] = this.succeeded;
+        data["message"] = this.message;
+        if (Array.isArray(this.errors)) {
+            data["errors"] = [];
+            for (let item of this.errors)
+                data["errors"].push(item);
+        }
+        data["data"] = this.data ? this.data.toJSON() : undefined as any;
+        return data;
+    }
+}
+
+export interface IAttachmentDownloadBatchDtoResponse {
+    succeeded?: boolean;
+    message?: string | undefined;
+    errors?: string[] | undefined;
+    data?: AttachmentDownloadBatchDto;
+}
+
+export class AttachmentDownloadFailureDto implements IAttachmentDownloadFailureDto {
+    id?: number;
+    reason?: string | undefined;
+
+    constructor(data?: IAttachmentDownloadFailureDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.reason = _data["reason"];
+        }
+    }
+
+    static fromJS(data: any): AttachmentDownloadFailureDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AttachmentDownloadFailureDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["reason"] = this.reason;
+        return data;
+    }
+}
+
+export interface IAttachmentDownloadFailureDto {
+    id?: number;
+    reason?: string | undefined;
+}
+
 export class AttachmentDto implements IAttachmentDto {
     id?: number;
     attachmentType?: AttachmentType;
@@ -10297,6 +11718,66 @@ export interface IAttachmentDto {
     base64Data?: string | undefined;
     contentType?: string | undefined;
     isDeleted?: boolean;
+}
+
+export class AttachmentImageDto implements IAttachmentImageDto {
+    id?: number;
+    attachmentType?: AttachmentType;
+    relationshipId?: number;
+    fileName?: string | undefined;
+    filePath?: string | undefined;
+    fileUrl?: string | undefined;
+    originalName?: string | undefined;
+
+    constructor(data?: IAttachmentImageDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.attachmentType = _data["attachmentType"];
+            this.relationshipId = _data["relationshipId"];
+            this.fileName = _data["fileName"];
+            this.filePath = _data["filePath"];
+            this.fileUrl = _data["fileUrl"];
+            this.originalName = _data["originalName"];
+        }
+    }
+
+    static fromJS(data: any): AttachmentImageDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new AttachmentImageDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["attachmentType"] = this.attachmentType;
+        data["relationshipId"] = this.relationshipId;
+        data["fileName"] = this.fileName;
+        data["filePath"] = this.filePath;
+        data["fileUrl"] = this.fileUrl;
+        data["originalName"] = this.originalName;
+        return data;
+    }
+}
+
+export interface IAttachmentImageDto {
+    id?: number;
+    attachmentType?: AttachmentType;
+    relationshipId?: number;
+    fileName?: string | undefined;
+    filePath?: string | undefined;
+    fileUrl?: string | undefined;
+    originalName?: string | undefined;
 }
 
 export enum AttachmentType {
@@ -11851,6 +13332,8 @@ export class CreateMilestoneCommand implements ICreateMilestoneCommand {
     name?: string | undefined;
     description?: string | undefined;
     order?: number;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
 
     constructor(data?: ICreateMilestoneCommand) {
         if (data) {
@@ -11869,6 +13352,8 @@ export class CreateMilestoneCommand implements ICreateMilestoneCommand {
             this.name = _data["name"];
             this.description = _data["description"];
             this.order = _data["order"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
         }
     }
 
@@ -11887,6 +13372,8 @@ export class CreateMilestoneCommand implements ICreateMilestoneCommand {
         data["name"] = this.name;
         data["description"] = this.description;
         data["order"] = this.order;
+        data["startDate"] = this.startDate ? formatDate(this.startDate) : undefined as any;
+        data["endDate"] = this.endDate ? formatDate(this.endDate) : undefined as any;
         return data;
     }
 }
@@ -11898,6 +13385,8 @@ export interface ICreateMilestoneCommand {
     name?: string | undefined;
     description?: string | undefined;
     order?: number;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
 }
 
 export class CreatePaymentFlowCommand implements ICreatePaymentFlowCommand {
@@ -13462,6 +14951,50 @@ export class DeleteTaskCommand implements IDeleteTaskCommand {
 
 export interface IDeleteTaskCommand {
     id?: number;
+}
+
+export class DownloadAttachmentsCommand implements IDownloadAttachmentsCommand {
+    ids?: number[] | undefined;
+
+    constructor(data?: IDownloadAttachmentsCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            if (Array.isArray(_data["ids"])) {
+                this.ids = [] as any;
+                for (let item of _data["ids"])
+                    this.ids!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): DownloadAttachmentsCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new DownloadAttachmentsCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        if (Array.isArray(this.ids)) {
+            data["ids"] = [];
+            for (let item of this.ids)
+                data["ids"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IDownloadAttachmentsCommand {
+    ids?: number[] | undefined;
 }
 
 export class DutyResponsibility implements IDutyResponsibility {
@@ -18236,6 +19769,54 @@ export interface IGetProjectPODtoResponse {
     data?: GetProjectPODto;
 }
 
+export class GetProjectStagesDetailsQuery implements IGetProjectStagesDetailsQuery {
+    projectId?: number;
+    projectStageIds?: number[] | undefined;
+
+    constructor(data?: IGetProjectStagesDetailsQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.projectId = _data["projectId"];
+            if (Array.isArray(_data["projectStageIds"])) {
+                this.projectStageIds = [] as any;
+                for (let item of _data["projectStageIds"])
+                    this.projectStageIds!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): GetProjectStagesDetailsQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectStagesDetailsQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["projectId"] = this.projectId;
+        if (Array.isArray(this.projectStageIds)) {
+            data["projectStageIds"] = [];
+            for (let item of this.projectStageIds)
+                data["projectStageIds"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IGetProjectStagesDetailsQuery {
+    projectId?: number;
+    projectStageIds?: number[] | undefined;
+}
+
 export class GetProjectSurveyingVisitDto implements IGetProjectSurveyingVisitDto {
     id?: number;
     projectStageId?: number;
@@ -20492,6 +22073,8 @@ export class MileStoneDto implements IMileStoneDto {
     name?: string | undefined;
     description?: string | undefined;
     order?: number;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
 
     constructor(data?: IMileStoneDto) {
         if (data) {
@@ -20508,6 +22091,8 @@ export class MileStoneDto implements IMileStoneDto {
             this.name = _data["name"];
             this.description = _data["description"];
             this.order = _data["order"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
         }
     }
 
@@ -20524,6 +22109,8 @@ export class MileStoneDto implements IMileStoneDto {
         data["name"] = this.name;
         data["description"] = this.description;
         data["order"] = this.order;
+        data["startDate"] = this.startDate ? formatDate(this.startDate) : undefined as any;
+        data["endDate"] = this.endDate ? formatDate(this.endDate) : undefined as any;
         return data;
     }
 }
@@ -20533,6 +22120,8 @@ export interface IMileStoneDto {
     name?: string | undefined;
     description?: string | undefined;
     order?: number;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
 }
 
 export class MileStones implements IMileStones {
@@ -20541,6 +22130,8 @@ export class MileStones implements IMileStones {
     name!: string | undefined;
     description?: string | undefined;
     order?: number;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
     agreementId?: number | undefined;
     agreement?: Agreement;
     mainContracts?: MainContract[] | undefined;
@@ -20561,6 +22152,8 @@ export class MileStones implements IMileStones {
             this.name = _data["name"];
             this.description = _data["description"];
             this.order = _data["order"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
             this.agreementId = _data["agreementId"];
             this.agreement = _data["agreement"] ? Agreement.fromJS(_data["agreement"]) : undefined as any;
             if (Array.isArray(_data["mainContracts"])) {
@@ -20585,6 +22178,8 @@ export class MileStones implements IMileStones {
         data["name"] = this.name;
         data["description"] = this.description;
         data["order"] = this.order;
+        data["startDate"] = this.startDate ? formatDate(this.startDate) : undefined as any;
+        data["endDate"] = this.endDate ? formatDate(this.endDate) : undefined as any;
         data["agreementId"] = this.agreementId;
         data["agreement"] = this.agreement ? this.agreement.toJSON() : undefined as any;
         if (Array.isArray(this.mainContracts)) {
@@ -20602,6 +22197,8 @@ export interface IMileStones {
     name: string | undefined;
     description?: string | undefined;
     order?: number;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
     agreementId?: number | undefined;
     agreement?: Agreement;
     mainContracts?: MainContract[] | undefined;
@@ -20612,6 +22209,8 @@ export class MileStonesDto implements IMileStonesDto {
     name?: string | undefined;
     description?: string | undefined;
     order?: number;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
     isDeleted?: boolean;
 
     constructor(data?: IMileStonesDto) {
@@ -20629,6 +22228,8 @@ export class MileStonesDto implements IMileStonesDto {
             this.name = _data["name"];
             this.description = _data["description"];
             this.order = _data["order"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
             this.isDeleted = _data["isDeleted"];
         }
     }
@@ -20646,6 +22247,8 @@ export class MileStonesDto implements IMileStonesDto {
         data["name"] = this.name;
         data["description"] = this.description;
         data["order"] = this.order;
+        data["startDate"] = this.startDate ? formatDate(this.startDate) : undefined as any;
+        data["endDate"] = this.endDate ? formatDate(this.endDate) : undefined as any;
         data["isDeleted"] = this.isDeleted;
         return data;
     }
@@ -20656,6 +22259,8 @@ export interface IMileStonesDto {
     name?: string | undefined;
     description?: string | undefined;
     order?: number;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
     isDeleted?: boolean;
 }
 
@@ -21695,6 +23300,162 @@ export interface IProjectBOQ {
     supplierId?: number | undefined;
 }
 
+export class ProjectDetailsDto implements IProjectDetailsDto {
+    id?: number;
+    title?: string | undefined;
+    projectNumber?: string | undefined;
+    description?: string | undefined;
+    status?: ProjectStatus;
+    startDate?: Date;
+    endDate?: Date;
+    budget?: number;
+    managerId?: number | undefined;
+    managerName?: string | undefined;
+    agreementId?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    paymentFlows?: ProjectPaymentFlowDetailsDto[] | undefined;
+    projectUsers?: ProjectUserDto[] | undefined;
+    tasks?: TaskDetailsDto[] | undefined;
+    images?: AttachmentImageDto[] | undefined;
+    stage?: ProjectStageDetailsDto;
+    stages?: ProjectStageDetailsDto[] | undefined;
+
+    constructor(data?: IProjectDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.title = _data["title"];
+            this.projectNumber = _data["projectNumber"];
+            this.description = _data["description"];
+            this.status = _data["status"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.budget = _data["budget"];
+            this.managerId = _data["managerId"];
+            this.managerName = _data["managerName"];
+            this.agreementId = _data["agreementId"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            if (Array.isArray(_data["paymentFlows"])) {
+                this.paymentFlows = [] as any;
+                for (let item of _data["paymentFlows"])
+                    this.paymentFlows!.push(ProjectPaymentFlowDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["projectUsers"])) {
+                this.projectUsers = [] as any;
+                for (let item of _data["projectUsers"])
+                    this.projectUsers!.push(ProjectUserDto.fromJS(item));
+            }
+            if (Array.isArray(_data["tasks"])) {
+                this.tasks = [] as any;
+                for (let item of _data["tasks"])
+                    this.tasks!.push(TaskDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["images"])) {
+                this.images = [] as any;
+                for (let item of _data["images"])
+                    this.images!.push(AttachmentImageDto.fromJS(item));
+            }
+            this.stage = _data["stage"] ? ProjectStageDetailsDto.fromJS(_data["stage"]) : undefined as any;
+            if (Array.isArray(_data["stages"])) {
+                this.stages = [] as any;
+                for (let item of _data["stages"])
+                    this.stages!.push(ProjectStageDetailsDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ProjectDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["title"] = this.title;
+        data["projectNumber"] = this.projectNumber;
+        data["description"] = this.description;
+        data["status"] = this.status;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        data["budget"] = this.budget;
+        data["managerId"] = this.managerId;
+        data["managerName"] = this.managerName;
+        data["agreementId"] = this.agreementId;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        if (Array.isArray(this.paymentFlows)) {
+            data["paymentFlows"] = [];
+            for (let item of this.paymentFlows)
+                data["paymentFlows"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.projectUsers)) {
+            data["projectUsers"] = [];
+            for (let item of this.projectUsers)
+                data["projectUsers"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.tasks)) {
+            data["tasks"] = [];
+            for (let item of this.tasks)
+                data["tasks"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.images)) {
+            data["images"] = [];
+            for (let item of this.images)
+                data["images"].push(item ? item.toJSON() : undefined as any);
+        }
+        data["stage"] = this.stage ? this.stage.toJSON() : undefined as any;
+        if (Array.isArray(this.stages)) {
+            data["stages"] = [];
+            for (let item of this.stages)
+                data["stages"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IProjectDetailsDto {
+    id?: number;
+    title?: string | undefined;
+    projectNumber?: string | undefined;
+    description?: string | undefined;
+    status?: ProjectStatus;
+    startDate?: Date;
+    endDate?: Date;
+    budget?: number;
+    managerId?: number | undefined;
+    managerName?: string | undefined;
+    agreementId?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    paymentFlows?: ProjectPaymentFlowDetailsDto[] | undefined;
+    projectUsers?: ProjectUserDto[] | undefined;
+    tasks?: TaskDetailsDto[] | undefined;
+    images?: AttachmentImageDto[] | undefined;
+    stage?: ProjectStageDetailsDto;
+    stages?: ProjectStageDetailsDto[] | undefined;
+}
+
 export class ProjectMainContractor implements IProjectMainContractor {
     id?: number;
     isDeleted?: boolean;
@@ -22105,6 +23866,82 @@ export interface IProjectPO {
     price?: number;
     subTotal?: number;
     status?: number;
+}
+
+export class ProjectPaymentFlowDetailsDto implements IProjectPaymentFlowDetailsDto {
+    id?: number;
+    projectId?: number;
+    cash?: number;
+    notes?: string | undefined;
+    createdAt?: Date;
+    paymentMethodId?: number;
+    paymentMethodName?: string | undefined;
+    currencyId?: number;
+    currencyName?: string | undefined;
+    currencyAbb?: string | undefined;
+    currencyRate?: number;
+
+    constructor(data?: IProjectPaymentFlowDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectId = _data["projectId"];
+            this.cash = _data["cash"];
+            this.notes = _data["notes"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.paymentMethodId = _data["paymentMethodId"];
+            this.paymentMethodName = _data["paymentMethodName"];
+            this.currencyId = _data["currencyId"];
+            this.currencyName = _data["currencyName"];
+            this.currencyAbb = _data["currencyAbb"];
+            this.currencyRate = _data["currencyRate"];
+        }
+    }
+
+    static fromJS(data: any): ProjectPaymentFlowDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectPaymentFlowDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectId"] = this.projectId;
+        data["cash"] = this.cash;
+        data["notes"] = this.notes;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["paymentMethodId"] = this.paymentMethodId;
+        data["paymentMethodName"] = this.paymentMethodName;
+        data["currencyId"] = this.currencyId;
+        data["currencyName"] = this.currencyName;
+        data["currencyAbb"] = this.currencyAbb;
+        data["currencyRate"] = this.currencyRate;
+        return data;
+    }
+}
+
+export interface IProjectPaymentFlowDetailsDto {
+    id?: number;
+    projectId?: number;
+    cash?: number;
+    notes?: string | undefined;
+    createdAt?: Date;
+    paymentMethodId?: number;
+    paymentMethodName?: string | undefined;
+    currencyId?: number;
+    currencyName?: string | undefined;
+    currencyAbb?: string | undefined;
+    currencyRate?: number;
 }
 
 export class ProjectReportAdvanceDto implements IProjectReportAdvanceDto {
@@ -23202,6 +25039,8 @@ export class ProjectReportStageDto implements IProjectReportStageDto {
     milestoneId?: number | undefined;
     milestoneName?: string | undefined;
     milestoneOrder?: number | undefined;
+    milestoneStartDate?: Date | undefined;
+    milestoneEndDate?: Date | undefined;
 
     constructor(data?: IProjectReportStageDto) {
         if (data) {
@@ -23220,6 +25059,8 @@ export class ProjectReportStageDto implements IProjectReportStageDto {
             this.milestoneId = _data["milestoneId"];
             this.milestoneName = _data["milestoneName"];
             this.milestoneOrder = _data["milestoneOrder"];
+            this.milestoneStartDate = _data["milestoneStartDate"] ? new Date(_data["milestoneStartDate"].toString()) : undefined as any;
+            this.milestoneEndDate = _data["milestoneEndDate"] ? new Date(_data["milestoneEndDate"].toString()) : undefined as any;
         }
     }
 
@@ -23238,6 +25079,8 @@ export class ProjectReportStageDto implements IProjectReportStageDto {
         data["milestoneId"] = this.milestoneId;
         data["milestoneName"] = this.milestoneName;
         data["milestoneOrder"] = this.milestoneOrder;
+        data["milestoneStartDate"] = this.milestoneStartDate ? formatDate(this.milestoneStartDate) : undefined as any;
+        data["milestoneEndDate"] = this.milestoneEndDate ? formatDate(this.milestoneEndDate) : undefined as any;
         return data;
     }
 }
@@ -23249,6 +25092,8 @@ export interface IProjectReportStageDto {
     milestoneId?: number | undefined;
     milestoneName?: string | undefined;
     milestoneOrder?: number | undefined;
+    milestoneStartDate?: Date | undefined;
+    milestoneEndDate?: Date | undefined;
 }
 
 export class ProjectReportSurveyingVisitDto implements IProjectReportSurveyingVisitDto {
@@ -23641,6 +25486,182 @@ export interface IProjectStage {
     advances?: AdvancePayment[] | undefined;
     milestonesId?: number | undefined;
     milestones?: MileStones;
+}
+
+export class ProjectStageDetailsDto implements IProjectStageDetailsDto {
+    id?: number;
+    projectId?: number;
+    status?: number | undefined;
+    stageType?: ProjectStageType;
+    milestoneId?: number | undefined;
+    milestone?: StageMilestoneDetailsDto;
+    tasks?: TaskDetailsDto[] | undefined;
+    boqs?: StageBOQDetailsDto[] | undefined;
+    mainContractors?: StageMainContractorDetailsDto[] | undefined;
+    purchaseOrders?: StagePurchaseOrderDetailsDto[] | undefined;
+    surveyingVisits?: StageSurveyingVisitDetailsDto[] | undefined;
+    variationOrders?: StageVariationOrderDetailsDto[] | undefined;
+    expenses?: StageExpenseDetailsDto[] | undefined;
+    advances?: StageAdvanceDetailsDto[] | undefined;
+    wirs?: StageWirDetailsDto[] | undefined;
+    images?: AttachmentImageDto[] | undefined;
+
+    constructor(data?: IProjectStageDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectId = _data["projectId"];
+            this.status = _data["status"];
+            this.stageType = _data["stageType"];
+            this.milestoneId = _data["milestoneId"];
+            this.milestone = _data["milestone"] ? StageMilestoneDetailsDto.fromJS(_data["milestone"]) : undefined as any;
+            if (Array.isArray(_data["tasks"])) {
+                this.tasks = [] as any;
+                for (let item of _data["tasks"])
+                    this.tasks!.push(TaskDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["boqs"])) {
+                this.boqs = [] as any;
+                for (let item of _data["boqs"])
+                    this.boqs!.push(StageBOQDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["mainContractors"])) {
+                this.mainContractors = [] as any;
+                for (let item of _data["mainContractors"])
+                    this.mainContractors!.push(StageMainContractorDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["purchaseOrders"])) {
+                this.purchaseOrders = [] as any;
+                for (let item of _data["purchaseOrders"])
+                    this.purchaseOrders!.push(StagePurchaseOrderDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["surveyingVisits"])) {
+                this.surveyingVisits = [] as any;
+                for (let item of _data["surveyingVisits"])
+                    this.surveyingVisits!.push(StageSurveyingVisitDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["variationOrders"])) {
+                this.variationOrders = [] as any;
+                for (let item of _data["variationOrders"])
+                    this.variationOrders!.push(StageVariationOrderDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["expenses"])) {
+                this.expenses = [] as any;
+                for (let item of _data["expenses"])
+                    this.expenses!.push(StageExpenseDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["advances"])) {
+                this.advances = [] as any;
+                for (let item of _data["advances"])
+                    this.advances!.push(StageAdvanceDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["wirs"])) {
+                this.wirs = [] as any;
+                for (let item of _data["wirs"])
+                    this.wirs!.push(StageWirDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["images"])) {
+                this.images = [] as any;
+                for (let item of _data["images"])
+                    this.images!.push(AttachmentImageDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): ProjectStageDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectStageDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectId"] = this.projectId;
+        data["status"] = this.status;
+        data["stageType"] = this.stageType;
+        data["milestoneId"] = this.milestoneId;
+        data["milestone"] = this.milestone ? this.milestone.toJSON() : undefined as any;
+        if (Array.isArray(this.tasks)) {
+            data["tasks"] = [];
+            for (let item of this.tasks)
+                data["tasks"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.boqs)) {
+            data["boqs"] = [];
+            for (let item of this.boqs)
+                data["boqs"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.mainContractors)) {
+            data["mainContractors"] = [];
+            for (let item of this.mainContractors)
+                data["mainContractors"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.purchaseOrders)) {
+            data["purchaseOrders"] = [];
+            for (let item of this.purchaseOrders)
+                data["purchaseOrders"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.surveyingVisits)) {
+            data["surveyingVisits"] = [];
+            for (let item of this.surveyingVisits)
+                data["surveyingVisits"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.variationOrders)) {
+            data["variationOrders"] = [];
+            for (let item of this.variationOrders)
+                data["variationOrders"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.expenses)) {
+            data["expenses"] = [];
+            for (let item of this.expenses)
+                data["expenses"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.advances)) {
+            data["advances"] = [];
+            for (let item of this.advances)
+                data["advances"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.wirs)) {
+            data["wirs"] = [];
+            for (let item of this.wirs)
+                data["wirs"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.images)) {
+            data["images"] = [];
+            for (let item of this.images)
+                data["images"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IProjectStageDetailsDto {
+    id?: number;
+    projectId?: number;
+    status?: number | undefined;
+    stageType?: ProjectStageType;
+    milestoneId?: number | undefined;
+    milestone?: StageMilestoneDetailsDto;
+    tasks?: TaskDetailsDto[] | undefined;
+    boqs?: StageBOQDetailsDto[] | undefined;
+    mainContractors?: StageMainContractorDetailsDto[] | undefined;
+    purchaseOrders?: StagePurchaseOrderDetailsDto[] | undefined;
+    surveyingVisits?: StageSurveyingVisitDetailsDto[] | undefined;
+    variationOrders?: StageVariationOrderDetailsDto[] | undefined;
+    expenses?: StageExpenseDetailsDto[] | undefined;
+    advances?: StageAdvanceDetailsDto[] | undefined;
+    wirs?: StageWirDetailsDto[] | undefined;
+    images?: AttachmentImageDto[] | undefined;
 }
 
 export class ProjectStageDto implements IProjectStageDto {
@@ -25817,6 +27838,1246 @@ export interface ISixthStepDto {
     quantityBillDto?: QuantityBillDto[] | undefined;
 }
 
+export class StageAdvanceDetailsDto implements IStageAdvanceDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    advanceNo?: string | undefined;
+    advanceDate?: Date;
+    amount?: number;
+    remainingBalance?: number;
+    status?: AdvancePaymentStatus;
+    engineerId?: number;
+    engineerName?: string | undefined;
+    paymentMethodId?: number | undefined;
+    paymentMethodName?: string | undefined;
+    currency?: string | undefined;
+    reference?: string | undefined;
+    notes?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    advanceExpenses?: StageAdvanceExpenseDetailsDto[] | undefined;
+
+    constructor(data?: IStageAdvanceDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.advanceNo = _data["advanceNo"];
+            this.advanceDate = _data["advanceDate"] ? new Date(_data["advanceDate"].toString()) : undefined as any;
+            this.amount = _data["amount"];
+            this.remainingBalance = _data["remainingBalance"];
+            this.status = _data["status"];
+            this.engineerId = _data["engineerId"];
+            this.engineerName = _data["engineerName"];
+            this.paymentMethodId = _data["paymentMethodId"];
+            this.paymentMethodName = _data["paymentMethodName"];
+            this.currency = _data["currency"];
+            this.reference = _data["reference"];
+            this.notes = _data["notes"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+            this.updatedAt = _data["updatedAt"] ? new Date(_data["updatedAt"].toString()) : undefined as any;
+            if (Array.isArray(_data["advanceExpenses"])) {
+                this.advanceExpenses = [] as any;
+                for (let item of _data["advanceExpenses"])
+                    this.advanceExpenses!.push(StageAdvanceExpenseDetailsDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): StageAdvanceDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StageAdvanceDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["advanceNo"] = this.advanceNo;
+        data["advanceDate"] = this.advanceDate ? this.advanceDate.toISOString() : undefined as any;
+        data["amount"] = this.amount;
+        data["remainingBalance"] = this.remainingBalance;
+        data["status"] = this.status;
+        data["engineerId"] = this.engineerId;
+        data["engineerName"] = this.engineerName;
+        data["paymentMethodId"] = this.paymentMethodId;
+        data["paymentMethodName"] = this.paymentMethodName;
+        data["currency"] = this.currency;
+        data["reference"] = this.reference;
+        data["notes"] = this.notes;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        data["updatedAt"] = this.updatedAt ? this.updatedAt.toISOString() : undefined as any;
+        if (Array.isArray(this.advanceExpenses)) {
+            data["advanceExpenses"] = [];
+            for (let item of this.advanceExpenses)
+                data["advanceExpenses"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IStageAdvanceDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    advanceNo?: string | undefined;
+    advanceDate?: Date;
+    amount?: number;
+    remainingBalance?: number;
+    status?: AdvancePaymentStatus;
+    engineerId?: number;
+    engineerName?: string | undefined;
+    paymentMethodId?: number | undefined;
+    paymentMethodName?: string | undefined;
+    currency?: string | undefined;
+    reference?: string | undefined;
+    notes?: string | undefined;
+    createdAt?: Date;
+    updatedAt?: Date | undefined;
+    advanceExpenses?: StageAdvanceExpenseDetailsDto[] | undefined;
+}
+
+export class StageAdvanceExpenseDetailsDto implements IStageAdvanceExpenseDetailsDto {
+    id?: number;
+    advanceId?: number;
+    expenseId?: number;
+    expenseNo?: string | undefined;
+    expenseTotalAmount?: number;
+    createdAt?: Date;
+
+    constructor(data?: IStageAdvanceExpenseDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.advanceId = _data["advanceId"];
+            this.expenseId = _data["expenseId"];
+            this.expenseNo = _data["expenseNo"];
+            this.expenseTotalAmount = _data["expenseTotalAmount"];
+            this.createdAt = _data["createdAt"] ? new Date(_data["createdAt"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): StageAdvanceExpenseDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StageAdvanceExpenseDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["advanceId"] = this.advanceId;
+        data["expenseId"] = this.expenseId;
+        data["expenseNo"] = this.expenseNo;
+        data["expenseTotalAmount"] = this.expenseTotalAmount;
+        data["createdAt"] = this.createdAt ? this.createdAt.toISOString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IStageAdvanceExpenseDetailsDto {
+    id?: number;
+    advanceId?: number;
+    expenseId?: number;
+    expenseNo?: string | undefined;
+    expenseTotalAmount?: number;
+    createdAt?: Date;
+}
+
+export class StageBOQDetailsDto implements IStageBOQDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    materialId?: number;
+    materialName?: string | undefined;
+    materialSubCategoryId?: number | undefined;
+    materialSubCategoryName?: string | undefined;
+    unitId?: number;
+    unitName?: string | undefined;
+    constructorId?: number;
+    constructorName?: string | undefined;
+    supplierId?: number | undefined;
+    supplierName?: string | undefined;
+    description?: string | undefined;
+    expectedQuantity?: number;
+    actualQuantity?: number;
+    expectedPrice?: number;
+    actualPrice?: number;
+    subTotal?: number;
+
+    constructor(data?: IStageBOQDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.materialId = _data["materialId"];
+            this.materialName = _data["materialName"];
+            this.materialSubCategoryId = _data["materialSubCategoryId"];
+            this.materialSubCategoryName = _data["materialSubCategoryName"];
+            this.unitId = _data["unitId"];
+            this.unitName = _data["unitName"];
+            this.constructorId = _data["constructorId"];
+            this.constructorName = _data["constructorName"];
+            this.supplierId = _data["supplierId"];
+            this.supplierName = _data["supplierName"];
+            this.description = _data["description"];
+            this.expectedQuantity = _data["expectedQuantity"];
+            this.actualQuantity = _data["actualQuantity"];
+            this.expectedPrice = _data["expectedPrice"];
+            this.actualPrice = _data["actualPrice"];
+            this.subTotal = _data["subTotal"];
+        }
+    }
+
+    static fromJS(data: any): StageBOQDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StageBOQDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["materialId"] = this.materialId;
+        data["materialName"] = this.materialName;
+        data["materialSubCategoryId"] = this.materialSubCategoryId;
+        data["materialSubCategoryName"] = this.materialSubCategoryName;
+        data["unitId"] = this.unitId;
+        data["unitName"] = this.unitName;
+        data["constructorId"] = this.constructorId;
+        data["constructorName"] = this.constructorName;
+        data["supplierId"] = this.supplierId;
+        data["supplierName"] = this.supplierName;
+        data["description"] = this.description;
+        data["expectedQuantity"] = this.expectedQuantity;
+        data["actualQuantity"] = this.actualQuantity;
+        data["expectedPrice"] = this.expectedPrice;
+        data["actualPrice"] = this.actualPrice;
+        data["subTotal"] = this.subTotal;
+        return data;
+    }
+}
+
+export interface IStageBOQDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    materialId?: number;
+    materialName?: string | undefined;
+    materialSubCategoryId?: number | undefined;
+    materialSubCategoryName?: string | undefined;
+    unitId?: number;
+    unitName?: string | undefined;
+    constructorId?: number;
+    constructorName?: string | undefined;
+    supplierId?: number | undefined;
+    supplierName?: string | undefined;
+    description?: string | undefined;
+    expectedQuantity?: number;
+    actualQuantity?: number;
+    expectedPrice?: number;
+    actualPrice?: number;
+    subTotal?: number;
+}
+
+export class StageExpenseDetailsDto implements IStageExpenseDetailsDto {
+    id?: number;
+    projectStageId?: number | undefined;
+    expenseDate?: Date;
+    expenseNo?: string | undefined;
+    totalAmount?: number;
+    notes?: string | undefined;
+    status?: string | undefined;
+    isLocked?: boolean;
+    lockedAt?: Date | undefined;
+    lockedByAdvanceId?: number | undefined;
+    autoPost?: boolean;
+    supplierId?: number;
+    supplierName?: string | undefined;
+    contractorDutyId?: number | undefined;
+    expenseDetails?: ExpenseDetailDto[] | undefined;
+    advanceIds?: number[] | undefined;
+    images?: AttachmentImageDto[] | undefined;
+
+    constructor(data?: IStageExpenseDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.expenseDate = _data["expenseDate"] ? new Date(_data["expenseDate"].toString()) : undefined as any;
+            this.expenseNo = _data["expenseNo"];
+            this.totalAmount = _data["totalAmount"];
+            this.notes = _data["notes"];
+            this.status = _data["status"];
+            this.isLocked = _data["isLocked"];
+            this.lockedAt = _data["lockedAt"] ? new Date(_data["lockedAt"].toString()) : undefined as any;
+            this.lockedByAdvanceId = _data["lockedByAdvanceId"];
+            this.autoPost = _data["autoPost"];
+            this.supplierId = _data["supplierId"];
+            this.supplierName = _data["supplierName"];
+            this.contractorDutyId = _data["contractorDutyId"];
+            if (Array.isArray(_data["expenseDetails"])) {
+                this.expenseDetails = [] as any;
+                for (let item of _data["expenseDetails"])
+                    this.expenseDetails!.push(ExpenseDetailDto.fromJS(item));
+            }
+            if (Array.isArray(_data["advanceIds"])) {
+                this.advanceIds = [] as any;
+                for (let item of _data["advanceIds"])
+                    this.advanceIds!.push(item);
+            }
+            if (Array.isArray(_data["images"])) {
+                this.images = [] as any;
+                for (let item of _data["images"])
+                    this.images!.push(AttachmentImageDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): StageExpenseDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StageExpenseDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["expenseDate"] = this.expenseDate ? this.expenseDate.toISOString() : undefined as any;
+        data["expenseNo"] = this.expenseNo;
+        data["totalAmount"] = this.totalAmount;
+        data["notes"] = this.notes;
+        data["status"] = this.status;
+        data["isLocked"] = this.isLocked;
+        data["lockedAt"] = this.lockedAt ? this.lockedAt.toISOString() : undefined as any;
+        data["lockedByAdvanceId"] = this.lockedByAdvanceId;
+        data["autoPost"] = this.autoPost;
+        data["supplierId"] = this.supplierId;
+        data["supplierName"] = this.supplierName;
+        data["contractorDutyId"] = this.contractorDutyId;
+        if (Array.isArray(this.expenseDetails)) {
+            data["expenseDetails"] = [];
+            for (let item of this.expenseDetails)
+                data["expenseDetails"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.advanceIds)) {
+            data["advanceIds"] = [];
+            for (let item of this.advanceIds)
+                data["advanceIds"].push(item);
+        }
+        if (Array.isArray(this.images)) {
+            data["images"] = [];
+            for (let item of this.images)
+                data["images"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IStageExpenseDetailsDto {
+    id?: number;
+    projectStageId?: number | undefined;
+    expenseDate?: Date;
+    expenseNo?: string | undefined;
+    totalAmount?: number;
+    notes?: string | undefined;
+    status?: string | undefined;
+    isLocked?: boolean;
+    lockedAt?: Date | undefined;
+    lockedByAdvanceId?: number | undefined;
+    autoPost?: boolean;
+    supplierId?: number;
+    supplierName?: string | undefined;
+    contractorDutyId?: number | undefined;
+    expenseDetails?: ExpenseDetailDto[] | undefined;
+    advanceIds?: number[] | undefined;
+    images?: AttachmentImageDto[] | undefined;
+}
+
+export class StageMainContractorDetailsDto implements IStageMainContractorDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    constructorId?: number;
+    constructorName?: string | undefined;
+    contractorTypeId?: number;
+    contractorTypeName?: string | undefined;
+    classification?: ClassificationProjectMainContractor;
+    amount?: number;
+    totalPayments?: number;
+    startDate?: Date;
+    endDate?: Date;
+    payments?: StageMainContractorPaymentDetailsDto[] | undefined;
+    duties?: StageMainContractorDutyDetailsDto[] | undefined;
+    tasks?: TaskDetailsDto[] | undefined;
+
+    constructor(data?: IStageMainContractorDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.constructorId = _data["constructorId"];
+            this.constructorName = _data["constructorName"];
+            this.contractorTypeId = _data["contractorTypeId"];
+            this.contractorTypeName = _data["contractorTypeName"];
+            this.classification = _data["classification"];
+            this.amount = _data["amount"];
+            this.totalPayments = _data["totalPayments"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            if (Array.isArray(_data["payments"])) {
+                this.payments = [] as any;
+                for (let item of _data["payments"])
+                    this.payments!.push(StageMainContractorPaymentDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["duties"])) {
+                this.duties = [] as any;
+                for (let item of _data["duties"])
+                    this.duties!.push(StageMainContractorDutyDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["tasks"])) {
+                this.tasks = [] as any;
+                for (let item of _data["tasks"])
+                    this.tasks!.push(TaskDetailsDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): StageMainContractorDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StageMainContractorDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["constructorId"] = this.constructorId;
+        data["constructorName"] = this.constructorName;
+        data["contractorTypeId"] = this.contractorTypeId;
+        data["contractorTypeName"] = this.contractorTypeName;
+        data["classification"] = this.classification;
+        data["amount"] = this.amount;
+        data["totalPayments"] = this.totalPayments;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        if (Array.isArray(this.payments)) {
+            data["payments"] = [];
+            for (let item of this.payments)
+                data["payments"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.duties)) {
+            data["duties"] = [];
+            for (let item of this.duties)
+                data["duties"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.tasks)) {
+            data["tasks"] = [];
+            for (let item of this.tasks)
+                data["tasks"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IStageMainContractorDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    constructorId?: number;
+    constructorName?: string | undefined;
+    contractorTypeId?: number;
+    contractorTypeName?: string | undefined;
+    classification?: ClassificationProjectMainContractor;
+    amount?: number;
+    totalPayments?: number;
+    startDate?: Date;
+    endDate?: Date;
+    payments?: StageMainContractorPaymentDetailsDto[] | undefined;
+    duties?: StageMainContractorDutyDetailsDto[] | undefined;
+    tasks?: TaskDetailsDto[] | undefined;
+}
+
+export class StageMainContractorDutyDetailsDto implements IStageMainContractorDutyDetailsDto {
+    id?: number;
+    projectMainContractorId?: number;
+    dutyTypeId?: number;
+    dutyTypeName?: string | undefined;
+    dutyResponsibilityId?: number;
+    dutyResponsibilityName?: string | undefined;
+    unitId?: number;
+    unitName?: string | undefined;
+    quantity?: number;
+    price?: number;
+    subTotal?: number;
+    supplierId?: number | undefined;
+    supplierName?: string | undefined;
+    materialId?: number | undefined;
+    materialName?: string | undefined;
+    autoPost?: boolean;
+    expenseId?: number | undefined;
+    expenseNumber?: string | undefined;
+
+    constructor(data?: IStageMainContractorDutyDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectMainContractorId = _data["projectMainContractorId"];
+            this.dutyTypeId = _data["dutyTypeId"];
+            this.dutyTypeName = _data["dutyTypeName"];
+            this.dutyResponsibilityId = _data["dutyResponsibilityId"];
+            this.dutyResponsibilityName = _data["dutyResponsibilityName"];
+            this.unitId = _data["unitId"];
+            this.unitName = _data["unitName"];
+            this.quantity = _data["quantity"];
+            this.price = _data["price"];
+            this.subTotal = _data["subTotal"];
+            this.supplierId = _data["supplierId"];
+            this.supplierName = _data["supplierName"];
+            this.materialId = _data["materialId"];
+            this.materialName = _data["materialName"];
+            this.autoPost = _data["autoPost"];
+            this.expenseId = _data["expenseId"];
+            this.expenseNumber = _data["expenseNumber"];
+        }
+    }
+
+    static fromJS(data: any): StageMainContractorDutyDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StageMainContractorDutyDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectMainContractorId"] = this.projectMainContractorId;
+        data["dutyTypeId"] = this.dutyTypeId;
+        data["dutyTypeName"] = this.dutyTypeName;
+        data["dutyResponsibilityId"] = this.dutyResponsibilityId;
+        data["dutyResponsibilityName"] = this.dutyResponsibilityName;
+        data["unitId"] = this.unitId;
+        data["unitName"] = this.unitName;
+        data["quantity"] = this.quantity;
+        data["price"] = this.price;
+        data["subTotal"] = this.subTotal;
+        data["supplierId"] = this.supplierId;
+        data["supplierName"] = this.supplierName;
+        data["materialId"] = this.materialId;
+        data["materialName"] = this.materialName;
+        data["autoPost"] = this.autoPost;
+        data["expenseId"] = this.expenseId;
+        data["expenseNumber"] = this.expenseNumber;
+        return data;
+    }
+}
+
+export interface IStageMainContractorDutyDetailsDto {
+    id?: number;
+    projectMainContractorId?: number;
+    dutyTypeId?: number;
+    dutyTypeName?: string | undefined;
+    dutyResponsibilityId?: number;
+    dutyResponsibilityName?: string | undefined;
+    unitId?: number;
+    unitName?: string | undefined;
+    quantity?: number;
+    price?: number;
+    subTotal?: number;
+    supplierId?: number | undefined;
+    supplierName?: string | undefined;
+    materialId?: number | undefined;
+    materialName?: string | undefined;
+    autoPost?: boolean;
+    expenseId?: number | undefined;
+    expenseNumber?: string | undefined;
+}
+
+export class StageMainContractorPaymentDetailsDto implements IStageMainContractorPaymentDetailsDto {
+    id?: number;
+    projectMainContractorId?: number;
+    paymentDate?: Date;
+    paidAmount?: number;
+    notes?: string | undefined;
+    receiptNo?: string | undefined;
+    paymentMethod?: number | undefined;
+    chequeNo?: string | undefined;
+    transferReferenceNumber?: string | undefined;
+    images?: AttachmentImageDto[] | undefined;
+
+    constructor(data?: IStageMainContractorPaymentDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectMainContractorId = _data["projectMainContractorId"];
+            this.paymentDate = _data["paymentDate"] ? new Date(_data["paymentDate"].toString()) : undefined as any;
+            this.paidAmount = _data["paidAmount"];
+            this.notes = _data["notes"];
+            this.receiptNo = _data["receiptNo"];
+            this.paymentMethod = _data["paymentMethod"];
+            this.chequeNo = _data["chequeNo"];
+            this.transferReferenceNumber = _data["transferReferenceNumber"];
+            if (Array.isArray(_data["images"])) {
+                this.images = [] as any;
+                for (let item of _data["images"])
+                    this.images!.push(AttachmentImageDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): StageMainContractorPaymentDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StageMainContractorPaymentDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectMainContractorId"] = this.projectMainContractorId;
+        data["paymentDate"] = this.paymentDate ? this.paymentDate.toISOString() : undefined as any;
+        data["paidAmount"] = this.paidAmount;
+        data["notes"] = this.notes;
+        data["receiptNo"] = this.receiptNo;
+        data["paymentMethod"] = this.paymentMethod;
+        data["chequeNo"] = this.chequeNo;
+        data["transferReferenceNumber"] = this.transferReferenceNumber;
+        if (Array.isArray(this.images)) {
+            data["images"] = [];
+            for (let item of this.images)
+                data["images"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IStageMainContractorPaymentDetailsDto {
+    id?: number;
+    projectMainContractorId?: number;
+    paymentDate?: Date;
+    paidAmount?: number;
+    notes?: string | undefined;
+    receiptNo?: string | undefined;
+    paymentMethod?: number | undefined;
+    chequeNo?: string | undefined;
+    transferReferenceNumber?: string | undefined;
+    images?: AttachmentImageDto[] | undefined;
+}
+
+export class StageMilestoneDetailsDto implements IStageMilestoneDetailsDto {
+    id?: number;
+    name?: string | undefined;
+    description?: string | undefined;
+    order?: number;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
+    agreementId?: number | undefined;
+
+    constructor(data?: IStageMilestoneDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.name = _data["name"];
+            this.description = _data["description"];
+            this.order = _data["order"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.agreementId = _data["agreementId"];
+        }
+    }
+
+    static fromJS(data: any): StageMilestoneDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StageMilestoneDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["description"] = this.description;
+        data["order"] = this.order;
+        data["startDate"] = this.startDate ? formatDate(this.startDate) : undefined as any;
+        data["endDate"] = this.endDate ? formatDate(this.endDate) : undefined as any;
+        data["agreementId"] = this.agreementId;
+        return data;
+    }
+}
+
+export interface IStageMilestoneDetailsDto {
+    id?: number;
+    name?: string | undefined;
+    description?: string | undefined;
+    order?: number;
+    startDate?: Date | undefined;
+    endDate?: Date | undefined;
+    agreementId?: number | undefined;
+}
+
+export class StagePurchaseOrderDetailsDto implements IStagePurchaseOrderDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    poNumber?: string | undefined;
+    supplierId?: number;
+    supplierName?: string | undefined;
+    description?: string | undefined;
+    unitId?: number;
+    unitName?: string | undefined;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+    images?: AttachmentImageDto[] | undefined;
+
+    constructor(data?: IStagePurchaseOrderDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.poNumber = _data["poNumber"];
+            this.supplierId = _data["supplierId"];
+            this.supplierName = _data["supplierName"];
+            this.description = _data["description"];
+            this.unitId = _data["unitId"];
+            this.unitName = _data["unitName"];
+            this.price = _data["price"];
+            this.subTotal = _data["subTotal"];
+            this.status = _data["status"];
+            if (Array.isArray(_data["images"])) {
+                this.images = [] as any;
+                for (let item of _data["images"])
+                    this.images!.push(AttachmentImageDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): StagePurchaseOrderDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StagePurchaseOrderDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["poNumber"] = this.poNumber;
+        data["supplierId"] = this.supplierId;
+        data["supplierName"] = this.supplierName;
+        data["description"] = this.description;
+        data["unitId"] = this.unitId;
+        data["unitName"] = this.unitName;
+        data["price"] = this.price;
+        data["subTotal"] = this.subTotal;
+        data["status"] = this.status;
+        if (Array.isArray(this.images)) {
+            data["images"] = [];
+            for (let item of this.images)
+                data["images"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IStagePurchaseOrderDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    poNumber?: string | undefined;
+    supplierId?: number;
+    supplierName?: string | undefined;
+    description?: string | undefined;
+    unitId?: number;
+    unitName?: string | undefined;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+    images?: AttachmentImageDto[] | undefined;
+}
+
+export class StageSurveyingVisitDetailsDto implements IStageSurveyingVisitDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    visitDate?: Date;
+    surveyor?: string | undefined;
+    purpose?: string | undefined;
+    quantity?: number;
+    unitId?: number;
+    unitName?: string | undefined;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+    images?: AttachmentImageDto[] | undefined;
+
+    constructor(data?: IStageSurveyingVisitDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.visitDate = _data["visitDate"] ? new Date(_data["visitDate"].toString()) : undefined as any;
+            this.surveyor = _data["surveyor"];
+            this.purpose = _data["purpose"];
+            this.quantity = _data["quantity"];
+            this.unitId = _data["unitId"];
+            this.unitName = _data["unitName"];
+            this.price = _data["price"];
+            this.subTotal = _data["subTotal"];
+            this.status = _data["status"];
+            if (Array.isArray(_data["images"])) {
+                this.images = [] as any;
+                for (let item of _data["images"])
+                    this.images!.push(AttachmentImageDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): StageSurveyingVisitDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StageSurveyingVisitDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["visitDate"] = this.visitDate ? this.visitDate.toISOString() : undefined as any;
+        data["surveyor"] = this.surveyor;
+        data["purpose"] = this.purpose;
+        data["quantity"] = this.quantity;
+        data["unitId"] = this.unitId;
+        data["unitName"] = this.unitName;
+        data["price"] = this.price;
+        data["subTotal"] = this.subTotal;
+        data["status"] = this.status;
+        if (Array.isArray(this.images)) {
+            data["images"] = [];
+            for (let item of this.images)
+                data["images"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IStageSurveyingVisitDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    visitDate?: Date;
+    surveyor?: string | undefined;
+    purpose?: string | undefined;
+    quantity?: number;
+    unitId?: number;
+    unitName?: string | undefined;
+    price?: number;
+    subTotal?: number;
+    status?: number;
+    images?: AttachmentImageDto[] | undefined;
+}
+
+export class StageVariationOrderDetailsDto implements IStageVariationOrderDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    voNumber?: string | undefined;
+    item?: string | undefined;
+    description?: string | undefined;
+    unitId?: number;
+    unitName?: string | undefined;
+    quantity?: number;
+    price?: number;
+    subTotal?: number;
+    isEffected?: boolean;
+    effectedDateStart?: Date | undefined;
+    effectedDateEnd?: Date | undefined;
+    status?: AcceptenceStatus;
+
+    constructor(data?: IStageVariationOrderDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.voNumber = _data["voNumber"];
+            this.item = _data["item"];
+            this.description = _data["description"];
+            this.unitId = _data["unitId"];
+            this.unitName = _data["unitName"];
+            this.quantity = _data["quantity"];
+            this.price = _data["price"];
+            this.subTotal = _data["subTotal"];
+            this.isEffected = _data["isEffected"];
+            this.effectedDateStart = _data["effectedDateStart"] ? new Date(_data["effectedDateStart"].toString()) : undefined as any;
+            this.effectedDateEnd = _data["effectedDateEnd"] ? new Date(_data["effectedDateEnd"].toString()) : undefined as any;
+            this.status = _data["status"];
+        }
+    }
+
+    static fromJS(data: any): StageVariationOrderDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StageVariationOrderDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["voNumber"] = this.voNumber;
+        data["item"] = this.item;
+        data["description"] = this.description;
+        data["unitId"] = this.unitId;
+        data["unitName"] = this.unitName;
+        data["quantity"] = this.quantity;
+        data["price"] = this.price;
+        data["subTotal"] = this.subTotal;
+        data["isEffected"] = this.isEffected;
+        data["effectedDateStart"] = this.effectedDateStart ? this.effectedDateStart.toISOString() : undefined as any;
+        data["effectedDateEnd"] = this.effectedDateEnd ? this.effectedDateEnd.toISOString() : undefined as any;
+        data["status"] = this.status;
+        return data;
+    }
+}
+
+export interface IStageVariationOrderDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    voNumber?: string | undefined;
+    item?: string | undefined;
+    description?: string | undefined;
+    unitId?: number;
+    unitName?: string | undefined;
+    quantity?: number;
+    price?: number;
+    subTotal?: number;
+    isEffected?: boolean;
+    effectedDateStart?: Date | undefined;
+    effectedDateEnd?: Date | undefined;
+    status?: AcceptenceStatus;
+}
+
+export class StageWirChecklistItemDetailsDto implements IStageWirChecklistItemDetailsDto {
+    id?: number;
+    wirId?: number;
+    wirChecklistItemId?: number;
+    checklistItem?: string | undefined;
+    displayOrder?: number;
+    status?: WirChecklistItemStatus;
+    inspectorComment?: string | undefined;
+    severityCode?: string | undefined;
+    createdDate?: Date;
+
+    constructor(data?: IStageWirChecklistItemDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.wirId = _data["wirId"];
+            this.wirChecklistItemId = _data["wirChecklistItemId"];
+            this.checklistItem = _data["checklistItem"];
+            this.displayOrder = _data["displayOrder"];
+            this.status = _data["status"];
+            this.inspectorComment = _data["inspectorComment"];
+            this.severityCode = _data["severityCode"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+        }
+    }
+
+    static fromJS(data: any): StageWirChecklistItemDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StageWirChecklistItemDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["wirId"] = this.wirId;
+        data["wirChecklistItemId"] = this.wirChecklistItemId;
+        data["checklistItem"] = this.checklistItem;
+        data["displayOrder"] = this.displayOrder;
+        data["status"] = this.status;
+        data["inspectorComment"] = this.inspectorComment;
+        data["severityCode"] = this.severityCode;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        return data;
+    }
+}
+
+export interface IStageWirChecklistItemDetailsDto {
+    id?: number;
+    wirId?: number;
+    wirChecklistItemId?: number;
+    checklistItem?: string | undefined;
+    displayOrder?: number;
+    status?: WirChecklistItemStatus;
+    inspectorComment?: string | undefined;
+    severityCode?: string | undefined;
+    createdDate?: Date;
+}
+
+export class StageWirDetailsDto implements IStageWirDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    wirNo?: string | undefined;
+    constructorId?: number;
+    constructorName?: string | undefined;
+    disciplineCode?: string | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    drawingReference?: string | undefined;
+    levelName?: string | undefined;
+    zoneName?: string | undefined;
+    gridReference?: string | undefined;
+    x_AXIS?: string | undefined;
+    y_AXIS?: string | undefined;
+    requestedBy?: number;
+    requestedByName?: string | undefined;
+    assignedTo?: number | undefined;
+    assignedToName?: string | undefined;
+    inspectionDate?: Date | undefined;
+    status?: WirStatus;
+    submittedDate?: Date | undefined;
+    approvedDate?: Date | undefined;
+    rejectedDate?: Date | undefined;
+    parentId?: number | undefined;
+    revisionNo?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    checklistItems?: StageWirChecklistItemDetailsDto[] | undefined;
+
+    constructor(data?: IStageWirDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.wirNo = _data["wirNo"];
+            this.constructorId = _data["constructorId"];
+            this.constructorName = _data["constructorName"];
+            this.disciplineCode = _data["disciplineCode"];
+            this.title = _data["title"];
+            this.description = _data["description"];
+            this.drawingReference = _data["drawingReference"];
+            this.levelName = _data["levelName"];
+            this.zoneName = _data["zoneName"];
+            this.gridReference = _data["gridReference"];
+            this.x_AXIS = _data["x_AXIS"];
+            this.y_AXIS = _data["y_AXIS"];
+            this.requestedBy = _data["requestedBy"];
+            this.requestedByName = _data["requestedByName"];
+            this.assignedTo = _data["assignedTo"];
+            this.assignedToName = _data["assignedToName"];
+            this.inspectionDate = _data["inspectionDate"] ? new Date(_data["inspectionDate"].toString()) : undefined as any;
+            this.status = _data["status"];
+            this.submittedDate = _data["submittedDate"] ? new Date(_data["submittedDate"].toString()) : undefined as any;
+            this.approvedDate = _data["approvedDate"] ? new Date(_data["approvedDate"].toString()) : undefined as any;
+            this.rejectedDate = _data["rejectedDate"] ? new Date(_data["rejectedDate"].toString()) : undefined as any;
+            this.parentId = _data["parentId"];
+            this.revisionNo = _data["revisionNo"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            if (Array.isArray(_data["checklistItems"])) {
+                this.checklistItems = [] as any;
+                for (let item of _data["checklistItems"])
+                    this.checklistItems!.push(StageWirChecklistItemDetailsDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): StageWirDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new StageWirDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["wirNo"] = this.wirNo;
+        data["constructorId"] = this.constructorId;
+        data["constructorName"] = this.constructorName;
+        data["disciplineCode"] = this.disciplineCode;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        data["drawingReference"] = this.drawingReference;
+        data["levelName"] = this.levelName;
+        data["zoneName"] = this.zoneName;
+        data["gridReference"] = this.gridReference;
+        data["x_AXIS"] = this.x_AXIS;
+        data["y_AXIS"] = this.y_AXIS;
+        data["requestedBy"] = this.requestedBy;
+        data["requestedByName"] = this.requestedByName;
+        data["assignedTo"] = this.assignedTo;
+        data["assignedToName"] = this.assignedToName;
+        data["inspectionDate"] = this.inspectionDate ? this.inspectionDate.toISOString() : undefined as any;
+        data["status"] = this.status;
+        data["submittedDate"] = this.submittedDate ? this.submittedDate.toISOString() : undefined as any;
+        data["approvedDate"] = this.approvedDate ? this.approvedDate.toISOString() : undefined as any;
+        data["rejectedDate"] = this.rejectedDate ? this.rejectedDate.toISOString() : undefined as any;
+        data["parentId"] = this.parentId;
+        data["revisionNo"] = this.revisionNo;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        if (Array.isArray(this.checklistItems)) {
+            data["checklistItems"] = [];
+            for (let item of this.checklistItems)
+                data["checklistItems"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface IStageWirDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    wirNo?: string | undefined;
+    constructorId?: number;
+    constructorName?: string | undefined;
+    disciplineCode?: string | undefined;
+    title?: string | undefined;
+    description?: string | undefined;
+    drawingReference?: string | undefined;
+    levelName?: string | undefined;
+    zoneName?: string | undefined;
+    gridReference?: string | undefined;
+    x_AXIS?: string | undefined;
+    y_AXIS?: string | undefined;
+    requestedBy?: number;
+    requestedByName?: string | undefined;
+    assignedTo?: number | undefined;
+    assignedToName?: string | undefined;
+    inspectionDate?: Date | undefined;
+    status?: WirStatus;
+    submittedDate?: Date | undefined;
+    approvedDate?: Date | undefined;
+    rejectedDate?: Date | undefined;
+    parentId?: number | undefined;
+    revisionNo?: number;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    checklistItems?: StageWirChecklistItemDetailsDto[] | undefined;
+}
+
 export enum StatusTask {
     ToDO = "toDO",
     InProgress = "inProgress",
@@ -26310,6 +29571,174 @@ export interface ISupplierServiceDto {
     supplierId?: number;
     agreementId?: number;
     isDeleted?: boolean;
+}
+
+export class TaskDetailsDto implements ITaskDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    stageType?: ProjectStageType;
+    title?: string | undefined;
+    description?: string | undefined;
+    assignTo?: number | undefined;
+    assignToName?: string | undefined;
+    startDate?: Date;
+    endDate?: Date;
+    priority?: number | undefined;
+    taskPoint?: number | undefined;
+    status?: StatusTask;
+    taskTypeId?: number;
+    taskTypeName?: string | undefined;
+    responsibility?: Responsibility;
+    projectMainContractorId?: number | undefined;
+    projectMainContractorName?: string | undefined;
+    supplierId?: number | undefined;
+    supplierName?: string | undefined;
+    excavationLocation?: string | undefined;
+    excavationDepth?: number | undefined;
+    excavationVolume?: number | undefined;
+    excavationSoilType?: string | undefined;
+    excavationEquipment?: string | undefined;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    subTasks?: ProjectSubTaskDto[] | undefined;
+    images?: AttachmentImageDto[] | undefined;
+
+    constructor(data?: ITaskDetailsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectStageId = _data["projectStageId"];
+            this.stageType = _data["stageType"];
+            this.title = _data["title"];
+            this.description = _data["description"];
+            this.assignTo = _data["assignTo"];
+            this.assignToName = _data["assignToName"];
+            this.startDate = _data["startDate"] ? new Date(_data["startDate"].toString()) : undefined as any;
+            this.endDate = _data["endDate"] ? new Date(_data["endDate"].toString()) : undefined as any;
+            this.priority = _data["priority"];
+            this.taskPoint = _data["taskPoint"];
+            this.status = _data["status"];
+            this.taskTypeId = _data["taskTypeId"];
+            this.taskTypeName = _data["taskTypeName"];
+            this.responsibility = _data["responsibility"];
+            this.projectMainContractorId = _data["projectMainContractorId"];
+            this.projectMainContractorName = _data["projectMainContractorName"];
+            this.supplierId = _data["supplierId"];
+            this.supplierName = _data["supplierName"];
+            this.excavationLocation = _data["excavationLocation"];
+            this.excavationDepth = _data["excavationDepth"];
+            this.excavationVolume = _data["excavationVolume"];
+            this.excavationSoilType = _data["excavationSoilType"];
+            this.excavationEquipment = _data["excavationEquipment"];
+            this.createdById = _data["createdById"];
+            this.createdDate = _data["createdDate"] ? new Date(_data["createdDate"].toString()) : undefined as any;
+            this.modifiedById = _data["modifiedById"];
+            this.modifiedDate = _data["modifiedDate"] ? new Date(_data["modifiedDate"].toString()) : undefined as any;
+            if (Array.isArray(_data["subTasks"])) {
+                this.subTasks = [] as any;
+                for (let item of _data["subTasks"])
+                    this.subTasks!.push(ProjectSubTaskDto.fromJS(item));
+            }
+            if (Array.isArray(_data["images"])) {
+                this.images = [] as any;
+                for (let item of _data["images"])
+                    this.images!.push(AttachmentImageDto.fromJS(item));
+            }
+        }
+    }
+
+    static fromJS(data: any): TaskDetailsDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new TaskDetailsDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectStageId"] = this.projectStageId;
+        data["stageType"] = this.stageType;
+        data["title"] = this.title;
+        data["description"] = this.description;
+        data["assignTo"] = this.assignTo;
+        data["assignToName"] = this.assignToName;
+        data["startDate"] = this.startDate ? this.startDate.toISOString() : undefined as any;
+        data["endDate"] = this.endDate ? this.endDate.toISOString() : undefined as any;
+        data["priority"] = this.priority;
+        data["taskPoint"] = this.taskPoint;
+        data["status"] = this.status;
+        data["taskTypeId"] = this.taskTypeId;
+        data["taskTypeName"] = this.taskTypeName;
+        data["responsibility"] = this.responsibility;
+        data["projectMainContractorId"] = this.projectMainContractorId;
+        data["projectMainContractorName"] = this.projectMainContractorName;
+        data["supplierId"] = this.supplierId;
+        data["supplierName"] = this.supplierName;
+        data["excavationLocation"] = this.excavationLocation;
+        data["excavationDepth"] = this.excavationDepth;
+        data["excavationVolume"] = this.excavationVolume;
+        data["excavationSoilType"] = this.excavationSoilType;
+        data["excavationEquipment"] = this.excavationEquipment;
+        data["createdById"] = this.createdById;
+        data["createdDate"] = this.createdDate ? this.createdDate.toISOString() : undefined as any;
+        data["modifiedById"] = this.modifiedById;
+        data["modifiedDate"] = this.modifiedDate ? this.modifiedDate.toISOString() : undefined as any;
+        if (Array.isArray(this.subTasks)) {
+            data["subTasks"] = [];
+            for (let item of this.subTasks)
+                data["subTasks"].push(item ? item.toJSON() : undefined as any);
+        }
+        if (Array.isArray(this.images)) {
+            data["images"] = [];
+            for (let item of this.images)
+                data["images"].push(item ? item.toJSON() : undefined as any);
+        }
+        return data;
+    }
+}
+
+export interface ITaskDetailsDto {
+    id?: number;
+    projectStageId?: number;
+    stageType?: ProjectStageType;
+    title?: string | undefined;
+    description?: string | undefined;
+    assignTo?: number | undefined;
+    assignToName?: string | undefined;
+    startDate?: Date;
+    endDate?: Date;
+    priority?: number | undefined;
+    taskPoint?: number | undefined;
+    status?: StatusTask;
+    taskTypeId?: number;
+    taskTypeName?: string | undefined;
+    responsibility?: Responsibility;
+    projectMainContractorId?: number | undefined;
+    projectMainContractorName?: string | undefined;
+    supplierId?: number | undefined;
+    supplierName?: string | undefined;
+    excavationLocation?: string | undefined;
+    excavationDepth?: number | undefined;
+    excavationVolume?: number | undefined;
+    excavationSoilType?: string | undefined;
+    excavationEquipment?: string | undefined;
+    createdById?: number | undefined;
+    createdDate?: Date | undefined;
+    modifiedById?: string | undefined;
+    modifiedDate?: Date | undefined;
+    subTasks?: ProjectSubTaskDto[] | undefined;
+    images?: AttachmentImageDto[] | undefined;
 }
 
 export enum TaskSource {

@@ -32,8 +32,16 @@
 
 .data-type-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  grid-template-columns: repeat(30, minmax(0, 1fr));
   gap: 0.9rem;
+
+  .data-type-card {
+    grid-column: span 5;
+
+    &:nth-child(n + 7) {
+      grid-column: span 6;
+    }
+  }
 }
 
 .data-type-card {
