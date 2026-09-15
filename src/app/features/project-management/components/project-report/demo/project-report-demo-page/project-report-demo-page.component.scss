@@ -37,10 +37,6 @@
 
   .data-type-card {
     grid-column: span 5;
-
-    &:nth-child(n + 7) {
-      grid-column: span 6;
-    }
   }
 }
 

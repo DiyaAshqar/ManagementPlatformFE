@@ -1,36 +1,16 @@
 <div class="demo-page p-3" dir="rtl">
   <p-card>
-    <ng-template pTemplate="title">تقرير المشروع — نسخة تجريبية</ng-template>
+    <ng-template pTemplate="title">تقرير المشروع</ng-template>
     <ng-template pTemplate="subtitle">
-      بيئة تجريبية حية لمولّد التقرير، باستخدام بيانات نموذجية ثابتة — لا حاجة لمشروع حقيقي أو اتصال بالخادم.
+      بيانات التقرير تُحمّل مباشرة من الخادم للمشروع 4 والمرحلة 9.
     </ng-template>
 
+    @if (loadError(); as error) {
+      <p class="text-red-500 mt-2">{{ error }}</p>
+    }
+
     <div class="demo-grid">
-      <div class="field-block">
-        <label class="block text-sm font-medium mb-2">سيناريو العرض التجريبي</label>
-        <p-select
-          [(ngModel)]="scenario"
-          [options]="scenarioOptions"
-          optionLabel="label"
-          optionValue="value"
-          styleClass="w-full"
-          (onChange)="refresh()">
-        </p-select>
-      </div>
-
-      <div class="field-block">
-        <label class="block text-sm font-medium mb-2">نوع التقرير</label>
-        <p-select
-          [(ngModel)]="selectedType"
-          [options]="reportTypeOptions"
-          optionLabel="label"
-          optionValue="value"
-          styleClass="w-full"
-          (onChange)="refresh()">
-        </p-select>
-      </div>
-
-      <div class="field-block">
+<div class="field-block">
         <label class="block text-sm font-medium mb-2">لغة التقرير</label>
         <p-select
           [(ngModel)]="selectedLanguage"
@@ -54,38 +34,10 @@
         </p-select>
       </div>
     </div>
-
-    @if (isCustom) {
-      <div class="field-block mt-3">
-        <label class="block text-sm font-medium mb-2">الأقسام المخصصة</label>
-        <p-multiSelect
-          [(ngModel)]="customSections"
-          [options]="sectionOptions"
-          optionLabel="label"
-          optionValue="value"
-          display="chip"
-          styleClass="w-full"
-          (onChange)="refresh()">
-        </p-multiSelect>
-      </div>
-    }
-
-    <div class="toggle-grid mt-3">
+<div class="toggle-grid mt-3">
       <div class="toggle-item">
         <p-checkbox [(ngModel)]="includeCompanyHeader" [binary]="true" inputId="demoCompanyHeader" (onChange)="refresh()"></p-checkbox>
         <label for="demoCompanyHeader">تضمين ترويسة الشركة والشعار</label>
-      </div>
-      <div class="toggle-item">
-        <p-checkbox [(ngModel)]="includeFinancial" [binary]="true" inputId="demoFinancial" (onChange)="refresh()"></p-checkbox>
-        <label for="demoFinancial">تضمين المعلومات المالية</label>
-      </div>
-      <div class="toggle-item">
-        <p-checkbox [(ngModel)]="includeDocuments" [binary]="true" inputId="demoDocuments" (onChange)="refresh()"></p-checkbox>
-        <label for="demoDocuments">تضمين المستندات</label>
-      </div>
-      <div class="toggle-item">
-        <p-checkbox [(ngModel)]="includePhotos" [binary]="true" inputId="demoPhotos" (onChange)="refresh()"></p-checkbox>
-        <label for="demoPhotos">تضمين صور سير العمل</label>
       </div>
       <div class="toggle-item">
         <p-checkbox [(ngModel)]="includeSignatures" [binary]="true" inputId="demoSignatures" (onChange)="refresh()"></p-checkbox>

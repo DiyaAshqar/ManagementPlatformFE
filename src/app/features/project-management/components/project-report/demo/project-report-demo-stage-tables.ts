@@ -1,3 +1,4 @@
+import { ProjectPaymentFlowDetailsDto, ProjectStageDetailsDto } from '../../../../../../nswag/api-client';
 import { escapeHtml } from '../../../../reporting/utilities/report-html.utils';
 import { formatReportDate, formatReportNumber } from '../utilities/project-report-calculations.util';
 
@@ -66,6 +67,20 @@ function tableBlock(
   </div>`;
 }
 
+const SHARED_SECTION_HEADER_COLOR = '#0d9488';
+
+/** Keeps the Scope of Work, Tasks, and Savings Items headers visually identical. */
+function sharedSectionHeaderBlock(
+  badge: string,
+  title: string,
+  subtitle: string,
+  columns: Column[],
+  rows: string[][],
+  totalLabel: string,
+  totalValue: string
+): string {
+  return tableBlock(SHARED_SECTION_HEADER_COLOR, badge, title, subtitle, columns, rows, totalLabel, totalValue);
+}
 function buildBoq(): string {
   const rows: string[][] = [
     ['1', esc('Concrete'), esc('باطون تجهيزات غرف العمال والمستودعات'), esc('m³'), esc('شركة محمد ثلجي وشركاؤه'), n(3, 0), n(46), `<b>${n(138)}</b>`],
@@ -341,7 +356,7 @@ function buildVo(): string {
     [
       { text: '#', align: 'center' },
       { text: 'رقم الأمر' },
-      { text: 'البند' },
+      { text: 'العنوان' },
       { text: 'الوصف' },
       { text: 'الكمية', align: 'end' },
       { text: 'السعر', align: 'end' },
@@ -488,15 +503,15 @@ function buildTask(): string {
 }
 
 /**
- * "مساحة الاهتمام" — a flat list of scope-of-interest items agreed on with
+ * "مساحات الاهتمام" — a flat list of scope-of-interest items agreed on with
  * contractors/suppliers at the agreement stage. Each numbered item in the
  * source document is one row; the columns below are the shape this data
  * will take once it is wired to a real backend endpoint: start/end dates,
  * title, description, the assignee's name, the task-type name, the
  * responsibility side, and the main contractor's name.
  */
-function buildAreasOfInterest(): string {
-  interface AreaOfInterestRow {
+function buildScopeOfWork(): string {
+  interface ScopeOfWorkRow {
     title: string;
     description: string;
     assignedToName: string | null;
@@ -507,7 +522,7 @@ function buildAreasOfInterest(): string {
     endDate: Date;
   }
 
-  const items: AreaOfInterestRow[] = [
+  const items: ScopeOfWorkRow[] = [
     {
       title: 'تجهيزات لوجستية',
       description: 'تجهيزات لوجستية للمشروع, كرفان, غرفة عمال وحارس, تنكات مياه, كهرباء للمشروع..الخ.',
@@ -641,11 +656,10 @@ function buildAreasOfInterest(): string {
     `${d(item.startDate)} → ${d(item.endDate)}`,
   ]);
 
-  return tableBlock(
-    '#0891b2',
-    'AOI',
-    'مساحة الاهتمام — Areas of Interest',
-    `بنود نطاق العمل المتفق عليها مع المقاولين والموردين (${items.length} عنصر)`,
+  return sharedSectionHeaderBlock(
+    'SOW',
+    'مساحات الاهتمام - Scope of Work',
+    `(بيانات ثابتة مؤقتًا) - ${items.length} عنصر`,
     [
       { text: '#', align: 'center' },
       { text: 'العنوان' },
@@ -657,7 +671,7 @@ function buildAreasOfInterest(): string {
       { text: 'الفترة' },
     ],
     rows,
-    'إجمالي البنود',
+    'إجمالي مساحات الاهتمام',
     String(items.length)
   );
 }
@@ -679,17 +693,21 @@ function buildSavingsItems(): string {
     { description: 'توفير عدم جلب طمم جديد', amount: 2400 },
   ];
 
-  const rows = items.map((item, index) => [String(index + 1), esc(item.description), `<b>${n(item.amount)}</b>`]);
+  const rows = items.map((item, index) => [String(index + 1), esc(item.description), `المبلغ الموفَّر: <b>${n(item.amount)}</b>`, '—', '—', '—', '—', '—']);
 
-  return tableBlock(
-    '#65a30d',
+  return sharedSectionHeaderBlock(
     'SAVE',
-    'بند التوفير — Savings Items',
-    `بنود التوفير المسجّلة لهذه الاتفاقية (${items.length} عنصر)`,
+    'بند التوفير - Savings Items',
+    `(بيانات ثابتة مؤقتًا) - ${items.length} عنصر`,
     [
       { text: '#', align: 'center' },
-      { text: 'البند' },
-      { text: 'المبلغ الموفَّر', align: 'end' },
+      { text: 'العنوان' },
+      { text: 'الوصف' },
+      { text: 'المكلّف' },
+      { text: 'نوع البند' },
+      { text: 'المسؤولية' },
+      { text: 'المقاول الرئيسي' },
+      { text: 'الفترة' },
     ],
     rows,
     'إجمالي التوفير',
@@ -697,40 +715,22 @@ function buildSavingsItems(): string {
   );
 }
 
-/**
- * "Owner Payment" — a literal transcription of a real `PaymentFlows`
- * response (owner cash payments). Each record in `data.data` is one row.
- */
-function buildOwnerPayments(): string {
-  interface OwnerPaymentRow {
-    cash: number;
-    paymentMethodName: string;
-    currencyAbb: string;
-    notes: string | null;
-    createdAt: Date;
-  }
-
-  const items: OwnerPaymentRow[] = [
-    { cash: 55555.0, paymentMethodName: 'Cash', currencyAbb: 'JOD', notes: null, createdAt: new Date('2026-07-05T21:02:54.053') },
-    { cash: 40000.0, paymentMethodName: 'Bank Transfer', currencyAbb: 'JOD', notes: 'الدفعة الثانية من أعمال تنفيذ مشروع الفيلا', createdAt: new Date('2026-06-14T21:00:00') },
-    { cash: 30000.0, paymentMethodName: 'Bank Transfer', currencyAbb: 'JOD', notes: 'second payment', createdAt: new Date('2026-05-17T18:44:37.36') },
-    { cash: 20000.0, paymentMethodName: 'Bank Transfer', currencyAbb: 'JOD', notes: 'first payment', createdAt: new Date('2026-05-10T21:00:00') },
-  ];
-
+/** Renders actual owner payments returned by `data.project.paymentFlows`. */
+function buildOwnerPayments(items: readonly ProjectPaymentFlowDetailsDto[]): string {
   const rows = items.map((item, index) => [
     String(index + 1),
-    `<b>${n(item.cash)}</b>`,
-    esc(item.currencyAbb),
-    esc(item.paymentMethodName),
-    item.notes ? esc(item.notes) : '—',
-    d(item.createdAt),
+    `<b>${numberValue(item.cash)}</b>`,
+    value(item.currencyAbb),
+    value(item.paymentMethodName),
+    value(item.notes),
+    item.createdAt ? d(item.createdAt) : '—',
   ]);
 
   return tableBlock(
     '#7c3aed',
     'OWN',
     'دفعات المالك — Owner Payment',
-    `سجلات الدفع المرتبطة بهذه القائمة (${items.length} عنصر)`,
+    `سجلات الدفع المرتبطة بالمشروع (${items.length} عنصر)`,
     [
       { text: '#', align: 'center' },
       { text: 'المبلغ', align: 'end' },
@@ -741,7 +741,7 @@ function buildOwnerPayments(): string {
     ],
     rows,
     'الإجمالي',
-    n(items.reduce((total, item) => total + item.cash, 0))
+    n(total(items.map((item) => item.cash)))
   );
 }
 
@@ -776,9 +776,8 @@ const STYLES = `
 .sdt-lock { display: inline-block; margin-inline-start: 4px; background: #fee2e2; color: #991b1b; border-radius: 4px; padding: 1px 5px; font-size: 8px; font-weight: 700; }
 `;
 
-export type StageDataTableKey = 'boq' | 'pmc' | 'po' | 'sv' | 'vo' | 'exp' | 'task' | 'aoi' | 'save' | 'ownerPayment';
+export type StageDataTableKey = 'boq' | 'pmc' | 'po' | 'sv' | 'vo' | 'exp' | 'task' | 'scopeOfWork' | 'save' | 'ownerPayment' | 'wir';
 
-/** Card metadata for the data-type picker (icon/badge/color/labels) — drives the demo page's selection UI. */
 export interface StageDataTableOption {
   key: StageDataTableKey;
   badge: string;
@@ -797,40 +796,94 @@ export const STAGE_DATA_TABLE_OPTIONS: StageDataTableOption[] = [
   { key: 'vo', badge: 'VO', color: '#db2777', icon: 'pi-file-edit', titleAr: 'أوامر التغيير', subtitleAr: 'Variation Orders', descriptionAr: 'أوامر التغيير المعتمدة' },
   { key: 'exp', badge: 'EXP', color: '#dc2626', icon: 'pi-wallet', titleAr: 'المصروفات', subtitleAr: 'Expenses', descriptionAr: 'مصروفات المشروع' },
   { key: 'task', badge: 'TASK', color: '#0d9488', icon: 'pi-check-square', titleAr: 'المهام', subtitleAr: 'Tasks', descriptionAr: 'مهام المرحلة' },
-  { key: 'aoi', badge: 'AOI', color: '#0891b2', icon: 'pi-star', titleAr: 'مساحة الاهتمام', subtitleAr: 'Areas of Interest', descriptionAr: 'بنود نطاق العمل' },
-  { key: 'save', badge: 'SAVE', color: '#65a30d', icon: 'pi-percentage', titleAr: 'بند التوفير', subtitleAr: 'Savings Items', descriptionAr: 'بنود التوفير المتفق عليها' },
-  { key: 'ownerPayment', badge: 'OWN', color: '#7c3aed', icon: 'pi-wallet', titleAr: 'دفعات المالك', subtitleAr: 'Owner Payment', descriptionAr: 'سجلات دفعات المالك' },
+  { key: 'scopeOfWork', badge: 'SOW', color: '#0891b2', icon: 'pi-star', titleAr: 'مساحات الاهتمام', subtitleAr: 'Scope of Work', descriptionAr: 'بيانات ثابتة مؤقتًا' },
+  { key: 'save', badge: 'SAVE', color: '#65a30d', icon: 'pi-percentage', titleAr: 'بند التوفير', subtitleAr: 'Savings Items', descriptionAr: 'بيانات ثابتة مؤقتًا' },
+  { key: 'ownerPayment', badge: 'OWN', color: '#7c3aed', icon: 'pi-wallet', titleAr: 'دفعات المالك', subtitleAr: 'Owner Payment', descriptionAr: 'بيانات ثابتة مؤقتًا' },
+  { key: 'wir', badge: 'WIR', color: '#7c3aed', icon: 'pi-verified', titleAr: 'طلبات التفتيش', subtitleAr: 'Work Inspection Request', descriptionAr: 'طلبات التفتيش' },
 ];
 
-const TABLE_BUILDERS: Record<StageDataTableKey, () => string> = {
-  boq: buildBoq,
-  pmc: buildPmc,
-  po: buildPo,
-  sv: buildSv,
-  vo: buildVo,
-  exp: buildExp,
-  task: buildTask,
-  aoi: buildAreasOfInterest,
-  save: buildSavingsItems,
-  ownerPayment: buildOwnerPayments,
+const value = (input: string | number | undefined | null): string => input === undefined || input === null || input === '' ? '—' : esc(String(input));
+const numberValue = (input: number | undefined | null, decimals = 2): string => input === undefined || input === null ? '—' : n(input, decimals);
+const dateValue = (input: Date | undefined | null): string => input ? d(input) : '—';
+const periodValue = (start: Date | undefined | null, end: Date | undefined | null): string => start || end ? `${dateValue(start)} → ${dateValue(end)}` : '—';
+const total = (values: Array<number | undefined>): number => values.reduce<number>((sum, item) => sum + (item ?? 0), 0);
+
+function buildDynamicBoq(stage: ProjectStageDetailsDto): string {
+  const items = stage.boqs ?? [];
+  return tableBlock('#2563eb', 'BOQ', 'كشف الكميات — Bill of Quantities', `المواد والكميات لهذه المرحلة (${items.length} عنصر)`,
+    [{ text: '#' }, { text: 'المادة' }, { text: 'الوصف' }, { text: 'الوحدة' }, { text: 'المقاول' }, { text: 'الكمية الفعلية', align: 'end' }, { text: 'سعر الوحدة', align: 'end' }, { text: 'المجموع', align: 'end' }],
+    items.map((item, index) => [String(index + 1), value(item.materialName), value(item.description), value(item.unitName), value(item.constructorName ?? item.supplierName), numberValue(item.actualQuantity, 0), numberValue(item.actualPrice), `<b>${numberValue(item.subTotal)}</b>`]),
+    'الإجمالي', n(total(items.map((item) => item.subTotal))));
+}
+
+function buildDynamicContractors(stage: ProjectStageDetailsDto): string {
+  const items = stage.mainContractors ?? [];
+  return tableBlock('#16a34a', 'PMC', 'المقاولون الرئيسيون — Main Contractors', `عقود المرحلة ودفعاتها (${items.length} عقد)`,
+    [{ text: '#' }, { text: 'المقاول' }, { text: 'نوع العقد' }, { text: 'الفترة' }, { text: 'قيمة العقد', align: 'end' }, { text: 'المدفوع', align: 'end' }, { text: 'المتبقي', align: 'end' }],
+    items.map((item, index) => [String(index + 1), value(item.constructorName), value(item.contractorTypeName), periodValue(item.startDate, item.endDate), numberValue(item.amount), numberValue(item.totalPayments), `<b>${numberValue((item.amount ?? 0) - (item.totalPayments ?? 0))}</b>`]),
+    'إجمالي قيمة العقود', n(total(items.map((item) => item.amount))));
+}
+
+function buildDynamicPurchaseOrders(stage: ProjectStageDetailsDto): string {
+  const items = stage.purchaseOrders ?? [];
+  return tableBlock('#d97706', 'PO', 'أوامر الشراء — Purchase Orders', `أوامر الشراء الصادرة لهذه المرحلة (${items.length} عنصر)`,
+    [{ text: '#' }, { text: 'رقم الأمر' }, { text: 'المورد' }, { text: 'الوصف' }, { text: 'الوحدة' }, { text: 'السعر', align: 'end' }, { text: 'المجموع', align: 'end' }, { text: 'الحالة' }],
+    items.map((item, index) => [String(index + 1), `<span class="sdt-code">${value(item.poNumber)}</span>`, value(item.supplierName), value(item.description), value(item.unitName), numberValue(item.price), `<b>${numberValue(item.subTotal)}</b>`, value(item.status)]),
+    'الإجمالي', n(total(items.map((item) => item.subTotal))));
+}
+
+function buildDynamicVisits(stage: ProjectStageDetailsDto): string {
+  const items = stage.surveyingVisits ?? [];
+  return tableBlock('#9333ea', 'SV', 'زيارات المساحة — Surveying Visits', `زيارات المساحة لهذه المرحلة (${items.length} عنصر)`,
+    [{ text: '#' }, { text: 'تاريخ الزيارة' }, { text: 'المساح' }, { text: 'الغرض' }, { text: 'الكمية', align: 'end' }, { text: 'الوحدة' }, { text: 'السعر', align: 'end' }, { text: 'المجموع', align: 'end' }],
+    items.map((item, index) => [String(index + 1), dateValue(item.visitDate), value(item.surveyor), value(item.purpose), numberValue(item.quantity, 0), value(item.unitName), numberValue(item.price), `<b>${numberValue(item.subTotal)}</b>`]),
+    'الإجمالي', n(total(items.map((item) => item.subTotal))));
+}
+
+function buildDynamicVariations(stage: ProjectStageDetailsDto): string {
+  const items = stage.variationOrders ?? [];
+  return tableBlock('#db2777', 'VO', 'أوامر التغيير — Variation Orders', `أوامر التغيير لهذه المرحلة (${items.length} عنصر)`,
+    [{ text: '#' }, { text: 'رقم الأمر' }, { text: 'البند' }, { text: 'الوصف' }, { text: 'الكمية', align: 'end' }, { text: 'السعر', align: 'end' }, { text: 'المجموع', align: 'end' }, { text: 'فترة التنفيذ' }, { text: 'الحالة' }],
+    items.map((item, index) => [String(index + 1), `<span class="sdt-code">${value(item.voNumber)}</span>`, value(item.item), value(item.description), numberValue(item.quantity, 0), numberValue(item.price), `<b>${numberValue(item.subTotal)}</b>`, periodValue(item.effectedDateStart, item.effectedDateEnd), value(item.status)]),
+    'الإجمالي', n(total(items.map((item) => item.subTotal))));
+}
+
+function buildDynamicExpenses(stage: ProjectStageDetailsDto): string {
+  const items = stage.expenses ?? [];
+  return tableBlock('#dc2626', 'EXP', 'المصروفات — Expenses', `المصروفات المسجّلة لهذه المرحلة (${items.length} عنصر)`,
+    [{ text: '#' }, { text: 'رقم المصروف' }, { text: 'التاريخ' }, { text: 'المورد' }, { text: 'الملاحظات' }, { text: 'المجموع', align: 'end' }, { text: 'الحالة' }],
+    items.map((item, index) => [String(index + 1), value(item.expenseNo), dateValue(item.expenseDate), value(item.supplierName), value(item.notes), `<b>${numberValue(item.totalAmount)}</b>`, `${value(item.status)}${item.isLocked ? ' <span class="sdt-lock">مقفلة</span>' : ''}`]),
+    'الإجمالي', n(total(items.map((item) => item.totalAmount))));
+}
+
+function buildDynamicTasks(stage: ProjectStageDetailsDto): string {
+  const items = stage.tasks ?? [];
+  const stageName = stage.milestone?.name ?? `المرحلة ${stage.id ?? '—'}`;
+  return sharedSectionHeaderBlock('TASK', 'المهام - Tasks', `(${stageName}) - ${items.length} مهمة`,
+    [{ text: '#' }, { text: 'العنوان' }, { text: 'الوصف' }, { text: 'المكلّف' }, { text: 'نوع البند' }, { text: 'المسؤولية' }, { text: 'المقاول الرئيسي' }, { text: 'الفترة' }],
+    items.map((item, index) => [String(index + 1), value(item.title), value(item.description), value(item.assignToName), value(item.taskTypeName), value(item.responsibility), value(item.projectMainContractorName), periodValue(item.startDate, item.endDate)]),
+    'إجمالي المهام', String(items.length));
+}
+
+function buildDynamicWirs(stage: ProjectStageDetailsDto): string {
+  const items = stage.wirs ?? [];
+  return tableBlock('#7c3aed', 'WIR', 'طلبات التفتيش — Work Inspection Requests', `طلبات التفتيش لهذه المرحلة (${items.length} طلب)`,
+    [{ text: '#' }, { text: 'رقم WIR' }, { text: 'العنوان' }, { text: 'المقاول' }, { text: 'المكلّف' }, { text: 'تاريخ الفحص' }, { text: 'الموقع' }, { text: 'بنود القائمة' }, { text: 'الحالة' }],
+    items.map((item, index) => [String(index + 1), `<span class="sdt-code">${value(item.wirNo)}</span>`, value(item.title), value(item.constructorName), value(item.assignedToName), dateValue(item.inspectionDate), value([item.levelName, item.zoneName, item.gridReference].filter(Boolean).join(' / ')), String(item.checklistItems?.length ?? 0), value(item.status)]),
+    'إجمالي الطلبات', String(items.length));
+}
+
+const DYNAMIC_BUILDERS: Record<StageDataTableKey, (stage: ProjectStageDetailsDto, ownerPayments: readonly ProjectPaymentFlowDetailsDto[]) => string> = {
+  boq: buildDynamicBoq, pmc: buildDynamicContractors, po: buildDynamicPurchaseOrders, sv: buildDynamicVisits,
+  vo: buildDynamicVariations, exp: buildDynamicExpenses, task: buildDynamicTasks,
+  scopeOfWork: buildScopeOfWork, save: buildSavingsItems, ownerPayment: (_stage, ownerPayments) => buildOwnerPayments(ownerPayments), wir: buildDynamicWirs,
 };
 
-/**
- * Full raw-data breakdown for the demo's one real Milestone Stage, as
- * color-coded stacked tables. Only the tables whose key is present in
- * `enabledKeys` are rendered, in `STAGE_DATA_TABLE_OPTIONS` order.
- * Returned as a self-contained fragment (its own `<style>` plus a wrapper
- * `<div>`) meant to be spliced into the generated report HTML.
- */
-export function buildStageDataTablesHtml(stageName: string, enabledKeys: ReadonlySet<StageDataTableKey>): string {
-  const blocks = STAGE_DATA_TABLE_OPTIONS.filter((option) => enabledKeys.has(option.key))
-    .map((option) => TABLE_BUILDERS[option.key]())
-    .join('');
-
-  return `<style>${STYLES}</style>
-  <div class="sdt-wrap">
-    <h1>بيانات مرحلة "${esc(stageName)}" الكاملة — كل الأقسام</h1>
-    <p class="sdt-wrap-subtitle">نقل حرفي للبيانات الحقيقية من الخادم لمرحلة المشروع رقم 48، مقسّمة كجداول ملوّنة لكل تبويب على حدة.</p>
-    ${blocks}
-  </div>`;
+export function buildStageDataTablesHtml(stage: ProjectStageDetailsDto, enabledKeys: ReadonlySet<StageDataTableKey>, ownerPayments: readonly ProjectPaymentFlowDetailsDto[] = []): string {
+  const stageName = stage.milestone?.name ?? `المرحلة رقم ${stage.id ?? '—'}`;
+  const blocks = STAGE_DATA_TABLE_OPTIONS.filter((option) => enabledKeys.has(option.key)).map((option) => DYNAMIC_BUILDERS[option.key](stage, ownerPayments)).join('');
+  const staticNotice = ['scopeOfWork', 'save', 'ownerPayment'].some((key) => enabledKeys.has(key as StageDataTableKey))
+    ? '<p class="sdt-wrap-subtitle" style="color:#b45309;font-weight:700">تنبيه: أقسام مساحات الاهتمام، بند التوفير، ودفعات المالك تعرض بيانات ثابتة مؤقتًا لحين توفيرها من الـAPI.</p>'
+    : '';
+  return `<style>${STYLES}</style><div class="sdt-wrap"><h1>بيانات مرحلة "${esc(stageName)}" — كل الأقسام</h1><p class="sdt-wrap-subtitle">بيانات مباشرة من واجهة المشروع، معروضة حسب كل قسم.</p>${staticNotice}${blocks}</div>`;
 }
