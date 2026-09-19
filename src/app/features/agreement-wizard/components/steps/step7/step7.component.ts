@@ -281,7 +281,7 @@ export class Step7Component implements OnInit, OnDestroy {
             dto.filePath = '';
             dto.originalName = att.file?.name || '';
             dto.relationshipId = this.agreementId();
-            dto.attachmentType = AttachmentTypeMap.Agreement
+            dto.attachmentType = AttachmentTypeMap.Agreement;
             dto.base64Data = att.file ? await this.convertFileToBase64(att.file) : '';
             dto.contentType = this.toMimeType(att.type || att.file?.type || att.file?.name || '');
             return dto;
