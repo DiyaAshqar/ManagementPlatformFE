@@ -55,6 +55,7 @@ interface NavSection {
   styleUrls: ['./sidebar.component.scss']
 })
 export class SidebarComponent implements OnInit {
+  readonly deploymentStatus = this.getDeploymentStatus();
   
   navSections: NavSection[] = [
     {
@@ -185,5 +186,19 @@ export class SidebarComponent implements OnInit {
   goHome(): void {
     this.router.navigate(['/dashboard']);
     this.closeMobileMenu();
+  }
+
+  private getDeploymentStatus(): string {
+    const deployedAt = window.__env?.DEPLOYED_AT;
+    if (!deployedAt) {
+      return 'نسخة تشغيل محلية';
+    }
+
+    const date = new Date(deployedAt);
+    if (Number.isNaN(date.getTime())) {
+      return `نسخة الخادم: ${deployedAt}`;
+    }
+
+    return `نسخة الخادم: ${date.toLocaleString('ar-JO', { dateStyle: 'short', timeStyle: 'short' })}`;
   }
 }

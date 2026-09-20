@@ -32,6 +32,11 @@
         padding: 0.75rem 0.5rem;
       }
 
+      .deployment-info {
+        justify-content: center;
+        padding: 0.5rem;
+      }
+
       .nav-icon {
         margin-inline-end: 0;
       }
@@ -161,8 +166,32 @@
 }
 
 .sidebar-footer {
-  padding: 0.5rem;
   border-top: 1px solid var(--surface-border);
+
+  .nav-items {
+    padding: 0.5rem;
+  }
+}
+
+.deployment-info {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-height: 3.5rem;
+  padding: 0.5rem 1.25rem;
+  border-bottom: 1px solid var(--surface-border);
+  color: var(--text-color-secondary);
+  font-size: 0.78rem;
+
+  .deployment-icon {
+    color: var(--primary-color);
+    font-size: 1rem;
+    flex-shrink: 0;
+  }
+
+  .deployment-label {
+    line-height: 1.35;
+  }
 }
 
 .sidebar-overlay {

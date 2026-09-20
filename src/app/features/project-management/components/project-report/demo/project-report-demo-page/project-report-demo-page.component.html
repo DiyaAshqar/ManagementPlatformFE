@@ -101,7 +101,7 @@
       @if (previewHtml(); as html) {
         <iframe class="preview-frame" [srcdoc]="html" title="معاينة تقرير المشروع"></iframe>
       } @else {
-        <p class="text-color-secondary">جارٍ إنشاء المعاينة…</p>
+        <p class="preview-empty-state">اختر المشروع ثم مرحلة الإنجاز لعرض التقرير.</p>
       }
     </div>
   </p-card>

@@ -40,6 +40,13 @@
 
   <!-- Footer Navigation -->
   <div class="sidebar-footer">
+    <div
+      class="deployment-info"
+      [pTooltip]="!sidebarService.isOpen() ? deploymentStatus : ''"
+      tooltipPosition="right">
+      <i class="pi pi-cloud-upload deployment-icon"></i>
+      <span class="deployment-label" *ngIf="sidebarService.isOpen()">{{ deploymentStatus }}</span>
+    </div>
     <div class="nav-items">
       <a 
         *ngFor="let item of footerItems"

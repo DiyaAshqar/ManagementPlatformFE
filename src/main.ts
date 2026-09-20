@@ -5,7 +5,7 @@ import { environment } from './environments/environment';
 
 declare global {
   interface Window {
-    __env?: { API_URL?: string };
+    __env?: { API_URL?: string; DEPLOYED_AT?: string };
   }
 }
 
