@@ -84,13 +84,11 @@ function buildExecutiveSummary(snapshot: ProjectReportSnapshot, config: ProjectR
   const s = snapshot.executiveSummary;
   const cards = [
     kpiCard(t('projectReport.summary.status'), esc(s.statusLabel)),
-    kpiCard(t('projectReport.summary.progress'), formatReportPercent(s.progressPercent)),
     kpiCard(t('projectReport.summary.startDate'), date(s.startDate, config.language)),
     kpiCard(t('projectReport.summary.endDate'), date(s.endDate, config.language)),
     kpiCard(t('projectReport.summary.daysElapsed'), s.daysElapsed === null ? DASH : String(s.daysElapsed)),
     kpiCard(t('projectReport.summary.daysRemaining'), s.daysRemaining === null ? DASH : String(s.daysRemaining)),
-    kpiCard(t('projectReport.summary.budget'), num(s.budget)),
-    kpiCard(t('projectReport.summary.contractValue'), num(s.contractValue)),
+    kpiCard(t('projectReport.summary.progress'), formatReportPercent(s.progressPercent)),
     kpiCard(t('projectReport.summary.actualExpenditure'), num(s.actualExpenditure)),
     kpiCard(t('projectReport.summary.committedAmount'), num(s.committedAmount)),
     kpiCard(t('projectReport.summary.milestonesTotal'), String(s.milestonesTotal)),

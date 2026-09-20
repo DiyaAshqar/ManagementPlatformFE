@@ -281,10 +281,16 @@ export class ProjectReportDemoPageComponent {
       review: tasks.filter((task) => String(task.status) === 'review').length,
       completed: tasks.filter((task) => String(task.status) === 'completed').length,
     };
-    const totalTasks = tasks.length;
-    const completedTasks = taskCounts.completed;
     const currency = advances.find((advance) => advance.currency)?.currency ?? null;
     const monthlyPayment = data.agreementPayment?.monthlyPayment;
+    const milestoneOrders = (data.milestones ?? [])
+      .map((milestone) => milestone.order ?? 0)
+      .filter((order) => order > 0);
+    const currentMilestoneOrder = stage.milestone?.order ?? 0;
+    const lastMilestoneOrder = Math.max(0, ...milestoneOrders);
+    const milestoneProgressPercent = lastMilestoneOrder > 0 && currentMilestoneOrder > 0
+      ? Math.min(100, (currentMilestoneOrder / lastMilestoneOrder) * 100)
+      : 0;
 
     return {
       meta: { generatedAt: new Date(), generatedByName: 'System Administrator', failedSections: [], warnings: [] },
@@ -294,7 +300,7 @@ export class ProjectReportDemoPageComponent {
         reportingPeriodLabel: stage.milestone?.name ?? `المرحلة رقم ${stage.id ?? '—'}`, asOfDate: now,
       },
       executiveSummary: {
-        statusLabel: STATUS_LABELS[String(project?.status)] ?? String(project?.status ?? '—'), progressPercent: totalTasks ? (completedTasks / totalTasks) * 100 : 0,
+        statusLabel: STATUS_LABELS[String(project?.status)] ?? String(project?.status ?? '—'), progressPercent: milestoneProgressPercent,
         startDate: startDate ?? null, endDate: endDate ?? null, daysElapsed: elapsed, daysRemaining: remaining,
         budget: project?.budget ?? null, contractValue: monthlyPayment?.amount ?? null,
         actualExpenditure: number((stage.expenses ?? []).map((expense) => expense.totalAmount)),

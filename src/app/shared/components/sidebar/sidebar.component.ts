@@ -191,14 +191,14 @@ export class SidebarComponent implements OnInit {
   private getDeploymentStatus(): string {
     const deployedAt = window.__env?.DEPLOYED_AT;
     if (!deployedAt) {
-      return 'نسخة تشغيل محلية';
+      return 'Local development version';
     }
 
     const date = new Date(deployedAt);
     if (Number.isNaN(date.getTime())) {
-      return `نسخة الخادم: ${deployedAt}`;
+      return `Server version: ${deployedAt}`;
     }
 
-    return `نسخة الخادم: ${date.toLocaleString('ar-JO', { dateStyle: 'short', timeStyle: 'short' })}`;
+    return `Server version: ${date.toLocaleString('en-GB', { dateStyle: 'short', timeStyle: 'short' })}`;
   }
 }
