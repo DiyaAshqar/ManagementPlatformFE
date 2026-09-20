@@ -38,7 +38,9 @@ export class ProjectService {
     averageProgress: 0
   });
 
-  private apiUrl = environment.apiUrl;
+  private get apiUrl(): string {
+    return environment.apiUrl;
+  }
 
   constructor(private http: HttpClient, private taskService: TaskService) {}
 

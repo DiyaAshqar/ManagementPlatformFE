@@ -90,7 +90,7 @@ export const appConfig: ApplicationConfig = {
     PermissionsClient,
     RolesClient,
     {
-      provide: API_BASE_URL, useValue: environment.nSwagUrl
+      provide: API_BASE_URL, useFactory: () => environment.nSwagUrl
     },
     importProvidersFrom(
       TranslateModule.forRoot({

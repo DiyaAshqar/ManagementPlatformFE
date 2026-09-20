@@ -12,6 +12,7 @@ import {
   API_BASE_URL
 } from '../../../nswag/api-client';
 import { Inject, Optional } from '@angular/core';
+import { environment } from '../../../environments/environment';
 
 /**
  * Enum mapping for AttachmentType with human-readable names
@@ -50,10 +51,12 @@ export interface AttachmentMetaData {
 export class AttachmentService {
   private attachmentClient = inject(AttachmentClient);
   private http = inject(HttpClient);
-  private baseUrl: string;
 
-  constructor(@Optional() @Inject(API_BASE_URL) baseUrl?: string) {
-    this.baseUrl = baseUrl ?? '';
+  constructor(@Optional() @Inject(API_BASE_URL) private readonly injectedBaseUrl?: string) {
+  }
+
+  private get baseUrl(): string {
+    return this.injectedBaseUrl ?? environment.nSwagUrl;
   }
 
   /**
