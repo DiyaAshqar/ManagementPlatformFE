@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { forkJoin } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -40,7 +41,22 @@ interface DataTypeCard {
   subtitleAr: string;
   descriptionAr: string;
 }
+interface LoadedStageReport {
+  details: AgreementDetailsDto;
+  stage: ProjectStageDetailsDto;
+}
 
+interface MilestoneSummary {
+  id: number;
+  name: string;
+  boq: number;
+  mc: number;
+  purchaseOrders: number;
+  expenses: number;
+  budget: number;
+  actual: number;
+  total: number;
+}
 const PHOTOS_CARD: DataTypeCard = {
   key: 'photos', badge: 'IMG', color: '#e11d48', icon: 'pi-images',
   titleAr: 'صور سير العمل', subtitleAr: 'Progress Photos', descriptionAr: 'صور توثيق تنفيذ الأعمال',
@@ -83,7 +99,8 @@ export class ProjectReportDemoPageComponent {
   projectOptions: Option<number>[] = [];
   stageOptions: Option<number>[] = [];
   selectedProjectId: number | null = null;
-  selectedStageId: number | null = null;
+  selectedStageIds: number[] = [];
+  viewMode: 'detailed' | 'summary' = 'detailed';
   selectedType: ProjectReportType = 'full';
   asOfDate = new Date();
   selectedLanguage: ProjectReportLanguage = 'ar';
@@ -103,6 +120,7 @@ export class ProjectReportDemoPageComponent {
   readonly previewHtml = signal<SafeHtml | null>(null);
   private details: AgreementDetailsDto | null = null;
   private stage: ProjectStageDetailsDto | null = null;
+  private loadedStageReports: LoadedStageReport[] = [];
   private lastGeneratedHtml = '';
   private stageLoadVersion = 0;
   private reportLoadVersion = 0;
@@ -113,6 +131,27 @@ export class ProjectReportDemoPageComponent {
 
   get isCustom(): boolean {
     return this.selectedType === 'custom';
+  }
+
+  get hasSelectedMilestones(): boolean {
+    return this.selectedStageIds.length > 0;
+  }
+
+  get milestoneSummaries(): MilestoneSummary[] {
+    return this.loadedStageReports.map(({ details, stage }) => this.createMilestoneSummary(details, stage));
+  }
+
+  get grandTotal(): MilestoneSummary | null {
+    const summaries = this.milestoneSummaries;
+    if (!summaries.length) return null;
+    const sum = (key: keyof Omit<MilestoneSummary, 'id' | 'name'>) => summaries.reduce((total, item) => total + (item[key] as number), 0);
+    const budget = sum('budget');
+    const actual = sum('actual');
+    return { id: 0, name: 'الإجمالي العام', boq: sum('boq'), mc: sum('mc'), purchaseOrders: sum('purchaseOrders'), expenses: sum('expenses'), budget, actual, total: sum('total') };
+  }
+
+  ratio(actual: number, budget: number): number | null {
+    return budget > 0 ? (actual / budget) * 100 : null;
   }
 
   isCardSelected(key: DataTypeCardKey): boolean {
@@ -170,7 +209,7 @@ export class ProjectReportDemoPageComponent {
 
   onProjectChange(): void {
     const projectId = this.selectedProjectId;
-    this.selectedStageId = null;
+    this.selectedStageIds = [];
     this.stageOptions = [];
     this.clearReport();
     if (!projectId) return;
@@ -195,26 +234,33 @@ export class ProjectReportDemoPageComponent {
   }
 
   onStageChange(): void {
-    if (this.selectedProjectId && this.selectedStageId) this.loadReport();
+    if (!this.selectedStageIds.length) {
+      this.clearReport();
+      return;
+    }
+    this.viewMode = this.selectedStageIds.length === 1 ? 'detailed' : 'summary';
+    if (this.selectedProjectId) this.loadReport();
   }
 
   private loadReport(): void {
     const projectId = this.selectedProjectId;
-    const projectStageId = this.selectedStageId;
-    if (!projectId || !projectStageId) return;
+    const projectStageIds = [...this.selectedStageIds];
+    if (!projectId || !projectStageIds.length) return;
     const requestVersion = ++this.reportLoadVersion;
     this.isRendering.set(true);
-    this.reportClient.getProjectStageDetails(projectId, projectStageId).subscribe({
-      next: (response) => {
+    forkJoin(projectStageIds.map((stageId) => this.reportClient.getProjectStageDetails(projectId, stageId))).subscribe({
+      next: (responses) => {
         if (requestVersion !== this.reportLoadVersion) return;
-        const stage = response.data?.project?.stage;
-        if (!response.succeeded || !response.data || !stage) {
-          this.loadError.set(response.message || 'لم تُرجع الواجهة بيانات المرحلة المطلوبة.');
+        const reports = responses.map((response) => ({ details: response.data, stage: response.data?.project?.stage }));
+        const invalid = reports.find((report, index) => !responses[index].succeeded || !report.details || !report.stage);
+        if (invalid) {
+          this.loadError.set('لم تُرجع الواجهة بيانات إحدى المراحل المطلوبة.');
           this.isRendering.set(false);
           return;
         }
-        this.details = response.data;
-        this.stage = stage;
+        this.loadedStageReports = reports as LoadedStageReport[];
+        this.details = this.loadedStageReports[0].details;
+        this.stage = this.loadedStageReports[0].stage;
         this.loadError.set(null);
         this.isRendering.set(false);
         this.refresh();
@@ -226,7 +272,6 @@ export class ProjectReportDemoPageComponent {
       },
     });
   }
-
   private loadProjects(): void {
     this.isLoadingProjects.set(true);
     this.projectClient.getAllProjects(1, 100, undefined).subscribe({
@@ -248,6 +293,7 @@ export class ProjectReportDemoPageComponent {
     this.reportLoadVersion++;
     this.details = null;
     this.stage = null;
+    this.loadedStageReports = [];
     this.lastGeneratedHtml = '';
     this.previewHtml.set(null);
     this.loadError.set(null);
@@ -255,6 +301,17 @@ export class ProjectReportDemoPageComponent {
 
   private getStageLabel(stage: ProjectStageDto): string {
     return stage.mileStone?.name || `Milestone stage #${stage.id}`;
+  }
+
+  private createMilestoneSummary(details: AgreementDetailsDto, stage: ProjectStageDetailsDto): MilestoneSummary {
+    const sum = (items: Array<number | undefined>): number => items.reduce<number>((total, value) => total + (value ?? 0), 0);
+    const boq = sum((stage.boqs ?? []).map((item) => item.subTotal));
+    const mc = sum((stage.mainContractors ?? []).map((item) => item.amount));
+    const purchaseOrders = sum((stage.purchaseOrders ?? []).map((item) => item.subTotal));
+    const expenses = sum((stage.expenses ?? []).map((item) => item.totalAmount));
+    // BOQ is the stage-level budget basis; this keeps each percentage scoped to its own milestone.
+    const budget = boq;
+    return { id: stage.id ?? 0, name: stage.milestone?.name ?? 'المرحلة رقم ' + (stage.id ?? '—'), boq, mc, purchaseOrders, expenses, budget, actual: expenses, total: boq + mc };
   }
 
   private buildSnapshot(): ProjectReportSnapshot {
