@@ -2,7 +2,7 @@
   <p-card>
     <ng-template pTemplate="title">تقرير المشروع</ng-template>
     <ng-template pTemplate="subtitle">
-      بيانات التقرير تُحمّل مباشرة من الخادم للمشروع 4 والمرحلة 9.
+      اختر المشروع ثم مرحلة الإنجاز لعرض التقرير مباشرة من الخادم.
     </ng-template>
 
     @if (loadError(); as error) {
@@ -10,6 +10,19 @@
     }
 
     <div class="demo-grid">
+      <div class="field-block">
+        <label class="block text-sm font-medium mb-2">Project</label>
+        <p-select
+          [(ngModel)]="selectedProjectId"
+          [options]="projectOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select a project"
+          [loading]="isLoadingProjects()"
+          styleClass="w-full"
+          (onChange)="onProjectChange()">
+        </p-select>
+      </div>
 <div class="field-block">
         <label class="block text-sm font-medium mb-2">لغة التقرير</label>
         <p-select
@@ -29,8 +42,11 @@
           [options]="stageOptions"
           optionLabel="label"
           optionValue="value"
+          placeholder="Select a milestone stage"
+          [disabled]="!selectedProjectId || isLoadingStages()"
+          [loading]="isLoadingStages()"
           styleClass="w-full"
-          (onChange)="refresh()">
+          (onChange)="onStageChange()">
         </p-select>
       </div>
     </div>

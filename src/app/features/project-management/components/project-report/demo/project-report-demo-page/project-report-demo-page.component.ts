@@ -9,7 +9,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
 
-import { AgreementDetailsDto, ProjectStageDetailsDto, ReportClient } from '../../../../../../../nswag/api-client';
+import { AgreementDetailsDto, ProjectClient, ProjectStageDetailsDto, ProjectStageDto, ReportClient } from '../../../../../../../nswag/api-client';
 import { PrintService } from '../../../../../../shared/services/print.service';
 import { buildProjectReportHtml } from '../../builders/project-report.builder';
 import {
@@ -41,9 +41,6 @@ interface DataTypeCard {
   descriptionAr: string;
 }
 
-const PROJECT_ID = 4;
-const PROJECT_STAGE_ID = 9;
-
 const PHOTOS_CARD: DataTypeCard = {
   key: 'photos', badge: 'IMG', color: '#e11d48', icon: 'pi-images',
   titleAr: 'صور سير العمل', subtitleAr: 'Progress Photos', descriptionAr: 'صور توثيق تنفيذ الأعمال',
@@ -71,6 +68,7 @@ const STATUS_LABELS: Record<string, string> = {
 })
 export class ProjectReportDemoPageComponent {
   private readonly http = inject(HttpClient);
+  private readonly projectClient = inject(ProjectClient);
   private readonly reportClient = inject(ReportClient);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly printService = inject(PrintService);
@@ -82,8 +80,10 @@ export class ProjectReportDemoPageComponent {
   readonly dataTypeCards: DataTypeCard[] = [...STAGE_DATA_TABLE_OPTIONS, PHOTOS_CARD];
   enabledStageTables = new Set<StageDataTableKey>(STAGE_DATA_TABLE_OPTIONS.map((option) => option.key));
 
-  stageOptions: Option<string>[] = [];
-  selectedStageId = String(PROJECT_STAGE_ID);
+  projectOptions: Option<number>[] = [];
+  stageOptions: Option<number>[] = [];
+  selectedProjectId: number | null = null;
+  selectedStageId: number | null = null;
   selectedType: ProjectReportType = 'full';
   asOfDate = new Date();
   selectedLanguage: ProjectReportLanguage = 'ar';
@@ -97,14 +97,18 @@ export class ProjectReportDemoPageComponent {
   customSections: ProjectReportSectionKey[] = [...PROJECT_REPORT_SECTION_KEYS];
 
   readonly isRendering = signal(false);
+  readonly isLoadingProjects = signal(false);
+  readonly isLoadingStages = signal(false);
   readonly loadError = signal<string | null>(null);
   readonly previewHtml = signal<SafeHtml | null>(null);
   private details: AgreementDetailsDto | null = null;
   private stage: ProjectStageDetailsDto | null = null;
   private lastGeneratedHtml = '';
+  private stageLoadVersion = 0;
+  private reportLoadVersion = 0;
 
   constructor() {
-    this.loadReport();
+    this.loadProjects();
   }
 
   get isCustom(): boolean {
@@ -164,10 +168,45 @@ export class ProjectReportDemoPageComponent {
     }
   }
 
-  private loadReport(): void {
-    this.isRendering.set(true);
-    this.reportClient.getProjectStageDetails(PROJECT_ID, PROJECT_STAGE_ID).subscribe({
+  onProjectChange(): void {
+    const projectId = this.selectedProjectId;
+    this.selectedStageId = null;
+    this.stageOptions = [];
+    this.clearReport();
+    if (!projectId) return;
+
+    const requestVersion = ++this.stageLoadVersion;
+    this.isLoadingStages.set(true);
+    this.projectClient.getProjectById(projectId).subscribe({
       next: (response) => {
+        if (requestVersion !== this.stageLoadVersion) return;
+        this.stageOptions = (response.data?.projectStages ?? [])
+          .filter((stage) => stage.id != null && stage.mileStone != null)
+          .map((stage) => ({ label: this.getStageLabel(stage), value: stage.id! }));
+        this.isLoadingStages.set(false);
+        if (!this.stageOptions.length) this.loadError.set('No milestone stages are available for the selected project.');
+      },
+      error: () => {
+        if (requestVersion !== this.stageLoadVersion) return;
+        this.isLoadingStages.set(false);
+        this.loadError.set('Unable to load the selected project stages.');
+      },
+    });
+  }
+
+  onStageChange(): void {
+    if (this.selectedProjectId && this.selectedStageId) this.loadReport();
+  }
+
+  private loadReport(): void {
+    const projectId = this.selectedProjectId;
+    const projectStageId = this.selectedStageId;
+    if (!projectId || !projectStageId) return;
+    const requestVersion = ++this.reportLoadVersion;
+    this.isRendering.set(true);
+    this.reportClient.getProjectStageDetails(projectId, projectStageId).subscribe({
+      next: (response) => {
+        if (requestVersion !== this.reportLoadVersion) return;
         const stage = response.data?.project?.stage;
         if (!response.succeeded || !response.data || !stage) {
           this.loadError.set(response.message || 'لم تُرجع الواجهة بيانات المرحلة المطلوبة.');
@@ -176,17 +215,46 @@ export class ProjectReportDemoPageComponent {
         }
         this.details = response.data;
         this.stage = stage;
-        this.stageOptions = [{ label: stage.milestone?.name ?? `المرحلة رقم ${stage.id ?? PROJECT_STAGE_ID}`, value: String(stage.id ?? PROJECT_STAGE_ID) }];
-        this.selectedStageId = this.stageOptions[0].value;
         this.loadError.set(null);
         this.isRendering.set(false);
         this.refresh();
       },
       error: () => {
+        if (requestVersion !== this.reportLoadVersion) return;
         this.loadError.set('تعذّر تحميل بيانات التقرير من الخادم.');
         this.isRendering.set(false);
       },
     });
+  }
+
+  private loadProjects(): void {
+    this.isLoadingProjects.set(true);
+    this.projectClient.getAllProjects(1, 100, undefined).subscribe({
+      next: (response) => {
+        this.projectOptions = (response.data?.data ?? [])
+          .filter((project) => project.id != null)
+          .map((project) => ({ label: project.title || `Project #${project.id}`, value: project.id! }));
+        this.isLoadingProjects.set(false);
+        if (!this.projectOptions.length) this.loadError.set('No projects are available.');
+      },
+      error: () => {
+        this.isLoadingProjects.set(false);
+        this.loadError.set('Unable to load projects.');
+      },
+    });
+  }
+
+  private clearReport(): void {
+    this.reportLoadVersion++;
+    this.details = null;
+    this.stage = null;
+    this.lastGeneratedHtml = '';
+    this.previewHtml.set(null);
+    this.loadError.set(null);
+  }
+
+  private getStageLabel(stage: ProjectStageDto): string {
+    return stage.mileStone?.name || `Milestone stage #${stage.id}`;
   }
 
   private buildSnapshot(): ProjectReportSnapshot {

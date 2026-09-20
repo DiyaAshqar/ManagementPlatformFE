@@ -3,7 +3,7 @@
   "defaultVariables": null,
   "documentGenerator": {
     "fromDocument": {
-      "url": "https://neuro-code.omaralsaheb.com/swagger/all/swagger.json",
+      "url": "https://api.dev.iconic.neurocodejo.com/swagger/all/swagger.json",
       "output": null,
       "newLineBehavior": "Auto"
     }
