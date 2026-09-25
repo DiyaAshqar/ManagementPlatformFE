@@ -1,4 +1,4 @@
-<div class="min-h-screen bg-surface-ground">
+<div class="project-detail min-h-screen bg-surface-ground">
   @if (isLoading()) {
     <!-- Loading Skeleton -->
     <div class="p-2">
@@ -9,8 +9,8 @@
     <!-- Header Section -->
     <header class="surface-card border-bottom-1 surface-border">
       <div class="p-2">
-        <div class="flex align-items-center justify-content-between">
-          <div class="flex align-items-center gap-3">
+        <div class="project-header-content flex align-items-center justify-content-between">
+          <div class="project-header-title flex align-items-center gap-3">
             <p-button 
               icon="pi pi-arrow-left"
               [text]="true"
@@ -25,7 +25,7 @@
               <p class="text-color-secondary text-sm m-0 mt-1">{{ project()!.clientName }}</p>
             </div>
           </div>
-          <div class="flex align-items-center gap-2">
+          <div class="project-header-actions flex align-items-center gap-2">
             <p-button
               icon="pi pi-print"
               [label]="'projectDetail.printReport' | translate"
@@ -47,7 +47,7 @@
       <div class="grid mb-2">
         <div class="col-12 md:col-6 lg:col-3">
           <p-card styleClass="h-full">
-            <div class="flex align-items-center gap-3">
+            <div class="project-header-title flex align-items-center gap-3">
               <div class="flex align-items-center justify-content-center border-circle bg-primary-100" 
                    style="width: 3rem; height: 3rem;">
                 <i class="pi pi-percentage text-primary text-xl"></i>
@@ -68,7 +68,7 @@
         
         <div class="col-12 md:col-6 lg:col-3">
           <p-card styleClass="h-full">
-            <div class="flex align-items-center gap-3">
+            <div class="project-header-title flex align-items-center gap-3">
               <div class="flex align-items-center justify-content-center border-circle bg-green-100" 
                    style="width: 3rem; height: 3rem;">
                 <i class="pi pi-dollar text-green-600 text-xl"></i>
@@ -84,7 +84,7 @@
         
         <div class="col-12 md:col-6 lg:col-3">
           <p-card styleClass="h-full">
-            <div class="flex align-items-center gap-3">
+            <div class="project-header-title flex align-items-center gap-3">
               <div class="flex align-items-center justify-content-center border-circle bg-blue-100" 
                    style="width: 3rem; height: 3rem;">
                 <i class="pi pi-calendar text-blue-600 text-xl"></i>
@@ -115,52 +115,52 @@
 
       <!-- Main Content Tabs -->
       <p-card>
-        <p-tabs [(value)]="activeTabIndex" styleClass="tabview-custom">
+        <p-tabs [(value)]="activeTabIndex" styleClass="tabview-custom project-tabs">
           <p-tablist>
               <p-tab *appHasPermission="permissions.ProjectTabs.Overview" value="0">
-                <div class="flex align-items-center gap-2">
+                <div class="project-header-actions flex align-items-center gap-2">
                   <i class="pi pi-chart-bar"></i>
                   <span>{{ 'projectDetail.tabs.overview' | translate }}</span>
                 </div>
               </p-tab>
               <p-tab *appHasPermission="permissions.ProjectTabs.Preparing" value="1">
-                <div class="flex align-items-center gap-2">
+                <div class="project-header-actions flex align-items-center gap-2">
                   <i class="pi pi-wrench"></i>
                   <span>{{ 'projectDetail.tabs.preparing' | translate }}</span>
                 </div>
               </p-tab>
               <p-tab *appHasPermission="permissions.ProjectTabs.Excavation" value="2">
-                <div class="flex align-items-center gap-2">
+                <div class="project-header-actions flex align-items-center gap-2">
                   <i class="pi pi-shield"></i>
                   <span>{{ 'projectDetail.tabs.excavation' | translate }}</span>
                 </div>
               </p-tab>
             <!-- <p-tab value="3">
-              <div class="flex align-items-center gap-2">
+              <div class="project-header-actions flex align-items-center gap-2">
                 <i class="pi pi-sitemap"></i>
                 <span>Staging</span>
               </div>
             </p-tab> -->
               <p-tab *appHasPermission="permissions.ProjectTabs.Milestones" value="4">
-                <div class="flex align-items-center gap-2">
+                <div class="project-header-actions flex align-items-center gap-2">
                   <i class="pi pi-flag"></i>
                   <span>{{ 'projectDetail.tabs.milestones' | translate }}</span>
                 </div>
               </p-tab>
               <p-tab *appHasPermission="permissions.ProjectTabs.Documents" value="5">
-                <div class="flex align-items-center gap-2">
+                <div class="project-header-actions flex align-items-center gap-2">
                   <i class="pi pi-file"></i>
                   <span>{{ 'projectDetail.tabs.documents' | translate }}</span>
                 </div>
               </p-tab>
               <p-tab *appHasPermission="permissions.ProjectTabs.OwnerPayments" value="6">
-                <div class="flex align-items-center gap-2">
+                <div class="project-header-actions flex align-items-center gap-2">
                   <i class="pi pi-credit-card"></i>
                   <span>{{ 'projectDetail.tabs.ownerPayment' | translate }}</span>
                 </div>
               </p-tab>
               <p-tab *appHasPermission="permissions.ProjectTabs.Timeframe" value="7">
-                <div class="flex align-items-center gap-2">
+                <div class="project-header-actions flex align-items-center gap-2">
                   <i class="pi pi-chart-bar"></i>
                   <span>{{ 'projectDetail.tabs.timeframe' | translate }}</span>
                 </div>

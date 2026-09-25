@@ -24,7 +24,7 @@
   <p-table
     [value]="visitItems()"
     [tableStyle]="{ 'min-width': '62rem' }"
-    styleClass="p-datatable-gridlines"
+    styleClass="p-datatable-gridlines sv-table"
     responsiveLayout="scroll">
 
     <ng-template pTemplate="header">
@@ -44,21 +44,21 @@
 
     <ng-template pTemplate="body" let-item>
       <tr>
-        <td>{{ item.visitDate | date:'yyyy-MM-dd' }}</td>
-        <td>{{ item.surveyor }}</td>
-        <td>{{ item.purpose }}</td>
-        <td><span class="sv-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
-        <td class="text-right">{{ item.quantity | appNumber }}</td>
-        <td class="text-right">{{ item.price | appNumber }}</td>
-        <td class="text-right">{{ getAmount(item) | appNumber }}</td>
-        <td class="text-right sv-subtotal">{{ item.subTotal | appNumber }}</td>
-        <td>
+        <td [attr.data-label]="'projectTabs.surveyingVisits.visitDate' | translate">{{ item.visitDate | date:'yyyy-MM-dd' }}</td>
+        <td [attr.data-label]="'projectTabs.surveyingVisits.surveyor' | translate">{{ item.surveyor }}</td>
+        <td [attr.data-label]="'projectTabs.surveyingVisits.purpose' | translate">{{ item.purpose }}</td>
+        <td [attr.data-label]="'projectTabs.surveyingVisits.unit' | translate"><span class="sv-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
+        <td class="text-right" [attr.data-label]="'projectTabs.surveyingVisits.quantity' | translate">{{ item.quantity | appNumber }}</td>
+        <td class="text-right" [attr.data-label]="'projectTabs.surveyingVisits.unitPrice' | translate">{{ item.price | appNumber }}</td>
+        <td class="text-right" [attr.data-label]="'projectTabs.surveyingVisits.amount' | translate">{{ getAmount(item) | appNumber }}</td>
+        <td class="text-right sv-subtotal" [attr.data-label]="'projectTabs.surveyingVisits.subtotal' | translate">{{ item.subTotal | appNumber }}</td>
+        <td [attr.data-label]="'projectTabs.surveyingVisits.status' | translate">
           <p-badge
             [value]="getStatusLabel(item.status)"
             [severity]="getStatusSeverity(item.status)">
           </p-badge>
         </td>
-        <td class="text-center">
+        <td class="text-center sv-actions-cell" [attr.data-label]="'projectTabs.surveyingVisits.actions' | translate">
             <div *appHasPermission="permissions.SurveyingVisits.Manage" class="sv-actions">
             <p-button
               icon="pi pi-pencil"

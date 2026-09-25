@@ -133,7 +133,7 @@
                 currentPageReportTemplate="{{ 'wizard.step4.showingContracts' | translate }}"
                 [rowsPerPageOptions]="[5, 10, 25, 50]"
                 [tableStyle]="{ 'min-width': '50rem' }"
-                styleClass="p-datatable-striped">
+                styleClass="p-datatable-striped main-contracts-table">
                 
                 <ng-template pTemplate="header">
                     <tr>
@@ -149,13 +149,13 @@
                 
                 <ng-template pTemplate="body" let-contract let-rowIndex="rowIndex">
                     <tr>
-                        <td>{{ getMainContractTypeDisplayName(contract) }}</td>
-                        <td>{{ getConstructorDisplayName(contract) }}</td>
-                        <td>{{ contract.total | appNumber }}</td>
-                        <td>{{ formatDate(contract.startDate) }}</td>
-                        <td>{{ formatDate(contract.endDate) }}</td>
-                        <td>{{ getMilestoneDisplayName(contract) }}</td>
-                        <td class="text-center">
+                        <td [attr.data-label]="'wizard.step4.contractType' | translate">{{ getMainContractTypeDisplayName(contract) }}</td>
+                        <td [attr.data-label]="'wizard.step4.contractor' | translate">{{ getConstructorDisplayName(contract) }}</td>
+                        <td [attr.data-label]="'wizard.step4.totalAmount' | translate">{{ contract.total | appNumber }}</td>
+                        <td [attr.data-label]="'wizard.step4.startDate' | translate">{{ formatDate(contract.startDate) }}</td>
+                        <td [attr.data-label]="'wizard.step4.endDate' | translate">{{ formatDate(contract.endDate) }}</td>
+                        <td [attr.data-label]="'wizard.step4.milestone' | translate">{{ getMilestoneDisplayName(contract) }}</td>
+                        <td class="text-center main-contract-actions" [attr.data-label]="'common.actions' | translate">
                             <button 
                                 type="button"
                                 class="p-button-rounded p-button-text p-button-secondary mr-2"

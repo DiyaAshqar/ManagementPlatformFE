@@ -141,7 +141,7 @@
       [value]="records()"
       [loading]="isLoadingRecords()"
       [tableStyle]="{ 'min-width': '52rem' }"
-      styleClass="p-datatable-sm p-datatable-striped"
+      styleClass="p-datatable-sm p-datatable-striped owner-payment-table"
       responsiveLayout="scroll">
       <ng-template pTemplate="header">
         <tr>
@@ -155,11 +155,11 @@
 
       <ng-template pTemplate="body" let-record>
         <tr>
-          <td>{{ record.createdAt | date: 'yyyy-MM-dd' }}</td>
-          <td>{{ record.paymentMethodName || getPaymentTypeLabel(record.paymentMethodId) }}</td>
-          <td>{{ getReferenceNumber(record) }}</td>
-          <td class="text-right font-semibold text-primary">{{ formatAmount(record.cash, record.currencyAbb || getCurrencyLabel(record.currencyId)) }}</td>
-          <td class="text-center">
+          <td [attr.data-label]="'ownerPaymentEntry.createdAt' | translate">{{ record.createdAt | date: 'yyyy-MM-dd' }}</td>
+          <td [attr.data-label]="'ownerPaymentEntry.paymentType' | translate">{{ record.paymentMethodName || getPaymentTypeLabel(record.paymentMethodId) }}</td>
+          <td [attr.data-label]="'ownerPaymentEntry.referenceNumber' | translate">{{ getReferenceNumber(record) }}</td>
+          <td class="text-right font-semibold text-primary" [attr.data-label]="'ownerPaymentEntry.amount' | translate">{{ formatAmount(record.cash, record.currencyAbb || getCurrencyLabel(record.currencyId)) }}</td>
+          <td class="text-center owner-payment-actions" [attr.data-label]="'common.actions' | translate">
             <p-button
               icon="pi pi-print"
               severity="info"

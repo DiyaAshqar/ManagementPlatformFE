@@ -27,7 +27,7 @@
   <p-table
     [value]="contractorItems()"
     [tableStyle]="{ 'min-width': '70rem' }"
-    styleClass="p-datatable-gridlines"
+    styleClass="p-datatable-gridlines contractor-table"
     responsiveLayout="scroll"
     [loading]="isLoading()">
 
@@ -46,20 +46,20 @@
 
     <ng-template pTemplate="body" let-item>
       <tr>
-        <td>{{ item.id }}</td>
-        <td>
+        <td [attr.data-label]="'projectTabs.projectMainContractor.columnId' | translate">{{ item.id }}</td>
+        <td [attr.data-label]="'projectTabs.projectMainContractor.columnName' | translate">
           <span class="contractor-name">{{ contractorMap[item.constructorId ?? 0] || '—' }}</span>
         </td>
-        <td>{{ getClassificationLabel(item.classification) }}</td>
-        <td class="text-right contractor-amount">
+        <td [attr.data-label]="'projectTabs.projectMainContractor.columnClassification' | translate">{{ getClassificationLabel(item.classification) }}</td>
+        <td class="text-right contractor-amount" [attr.data-label]="'projectTabs.projectMainContractor.columnAmount' | translate">
           {{ item.amount | appNumber }}
         </td>
-        <td class="text-right contractor-total-payments">
+        <td class="text-right contractor-total-payments" [attr.data-label]="'projectTabs.projectMainContractor.columnTotalPayments' | translate">
           {{ item.totalPayments | appNumber }}
         </td>
-        <td>{{ item.startDate | date:'yyyy-MM-dd' }}</td>
-        <td>{{ item.endDate | date:'yyyy-MM-dd' }}</td>
-        <td class="text-center">
+        <td [attr.data-label]="'projectTabs.projectMainContractor.columnStartDate' | translate">{{ item.startDate | date:'yyyy-MM-dd' }}</td>
+        <td [attr.data-label]="'projectTabs.projectMainContractor.columnEndDate' | translate">{{ item.endDate | date:'yyyy-MM-dd' }}</td>
+        <td class="text-center contractor-actions-cell" [attr.data-label]="'common.actions' | translate">
             <div *appHasPermission="permissions.MainContractor.Manage" class="contractor-actions">
             <p-button
               icon="pi pi-credit-card"

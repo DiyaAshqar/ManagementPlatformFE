@@ -24,7 +24,7 @@
   <p-table
     [value]="poItems()"
     [tableStyle]="{ 'min-width': '62rem' }"
-    styleClass="p-datatable-gridlines"
+    styleClass="p-datatable-gridlines po-table"
     responsiveLayout="scroll">
 
     <ng-template pTemplate="header">
@@ -43,20 +43,20 @@
 
     <ng-template pTemplate="body" let-item>
       <tr>
-        <td><span class="po-number">{{ item.poNumber }}</span></td>
-        <td>{{ supplierMap[item.supplierId ?? 0] || '—' }}</td>
-        <td>{{ item.description }}</td>
-        <td><span class="po-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
-        <td class="text-right">{{ item.price | appNumber }}</td>
-        <td class="text-right">{{ getAmount(item) | appNumber }}</td>
-        <td class="text-right po-subtotal">{{ item.subTotal | appNumber }}</td>
-        <td>
+        <td [attr.data-label]="'projectTabs.purchaseOrders.columnPoNumber' | translate"><span class="po-number">{{ item.poNumber }}</span></td>
+        <td [attr.data-label]="'projectTabs.purchaseOrders.columnSupplier' | translate">{{ supplierMap[item.supplierId ?? 0] || '—' }}</td>
+        <td [attr.data-label]="'projectTabs.purchaseOrders.columnDescription' | translate">{{ item.description }}</td>
+        <td [attr.data-label]="'projectTabs.purchaseOrders.columnUnit' | translate"><span class="po-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
+        <td class="text-right" [attr.data-label]="'projectTabs.purchaseOrders.columnUnitPrice' | translate">{{ item.price | appNumber }}</td>
+        <td class="text-right" [attr.data-label]="'projectTabs.purchaseOrders.columnAmount' | translate">{{ getAmount(item) | appNumber }}</td>
+        <td class="text-right po-subtotal" [attr.data-label]="'projectTabs.purchaseOrders.columnSubtotal' | translate">{{ item.subTotal | appNumber }}</td>
+        <td [attr.data-label]="'common.status' | translate">
           <p-badge 
             [value]="getStatusLabel(item.status)" 
             [severity]="getStatusSeverity(item.status)">
           </p-badge>
         </td>
-        <td class="text-center">
+        <td class="text-center po-actions-cell" [attr.data-label]="'common.actions' | translate">
             <div *appHasPermission="permissions.PurchaseOrders.Manage" class="po-actions">
             <p-button
               icon="pi pi-eye"

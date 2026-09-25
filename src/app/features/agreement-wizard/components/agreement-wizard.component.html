@@ -1,6 +1,6 @@
-<div class="card flex justify-center p-2">
+<div class="agreement-wizard card flex justify-center p-2">
   <p-stepper [value]="currentStep()" class="w-full" [linear]="!isViewMode()">
-    <p-step-list>
+    <p-step-list class="wizard-step-list">
       @for (step of visibleSteps(); track step.value) {
         <p-step 
           [value]="step.value"
@@ -27,7 +27,7 @@
             ></app-step1>
             
             @if (!isViewMode()) {
-              <div class="flex pt-4 justify-end gap-2">
+              <div class="wizard-navigation flex pt-4 justify-end gap-2">
                 <p-button 
                   [label]="'wizard.next' | translate" 
                   [icon]="isRTL() ? 'pi pi-arrow-left' : 'pi pi-arrow-right'" 
@@ -54,7 +54,7 @@
               ></app-step2>
 
               @if (!isViewMode()) {
-                <div class="flex pt-4 justify-between gap-2">
+                <div class="wizard-navigation flex pt-4 justify-between gap-2">
                   <p-button
                     [label]="'wizard.back' | translate"
                     severity="secondary"
@@ -87,7 +87,7 @@
             ></app-step-milestones>
             
             @if (!isViewMode()) {
-              <div class="flex pt-4 justify-between gap-2">
+              <div class="wizard-navigation flex pt-4 justify-between gap-2">
                 <p-button 
                   [label]="'wizard.back' | translate" 
                   severity="secondary" 
@@ -120,7 +120,7 @@
             ></app-step3>
             
             @if (!isViewMode()) {
-              <div class="flex pt-4 justify-between gap-2">
+              <div class="wizard-navigation flex pt-4 justify-between gap-2">
                 <p-button 
                   [label]="'wizard.back' | translate" 
                   severity="secondary" 
@@ -153,7 +153,7 @@
             ></app-step4>
             
             @if (!isViewMode()) {
-              <div class="flex pt-4 justify-between gap-2">
+              <div class="wizard-navigation flex pt-4 justify-between gap-2">
                 <p-button 
                   [label]="'wizard.back' | translate" 
                   severity="secondary" 
@@ -186,7 +186,7 @@
             ></app-step5>
             
             @if (!isViewMode()) {
-              <div class="flex pt-4 justify-between gap-2">
+              <div class="wizard-navigation flex pt-4 justify-between gap-2">
                 <p-button 
                   [label]="'wizard.back' | translate" 
                   severity="secondary" 
@@ -218,7 +218,7 @@
             ></app-step6>
             
             @if (!isViewMode()) {
-              <div class="flex pt-4 justify-between gap-2">
+              <div class="wizard-navigation flex pt-4 justify-between gap-2">
                 <p-button 
                   [label]="'wizard.back' | translate" 
                   severity="secondary" 
@@ -250,7 +250,7 @@
             ></app-step7>
             
             @if (!isViewMode()) {
-              <div class="flex pt-4 justify-between gap-2">
+              <div class="wizard-navigation flex pt-4 justify-between gap-2">
                 <p-button 
                   [label]="'wizard.back' | translate" 
                   severity="secondary" 

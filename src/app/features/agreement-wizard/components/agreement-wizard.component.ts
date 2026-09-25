@@ -35,7 +35,8 @@ import { HasPermissionDirective } from '../../../core/auth/directives/has-permis
     StepMilestonesComponent,
     HasPermissionDirective
   ],
-  templateUrl: './agreement-wizard.component.html'
+  templateUrl: './agreement-wizard.component.html',
+  styleUrls: ['./agreement-wizard.component.scss']
 })
 export class AgreementWizardComponent implements OnInit {
   readonly permissions = Permissions;

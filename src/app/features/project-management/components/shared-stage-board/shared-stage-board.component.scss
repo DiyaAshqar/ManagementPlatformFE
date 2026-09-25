@@ -132,3 +132,39 @@
 .cdk-drop-list-dragging .work-item-card:not(.cdk-drag-placeholder) {
   transition: transform 250ms cubic-bezier(0, 0, 0.2, 1);
 }
+
+@media (max-width: 768px) {
+  .staging-board {
+    padding: 0;
+  }
+
+  .kanban-container {
+    height: auto;
+    overflow: visible;
+    padding-bottom: 0;
+  }
+
+  .kanban-columns {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 0;
+    height: auto;
+  }
+
+  .kanban-column {
+    flex: 0 0 auto;
+    width: 100%;
+    max-height: none;
+    padding: 0.75rem;
+  }
+
+  .column-items {
+    max-height: none;
+    overflow: visible;
+  }
+
+  .work-item-card {
+    padding: 0.75rem;
+  }
+}

@@ -64,7 +64,7 @@
       </div>
     </div>
 
-    <div class="flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
+    <div class="advance-list-toolbar flex flex-wrap align-items-center justify-content-between gap-2 mb-2">
       <div class="flex flex-wrap align-items-center gap-2">
         <p-select
           [options]="statusOptions()" optionLabel="label" optionValue="value"
@@ -91,7 +91,7 @@
       [value]="filteredAdvances()"
       [loading]="isLoadingList()"
       [tableStyle]="{ 'min-width': '60rem' }"
-      styleClass="p-datatable-gridlines p-datatable-striped"
+      styleClass="p-datatable-gridlines p-datatable-striped advance-list-table"
       responsiveLayout="scroll"
       [paginator]="filteredAdvances().length > 10"
       [rows]="10"
@@ -113,16 +113,16 @@
 
       <ng-template pTemplate="body" let-advance let-i="rowIndex">
         <tr>
-          <td class="text-center text-500 font-medium">{{ i + 1 }}</td>
-          <td><span class="font-semibold text-color">{{ advance.advance_no }}</span></td>
-          <td>{{ advance.engineer || '—' }}</td>
-          <td>{{ advance.advance_date | date: 'yyyy-MM-dd' }}</td>
-          <td class="text-right font-semibold text-color">{{ formatAmount(advance.amount) }}</td>
-          <td class="text-right font-semibold text-primary">{{ formatAmount(advance.remaining_balance) }}</td>
-          <td class="text-center">
+          <td class="text-center text-500 font-medium advance-index">{{ i + 1 }}</td>
+          <td [attr.data-label]="'projectTabs.advances.columns.advanceNo' | translate"><span class="font-semibold text-color">{{ advance.advance_no }}</span></td>
+          <td [attr.data-label]="'projectTabs.advances.columns.engineer' | translate">{{ advance.engineer || '—' }}</td>
+          <td [attr.data-label]="'projectTabs.advances.columns.date' | translate">{{ advance.advance_date | date: 'yyyy-MM-dd' }}</td>
+          <td class="text-right font-semibold text-color" [attr.data-label]="'projectTabs.advances.columns.amount' | translate">{{ formatAmount(advance.amount) }}</td>
+          <td class="text-right font-semibold text-primary" [attr.data-label]="'projectTabs.advances.columns.remaining' | translate">{{ formatAmount(advance.remaining_balance) }}</td>
+          <td class="text-center" [attr.data-label]="'common.status' | translate">
             <p-tag [value]="statusLabel(advance.status)" [severity]="statusSeverity(advance.status)"></p-tag>
           </td>
-          <td class="text-center">
+          <td class="text-center advance-actions" [attr.data-label]="'common.actions' | translate">
             <div class="flex align-items-center justify-content-center gap-1">
                 <p-button *appHasPermission="permissions.Advances.Edit"
                   icon="pi pi-pencil"
@@ -165,7 +165,7 @@
       <ng-template pTemplate="emptymessage">
         <tr>
           <td colspan="8">
-            <div class="flex flex-column align-items-center justify-content-center py-6 gap-3">
+            <div class="advance-empty-state flex flex-column align-items-center justify-content-center py-6 gap-3">
               <div class="flex align-items-center justify-content-center border-circle bg-primary-50"
                    style="width: 4rem; height: 4rem;">
                 <i class="pi pi-money-bill text-primary text-2xl"></i>

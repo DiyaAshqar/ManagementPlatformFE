@@ -369,3 +369,51 @@
     }
   }
 }
+
+@media (max-width: 576px) {
+  .owner-payment-wrap { padding: 1rem 0; }
+  .op-section { overflow-x: auto; margin-inline: -0.25rem; }
+  .op-section-header { min-width: max-content; padding: 0.75rem 1rem; }
+  .op-section-total { padding-inline-start: 1rem; }
+  .op-grand-total { align-items: flex-start; flex-direction: column; gap: 0.25rem; padding: 1rem; }
+  :host ::ng-deep .p-datatable { font-size: 0.8125rem; .p-datatable-thead > tr > th, .p-datatable-tbody > tr > td { padding: 0.625rem 0.75rem; white-space: nowrap; } }
+}
+@media (max-width: 576px) {
+  .op-section {
+    overflow: hidden;
+  }
+
+  :host ::ng-deep .op-section {
+    .p-datatable-wrapper {
+      overflow: visible;
+    }
+
+    table,
+    .p-datatable-table {
+      width: 100% !important;
+      min-width: 0 !important;
+      table-layout: fixed;
+    }
+
+    .p-datatable-thead > tr > th,
+    .p-datatable-tbody > tr > td {
+      padding: 0.5rem 0.4rem;
+      white-space: normal !important;
+      overflow-wrap: anywhere;
+      font-size: 0.75rem;
+      vertical-align: top;
+    }
+  }
+
+  .op-preview-header-right,
+  .op-actions {
+    align-items: stretch;
+    flex-direction: column;
+    width: 100%;
+
+    ::ng-deep .p-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}

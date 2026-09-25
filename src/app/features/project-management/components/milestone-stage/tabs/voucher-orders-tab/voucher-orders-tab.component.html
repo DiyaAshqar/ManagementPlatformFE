@@ -24,7 +24,7 @@
   <p-table
     [value]="voItems()"
     [tableStyle]="{ 'min-width': '80rem' }"
-    styleClass="p-datatable-gridlines"
+    styleClass="p-datatable-gridlines vo-table"
     responsiveLayout="scroll">
 
     <ng-template pTemplate="header">
@@ -46,40 +46,40 @@
 
     <ng-template pTemplate="body" let-item>
       <tr>
-        <td><span class="vo-number">{{ item.voNumber }}</span></td>
-        <td>{{ item.item }}</td>
-        <td>{{ item.description }}</td>
-        <td class="text-right">{{ item.quantity }}</td>
-        <td><span class="vo-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
-        <td class="text-right">{{ item.price | appNumber }}</td>
-        <td class="text-right vo-subtotal">{{ item.subTotal | appNumber }}</td>
-        <td class="text-center">
+        <td [attr.data-label]="'projectTabs.voucherOrders.voNumber' | translate"><span class="vo-number">{{ item.voNumber }}</span></td>
+        <td [attr.data-label]="'projectTabs.voucherOrders.voItem' | translate">{{ item.item }}</td>
+        <td [attr.data-label]="'projectTabs.voucherOrders.description' | translate">{{ item.description }}</td>
+        <td class="text-right" [attr.data-label]="'projectTabs.voucherOrders.quantity' | translate">{{ item.quantity }}</td>
+        <td [attr.data-label]="'projectTabs.voucherOrders.unit' | translate"><span class="vo-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
+        <td class="text-right" [attr.data-label]="'projectTabs.voucherOrders.amount' | translate">{{ item.price | appNumber }}</td>
+        <td class="text-right vo-subtotal" [attr.data-label]="'projectTabs.voucherOrders.subtotal' | translate">{{ item.subTotal | appNumber }}</td>
+        <td class="text-center" [attr.data-label]="'projectTabs.voucherOrders.isEffected' | translate">
           <p-badge 
             [value]="item.isEffected ? ('projectTabs.voucherOrders.yes' | translate) : ('projectTabs.voucherOrders.no' | translate)" 
             [severity]="item.isEffected ? 'success' : 'secondary'">
           </p-badge>
         </td>
-        <td>
+        <td [attr.data-label]="'projectTabs.voucherOrders.effectedDateStart' | translate">
           @if (item.effectedDateStart) {
             {{ formatDate(item.effectedDateStart) }}
           } @else {
             <span class="text-muted-color">—</span>
           }
         </td>
-        <td>
+        <td [attr.data-label]="'projectTabs.voucherOrders.effectedDateEnd' | translate">
           @if (item.effectedDateEnd) {
             {{ formatDate(item.effectedDateEnd) }}
           } @else {
             <span class="text-muted-color">—</span>
           }
         </td>
-        <td>
+        <td [attr.data-label]="'projectTabs.voucherOrders.approvalStatus' | translate">
           <p-badge 
             [value]="getStatusLabel(item.status)" 
             [severity]="getStatusSeverity(item.status)">
           </p-badge>
         </td>
-        <td class="text-center">
+        <td class="text-center vo-actions-cell" [attr.data-label]="'projectTabs.voucherOrders.actions' | translate">
             <div *appHasPermission="permissions.VoucherOrders.Manage" class="vo-actions">
             <p-button
               icon="pi pi-pencil"

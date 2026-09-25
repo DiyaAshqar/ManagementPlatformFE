@@ -80,3 +80,15 @@
 
 .text-right  { text-align: right;  }
 .text-center { text-align: center; }
+
+@media (max-width: 576px) {
+  .sv-card { overflow: visible; padding: 1rem; .sv-toolbar { align-items: stretch; ::ng-deep .p-button { width: 100%; justify-content: center; } } }
+  ::ng-deep .sv-table {
+    .p-datatable-wrapper { overflow: visible; }
+    .p-datatable-table, .p-datatable-tbody, .p-datatable-tbody > tr, .p-datatable-tbody > tr > td { display: block; width: 100% !important; min-width: 0 !important; }
+    .p-datatable-thead, .p-datatable-tfoot { display: none; }
+    .p-datatable-tbody > tr { margin: 0.75rem 0; padding: 0.25rem 0; border: 1px solid var(--surface-border); border-radius: 0.75rem; overflow: hidden; }
+    .p-datatable-tbody > tr > td { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.625rem 0.75rem; border: 0; border-bottom: 1px solid var(--surface-border); text-align: end; white-space: normal; &::before { content: attr(data-label); flex: 0 0 42%; color: var(--text-color-secondary); font-size: 0.75rem; font-weight: 600; text-align: start; } &:last-child { border-bottom: 0; } }
+    .sv-actions-cell { align-items: flex-start !important; flex-direction: column; &::before { flex-basis: auto !important; } .sv-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; } ::ng-deep .p-button { justify-self: center; } }
+  }
+}

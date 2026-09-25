@@ -32,7 +32,7 @@
         currentPageReportTemplate="{{ 'agreements.pagination' | translate }}"
         [rowsPerPageOptions]="[5, 10, 25, 50]"
         [globalFilterFields]="['projectNumber', 'projectName']"
-        styleClass="p-datatable-gridlines"
+        styleClass="p-datatable-gridlines agreement-table"
         [tableStyle]="{ 'min-width': '50rem' }"
         responsiveLayout="scroll"
       >
@@ -78,13 +78,13 @@
 
         <ng-template pTemplate="body" let-agreement let-rowIndex="rowIndex">
           <tr>
-            <td>{{ first + rowIndex + 1 }}</td>
-            <td>
+            <td class="agreement-index">{{ first + rowIndex + 1 }}</td>
+            <td [attr.data-label]="'agreements.columns.projectNumber' | translate">
               <span class="font-semibold">{{ agreement.projectNumber || '-' }}</span>
             </td>
-            <td>{{ agreement.projectName || '-' }}</td>
-            <td>{{ formatDate(agreement.agreementDate) }}</td>
-            <td>
+            <td [attr.data-label]="'agreements.columns.projectName' | translate">{{ agreement.projectName || '-' }}</td>
+            <td [attr.data-label]="'agreements.columns.agreementDate' | translate">{{ formatDate(agreement.agreementDate) }}</td>
+            <td class="agreement-actions" [attr.data-label]="'agreements.columns.actions' | translate">
               <div class="action-buttons">
                 <p-button 
                   icon="pi pi-eye" 

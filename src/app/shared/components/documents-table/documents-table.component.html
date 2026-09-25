@@ -1,5 +1,5 @@
 <!-- Header Row: count + upload button -->
-<div class="flex align-items-center justify-content-between mb-2">
+<div class="documents-toolbar flex align-items-center justify-content-between mb-2">
   <span class="text-primary font-medium">{{ 'documentsTable.totalDocuments' | translate }}: {{ documents().length }}</span>
     <p-button [label]="'documentsTable.uploadDocument' | translate" icon="pi pi-upload" (onClick)="openUploadDialog()"></p-button>
 </div>
@@ -20,7 +20,7 @@
     [paginator]="documents().length > 10"
     [rows]="10"
     [rowsPerPageOptions]="[10, 25, 50]"
-    styleClass="p-datatable-sm"
+    styleClass="p-datatable-sm documents-data-table"
     [tableStyle]="{ 'min-width': '55rem' }">
     <ng-template pTemplate="header">
       <tr>

@@ -37,3 +37,25 @@
     background: var(--surface-hover);
   }
 }
+
+@media (max-width: 576px) {
+  .documents-toolbar {
+    align-items: stretch !important;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    ::ng-deep .p-button { width: 100%; justify-content: center; }
+  }
+
+  :host ::ng-deep .documents-data-table {
+    .p-datatable-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .p-datatable-table { min-width: 42rem !important; }
+    .p-paginator { flex-wrap: wrap; justify-content: center; }
+  }
+
+  .documents-toolbar + .p-datatable + .flex {
+    align-items: flex-start !important;
+    flex-direction: column;
+    gap: 0.5rem !important;
+  }
+}

@@ -285,7 +285,7 @@
             (onLazyLoad)="onMaterialPageChange($event)"
             [first]="materialFirst"
             [rowsPerPageOptions]="[10, 25, 50]"
-            styleClass="p-datatable-sm p-datatable-striped"
+            styleClass="p-datatable-sm p-datatable-striped material-table"
             [tableStyle]="{'min-width': '100%'}">
 
             <ng-template pTemplate="header">
@@ -298,9 +298,9 @@
 
             <ng-template pTemplate="body" let-mat let-rowIndex="rowIndex">
               <tr>
-                <td>{{ materialFirst + rowIndex + 1 }}</td>
-                <td>{{ mat.name }}</td>
-                <td>
+                <td class="material-index">{{ materialFirst + rowIndex + 1 }}</td>
+                <td [attr.data-label]="'material.item.name' | translate">{{ mat.name }}</td>
+                <td class="material-actions" [attr.data-label]="'common.actions' | translate">
                   <div class="flex gap-1">
                     <p-button
                       icon="pi pi-pencil"

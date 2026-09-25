@@ -24,3 +24,90 @@
     overflow: hidden;
   }
 }
+
+@media (max-width: 576px) {
+  .project-detail {
+    .p-2 {
+      padding: 0.75rem !important;
+    }
+
+    .project-header-content {
+      align-items: stretch !important;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+
+    .project-header-title {
+      min-width: 0;
+
+      > div {
+        min-width: 0;
+      }
+
+      h1 {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        font-size: 1.25rem !important;
+      }
+
+      p {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
+
+    .project-header-actions {
+      width: 100%;
+      justify-content: space-between !important;
+
+      ::ng-deep .p-button {
+        flex: 1;
+        justify-content: center;
+      }
+    }
+
+    ::ng-deep {
+      .p-card-body {
+        padding: 0.875rem;
+      }
+
+      .project-tabs .p-tablist {
+        margin-inline: -0.25rem;
+        padding-inline: 0.25rem;
+      }
+
+      .project-tabs .p-tab {
+        flex: 0 0 auto;
+        padding: 0.75rem;
+      }
+
+      .project-tabs .p-tab span {
+        font-size: 0.8125rem;
+        white-space: nowrap;
+      }
+
+      .project-tabs .p-tabpanels {
+        padding-inline: 0;
+      }
+    }
+  }
+}
+
+@media (max-width: 360px) {
+  .project-detail {
+    .project-header-actions {
+      align-items: stretch !important;
+      flex-direction: column;
+
+      ::ng-deep .p-button {
+        width: 100%;
+      }
+    }
+
+    ::ng-deep .project-tabs .p-tab span {
+      display: none;
+    }
+  }
+}
