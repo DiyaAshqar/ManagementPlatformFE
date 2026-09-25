@@ -266,6 +266,10 @@ function buildPmc(): string {
         <tr class="sdt-detail-row"><td colspan="7">${paymentDetail}${dutyDetail}</td></tr>`;
     })
     .join('');
+  const contractorsTotalPaid = contractors.reduce(
+    (total, contractor) => total + contractor.payments.reduce((paid, payment) => paid + payment.amount, 0),
+    0,
+  );
 
   return `<div class="sdt-block" style="border-inline-start-color:#16a34a">
     <div class="sdt-head" style="background:#16a34a1a">
@@ -274,7 +278,7 @@ function buildPmc(): string {
         <div class="sdt-title" style="color:#16a34a">المقاولون الرئيسيون — Main Contractors</div>
         <div class="sdt-subtitle">العقد هو السجل الرئيسي؛ افتح صف التفاصيل للاطلاع على دفعاته والتزاماته (${contractors.length} عقود)</div>
       </div>
-      <div class="sdt-total" style="color:#16a34a"><span class="sdt-total-label">إجمالي قيمة العقود</span><span class="sdt-total-value">${n(15881)}</span></div>
+      <div class="sdt-total" style="color:#16a34a"><span class="sdt-total-label">إجمالي المدفوع</span><span class="sdt-total-value">${n(contractorsTotalPaid)}</span></div>
     </div>
     <table class="sdt-table">
       <thead><tr><th>#</th><th>المقاول</th><th>نوع العقد</th><th>تاريخ البدء</th><th>تاريخ الانتهاء</th><th style="text-align:end">قيمة العقد</th><th style="text-align:end">إجمالي المدفوعات</th></tr></thead>
@@ -821,7 +825,7 @@ function buildDynamicContractors(stage: ProjectStageDetailsDto): string {
   return tableBlock('#16a34a', 'PMC', 'المقاولون الرئيسيون — Main Contractors', `عقود المرحلة ودفعاتها (${items.length} عقد)`,
     [{ text: '#' }, { text: 'المقاول' }, { text: 'نوع العقد' }, { text: 'الفترة' }, { text: 'قيمة العقد', align: 'end' }, { text: 'المدفوع', align: 'end' }, { text: 'المتبقي', align: 'end' }],
     items.map((item, index) => [String(index + 1), value(item.constructorName), value(item.contractorTypeName), periodValue(item.startDate, item.endDate), numberValue(item.amount), numberValue(item.totalPayments), `<b>${numberValue((item.amount ?? 0) - (item.totalPayments ?? 0))}</b>`]),
-    'إجمالي قيمة العقود', n(total(items.map((item) => item.amount))));
+    'إجمالي المدفوع', n(total(items.map((item) => item.totalPayments))));
 }
 
 function buildDynamicPurchaseOrders(stage: ProjectStageDetailsDto): string {
