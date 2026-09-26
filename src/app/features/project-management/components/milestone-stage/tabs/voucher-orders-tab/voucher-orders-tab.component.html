@@ -80,6 +80,19 @@
           </p-badge>
         </td>
         <td class="text-center vo-actions-cell" [attr.data-label]="'projectTabs.voucherOrders.actions' | translate">
+          <div class="flex align-items-center justify-content-center gap-1">
+            @if (attachmentType) {
+              <p-button
+                icon="pi pi-paperclip"
+                [rounded]="true"
+                [text]="true"
+                severity="info"
+                size="small"
+                [pTooltip]="'common.attachments' | translate"
+                tooltipPosition="top"
+                (onClick)="openAttachments(item)">
+              </p-button>
+            }
             <div *appHasPermission="permissions.VoucherOrders.Manage" class="vo-actions">
             <p-button
               icon="pi pi-pencil"
@@ -102,6 +115,7 @@
               (onClick)="confirmDelete(item)">
             </p-button>
             </div>
+          </div>
         </td>
       </tr>
     </ng-template>
@@ -153,4 +167,27 @@
     [unitOptions]="unitOptions"
     (saved)="onDialogSaved($event)">
   </app-add-vo-dialog>
+}
+
+<!-- Attachments viewer (opened from the list) -->
+@if (attachmentType; as type) {
+  <p-dialog
+    [visible]="!!attachmentsItem"
+    (visibleChange)="!$event && closeAttachments()"
+    [header]="'common.attachments' | translate"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    appendTo="body"
+    [style]="{ width: '98vw', 'max-width': '1600px', height: '90vh' }"
+    [breakpoints]="{ '960px': '98vw' }"
+    [contentStyle]="{ overflow: 'auto', height: 'calc(90vh - 60px)' }"
+    [maximizable]="true">
+    @if (attachmentsItem && (attachmentsItem.id ?? 0) > 0) {
+      <app-documents-table
+        [attachmentType]="type"
+        [relationshipId]="attachmentsItem.id!">
+      </app-documents-table>
+    }
+  </p-dialog>
 }

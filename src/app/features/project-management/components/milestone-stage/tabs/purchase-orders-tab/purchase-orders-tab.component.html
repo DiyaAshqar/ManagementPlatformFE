@@ -57,6 +57,17 @@
           </p-badge>
         </td>
         <td class="text-center po-actions-cell" [attr.data-label]="'common.actions' | translate">
+          <div class="flex align-items-center justify-content-center gap-1">
+            <p-button
+              icon="pi pi-paperclip"
+              [rounded]="true"
+              [text]="true"
+              severity="info"
+              size="small"
+              [pTooltip]="'common.attachments' | translate"
+              tooltipPosition="top"
+              (onClick)="openAttachments(item)">
+            </p-button>
             <div *appHasPermission="permissions.PurchaseOrders.Manage" class="po-actions">
             <p-button
               icon="pi pi-eye"
@@ -89,6 +100,7 @@
               (onClick)="confirmDelete(item)">
             </p-button>
             </div>
+          </div>
         </td>
       </tr>
     </ng-template>
@@ -144,3 +156,24 @@
     (saved)="onDialogSaved($event)">
   </app-add-po-dialog>
 }
+
+<!-- Attachments viewer (opened from the list) -->
+<p-dialog
+  [visible]="!!attachmentsItem"
+  (visibleChange)="!$event && closeAttachments()"
+  [header]="'common.attachments' | translate"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  appendTo="body"
+  [style]="{ width: '98vw', 'max-width': '1600px', height: '90vh' }"
+  [breakpoints]="{ '960px': '98vw' }"
+  [contentStyle]="{ overflow: 'auto', height: 'calc(90vh - 60px)' }"
+  [maximizable]="true">
+  @if (attachmentsItem && (attachmentsItem.id ?? 0) > 0) {
+    <app-documents-table
+      [attachmentType]="attachmentType"
+      [relationshipId]="attachmentsItem.id!">
+    </app-documents-table>
+  }
+</p-dialog>

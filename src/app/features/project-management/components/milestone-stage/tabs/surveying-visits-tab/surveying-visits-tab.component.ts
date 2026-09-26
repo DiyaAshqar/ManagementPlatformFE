@@ -7,6 +7,8 @@ import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
+import { DocumentsTableComponent } from '../../../../../../shared/components/documents-table/documents-table.component';
 import { BadgeModule } from 'primeng/badge';
 
 import { ConfirmationService } from 'primeng/api';
@@ -15,7 +17,8 @@ import {
   GetProjectSurveyingVisitDto,
   LookupClient,
   LookupType,
-  ProjectSurveyingVisitClient
+  ProjectSurveyingVisitClient,
+  AttachmentType
 } from '../../../../../../../nswag/api-client';
 import { AddSurveyingVisitDialogComponent } from '../../../dialog/add-surveying-visit-dialog/add-surveying-visit-dialog.component';
 import { Permissions } from '../../../../../../core/auth/models/auth.models';
@@ -38,6 +41,8 @@ export enum VisitStatus {
     TableModule,
     ButtonModule,
     TooltipModule,
+    DialogModule,
+    DocumentsTableComponent,
     SkeletonModule,
     BadgeModule,
     AddSurveyingVisitDialogComponent,
@@ -53,6 +58,18 @@ export class SurveyingVisitsTabComponent implements OnInit {
   @Input() projectStageId: number = 0;
 
   visitItems  = signal<GetProjectSurveyingVisitDto[]>([]);
+
+  /** Row whose attachments are shown in the viewer dialog (null = closed). */
+  attachmentsItem: GetProjectSurveyingVisitDto | null = null;
+  readonly attachmentType = AttachmentType.SurveyingVisit;
+
+  openAttachments(item: GetProjectSurveyingVisitDto): void {
+    if ((item.id ?? 0) > 0) this.attachmentsItem = item;
+  }
+
+  closeAttachments(): void {
+    this.attachmentsItem = null;
+  }
   isLoading   = signal(false);
 
   showDialog  = signal(false);

@@ -8,6 +8,8 @@ import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
+import { DocumentsTableComponent } from '../../../../../../shared/components/documents-table/documents-table.component';
 import { BadgeModule } from 'primeng/badge';
 
 import { ConfirmationService } from 'primeng/api';
@@ -16,13 +18,22 @@ import {
   IGetProjectVODto,
   LookupClient,
   LookupType,
-  ProjectVOClient
+  ProjectVOClient,
+  AttachmentType
 } from '../../../../../../../nswag/api-client';
 import { AddVoDialogComponent } from '../../../dialog/add-vo-dialog/add-vo-dialog.component';
 import { Permissions } from '../../../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
 import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
 import { AppNumberPipe } from '../../../../../../shared/pipes/app-number.pipe';
+
+/**
+ * The backend AttachmentType enum has no Variation Order value yet. Once it is added
+ * (expected name: `VariationOrder` = "variationOrder") and `npm run generate:api` is run,
+ * this resolves automatically and the attachments button appears — no further FE change needed.
+ */
+const VO_ATTACHMENT_TYPE: AttachmentType | null =
+  (AttachmentType as unknown as Record<string, AttachmentType | undefined>)['VariationOrder'] ?? null;
 
 // VO Status enum matching the backend
 export enum VOStatus {
@@ -40,6 +51,8 @@ export enum VOStatus {
     TableModule,
     ButtonModule,
     TooltipModule,
+    DialogModule,
+    DocumentsTableComponent,
     SkeletonModule,
     BadgeModule,
     AddVoDialogComponent,
@@ -55,6 +68,19 @@ export class VoucherOrdersTabComponent implements OnInit {
   @Input() projectStageId: number = 0;
 
   voItems = signal<IGetProjectVODto[]>([]);
+
+  /** Null until the backend supports VO attachments — hides the attachments button. */
+  readonly attachmentType = VO_ATTACHMENT_TYPE;
+  /** Row whose attachments are shown in the viewer dialog (null = closed). */
+  attachmentsItem: IGetProjectVODto | null = null;
+
+  openAttachments(item: IGetProjectVODto): void {
+    if (this.attachmentType && (item.id ?? 0) > 0) this.attachmentsItem = item;
+  }
+
+  closeAttachments(): void {
+    this.attachmentsItem = null;
+  }
   isLoading = signal(false);
 
   showVoDialog = signal(false);

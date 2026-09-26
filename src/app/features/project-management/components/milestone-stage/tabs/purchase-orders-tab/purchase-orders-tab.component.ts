@@ -9,6 +9,8 @@ import { ButtonModule } from 'primeng/button';
 import { SkeletonModule } from 'primeng/skeleton';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
+import { DialogModule } from 'primeng/dialog';
+import { DocumentsTableComponent } from '../../../../../../shared/components/documents-table/documents-table.component';
 import { BadgeModule } from 'primeng/badge';
 
 import { ConfirmationService } from 'primeng/api';
@@ -18,7 +20,8 @@ import {
   LookupClient,
   LookupType,
   ProjectPOClient,
-  SupplierClient
+  SupplierClient,
+  AttachmentType
 } from '../../../../../../../nswag/api-client';
 import { AddPoDialogComponent } from '../../../dialog/add-po-dialog/add-po-dialog.component';
 import { Permissions } from '../../../../../../core/auth/models/auth.models';
@@ -42,6 +45,8 @@ export enum POStatus {
     TableModule,
     ButtonModule,
     TooltipModule,
+    DialogModule,
+    DocumentsTableComponent,
     SkeletonModule,
     BadgeModule,
     AddPoDialogComponent,
@@ -57,6 +62,18 @@ export class PurchaseOrdersTabComponent implements OnInit, OnDestroy {
   @Input() projectStageId: number = 0;
 
   poItems = signal<IGetProjectPODto[]>([]);
+
+  /** Row whose attachments are shown in the viewer dialog (null = closed). */
+  attachmentsItem: IGetProjectPODto | null = null;
+  readonly attachmentType = AttachmentType.ProjectPO;
+
+  openAttachments(item: IGetProjectPODto): void {
+    if ((item.id ?? 0) > 0) this.attachmentsItem = item;
+  }
+
+  closeAttachments(): void {
+    this.attachmentsItem = null;
+  }
   isLoading = signal(false);
 
   showPoDialog = signal(false);
