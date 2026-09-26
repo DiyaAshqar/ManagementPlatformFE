@@ -6,6 +6,7 @@ import {
   GetExpenseDtoListPagedResponseResponse,
   GetExpenseDtoResponse,
   BooleanResponse,
+  SetExpensePaidCommand,
 } from '../../../../nswag/api-client';
 
 @Injectable({
@@ -28,6 +29,11 @@ export class ExpenseApiService {
     pageSize: number = 100
   ): Observable<GetExpenseDtoListPagedResponseResponse> {
     return this.expenseClient.getByProjectId(projectStageId, undefined, pageNumber, pageSize, undefined);
+  }
+
+  /** PATCH /api/Expense/{id}/paid */
+  setPaid(id: number, paid: boolean): Observable<void> {
+    return this.expenseClient.setPaid(id, new SetExpensePaidCommand({ id, paid }));
   }
 
   getById(id: number): Observable<GetExpenseDtoResponse> {

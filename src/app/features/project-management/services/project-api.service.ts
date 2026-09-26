@@ -5,7 +5,10 @@ import {
   CreateProjectCommand,
   GetProjectDtoListPagedResponseResponse,
   GetProjectDtoResponse,
-  Int32Response
+  Int32Response,
+  AssignProjectUsersCommand,
+  UnassignProjectUsersCommand,
+  ProjectUserDtoListResponse
 } from '../../../../nswag/api-client';
 
 @Injectable({
@@ -26,5 +29,21 @@ export class ProjectApiService {
 
   getProjectById(id: number): Observable<GetProjectDtoResponse> {
     return this.projectClient.getProjectById(id);
+  }
+
+  // Project users (GET/POST/DELETE /api/Project/{projectId}/users)
+  getProjectUsers(projectId: number): Observable<ProjectUserDtoListResponse> {
+    return this.projectClient.getProjectUsers(projectId);
+  }
+
+  assignProjectUsers(projectId: number, userIds: number[]): Observable<ProjectUserDtoListResponse> {
+    return this.projectClient.assignProjectUsers(
+      projectId,
+      new AssignProjectUsersCommand({ projectId, userIds, replaceExisting: false })
+    );
+  }
+
+  unassignProjectUsers(projectId: number, userIds: number[]): Observable<ProjectUserDtoListResponse> {
+    return this.projectClient.unassignProjectUsers(projectId, new UnassignProjectUsersCommand({ projectId, userIds }));
   }
 }

@@ -65,6 +65,7 @@
         optionValue="value"
         placeholder="Select status"
         styleClass="w-full"
+        appendTo="body"
       >
       </p-select>
     </div>
@@ -72,15 +73,17 @@
       <label for="subtask-type" class="block text-sm font-medium mb-2"
         >Type</label
       >
-      <input
+      <p-select
         id="subtask-type"
-        type="text"
-        pInputText
         [ngModel]="currentFormData.type"
         (ngModelChange)="updateFormField('type', $event)"
-        placeholder="e.g., Excavation, Preparation"
-        class="w-full"
-      />
+        [options]="typeOptions"
+        optionLabel="label"
+        optionValue="value"
+        styleClass="w-full"
+        appendTo="body"
+      >
+      </p-select>
     </div>
   </div>
 

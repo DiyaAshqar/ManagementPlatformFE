@@ -5,7 +5,6 @@ import {
   ProjectSubTaskDtoResponse,
   SubTaskType
 } from '../../../../nswag/api-client';
-import { formatAppNumber } from '../../../shared/pipes/app-number.pipe';
 
 @Injectable({
   providedIn: 'root'
@@ -21,12 +20,12 @@ export class SubtaskService {
     return new CreateSubTaskCommand({
       id: formData.id,
       title: formData.title,
-      startDate: formData.startDate ? new Date(formData.startDate) : undefined,
-      endDate: formData.endDate ? new Date(formData.endDate) : undefined,
+      startDate: this.toUtcDate(formData.startDate),
+      endDate: this.toUtcDate(formData.endDate),
       status: this.mapStatusToEnum(formData.status),
       type: this.mapTypeToEnum(formData.type),
-      cost: formData.cost ? parseFloat(formData.cost.replace(/[^0-9.-]/g, '')) : undefined,
-      qty: formData.quantity ? parseFloat(formData.quantity.replace(/[^0-9.-]/g, '')) : undefined,
+      cost: this.toNumber(formData.cost),
+      qty: this.toNumber(formData.quantity),
       projectStageTaskId
     });
   }
@@ -43,47 +42,60 @@ export class SubtaskService {
     return {
       id: data.id,
       title: data.title || '',
-      startDate: data.startDate ? this.formatDateForInput(data.startDate) : '',
-      endDate: data.endDate ? this.formatDateForInput(data.endDate) : '',
+      startDate: data.startDate ? this.toLocalDate(data.startDate) : '',
+      endDate: data.endDate ? this.toLocalDate(data.endDate) : '',
       status: this.mapEnumToStatus(data.status),
       type: this.mapEnumToType(data.type),
-      cost: data.cost ? `$${formatAppNumber(data.cost)}` : '',
-      quantity: data.qty ? `${data.qty}` : ''
+      cost: data.cost != null ? `${data.cost}` : '',
+      quantity: data.qty != null ? `${data.qty}` : ''
     };
   }
 
-  private formatDateForInput(date: Date): string {
-    const d = new Date(date);
-    const year = d.getFullYear();
-    const month = String(d.getMonth() + 1).padStart(2, '0');
-    const day = String(d.getDate()).padStart(2, '0');
-    return `${year}-${month}-${day}`;
+  /**
+   * The picker returns local midnight; the generated client serializes with toISOString(),
+   * which shifts the day back in UTC+ time zones. Send the selected calendar day as UTC midnight.
+   */
+  private toUtcDate(value: string | Date | null | undefined): Date | undefined {
+    if (!value) return undefined;
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return undefined;
+    return new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  }
+
+  /** Inverse of toUtcDate: rebuild the calendar day as a local Date the picker can display. */
+  private toLocalDate(value: Date | string): Date {
+    const d = new Date(value);
+    return new Date(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate());
+  }
+
+  private toNumber(value: unknown): number | undefined {
+    if (value === null || value === undefined || value === '') return undefined;
+    const n = typeof value === 'number' ? value : parseFloat(String(value).replace(/[^0-9.-]/g, ''));
+    return Number.isFinite(n) ? n : undefined;
   }
 
   private mapStatusToEnum(status: string): ProjectStatusSubTask {
     switch (status) {
-      case 'completed': return ProjectStatusSubTask.InProgress;
-      case 'in-progress': return ProjectStatusSubTask.Complited;
+      case 'completed': return ProjectStatusSubTask.Complited;
+      // Backend only knows InProgress / Complited — anything not completed is in progress.
+      case 'in-progress':
       case 'pending':
-      default: return ProjectStatusSubTask.Complited;
+      default: return ProjectStatusSubTask.InProgress;
     }
   }
 
   private mapEnumToStatus(status?: ProjectStatusSubTask): string {
     switch (status) {
-      case ProjectStatusSubTask.InProgress: return 'completed';
-      case ProjectStatusSubTask.Complited: return 'in-progress';
-      default: return 'pending';
+      case ProjectStatusSubTask.Complited: return 'completed';
+      default: return 'in-progress';
     }
   }
 
   private mapTypeToEnum(type: string): SubTaskType {
-    // Map string to SubTaskType enum - adjust based on your actual enum values
-    return SubTaskType.Construction;
+    return (Object.values(SubTaskType) as string[]).includes(type) ? (type as SubTaskType) : SubTaskType.Construction;
   }
 
   private mapEnumToType(type?: SubTaskType): string {
-    // Map SubTaskType enum to string - adjust based on your actual enum values
-    return type !== undefined ? `Type ${type}` : '';
+    return type ?? SubTaskType.Construction;
   }
 }

@@ -17,6 +17,7 @@ import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TextareaModule } from 'primeng/textarea';
 import { TooltipModule } from 'primeng/tooltip';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 
 import {
   AttachmentType,
@@ -65,6 +66,7 @@ const emptyDetails = (): IExpenseDetailDto[] => [createEmptyDetail()];
     SelectModule,
     DatePickerModule,
     TooltipModule,
+    ToggleSwitchModule,
     TextareaModule,
     TagModule,
     SkeletonModule,
@@ -366,6 +368,38 @@ export class ProjectExpenseManagementComponent implements OnInit {
           },
         });
       },
+    });
+  }
+
+  /** Expense ids with an in-flight paid toggle (disables the switch while saving). */
+  readonly updatingPaidIds = signal<Set<number>>(new Set());
+
+  togglePaid(expense: GetExpenseDto, paid: boolean): void {
+    const id = expense.id;
+    if (id == null) return;
+    const previous = !!expense.paid;
+    this.setExpensePaid(id, paid);
+    this.updatingPaidIds.update((ids) => new Set(ids).add(id));
+    this.expenseService.setPaid(id, paid).subscribe({
+      next: () => this.clearUpdatingPaid(id),
+      error: () => {
+        this.setExpensePaid(id, previous);
+        this.clearUpdatingPaid(id);
+      },
+    });
+  }
+
+  private setExpensePaid(id: number, paid: boolean): void {
+    this.expenses.update((list) =>
+      list.map((e) => (e.id === id ? new GetExpenseDto({ ...e, paid }) : e))
+    );
+  }
+
+  private clearUpdatingPaid(id: number): void {
+    this.updatingPaidIds.update((ids) => {
+      const next = new Set(ids);
+      next.delete(id);
+      return next;
     });
   }
 

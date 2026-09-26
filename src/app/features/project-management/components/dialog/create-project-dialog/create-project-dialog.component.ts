@@ -9,6 +9,7 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { DialogModule } from 'primeng/dialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputNumberModule } from 'primeng/inputnumber';
+import { MultiSelectModule } from 'primeng/multiselect';
 import { InputTextModule } from 'primeng/inputtext';
 import { SelectModule } from 'primeng/select';
 import { TextareaModule } from 'primeng/textarea';
@@ -17,6 +18,8 @@ import { CreateProjectCommand, GetAllAgreementDto, ProjectStatus } from '../../.
 import { AgreementWizardService } from '../../../../agreement-wizard/services/agreement-wizard.service';
 import { Project } from '../../../models';
 import { ProjectApiService } from '../../../services/project-api.service';
+import { UsersApiService } from '../../../../user-management/services/users-api.service';
+import { forkJoin, Observable, of } from 'rxjs';
 
 @Component({
   selector: 'app-create-project-dialog',
@@ -30,6 +33,7 @@ import { ProjectApiService } from '../../../services/project-api.service';
     InputTextModule,
     TextareaModule,
     InputNumberModule,
+    MultiSelectModule,
     DatePickerModule,
     SelectModule,
     FloatLabelModule
@@ -56,17 +60,52 @@ export class CreateProjectDialogComponent implements OnInit {
   ];
 
   agreementOptions = signal<{ label: string, value: number }[]>([]);
+  userOptions = signal<{ label: string, value: number }[]>([]);
+  isLoadingUsers = signal<boolean>(false);
+  /** User ids assigned when the dialog opened (edit mode) — used to diff assign/unassign on save. */
+  private originalUserIds: number[] = [];
 
   constructor(
     private fb: FormBuilder,
     private projectApiService: ProjectApiService,
     private agreementWizardService: AgreementWizardService,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private usersApi: UsersApiService
   ) {}
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadAgreements();
+    this.loadUsers();
+    this.loadProjectUsers();
+  }
+
+  loadUsers(): void {
+    this.isLoadingUsers.set(true);
+    this.usersApi.getAllUsers().subscribe({
+      next: (response) => {
+        this.userOptions.set(
+          (response.data ?? [])
+            .filter((user) => user.id != null)
+            .map((user) => ({
+              label: user.fullName || user.arabicFullName || user.email || `User ${user.id}`,
+              value: user.id!
+            }))
+        );
+        this.isLoadingUsers.set(false);
+      },
+      error: () => this.isLoadingUsers.set(false)
+    });
+  }
+
+  loadProjectUsers(): void {
+    if (!this.project) return;
+    this.projectApiService.getProjectUsers(parseInt(this.project.id)).subscribe({
+      next: (response) => {
+        this.originalUserIds = (response.data ?? []).map((u) => u.userId!).filter((id) => id != null);
+        this.projectForm.patchValue({ userIds: [...this.originalUserIds] });
+      }
+    });
   }
 
 
@@ -85,7 +124,9 @@ export class CreateProjectDialogComponent implements OnInit {
       agreementId: [null, [Validators.required]],
       startDate: [new Date(), Validators.required],
       endDate: [null, Validators.required],
-      status: [ProjectStatus.ToDO]
+      status: [ProjectStatus.ToDO],
+      budget: [0, [Validators.min(0)]],
+      userIds: [[] as number[]]
     });
     
     if (this.project) {
@@ -102,7 +143,8 @@ export class CreateProjectDialogComponent implements OnInit {
       agreementId: this.project.agreementId || null, // Set agreementId when editing
       startDate: new Date(this.project.startDate),
       endDate: new Date(this.project.endDate),
-      status: this.mapProjectStatus(this.project.status)
+      status: this.mapProjectStatus(this.project.status),
+      budget: this.project.budget ?? 0
     });
   }
 
@@ -163,27 +205,17 @@ export class CreateProjectDialogComponent implements OnInit {
       agreementId: this.projectForm.get('agreementId')?.value || undefined,
       startDate: this.projectForm.get('startDate')?.value,
       endDate: this.projectForm.get('endDate')?.value,
-      status: this.projectForm.get('status')?.value
+      status: this.projectForm.get('status')?.value,
+      budget: this.projectForm.get('budget')?.value ?? 0
     });
 
     this.projectApiService.createProject(command).subscribe({
       next: (response) => {
         if (response.succeeded) {
-          // Refresh the projects list
-          this.projectApiService.getAllProjects(1, 100).subscribe({
-            next: () => {
-              // Emit event to close dialog
-              this.visibleChange.emit(false);
-              this.isSubmitting.set(false);
-              this.projectForm.reset();
-              this.projectCreated.emit();
-            },
-            error: (error) => {
-              console.error('Error refreshing projects:', error);
-              this.visibleChange.emit(false);
-              this.isSubmitting.set(false);
-              this.projectForm.reset();
-            }
+          const projectId = response.data || (this.project ? parseInt(this.project.id) : 0);
+          this.syncProjectUsers(projectId).subscribe({
+            next: () => this.finishSubmit(),
+            error: () => this.finishSubmit()
           });
         } else {
           this.isSubmitting.set(false);
@@ -192,6 +224,37 @@ export class CreateProjectDialogComponent implements OnInit {
       error: (error) => {
         console.error('Error creating project:', error);
         this.isSubmitting.set(false);
+      }
+    });
+  }
+
+  /** Assigns newly selected users and unassigns removed ones via /api/Project/{projectId}/users. */
+  private syncProjectUsers(projectId: number): Observable<unknown> {
+    if (!projectId) return of(null);
+    const selected: number[] = this.projectForm.get('userIds')?.value ?? [];
+    const toAssign = selected.filter((id) => !this.originalUserIds.includes(id));
+    const toUnassign = this.originalUserIds.filter((id) => !selected.includes(id));
+    const calls: Observable<unknown>[] = [];
+    if (toAssign.length) calls.push(this.projectApiService.assignProjectUsers(projectId, toAssign));
+    if (toUnassign.length) calls.push(this.projectApiService.unassignProjectUsers(projectId, toUnassign));
+    return calls.length ? forkJoin(calls) : of(null);
+  }
+
+  private finishSubmit(): void {
+    // Refresh the projects list
+    this.projectApiService.getAllProjects(1, 100).subscribe({
+      next: () => {
+        // Emit event to close dialog
+        this.visibleChange.emit(false);
+        this.isSubmitting.set(false);
+        this.projectForm.reset();
+        this.projectCreated.emit();
+      },
+      error: (error) => {
+        console.error('Error refreshing projects:', error);
+        this.visibleChange.emit(false);
+        this.isSubmitting.set(false);
+        this.projectForm.reset();
       }
     });
   }

@@ -123,8 +123,15 @@ function isSkippedUrl(request: HttpRequest<any>): boolean {
     '/api/Auth/logout',
   ];
 
+  // Follow-up calls whose parent request already shows the success toast
+  // (e.g. assigning users after saving the project form).
+  const skipUrlPatterns = [/\/api\/project\/\d+\/users(\?|$)/];
+
   const requestUrl = request.url.toLowerCase();
-  return skipUrls.some(url => requestUrl.includes(url.toLowerCase()));
+  return (
+    skipUrls.some(url => requestUrl.includes(url.toLowerCase())) ||
+    skipUrlPatterns.some(pattern => pattern.test(requestUrl))
+  );
 }
 
 function shouldShowSuccessToast(

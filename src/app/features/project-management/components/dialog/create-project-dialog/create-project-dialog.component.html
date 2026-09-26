@@ -71,8 +71,35 @@
         </div>
       </div>
 
-      <!-- Status -->
+      <!-- Budget -->
+      <div class="col-12 md:col-6">
+        <div class="field">
+          <p-floatlabel variant="in" class="w-full">
+            <p-inputnumber inputId="budget" formControlName="budget" [min]="0" [minFractionDigits]="0"
+              [maxFractionDigits]="2" class="w-full" styleClass="w-full" inputStyleClass="w-full"
+              [class.ng-invalid]="isFieldInvalid('budget')">
+            </p-inputnumber>
+            <label for="budget">{{ 'projects.form.budget' | translate }}</label>
+          </p-floatlabel>
+          <small *ngIf="isFieldInvalid('budget')" class="p-error">{{ getErrorMessage('budget') }}</small>
+        </div>
+      </div>
+
+      <!-- Assigned users -->
       <div class="col-12">
+        <div class="field">
+          <p-floatlabel variant="in">
+            <p-multiselect inputId="userIds" formControlName="userIds" [options]="userOptions()" optionLabel="label"
+              optionValue="value" [filter]="true" display="chip" [loading]="isLoadingUsers()" class="w-full"
+              styleClass="w-full" appendTo="body" [maxSelectedLabels]="10">
+            </p-multiselect>
+            <label for="userIds">{{ 'projects.form.assignedUsers' | translate }}</label>
+          </p-floatlabel>
+        </div>
+      </div>
+
+      <!-- Status -->
+      <div class="col-12 md:col-6">
         <div class="field">
           <p-floatlabel variant="in">
             <p-select inputId="status" formControlName="status" [options]="statusOptions" optionLabel="label"

@@ -9,6 +9,7 @@ import { CalendarModule } from 'primeng/calendar';
 import { TooltipModule } from 'primeng/tooltip';
 import { SubtaskApiService } from '../../../../services/subtask-api.service';
 import { SubtaskService } from '../../../../services/subtask.service';
+import { SubTaskType } from '../../../../../../../nswag/api-client';
 
 export interface SubTaskFormData {
   id?: number;
@@ -46,8 +47,8 @@ export class SubtaskDialogComponent implements OnInit {
     title: '',
     startDate: '',
     endDate: '',
-    status: 'pending',
-    type: '',
+    status: 'in-progress',
+    type: SubTaskType.Construction,
     cost: '',
     quantity: ''
   });
@@ -55,11 +56,16 @@ export class SubtaskDialogComponent implements OnInit {
   isLoading = signal(false);
   projectStageTaskId?: number;
 
+  // Backend (ProjectStatusSubTask) only supports In Progress / Completed.
   statusOptions = [
-    { label: 'Pending', value: 'pending' },
     { label: 'In Progress', value: 'in-progress' },
     { label: 'Completed', value: 'completed' }
   ];
+
+  typeOptions = Object.values(SubTaskType).map((value) => ({
+    label: value.charAt(0).toUpperCase() + value.slice(1),
+    value
+  }));
 
   ngOnInit(): void {
     const data = this.config.data;
@@ -74,7 +80,11 @@ export class SubtaskDialogComponent implements OnInit {
       if (data.subtask.id) {
         this.loadSubTask(data.subtask.id);
       } else {
-        this.formData.set({ ...data.subtask });
+        this.formData.set({
+          ...data.subtask,
+          status: data.subtask.status === 'completed' ? 'completed' : 'in-progress',
+          type: data.subtask.type || SubTaskType.Construction
+        });
       }
     }
   }

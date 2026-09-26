@@ -160,7 +160,8 @@
       "endDate": "End Date",
       "budget": "Budget",
       "priority": "Priority",
-      "milestoneCount": "Milestone Count"
+      "milestoneCount": "Milestone Count",
+      "assignedUsers": "Assigned Users"
     },
     "stages": {
       "title": "Stages",
@@ -900,7 +901,8 @@
         "supplier": "Supplier",
         "date": "Date",
         "total": "Total",
-        "notes": "Notes"
+        "notes": "Notes",
+        "paid": "Paid"
       },
       "list": {
         "newExpense": "New Expense",
@@ -949,7 +951,9 @@
       "attachments": {
         "title": "Attachments",
         "saveFirst": "Save the expense first to add attachments."
-      }
+      },
+      "paid": "Paid",
+      "unpaid": "Unpaid"
     },
     "advances": {
       "title": "Advances Management",
