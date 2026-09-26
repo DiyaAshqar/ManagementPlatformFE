@@ -4,6 +4,17 @@ export type TimelineScale = 'day' | 'week' | 'month';
 
 export type ContractorStatus = 'not_started' | 'in_progress' | 'delayed' | 'completed';
 
+export interface TimelineTask {
+  id: number;
+  name: string;
+  assignee?: string;
+  /** Null when the task has no planned dates (row shown without a bar). */
+  startDate: Date | null;
+  endDate: Date | null;
+  status: ContractorStatus;
+  progress: number;
+}
+
 export interface TimelineContractor {
   id: number;
   name: string;
@@ -18,6 +29,10 @@ export interface TimelineContractor {
   notes?: string;
   attachments?: TimelineAttachment[];
   dependsOnIds?: number[];
+  tasks?: TimelineTask[];
+  expanded?: boolean;
+  /** Synthetic row grouping a stage's tasks that have no main contractor (excluded from conflicts). */
+  isUnassigned?: boolean;
 }
 
 export interface TimelinePhase {

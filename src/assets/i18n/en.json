@@ -1323,7 +1323,10 @@
       "completed": "Completed"
     },
     "board": {
-      "phaseAndContractor": "Phase / Contractor"
+      "phaseAndContractor": "Phase / Contractor",
+      "unassignedTasks": "Tasks without a contractor",
+      "tasks": "tasks",
+      "noDates": "No dates"
     },
     "alert": {
       "conflictsFound": "{{count}} conflict(s) detected between contractors — click to review"
@@ -1356,7 +1359,10 @@
     "empty": {
       "title": "No timeline data to display",
       "subtitle": "No contractors with valid dates were found for this project"
-    }
+    },
+    "loading": "Loading timeline...",
+    "loadError": "Unable to load the project timeline.",
+    "retry": "Retry"
   },
   "topNav": {
     "profileMenu": {

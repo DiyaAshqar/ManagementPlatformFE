@@ -18,6 +18,10 @@ export class TimeframeService {
       p.contractors.forEach((c) => {
         dates.push(c.startDate);
         dates.push(c.endDate);
+        (c.tasks ?? []).forEach((t) => {
+          if (t.startDate) dates.push(t.startDate);
+          if (t.endDate) dates.push(t.endDate);
+        });
       });
     });
 
@@ -156,7 +160,7 @@ export class TimeframeService {
 
   detectConflicts(phases: TimelinePhase[]): TimelineConflict[] {
     const flat: { phase: TimelinePhase; c: TimelineContractor }[] = [];
-    phases.forEach((p) => p.contractors.forEach((c) => flat.push({ phase: p, c })));
+    phases.forEach((p) => p.contractors.filter((c) => !c.isUnassigned).forEach((c) => flat.push({ phase: p, c })));
 
     const conflicts: TimelineConflict[] = [];
 

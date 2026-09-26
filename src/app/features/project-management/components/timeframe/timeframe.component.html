@@ -160,7 +160,18 @@
   <!-- ── Gantt body ───────────────────────────────────────────────── -->
   <div class="tf-board" [class.tf-empty]="filteredPhases().length === 0">
 
-    @if (range() === null) {
+    @if (isLoading()) {
+      <div class="tf-empty-state">
+        <i class="pi pi-spin pi-spinner tf-empty-icon"></i>
+        <p>{{ 'timeframe.loading' | translate }}</p>
+      </div>
+    } @else if (loadError()) {
+      <div class="tf-empty-state">
+        <i class="pi pi-exclamation-triangle tf-empty-icon"></i>
+        <h3>{{ 'timeframe.loadError' | translate }}</h3>
+        <p-button icon="pi pi-refresh" [label]="'timeframe.retry' | translate" [text]="true" (onClick)="loadTimeline()"></p-button>
+      </div>
+    } @else if (range() === null) {
       <!-- Empty State ----------------------------------------------- -->
       <div class="tf-empty-state">
         <i class="pi pi-inbox tf-empty-icon"></i>
@@ -188,11 +199,23 @@
               </div>
               @if (phase.expanded) {
                 @for (c of phase.contractors; track trackByContractorId(0, c)) {
-                  <div class="tf-side-contractor" (click)="selectContractor(c, phase.id)">
+                  <div class="tf-side-contractor" [class.tf-side-unassigned]="c.isUnassigned" (click)="selectContractor(c, phase.id)">
+                    @if (c.tasks?.length) {
+                      <button type="button" class="tf-side-task-toggle" (click)="toggleContractor(phase.id, c.id, $event)">
+                        <i class="pi" [class.pi-chevron-down]="c.expanded" [class.pi-chevron-left]="!c.expanded"></i>
+                      </button>
+                    } @else {
+                      <span class="tf-side-task-toggle"></span>
+                    }
                     <span class="tf-side-status-dot" [style.background]="statusColor(c.status)"></span>
                     <div class="tf-side-contractor-info">
                       <div class="tf-side-contractor-name">{{ c.name }}</div>
-                      <div class="tf-side-contractor-type">{{ c.contractorType }}</div>
+                      <div class="tf-side-contractor-type">
+                        {{ c.contractorType }}
+                        @if (c.tasks?.length) {
+                          <span class="tf-side-task-count">· {{ c.tasks!.length }} {{ 'timeframe.board.tasks' | translate }}</span>
+                        }
+                      </div>
                     </div>
                     @if (contractorConflicts(c.id).length > 0) {
                       <i class="pi pi-exclamation-triangle tf-side-conflict-icon"
@@ -200,6 +223,24 @@
                          tooltipPosition="left"></i>
                     }
                   </div>
+                  @if (c.expanded) {
+                    @for (t of c.tasks ?? []; track trackByTaskId(0, t)) {
+                      <div class="tf-side-task">
+                        <span class="tf-side-status-dot" [style.background]="statusColor(t.status)"></span>
+                        <div class="tf-side-contractor-info">
+                          <div class="tf-side-task-name" [title]="t.name">{{ t.name }}</div>
+                          <div class="tf-side-contractor-type">
+                            @if (t.startDate && t.endDate) {
+                              {{ formatDate(t.startDate) }} → {{ formatDate(t.endDate) }}
+                            } @else {
+                              {{ 'timeframe.board.noDates' | translate }}
+                            }
+                            @if (t.assignee) { · {{ t.assignee }} }
+                          </div>
+                        </div>
+                      </div>
+                    }
+                  }
                 }
               }
             }
@@ -287,6 +328,22 @@
                           </button>
                         }
                       </div>
+                      @if (c.expanded) {
+                        @for (t of c.tasks ?? []; track trackByTaskId(0, t)) {
+                          <div class="tf-row tf-row-task">
+                            @if (taskBars().get(taskKey(c.id, t.id)); as tb) {
+                              <div class="tf-task-bar"
+                                   [style.inset-inline-start.%]="tb.left"
+                                   [style.width.%]="tb.width"
+                                   [style.background]="statusBg(t.status)"
+                                   [pTooltip]="t.name + ' • ' + formatDate(t.startDate) + ' → ' + formatDate(t.endDate)"
+                                   tooltipPosition="top">
+                                <span class="tf-bar-label">{{ t.name }}</span>
+                              </div>
+                            }
+                          </div>
+                        }
+                      }
                     }
                   }
                 }

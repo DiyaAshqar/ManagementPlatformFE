@@ -30,7 +30,8 @@ import { DatePickerModule } from 'primeng/datepicker';
 import { ChipModule } from 'primeng/chip';
 import { DividerModule } from 'primeng/divider';
 
-import { buildMockTimeframe } from './timeframe-mock.data';
+import { mapProjectStagesToTimeline } from './timeframe-api.mapper';
+import { TimeframeApiService } from './timeframe-api.service';
 import {
   ContractorStatus,
   TimelineConflict,
@@ -40,6 +41,7 @@ import {
   TimelineRange,
   TimelineScale,
   TimelineSummary,
+  TimelineTask,
   TimelineTickColumn,
 } from './timeframe.model';
 import { TimeframeService } from './timeframe.service';
@@ -104,6 +106,8 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
   showDetails = signal(false);
   showConflictsPanel = signal(false);
   isFullscreen = signal(false);
+  isLoading = signal(false);
+  loadError = signal(false);
 
   /** Currently hovered contractor (popover content). */
   hoverContractor: TimelineContractor | null = null;
@@ -147,7 +151,12 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
         contractors: p.contractors.filter((c) => {
           if (f.contractorIds.length > 0 && !f.contractorIds.includes(c.id)) return false;
           if (f.statuses.length > 0 && !f.statuses.includes(c.status)) return false;
-          if (term && !c.name.toLowerCase().includes(term) && !c.contractorType.toLowerCase().includes(term)) {
+          if (
+            term &&
+            !c.name.toLowerCase().includes(term) &&
+            !c.contractorType.toLowerCase().includes(term) &&
+            !(c.tasks ?? []).some((t) => t.name.toLowerCase().includes(term))
+          ) {
             return false;
           }
           if (f.dateRange && f.dateRange[0] && c.endDate < f.dateRange[0]) return false;
@@ -160,7 +169,7 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
 
   summary = computed<TimelineSummary>(() => {
     const ph = this.phases();
-    const allContractors = ph.flatMap((p) => p.contractors);
+    const allContractors = ph.flatMap((p) => p.contractors.filter((c) => !c.isUnassigned));
     const delayed = allContractors.filter((c) => c.status === 'delayed').length;
     const overall =
       allContractors.length === 0
@@ -189,7 +198,7 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
   // ── Filter option lists ---------------------------------------------------
   contractorOptions = computed(() =>
     this.phases().flatMap((p) =>
-      p.contractors.map((c) => ({ label: c.name, value: c.id }))
+      p.contractors.filter((c) => !c.isUnassigned).map((c) => ({ label: c.name, value: c.id }))
     )
   );
   phaseOptions = computed(() =>
@@ -217,6 +226,21 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
         });
       });
     });
+    return map;
+  });
+
+  taskBars = computed<Map<string, { left: number; width: number }>>(() => {
+    const map = new Map<string, { left: number; width: number }>();
+    const r = this.range();
+    if (!r) return map;
+    this.phases().forEach((p) =>
+      p.contractors.forEach((c) =>
+        (c.tasks ?? []).forEach((t) => {
+          if (!t.startDate || !t.endDate) return;
+          map.set(this.taskKey(c.id, t.id), this.timeframeService.barGeometry(t.startDate, t.endDate, r));
+        })
+      )
+    );
     return map;
   });
 
@@ -248,6 +272,7 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
       p.contractors.forEach((c) => {
         rowMap.set(c.id, rowIndex);
         rowIndex++;
+        if (p.expanded && c.expanded) rowIndex += (c.tasks ?? []).length;
       });
     });
 
@@ -278,13 +303,35 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
   constructor(
     private timeframeService: TimeframeService,
     private translate: TranslateService,
-    private host: ElementRef<HTMLElement>
+    private host: ElementRef<HTMLElement>,
+    private timeframeApi: TimeframeApiService
   ) {}
 
   ngOnInit(): void {
-    this.phases.set(buildMockTimeframe(this.projectId));
+    this.loadTimeline();
     this.buildStaticOptions();
     this.translate.onLangChange.subscribe(() => this.buildStaticOptions());
+  }
+
+  loadTimeline(): void {
+    const projectId = Number(this.projectId);
+    if (!projectId) return;
+    this.isLoading.set(true);
+    this.loadError.set(false);
+    this.timeframeApi.getProjectStagesDetails(projectId).subscribe({
+      next: (response) => {
+        this.phases.set(
+          mapProjectStagesToTimeline(response.data, this.translate.instant('timeframe.board.unassignedTasks'))
+        );
+        this.isLoading.set(false);
+        setTimeout(() => this.scrollToToday(), 300);
+      },
+      error: () => {
+        this.phases.set([]);
+        this.loadError.set(true);
+        this.isLoading.set(false);
+      },
+    });
   }
 
   ngAfterViewInit(): void {
@@ -374,7 +421,30 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
     );
   }
 
+  toggleContractor(phaseId: number, contractorId: number, event?: Event): void {
+    event?.stopPropagation();
+    this.phases.update((arr) =>
+      arr.map((p) =>
+        p.id !== phaseId
+          ? p
+          : { ...p, contractors: p.contractors.map((c) => (c.id === contractorId ? { ...c, expanded: !c.expanded } : c)) }
+      )
+    );
+  }
+
+  taskKey(contractorId: number, taskId: number): string {
+    return `${contractorId}-${taskId}`;
+  }
+
+  taskDurationDays(t: TimelineTask): number | null {
+    return t.startDate && t.endDate ? this.timeframeService.durationDays(t.startDate, t.endDate) : null;
+  }
+
   selectContractor(c: TimelineContractor, phaseId: number): void {
+    if (c.isUnassigned) {
+      this.toggleContractor(phaseId, c.id);
+      return;
+    }
     this.selectedContractor.set(c);
     this.selectedPhaseId.set(phaseId);
     this.showDetails.set(true);
@@ -421,7 +491,7 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
     // Simple CSV export
     const phases = this.filteredPhases();
     const rows: string[] = [
-      ['Phase', 'Contractor', 'Type', 'Zone', 'Start', 'End', 'Duration (days)', 'Progress', 'Status'].join(','),
+      ['Phase', 'Contractor', 'Task', 'Type', 'Zone', 'Start', 'End', 'Duration (days)', 'Progress', 'Status'].join(','),
     ];
     phases.forEach((p) => {
       p.contractors.forEach((c) => {
@@ -429,6 +499,7 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
           [
             this.csv(p.name),
             this.csv(c.name),
+            '',
             this.csv(c.contractorType),
             this.csv(c.zone || ''),
             this.formatDate(c.startDate),
@@ -438,6 +509,22 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
             c.status,
           ].join(',')
         );
+        (c.tasks ?? []).forEach((t) => {
+          rows.push(
+            [
+              this.csv(p.name),
+              this.csv(c.name),
+              this.csv(t.name),
+              '',
+              '',
+              t.startDate ? this.formatDate(t.startDate) : '',
+              t.endDate ? this.formatDate(t.endDate) : '',
+              this.taskDurationDays(t) ?? '',
+              t.progress + '%',
+              t.status,
+            ].join(',')
+          );
+        });
       });
     });
     const blob = new Blob(['﻿' + rows.join('\n')], { type: 'text/csv;charset=utf-8' });
@@ -528,7 +615,7 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
     const r = this.range();
     if (!r) return [];
     return this.phases().flatMap((p) =>
-      p.contractors.map((c) => {
+      p.contractors.filter((c) => !c.isUnassigned).map((c) => {
         const g = this.timeframeService.barGeometry(c.startDate, c.endDate, r);
         return { left: g.left, width: g.width, color: this.statusColor(c.status) };
       })
@@ -546,6 +633,7 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
 
   trackByPhaseId = (_: number, p: TimelinePhase) => p.id;
   trackByContractorId = (_: number, c: TimelineContractor) => c.id;
+  trackByTaskId = (_: number, t: TimelineTask) => t.id;
   trackByConflictId = (_: number, c: TimelineConflict) => c.id;
   trackByColIndex = (i: number) => i;
 }

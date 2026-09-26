@@ -742,3 +742,80 @@
   .tf-shell { background: white; }
   .tf-board { box-shadow: none; }
 }
+
+// ── Tasks (third level: stage → contractor → task) ──────────────────
+.tf-side-task-toggle {
+  width: 1.1rem;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--text-color-secondary);
+  cursor: pointer;
+  font-size: 0.7rem;
+}
+
+.tf-side-contractor.tf-side-unassigned .tf-side-contractor-name {
+  font-style: italic;
+  color: var(--text-color-secondary);
+}
+
+.tf-side-task-count { color: var(--text-color-secondary); }
+
+.tf-side-task {
+  height: var(--tf-row-h);
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding-inline: 3.1rem 0.85rem;
+  border-block-end: 1px solid var(--surface-border);
+  background: color-mix(in srgb, var(--surface-hover) 45%, transparent);
+
+  .tf-side-status-dot {
+    width: 6px; height: 6px; border-radius: 50%;
+    flex-shrink: 0;
+  }
+
+  .tf-side-contractor-info { flex: 1; min-width: 0; }
+
+  .tf-side-task-name {
+    font-size: 0.8rem;
+    color: var(--text-color);
+    line-height: 1.2;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+
+  .tf-side-contractor-type {
+    font-size: 0.68rem;
+    color: var(--text-color-secondary);
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+}
+
+.tf-row.tf-row-task {
+  background: color-mix(in srgb, var(--surface-hover) 45%, transparent);
+}
+
+.tf-task-bar {
+  position: absolute;
+  inset-block: 13px;
+  border-radius: 5px;
+  display: flex;
+  align-items: center;
+  padding-inline: 8px;
+  overflow: hidden;
+  opacity: 0.9;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+
+  .tf-bar-label {
+    color: white;
+    font-size: 0.66rem;
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
