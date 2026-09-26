@@ -77,7 +77,16 @@ export class TaskService {
     projectMainContractorId?: number,
     supplierId?: number
   ): Observable<BooleanResponse> {
-    return this.taskClient.updateStatus(taskId, status, source, responsibility, projectMainContractorId, supplierId);
+    // The generated client throws synchronously on `null` (tasks without a contractor/supplier come back as null),
+    // so normalize to `undefined`, which simply omits the query param.
+    return this.taskClient.updateStatus(
+      taskId,
+      status,
+      source ?? undefined,
+      responsibility ?? undefined,
+      projectMainContractorId ?? undefined,
+      supplierId ?? undefined
+    );
   }
 
   /**

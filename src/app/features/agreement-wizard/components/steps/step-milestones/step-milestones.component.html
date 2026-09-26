@@ -66,6 +66,32 @@
           </div>
         </div>
 
+        <!-- Estimated Start Date field -->
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
+          <div class="field">
+            <p-floatlabel variant="in">
+              <p-datepicker inputId="milestoneStartDate" formControlName="startDate" dateFormat="mm/dd/yy"
+                [showIcon]="true" [showButtonBar]="true" appendTo="body" styleClass="w-full"></p-datepicker>
+              <label for="milestoneStartDate">{{ 'wizard.stepMilestones.estimatedStartDate' | translate }}</label>
+            </p-floatlabel>
+          </div>
+        </div>
+
+        <!-- Estimated End Date field -->
+        <div class="col-12 md:col-6 lg:col-3 mb-1">
+          <div class="field">
+            <p-floatlabel variant="in">
+              <p-datepicker inputId="milestoneEndDate" formControlName="endDate" dateFormat="mm/dd/yy"
+                [minDate]="milestoneForm.get('startDate')?.value" [showIcon]="true" [showButtonBar]="true"
+                appendTo="body" styleClass="w-full"></p-datepicker>
+              <label for="milestoneEndDate">{{ 'wizard.stepMilestones.estimatedEndDate' | translate }}</label>
+            </p-floatlabel>
+            @if (milestoneForm.hasError('dateRange')) {
+            <small class="text-red-500">{{ 'wizard.stepMilestones.endBeforeStart' | translate }}</small>
+            }
+          </div>
+        </div>
+
         <!-- Action buttons -->
         <div class="col-12 md:col-6 lg:col-3 mb-1">
           <div class="flex gap-2 justify-end mt-2">
@@ -106,6 +132,8 @@
               <th>{{ 'wizard.stepMilestones.name' | translate }}</th>
               <th>{{ 'wizard.stepMilestones.orderNo' | translate }}</th>
               <th>{{ 'wizard.stepMilestones.description' | translate }}</th>
+              <th>{{ 'wizard.stepMilestones.estimatedStartDate' | translate }}</th>
+              <th>{{ 'wizard.stepMilestones.estimatedEndDate' | translate }}</th>
               @if (!isViewMode()) {
               <th class="text-center" style="width: 150px">{{ 'wizard.stepMilestones.actions' | translate }}</th>
               }
@@ -117,6 +145,8 @@
               <td>{{ entry.name }}</td>
               <td>{{ entry.order }}</td>
               <td>{{ entry.description }}</td>
+              <td>{{ entry.startDate ? (entry.startDate | date: 'MM/dd/yyyy') : '—' }}</td>
+              <td>{{ entry.endDate ? (entry.endDate | date: 'MM/dd/yyyy') : '—' }}</td>
               @if (!isViewMode()) {
               <td class="text-center">
                 <button type="button" class="p-button-rounded p-button-text p-button-warning mr-2"
@@ -134,7 +164,7 @@
 
           <ng-template pTemplate="emptymessage">
             <tr>
-              <td [attr.colspan]="isViewMode() ? 3 : 4" class="text-center p-6">
+              <td [attr.colspan]="isViewMode() ? 5 : 6" class="text-center p-6">
                 <i class="pi pi-inbox text-4xl mb-1 block text-gray-400"></i>
                 <p class="text-gray-500">{{ 'wizard.stepMilestones.noData' | translate }}</p>
               </td>

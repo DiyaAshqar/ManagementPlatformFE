@@ -341,6 +341,9 @@
       "validate": "Validate Step 2"
     },
     "stepMilestones": {
+      "estimatedStartDate": "Estimated Start Date",
+      "estimatedEndDate": "Estimated End Date",
+      "endBeforeStart": "End date must be on or after the start date",
       "title": "Milestones",
       "name": "Name",
       "orderNo": "Order No",

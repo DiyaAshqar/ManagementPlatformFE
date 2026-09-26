@@ -351,6 +351,7 @@ export const Permissions = {
   },
   ProjectReport: {
     View: 'project-report.view',
+    ViewFinanceDetails: 'project-report.finance-details.view',
   },
 } as const;
 
@@ -510,6 +511,7 @@ export const PERMISSION_FEATURE_MAP: Record<string, FeaturePermissionMapping> = 
   [Permissions.MilestoneTabs.Tasks]: { featureCode: 'PROJECT_MILESTONE_TASKS', permissionCodes: ['READ'] },
   [Permissions.MilestoneTabs.PaymentClaims]: { featureCode: 'PROJECT_MILESTONE_PAYMENT_CLAIM', permissionCodes: ['READ'] },
   [Permissions.ProjectReport.View]: { featureCode: 'PROJECT_REPORT', permissionCodes: ['READ'] },
+  [Permissions.ProjectReport.ViewFinanceDetails]: { featureCode: 'PROJECT_REPORT', permissionCodes: ['FINANCE_DETAILS'] },
 
   [Permissions.MainContractor.Manage]: { featureCode: 'PROJECT_MILESTONE_MC', permissionCodes: ['CREATE', 'UPDATE', 'DELETE'] },
   [Permissions.VoucherOrders.Manage]: { featureCode: 'PROJECT_MILESTONE_VO', permissionCodes: ['CREATE', 'UPDATE', 'DELETE'] },

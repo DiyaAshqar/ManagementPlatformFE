@@ -11,6 +11,9 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
 
 import { AgreementDetailsDto, ProjectClient, ProjectStageDetailsDto, ProjectStageDto, ReportClient } from '../../../../../../../nswag/api-client';
+import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
+import { Permissions } from '../../../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../../../core/auth/services/auth.service';
 import { PrintService } from '../../../../../../shared/services/print.service';
 import { buildProjectReportHtml } from '../../builders/project-report.builder';
 import {
@@ -52,6 +55,9 @@ interface MilestoneSummary {
   boq: number;
   mc: number;
   purchaseOrders: number;
+  variationOrders: number;
+  surveyingVisits: number;
+  savings: number;
   expenses: number;
   budget: number;
   actual: number;
@@ -78,7 +84,7 @@ const STATUS_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-project-report-demo-page',
   standalone: true,
-  imports: [FormsModule, ButtonModule, CardModule, SelectModule, CheckboxModule, MultiSelectModule],
+  imports: [FormsModule, ButtonModule, CardModule, SelectModule, CheckboxModule, MultiSelectModule, HasPermissionDirective],
   templateUrl: './project-report-demo-page.component.html',
   styleUrl: './project-report-demo-page.component.scss',
 })
@@ -88,6 +94,12 @@ export class ProjectReportDemoPageComponent {
   private readonly reportClient = inject(ReportClient);
   private readonly sanitizer = inject(DomSanitizer);
   private readonly printService = inject(PrintService);
+  private readonly authService = inject(AuthService);
+  readonly Permissions = Permissions;
+
+  get canViewFinanceDetails(): boolean {
+    return this.authService.hasPermission(Permissions.ProjectReport.ViewFinanceDetails);
+  }
 
   readonly reportTypeOptions: Option<ProjectReportType>[] = (['full', 'summary', 'progress', 'financial', 'custom'] as ProjectReportType[])
     .map((value) => ({ label: REPORT_TYPE_LABELS_AR[value], value }));
@@ -147,7 +159,7 @@ export class ProjectReportDemoPageComponent {
     const sum = (key: keyof Omit<MilestoneSummary, 'id' | 'name'>) => summaries.reduce((total, item) => total + (item[key] as number), 0);
     const budget = sum('budget');
     const actual = sum('actual');
-    return { id: 0, name: 'الإجمالي العام', boq: sum('boq'), mc: sum('mc'), purchaseOrders: sum('purchaseOrders'), expenses: sum('expenses'), budget, actual, total: sum('total') };
+    return { id: 0, name: 'الإجمالي العام', boq: sum('boq'), mc: sum('mc'), purchaseOrders: sum('purchaseOrders'), variationOrders: sum('variationOrders'), surveyingVisits: sum('surveyingVisits'), savings: sum('savings'), expenses: sum('expenses'), budget, actual, total: sum('total') };
   }
 
   ratio(actual: number, budget: number): number | null {
@@ -178,7 +190,7 @@ export class ProjectReportDemoPageComponent {
       type: this.selectedType, asOfDate: this.asOfDate, language: this.selectedLanguage,
       includeCompanyHeader: this.includeCompanyHeader, includeFinancial: this.includeFinancial,
       includeDocuments: this.includeDocuments, includePhotos: this.includePhotos,
-      includeSignatures: this.includeSignatures, includePercentageFees: this.includePercentageFees,
+      includeSignatures: this.includeSignatures, includePercentageFees: this.includePercentageFees && this.canViewFinanceDetails,
       confidential: this.confidential, customSections: this.customSections, companyLogoDataUrl: undefined,
     };
 
@@ -308,10 +320,17 @@ export class ProjectReportDemoPageComponent {
     const boq = sum((stage.boqs ?? []).map((item) => item.subTotal));
     const mc = sum((stage.mainContractors ?? []).map((item) => item.amount));
     const purchaseOrders = sum((stage.purchaseOrders ?? []).map((item) => item.subTotal));
+    const paidMc = sum((stage.mainContractors ?? []).map((item) =>
+      item.totalPayments ?? sum((item.payments ?? []).map((payment) => payment.paidAmount))));
+    const variationOrders = sum((stage.variationOrders ?? []).map((item) => item.subTotal));
+    const surveyingVisits = sum((stage.surveyingVisits ?? []).map((item) => item.subTotal));
+    // Savings = planned BOQ cost minus actual BOQ cost (no dedicated backend field yet).
+    const savings = sum((stage.boqs ?? []).map((item) =>
+      (item.expectedQuantity ?? 0) * (item.expectedPrice ?? 0) - (item.actualQuantity ?? 0) * (item.actualPrice ?? 0)));
     const expenses = sum((stage.expenses ?? []).map((item) => item.totalAmount));
     // BOQ is the stage-level budget basis; this keeps each percentage scoped to its own milestone.
     const budget = boq;
-    return { id: stage.id ?? 0, name: stage.milestone?.name ?? 'المرحلة رقم ' + (stage.id ?? '—'), boq, mc, purchaseOrders, expenses, budget, actual: expenses, total: boq + mc };
+    return { id: stage.id ?? 0, name: stage.milestone?.name ?? 'المرحلة رقم ' + (stage.id ?? '—'), boq, mc, purchaseOrders, variationOrders, surveyingVisits, savings, expenses, budget, actual: expenses, total: paidMc + expenses + variationOrders + surveyingVisits };
   }
 
   private buildSnapshot(): ProjectReportSnapshot {

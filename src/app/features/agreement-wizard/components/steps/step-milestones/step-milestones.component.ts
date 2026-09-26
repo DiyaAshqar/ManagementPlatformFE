@@ -1,9 +1,10 @@
 import { CommonModule } from '@angular/common';
 import { Component, input, OnDestroy, OnInit, output, signal } from '@angular/core';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { MessageService } from 'primeng/api';
 import { ButtonModule } from 'primeng/button';
+import { DatePickerModule } from 'primeng/datepicker';
 import { FloatLabelModule } from 'primeng/floatlabel';
 import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
@@ -32,6 +33,7 @@ import {
     FloatLabelModule,
     TooltipModule,
     TableModule,
+    DatePickerModule,
     NumberInputComponent
   ],
   templateUrl: './step-milestones.component.html'
@@ -75,8 +77,16 @@ export class StepMilestonesComponent implements OnInit, OnDestroy {
       id: [0],
       name: ['', [Validators.required, Validators.maxLength(200)]],
       order: [{ value: 1, disabled: true }, [Validators.required, Validators.min(1)]],
-      description: ['', [Validators.required, Validators.maxLength(500)]]
-    });
+      description: ['', [Validators.required, Validators.maxLength(500)]],
+      startDate: [null as Date | null],
+      endDate: [null as Date | null]
+    }, { validators: StepMilestonesComponent.dateRangeValidator });
+  }
+
+  private static dateRangeValidator(group: AbstractControl): ValidationErrors | null {
+    const start: Date | null = group.get('startDate')?.value;
+    const end: Date | null = group.get('endDate')?.value;
+    return start && end && end < start ? { dateRange: true } : null;
   }
 
   private loadAgreementData(): void {
@@ -138,6 +148,8 @@ export class StepMilestonesComponent implements OnInit, OnDestroy {
       updated.name = formValue.name;
       updated.order = formValue.order;
       updated.description = formValue.description;
+      updated.startDate = formValue.startDate ?? undefined;
+      updated.endDate = formValue.endDate ?? undefined;
       updated.isDeleted = currentEntries[currentEditingIndex].isDeleted ?? false;
       currentEntries[currentEditingIndex] = updated;
       this.milestones.set(currentEntries);
@@ -148,6 +160,8 @@ export class StepMilestonesComponent implements OnInit, OnDestroy {
       newDto.name = formValue.name;
       newDto.order = formValue.order;
       newDto.description = formValue.description;
+      newDto.startDate = formValue.startDate ?? undefined;
+      newDto.endDate = formValue.endDate ?? undefined;
       newDto.isDeleted = false;
       currentEntries.push(newDto);
       this.milestones.set(currentEntries);
@@ -167,7 +181,9 @@ export class StepMilestonesComponent implements OnInit, OnDestroy {
       id: entry.id,
       name: entry.name,
       order: entry.order,
-      description: entry.description
+      description: entry.description,
+      startDate: entry.startDate ? new Date(entry.startDate) : null,
+      endDate: entry.endDate ? new Date(entry.endDate) : null
     });
   }
 
@@ -187,7 +203,7 @@ export class StepMilestonesComponent implements OnInit, OnDestroy {
   }
 
   clearForm(): void {
-    this.milestoneForm.reset({ id: 0, name: '', order: this.getNextOrder(), description: '' });
+    this.milestoneForm.reset({ id: 0, name: '', order: this.getNextOrder(), description: '', startDate: null, endDate: null });
     this.editingIndex.set(null);
   }
 
@@ -267,6 +283,8 @@ export class StepMilestonesComponent implements OnInit, OnDestroy {
       dto.name = entry.name;
       dto.order = entry.order;
       dto.description = entry.description;
+      dto.startDate = entry.startDate;
+      dto.endDate = entry.endDate;
       dto.isDeleted = entry.isDeleted || false;
       return dto;
     });
