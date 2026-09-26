@@ -1,3 +1,118 @@
 .assign-role-dialog {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
   padding: 0.25rem;
+}
+
+.ard-user {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  border-radius: 10px;
+  background: var(--surface-hover);
+}
+
+.ard-avatar {
+  flex: 0 0 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #fff;
+  background: var(--primary-color);
+}
+
+.ard-user-name {
+  font-weight: 700;
+  color: var(--text-color);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ard-user-email {
+  font-size: 0.8rem;
+  color: var(--text-color-secondary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.ard-section-title {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--text-color-secondary);
+}
+
+.ard-roles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.ard-role-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.35rem 0.3rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  background: color-mix(in srgb, var(--primary-color) 14%, transparent);
+  border: 1px solid color-mix(in srgb, var(--primary-color) 30%, transparent);
+
+  > .pi-shield { font-size: 0.75rem; }
+}
+
+.ard-role-remove {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+
+  .pi { font-size: 0.7rem; }
+
+  &:hover:not(:disabled) {
+    background: color-mix(in srgb, var(--p-red-500, #ef4444) 18%, transparent);
+    color: var(--p-red-500, #ef4444);
+  }
+
+  &:disabled { opacity: 0.5; cursor: default; }
+}
+
+.ard-empty {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  color: var(--text-color-secondary);
+}
+
+.ard-add {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+}
+
+.ard-footer {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--surface-border);
 }

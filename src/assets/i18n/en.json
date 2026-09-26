@@ -1485,7 +1485,11 @@
       "roleIdLabel": "Role",
       "selectRole": "Select a role",
       "assign": "Assign",
-      "remove": "Remove"
+      "remove": "Remove",
+      "currentRoles": "Current roles",
+      "addRole": "Add role",
+      "allAssigned": "All available roles are assigned",
+      "failed": "Operation failed"
     },
     "roles": {
       "admin": "Admin",

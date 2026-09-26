@@ -1481,7 +1481,11 @@
       "roleIdLabel": "الدور",
       "selectRole": "اختر دوراً",
       "assign": "إسناد",
-      "remove": "إزالة"
+      "remove": "إزالة",
+      "currentRoles": "الأدوار الحالية",
+      "addRole": "إضافة دور",
+      "allAssigned": "كل الأدوار المتاحة معيّنة",
+      "failed": "فشلت العملية"
     },
     "roles": {
       "admin": "مسؤول",
