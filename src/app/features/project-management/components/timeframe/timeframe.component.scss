@@ -819,3 +819,11 @@
     text-overflow: ellipsis;
   }
 }
+
+// Short-duration bars would otherwise collapse into tiny squares; keep them
+// wide enough to read the label. Exact dates remain in the tooltip/popover.
+.tf-phase-bar,
+.tf-bar,
+.tf-task-bar {
+  min-width: 96px;
+}

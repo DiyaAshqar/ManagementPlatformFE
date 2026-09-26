@@ -324,7 +324,8 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
           mapProjectStagesToTimeline(response.data, this.translate.instant('timeframe.board.unassignedTasks'))
         );
         this.isLoading.set(false);
-        setTimeout(() => this.scrollToToday(), 300);
+        this.autoPickScale();
+        setTimeout(() => this.scrollToStart(), 300);
       },
       error: () => {
         this.phases.set([]);
@@ -336,7 +337,7 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
 
   ngAfterViewInit(): void {
     // Scroll to today indicator if possible
-    setTimeout(() => this.scrollToToday(), 300);
+    setTimeout(() => this.scrollToStart(), 300);
   }
 
   // ── Static options -------------------------------------------------------
@@ -405,6 +406,22 @@ export class TimeframeComponent implements OnInit, AfterViewInit {
     const s = this.scale();
     if (s === 'day') this.scale.set('week');
     else if (s === 'week') this.scale.set('month');
+  }
+
+  private scaleAutoPicked = false;
+
+  /** Pick the zoom level from the project span, once per component (keeps the user's manual choice). */
+  private autoPickScale(): void {
+    const r = this.range();
+    if (this.scaleAutoPicked || !r) return;
+    this.scaleAutoPicked = true;
+    const days = this.timeframeService.durationDays(r.start, r.end);
+    this.scale.set(days <= 60 ? 'day' : days <= 365 ? 'week' : 'month');
+  }
+
+  /** Scroll to the project start (inline-start edge; works in LTR and RTL). */
+  scrollToStart(): void {
+    this.chartScrollRef?.nativeElement.scrollTo({ left: 0, behavior: 'smooth' });
   }
 
   scrollToToday(): void {
