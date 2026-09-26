@@ -16,7 +16,7 @@ import { TooltipModule } from 'primeng/tooltip';
 import { CreateWirChecklistItemCommand, GetWirChecklistItemDto } from '../../../../../nswag/api-client';
 import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 import { Permissions } from '../../../../core/auth/models/auth.models';
-import { WirApiService } from '../../services/wir-api.service';
+import { NEW_ENTITY_ID, WirApiService } from '../../services/wir-api.service';
 
 /** Master catalog of WIR checklist items (the rows of the Excel checklist). */
 @Component({
@@ -108,7 +108,7 @@ export class WirChecklistManagementComponent implements OnInit {
     this.wirApi
       .saveChecklistItem(
         new CreateWirChecklistItemCommand({
-          id: this.editingId() ?? 0,
+          id: this.editingId() ?? NEW_ENTITY_ID,
           checklistItem: checklistItem!.trim(),
           displayOrder: displayOrder ?? 1,
         })

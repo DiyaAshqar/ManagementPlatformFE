@@ -13,6 +13,12 @@ import {
   WirChecklistItemClient,
 } from '../../../../nswag/api-client';
 
+/**
+ * The WIR endpoints create a record only when `id` is null (0 is treated as "update id 0" → not found).
+ * The generated command types are `number | undefined`, so this typed null is serialized as `"id": null`.
+ */
+export const NEW_ENTITY_ID = null as unknown as number | undefined;
+
 /** Wrapper around the generated ProjectWir / WirChecklistItem clients (Work Inspection Requests). */
 @Injectable({ providedIn: 'root' })
 export class WirApiService {

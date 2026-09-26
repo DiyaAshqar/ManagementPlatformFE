@@ -19,7 +19,7 @@ import {
   WirChecklistItemStatus,
   WirStatus,
 } from '../../../../../../nswag/api-client';
-import { WirApiService } from '../../../services/wir-api.service';
+import { NEW_ENTITY_ID, WirApiService } from '../../../services/wir-api.service';
 
 export interface WirOption<T = number> {
   label: string;
@@ -154,7 +154,7 @@ export class WirDialogComponent implements OnChanges {
     const status: WirStatus = v.status;
     const today = new Date();
     const command = new CreateProjectWirCommand({
-      id: this.wirId ?? 0,
+      id: this.wirId ?? NEW_ENTITY_ID,
       projectStageId: this.projectStageId,
       wirNo: v.wirNo,
       title: v.title,
@@ -178,7 +178,7 @@ export class WirDialogComponent implements OnChanges {
       checklistItems: v.checklistItems.map(
         (item: any, index: number) =>
           new CreateProjectWirChecklistItemModel({
-            id: item.id || 0,
+            id: item.id || NEW_ENTITY_ID,
             wirChecklistItemId: item.wirChecklistItemId,
             checklistItem: this.checklistOptions.find((o) => o.value === item.wirChecklistItemId)?.label,
             displayOrder: index + 1,
