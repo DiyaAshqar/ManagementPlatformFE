@@ -88,7 +88,7 @@ export class Step7Component implements OnInit, OnDestroy {
 
   private initializeForm(): void {
     this.attachmentForm = this.fb.group({
-      attachmentName: ['', [Validators.required, Validators.maxLength(200)]],
+      attachmentName: ['', [Validators.maxLength(200)]],
       file: [null, [Validators.required]]
     });
   }
@@ -141,7 +141,7 @@ export class Step7Component implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'error',
         summary: 'Validation Error',
-        detail: 'Please select a file and enter an attachment name',
+        detail: 'Please select a file',
         life: 5000
       });
       return;
@@ -149,7 +149,7 @@ export class Step7Component implements OnInit, OnDestroy {
 
     const file = this.selectedFile()!;
     const newAttachment: Attachment = {
-      name: this.attachmentForm.value.attachmentName,
+      name: this.attachmentForm.value.attachmentName?.trim() || file.name,
       type: this.getFileExtension(file.name),
       file: file,
       fileName: file.name,
@@ -277,9 +277,9 @@ export class Step7Component implements OnInit, OnDestroy {
           .map(async att => {
             const dto = new AttachmentDto();
             dto.id = 0;
-            dto.fileName = att.name || att.file?.name || '';
+            dto.fileName = att.file?.name || att.name || '';
             dto.filePath = '';
-            dto.originalName = att.file?.name || '';
+            dto.originalName = att.name?.trim() || att.file?.name || '';
             dto.relationshipId = this.agreementId();
             dto.attachmentType = AttachmentTypeMap.Agreement;
             dto.base64Data = att.file ? await this.convertFileToBase64(att.file) : '';
@@ -368,7 +368,7 @@ export class Step7Component implements OnInit, OnDestroy {
           if (response.succeeded && response.data) {
             const loadedAttachments: Attachment[] = response.data.map(att => ({
               id: att.id,
-              name: att.fileName || '',
+              name: att.originalName || att.fileName || '',
               type: this.getFileExtension(att.fileName || ''),
               fileName: att.fileName,
               filePath: att.filePath,

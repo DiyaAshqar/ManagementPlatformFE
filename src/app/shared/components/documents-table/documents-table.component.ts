@@ -12,11 +12,14 @@ import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { TableModule } from 'primeng/table';
 import { TagModule } from 'primeng/tag';
 import { TooltipModule } from 'primeng/tooltip';
+import { InputTextModule } from 'primeng/inputtext';
 import { AttachmentType } from '../../../../nswag/api-client';
 import { AttachmentMetaData, AttachmentService } from '../../services/attachment.service';
 
 export interface UploadedFile {
   name: string;
+  /** Optional attachment name (sent as originalName); empty = use the file name. */
+  displayName: string;
   size: number;
   type: string;
   file: File;
@@ -36,6 +39,7 @@ export interface UploadedFile {
     TableModule,
     TagModule,
     TooltipModule,
+    InputTextModule,
   ],
   providers: [ConfirmationService],
   templateUrl: './documents-table.component.html',
@@ -135,11 +139,16 @@ export class DocumentsTableComponent implements OnInit, OnDestroy {
   private addFiles(files: File[]): void {
     const newFiles: UploadedFile[] = files.map((f) => ({
       name: f.name,
+      displayName: '',
       size: f.size,
       type: f.type,
       file: f,
     }));
     this.selectedFiles.set([...this.selectedFiles(), ...newFiles]);
+  }
+
+  setDisplayName(index: number, value: string): void {
+    this.selectedFiles.update((files) => files.map((f, i) => (i === index ? { ...f, displayName: value } : f)));
   }
 
   removeFile(index: number): void {
@@ -157,7 +166,7 @@ export class DocumentsTableComponent implements OnInit, OnDestroy {
           attachmentType: this.attachmentType,
           relationshipId: this.relationshipId,
           file: f.file,
-          fileName: f.name,
+          originalName: f.displayName,
         })
       )
     )

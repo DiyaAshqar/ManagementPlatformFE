@@ -135,6 +135,12 @@
                   size="small" severity="danger" (onClick)="removeFile(i)">
                 </p-button>
               </div>
+              <input pInputText type="text" class="w-full mb-2 p-inputtext-sm"
+                [value]="file.displayName"
+                (input)="setDisplayName(i, $any($event.target).value)"
+                [placeholder]="file.name"
+                [attr.aria-label]="'documentsTable.attachmentName' | translate"
+                [pTooltip]="'documentsTable.attachmentNameHint' | translate" tooltipPosition="top" />
               <div class="flex align-items-center gap-2 text-xs text-500">
                 <span>{{ formatFileSize(file.size) }}</span>
                 <span>•</span>

@@ -439,7 +439,7 @@
       "file": "الملف",
       "chooseFile": "اختر ملف",
       "attachmentName": "اسم المرفق",
-      "attachmentNamePlaceholder": "مثال: مخطط الموقع، الرسومات الإنشائية",
+      "attachmentNamePlaceholder": "اختياري — يُستخدم اسم الملف افتراضياً",
       "uploading": "جاري الرفع",
       "uploadSuccess": "تم رفع الملف بنجاح!",
       "attachmentsList": "قائمة المرفقات",
@@ -1308,7 +1308,9 @@
     "close": "إغلاق",
     "cancel": "إلغاء",
     "upload": "رفع",
-    "uploading": "جاري الرفع..."
+    "uploading": "جاري الرفع...",
+    "attachmentName": "اسم المرفق",
+    "attachmentNameHint": "اختياري — اتركه فارغاً لاستخدام اسم الملف"
   },
   "material": {
     "title": "إدارة المواد",

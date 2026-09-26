@@ -30,7 +30,8 @@ export interface AttachmentUploadParams {
   attachmentType: AttachmentType;
   relationshipId: number;
   file: File;
-  fileName?: string;
+  /** Display name saved as `originalName`; falls back to the file's own name when empty. */
+  originalName?: string;
 }
 
 export interface AttachmentMetaData {
@@ -70,8 +71,8 @@ export class AttachmentService {
         const command = new UploadAttachmentCommand();
         command.attachmentType = params.attachmentType;
         command.relationshipId = params.relationshipId;
-        command.fileName = params.fileName || params.file.name;
-        command.originalName = params.fileName || params.file.name;
+        command.fileName = params.file.name;
+        command.originalName = params.originalName?.trim() || params.file.name;
         command.filePath = ''; // Server will handle path
         command.base64Data = base64Data;
         command.contentType = params.file.type || this.getMimeType(params.file.name);
@@ -220,7 +221,11 @@ export class AttachmentService {
       fileName: displayName,
       filePath: att.filePath || '',
       relationshipId: att.relationshipId || 0,
-      fileType: this.determineFileType(displayName)
+      // The display name (originalName) may be a custom label without an extension,
+      // so detect the type from the real stored file name first.
+      fileType: this.determineFileType(
+        [att.fileName, att.filePath, displayName].find((name) => !!name && /\.[a-z0-9]+$/i.test(name)) ?? displayName
+      )
     };
   }
 

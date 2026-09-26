@@ -443,7 +443,7 @@
       "file": "File",
       "chooseFile": "Choose File",
       "attachmentName": "Attachment Name",
-      "attachmentNamePlaceholder": "e.g., Site Plan, Construction Drawings",
+      "attachmentNamePlaceholder": "Optional — defaults to the file name",
       "uploading": "Uploading",
       "uploadSuccess": "File uploaded successfully!",
       "attachmentsList": "Attachments List",
@@ -1312,7 +1312,9 @@
     "close": "Close",
     "cancel": "Cancel",
     "upload": "Upload",
-    "uploading": "Uploading..."
+    "uploading": "Uploading...",
+    "attachmentName": "Attachment name",
+    "attachmentNameHint": "Optional — leave empty to use the file name"
   },
   "material": {
     "title": "Material Management",
