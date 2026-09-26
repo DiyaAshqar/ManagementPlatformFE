@@ -1,0 +1,113 @@
+<div class="wir-card">
+
+  <!-- Header -->
+  <div class="wir-card-header">
+    <div>
+      <h3 class="wir-card-title">{{ 'projectTabs.wir.cardTitle' | translate }}</h3>
+      <p class="wir-card-subtitle">{{ 'projectTabs.wir.cardSubtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="wir-toolbar">
+    <span class="wir-total-label">{{ 'projectTabs.wir.total' | translate }}: {{ wirs().length }}</span>
+    <p-button *appHasPermission="permissions.Wir.Manage"
+      [label]="'projectTabs.wir.create' | translate"
+      icon="pi pi-plus"
+      severity="contrast"
+      [raised]="true"
+      (onClick)="openAdd()">
+    </p-button>
+  </div>
+
+  <!-- Table -->
+  <p-table
+    [value]="sortedWirs()"
+    [loading]="isLoading()"
+    [tableStyle]="{ 'min-width': '64rem' }"
+    styleClass="p-datatable-gridlines wir-table"
+    responsiveLayout="scroll">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>{{ 'projectTabs.wir.fields.wirNo' | translate }}</th>
+        <th>{{ 'projectTabs.wir.fields.inspectionDate' | translate }}</th>
+        <th>{{ 'projectTabs.wir.fields.title' | translate }}</th>
+        <th>{{ 'projectTabs.wir.fields.drawingReference' | translate }}</th>
+        <th class="text-center">{{ 'projectTabs.wir.fields.revisionNo' | translate }}</th>
+        <th>{{ 'projectTabs.wir.fields.contractor' | translate }}</th>
+        <th class="text-center">{{ 'projectTabs.wir.fields.checklist' | translate }}</th>
+        <th>{{ 'projectTabs.wir.fields.finalStatus' | translate }}</th>
+        <th class="text-center">{{ 'common.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-wir>
+      <tr>
+        <td [attr.data-label]="'projectTabs.wir.fields.wirNo' | translate"><span class="wir-number">{{ wir.wirNo || '—' }}</span></td>
+        <td [attr.data-label]="'projectTabs.wir.fields.inspectionDate' | translate">{{ wir.inspectionDate ? (wir.inspectionDate | date: 'dd/MM/yyyy' : 'UTC') : '—' }}</td>
+        <td [attr.data-label]="'projectTabs.wir.fields.title' | translate">{{ wir.title || '—' }}</td>
+        <td [attr.data-label]="'projectTabs.wir.fields.drawingReference' | translate">{{ wir.drawingReference || '—' }}</td>
+        <td class="text-center" [attr.data-label]="'projectTabs.wir.fields.revisionNo' | translate">
+          <span class="wir-rev">R{{ wir.revisionNo ?? 0 }}</span>
+        </td>
+        <td [attr.data-label]="'projectTabs.wir.fields.contractor' | translate">{{ wir.constructorName || '—' }}</td>
+        <td class="text-center" [attr.data-label]="'projectTabs.wir.fields.checklist' | translate">
+          @if (wir.checklistItems?.length) {
+            @let s = itemSummary(wir);
+            <span class="wir-counts">
+              <span class="wir-count ok" [pTooltip]="'projectTabs.wir.itemStatus.approved' | translate">{{ s.approved }}</span>
+              <span class="wir-count warn" [pTooltip]="'projectTabs.wir.itemStatus.approvedWithComment' | translate">{{ s.withComment }}</span>
+              <span class="wir-count bad" [pTooltip]="'projectTabs.wir.itemStatus.rejected' | translate">{{ s.rejected }}</span>
+            </span>
+          } @else {
+            <span class="text-500">—</span>
+          }
+        </td>
+        <td [attr.data-label]="'projectTabs.wir.fields.finalStatus' | translate">
+          @if (wir.status) {
+            <p-tag [value]="('projectTabs.wir.status.' + wir.status) | translate" [severity]="severityOf(wir.status)"></p-tag>
+          }
+        </td>
+        <td class="text-center wir-actions-cell" [attr.data-label]="'common.actions' | translate">
+          <div class="flex align-items-center justify-content-center gap-1">
+            <p-button icon="pi pi-eye" [rounded]="true" [text]="true" severity="secondary" size="small"
+              [pTooltip]="'common.view' | translate" tooltipPosition="top" (onClick)="openView(wir)"></p-button>
+            <ng-container *appHasPermission="permissions.Wir.Manage">
+              <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" size="small"
+                [pTooltip]="'common.edit' | translate" tooltipPosition="top" (onClick)="openEdit(wir)"></p-button>
+              <p-button icon="pi pi-copy" [rounded]="true" [text]="true" severity="info" size="small"
+                [loading]="revisingId() === wir.id"
+                [pTooltip]="'projectTabs.wir.newRevision' | translate" tooltipPosition="top" (onClick)="createRevision(wir)"></p-button>
+              <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small"
+                [pTooltip]="'common.delete' | translate" tooltipPosition="top" (onClick)="confirmDelete(wir)"></p-button>
+            </ng-container>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="9" class="text-center">
+          <div class="wir-empty">
+            <i class="pi pi-clipboard"></i>
+            <p>{{ 'projectTabs.wir.empty' | translate }}</p>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+  </p-table>
+</div>
+
+<app-wir-dialog
+  [visible]="dialogVisible()"
+  (visibleChange)="onDialogVisibleChange($event)"
+  [projectStageId]="projectStageId"
+  [wirId]="dialogWirId()"
+  [readonly]="dialogReadonly()"
+  [constructorOptions]="constructorOptions"
+  [userOptions]="userOptions"
+  [checklistOptions]="checklistOptions"
+  (saved)="onSaved()">
+</app-wir-dialog>

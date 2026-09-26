@@ -268,6 +268,7 @@ export const Permissions = {
     Advances: 'milestone-tabs.advances.view',
     Tasks: 'milestone-tabs.tasks.view',
     PaymentClaims: 'milestone-tabs.payment-claims.view',
+    Wir: 'milestone-tabs.wir.view',
   },
   Agreements: {
     View: 'agreements.view',
@@ -325,6 +326,9 @@ export const Permissions = {
   },
   SurveyingVisits: {
     Manage: 'surveying-visits.manage',
+  },
+  Wir: {
+    Manage: 'wir.manage',
   },
   PurchaseOrders: {
     Manage: 'purchase-orders.manage',
@@ -517,6 +521,9 @@ export const PERMISSION_FEATURE_MAP: Record<string, FeaturePermissionMapping> = 
   [Permissions.VoucherOrders.Manage]: { featureCode: 'PROJECT_MILESTONE_VO', permissionCodes: ['CREATE', 'UPDATE', 'DELETE'] },
   [Permissions.SurveyingVisits.Manage]: { featureCode: 'PROJECT_MILESTONE_SURVEYING', permissionCodes: ['CREATE', 'UPDATE', 'DELETE'] },
   [Permissions.PurchaseOrders.Manage]: { featureCode: 'PROJECT_MILESTONE_PURCHASE_ORDERS', permissionCodes: ['CREATE', 'UPDATE', 'DELETE'] },
+  // WIR has no dedicated backend feature yet — mapped onto the milestone feature until one is added.
+  [Permissions.MilestoneTabs.Wir]: { featureCode: 'PROJECT_MILESTONE', permissionCodes: ['READ'] },
+  [Permissions.Wir.Manage]: { featureCode: 'PROJECT_MILESTONE', permissionCodes: ['CREATE', 'UPDATE', 'DELETE'] },
 
   [Permissions.Agreements.View]: { featureCode: 'AGREEMENTS', permissionCodes: ['READ'] },
   [Permissions.Agreements.Create]: { featureCode: 'AGREEMENTS', permissionCodes: ['CREATE'] },

@@ -1,0 +1,189 @@
+<p-dialog
+  [visible]="visible"
+  (visibleChange)="!$event && close()"
+  [header]="headerKey | translate"
+  [modal]="true"
+  [closable]="true"
+  [draggable]="false"
+  appendTo="body"
+  [style]="{ width: '96vw', 'max-width': '1200px' }"
+  [breakpoints]="{ '960px': '98vw' }"
+  [contentStyle]="{ 'max-height': '75vh', overflow: 'auto' }"
+  [maximizable]="true"
+  styleClass="wir-dialog">
+
+  @if (isLoading()) {
+    <div class="flex flex-column gap-2 p-2">
+      <p-skeleton height="2.5rem"></p-skeleton>
+      <p-skeleton height="2.5rem"></p-skeleton>
+      <p-skeleton height="8rem"></p-skeleton>
+    </div>
+  } @else {
+    <form [formGroup]="form" class="wir-form">
+
+      <!-- ── Master ─────────────────────────────────────────────── -->
+      <section class="wir-section">
+        <div class="wir-section-head">
+          <h4>{{ 'projectTabs.wir.masterTitle' | translate }}</h4>
+          @if (wirId) {
+            <span class="wir-rev-badge">{{ 'projectTabs.wir.fields.revisionNo' | translate }}: {{ revisionNo() }}</span>
+          }
+        </div>
+
+        <div class="grid">
+          <div class="col-12 md:col-6 lg:col-3 field">
+            <label for="wirNo">{{ 'projectTabs.wir.fields.wirNo' | translate }} <span class="required-asterisk">*</span></label>
+            <input pInputText id="wirNo" formControlName="wirNo" class="w-full" />
+          </div>
+          <div class="col-12 md:col-6 lg:col-3 field">
+            <label for="inspectionDate">{{ 'projectTabs.wir.fields.inspectionDate' | translate }} <span class="required-asterisk">*</span></label>
+            <p-datepicker inputId="inspectionDate" formControlName="inspectionDate" dateFormat="dd/mm/yy"
+              [showIcon]="true" appendTo="body" styleClass="w-full"></p-datepicker>
+          </div>
+          <div class="col-12 md:col-6 lg:col-3 field">
+            <label for="drawingReference">{{ 'projectTabs.wir.fields.drawingReference' | translate }}</label>
+            <input pInputText id="drawingReference" formControlName="drawingReference" class="w-full" />
+          </div>
+          <div class="col-12 md:col-6 lg:col-3 field">
+            <label for="status">{{ 'projectTabs.wir.fields.finalStatus' | translate }} <span class="required-asterisk">*</span></label>
+            <p-select inputId="status" formControlName="status" [options]="statusOptions" optionValue="value"
+              appendTo="body" styleClass="w-full">
+              <ng-template let-option pTemplate="item">{{ option.label | translate }}</ng-template>
+              <ng-template let-option pTemplate="selectedItem">{{ option?.label | translate }}</ng-template>
+            </p-select>
+          </div>
+
+          <div class="col-12 md:col-6 field">
+            <label for="title">{{ 'projectTabs.wir.fields.title' | translate }} <span class="required-asterisk">*</span></label>
+            <input pInputText id="title" formControlName="title" class="w-full" />
+          </div>
+          <div class="col-12 md:col-6 lg:col-3 field">
+            <label for="constructorId">{{ 'projectTabs.wir.fields.contractor' | translate }}</label>
+            <p-select inputId="constructorId" formControlName="constructorId" [options]="constructorOptions"
+              optionLabel="label" optionValue="value" [filter]="true" [showClear]="true" appendTo="body" styleClass="w-full"></p-select>
+          </div>
+          <div class="col-12 md:col-6 lg:col-3 field">
+            <label for="disciplineCode">{{ 'projectTabs.wir.fields.discipline' | translate }}</label>
+            <input pInputText id="disciplineCode" formControlName="disciplineCode" class="w-full" />
+          </div>
+
+          <div class="col-12 md:col-4 lg:col-2 field">
+            <label for="levelName">{{ 'projectTabs.wir.fields.level' | translate }}</label>
+            <input pInputText id="levelName" formControlName="levelName" class="w-full" />
+          </div>
+          <div class="col-12 md:col-4 lg:col-2 field">
+            <label for="zoneName">{{ 'projectTabs.wir.fields.zone' | translate }}</label>
+            <input pInputText id="zoneName" formControlName="zoneName" class="w-full" />
+          </div>
+          <div class="col-12 md:col-4 lg:col-2 field">
+            <label for="gridReference">{{ 'projectTabs.wir.fields.grid' | translate }}</label>
+            <input pInputText id="gridReference" formControlName="gridReference" class="w-full" />
+          </div>
+          <div class="col-6 lg:col-1 field">
+            <label for="xAxis">X</label>
+            <input pInputText id="xAxis" formControlName="xAxis" class="w-full" />
+          </div>
+          <div class="col-6 lg:col-1 field">
+            <label for="yAxis">Y</label>
+            <input pInputText id="yAxis" formControlName="yAxis" class="w-full" />
+          </div>
+          <div class="col-12 md:col-6 lg:col-2 field">
+            <label for="requestedBy">{{ 'projectTabs.wir.fields.requestedBy' | translate }}</label>
+            <p-select inputId="requestedBy" formControlName="requestedBy" [options]="userOptions" optionLabel="label"
+              optionValue="value" [filter]="true" [showClear]="true" appendTo="body" styleClass="w-full"></p-select>
+          </div>
+          <div class="col-12 md:col-6 lg:col-2 field">
+            <label for="assignedTo">{{ 'projectTabs.wir.fields.assignedTo' | translate }}</label>
+            <p-select inputId="assignedTo" formControlName="assignedTo" [options]="userOptions" optionLabel="label"
+              optionValue="value" [filter]="true" [showClear]="true" appendTo="body" styleClass="w-full"></p-select>
+          </div>
+
+          <div class="col-12 md:col-4 field">
+            <label for="submittedDate">{{ 'projectTabs.wir.fields.submittedDate' | translate }}</label>
+            <p-datepicker inputId="submittedDate" formControlName="submittedDate" dateFormat="dd/mm/yy"
+              [showIcon]="true" [showButtonBar]="true" appendTo="body" styleClass="w-full"></p-datepicker>
+          </div>
+          <div class="col-12 md:col-4 field">
+            <label for="approvedDate">{{ 'projectTabs.wir.fields.approvedDate' | translate }}</label>
+            <p-datepicker inputId="approvedDate" formControlName="approvedDate" dateFormat="dd/mm/yy"
+              [showIcon]="true" [showButtonBar]="true" appendTo="body" styleClass="w-full"></p-datepicker>
+          </div>
+          <div class="col-12 md:col-4 field">
+            <label for="rejectedDate">{{ 'projectTabs.wir.fields.rejectedDate' | translate }}</label>
+            <p-datepicker inputId="rejectedDate" formControlName="rejectedDate" dateFormat="dd/mm/yy"
+              [showIcon]="true" [showButtonBar]="true" appendTo="body" styleClass="w-full"></p-datepicker>
+          </div>
+
+          <div class="col-12 field">
+            <label for="description">{{ 'projectTabs.wir.fields.description' | translate }}</label>
+            <textarea pTextarea id="description" formControlName="description" rows="2" class="w-full"></textarea>
+          </div>
+        </div>
+      </section>
+
+      <!-- ── Details (checklist) ────────────────────────────────── -->
+      <section class="wir-section">
+        <div class="wir-section-head">
+          <h4>{{ 'projectTabs.wir.detailsTitle' | translate }} ({{ items.length }})</h4>
+          @if (!readonly) {
+            <div class="flex gap-2">
+              <p-button [label]="'projectTabs.wir.addAllItems' | translate" icon="pi pi-list-check" [outlined]="true"
+                size="small" [disabled]="!checklistOptions.length" (onClick)="addAllCatalogItems()"></p-button>
+              <p-button [label]="'projectTabs.wir.addItem' | translate" icon="pi pi-plus" size="small" (onClick)="addItem()"></p-button>
+            </div>
+          }
+        </div>
+
+        <div class="wir-items" formArrayName="checklistItems">
+          <div class="wir-item wir-item-head">
+            <span>#</span>
+            <span>{{ 'projectTabs.wir.fields.checklistItem' | translate }}</span>
+            <span>{{ 'projectTabs.wir.fields.itemStatus' | translate }}</span>
+            <span>{{ 'projectTabs.wir.fields.comment' | translate }}</span>
+            <span></span>
+          </div>
+
+          @for (row of items.controls; track row; let i = $index) {
+            <div class="wir-item" [formGroupName]="i">
+              <span class="wir-item-index">{{ i + 1 }}</span>
+              <p-select formControlName="wirChecklistItemId" [options]="availableChecklistOptions(i)" optionLabel="label"
+                optionValue="value" [filter]="true" appendTo="body" styleClass="w-full"
+                [placeholder]="'projectTabs.wir.selectItem' | translate"></p-select>
+              <p-select formControlName="status" [options]="itemStatusOptions" optionValue="value" appendTo="body" styleClass="w-full">
+                <ng-template let-option pTemplate="item">
+                  <p-tag [value]="option.label | translate" [severity]="itemSeverity(option.value)"></p-tag>
+                </ng-template>
+                <ng-template let-option pTemplate="selectedItem">
+                  @if (option) {
+                    <p-tag [value]="option.label | translate" [severity]="itemSeverity(option.value)"></p-tag>
+                  }
+                </ng-template>
+              </p-select>
+              <input pInputText formControlName="inspectorComment" class="w-full"
+                [placeholder]="'projectTabs.wir.commentPlaceholder' | translate" />
+              @if (!readonly) {
+                <p-button icon="pi pi-trash" severity="danger" [text]="true" [rounded]="true" size="small"
+                  [pTooltip]="'common.delete' | translate" (onClick)="removeItem(i)"></p-button>
+              } @else {
+                <span></span>
+              }
+            </div>
+          } @empty {
+            <div class="wir-items-empty">
+              <i class="pi pi-list"></i>
+              <span>{{ 'projectTabs.wir.noItems' | translate }}</span>
+            </div>
+          }
+        </div>
+      </section>
+    </form>
+  }
+
+  <ng-template pTemplate="footer">
+    <p-button [label]="'common.cancel' | translate" icon="pi pi-times" severity="secondary" [outlined]="true" (onClick)="close()"></p-button>
+    @if (!readonly) {
+      <p-button [label]="'common.save' | translate" icon="pi pi-check" [loading]="isSaving()"
+        [disabled]="isLoading() || isSaving()" (onClick)="save()"></p-button>
+    }
+  </ng-template>
+</p-dialog>

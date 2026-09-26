@@ -84,6 +84,12 @@
                         <span>{{ 'ownerPayment.tabTitle' | translate }}</span>
                       </div>
                     </p-tab>
+                    <p-tab *appHasPermission="permissions.MilestoneTabs.Wir" value="10">
+                      <div class="flex align-items-center gap-2">
+                        <i class="pi pi-clipboard" style="color: #0EA5E9"></i>
+                        <span>{{ 'projectTabs.wir.tabTitle' | translate }}</span>
+                      </div>
+                    </p-tab>
                 </p-tablist>
 
                 <p-tabpanels>
@@ -152,6 +158,12 @@
                           [projectId]="projectId"
                           [agreementId]="agreementId">
                         </app-payment-claim-tab>
+                      }
+                    </p-tabpanel>
+
+                    <p-tabpanel *appHasPermission="permissions.MilestoneTabs.Wir" value="10">
+                      @if (shouldLoadTab(stage.id!, '10')) {
+                        <app-wir-tab [projectStageId]="stage.id!"></app-wir-tab>
                       }
                     </p-tabpanel>
                 </p-tabpanels>

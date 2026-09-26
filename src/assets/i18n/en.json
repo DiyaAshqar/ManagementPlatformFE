@@ -274,7 +274,8 @@
       "reportingDemo": "Reporting Demo",
       "feature1": "Feature 1",
       "feature2": "Feature 2",
-      "projectReportDemo": "Report Demo"
+      "projectReportDemo": "Report Demo",
+      "wirChecklist": "WIR Checklist"
     },
     "footer": {
       "settings": "Settings",
@@ -1015,6 +1016,62 @@
         "overLimit": "Selected expenses exceed the remaining balance.",
         "noAvailable": "No available expenses to link for this advance.",
         "confirm": "Confirm Settlement"
+      }
+    },
+    "wir": {
+      "tabTitle": "WIR",
+      "cardTitle": "Work Inspection Requests (WIR)",
+      "cardSubtitle": "Inspection requests and checklist results for this milestone",
+      "total": "Total WIRs",
+      "create": "New WIR",
+      "addTitle": "New Work Inspection Request",
+      "editTitle": "Edit Work Inspection Request",
+      "viewTitle": "Work Inspection Request",
+      "masterTitle": "Request Details",
+      "detailsTitle": "Checklist",
+      "addItem": "Add Item",
+      "addAllItems": "Add All Checklist Items",
+      "selectItem": "Select checklist item",
+      "commentPlaceholder": "Inspector comment",
+      "noItems": "No checklist items yet",
+      "empty": "No inspection requests for this milestone yet",
+      "newRevision": "New Revision",
+      "deleteConfirm": "Are you sure you want to delete WIR {{no}}?",
+      "confirmDeleteHeader": "Confirm Delete",
+      "fields": {
+        "wirNo": "WIR No",
+        "inspectionDate": "Date",
+        "drawingReference": "Ref",
+        "revisionNo": "Rev No",
+        "finalStatus": "Final Status",
+        "title": "Title",
+        "contractor": "Contractor",
+        "discipline": "Discipline",
+        "level": "Level",
+        "zone": "Zone",
+        "grid": "Grid Ref",
+        "requestedBy": "Requested By",
+        "assignedTo": "Assigned To",
+        "submittedDate": "Submitted Date",
+        "approvedDate": "Approved Date",
+        "rejectedDate": "Rejected Date",
+        "description": "Description",
+        "checklist": "Checklist",
+        "checklistItem": "Checklist Item",
+        "itemStatus": "Status",
+        "comment": "Comment"
+      },
+      "status": {
+        "draft": "Draft",
+        "submitted": "Submitted",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "archived": "Archived"
+      },
+      "itemStatus": {
+        "approved": "Approved",
+        "approvedWithComment": "Approved With Comments",
+        "rejected": "Rejected"
       }
     }
   },
@@ -1903,5 +1960,21 @@
     "footer": {
       "generated": "Generated on {{date}} by {{user}}. This document was produced by the Management Platform reporting tool."
     }
+  },
+  "wirChecklist": {
+    "title": "WIR Checklist Items",
+    "subtitle": "Master checklist used when filling Work Inspection Requests",
+    "add": "New Item",
+    "addTitle": "New Checklist Item",
+    "editTitle": "Edit Checklist Item",
+    "item": "Checklist Item",
+    "order": "Order",
+    "count": "Items",
+    "searchPlaceholder": "Search checklist items...",
+    "empty": "No checklist items yet",
+    "noResults": "No matching items",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "deleteConfirm": "Are you sure you want to delete \"{{item}}\"?"
   }
 }

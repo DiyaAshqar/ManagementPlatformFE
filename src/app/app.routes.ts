@@ -166,6 +166,12 @@ export const routes: Routes = [
         ]
       },
       {
+        path: 'wir-checklist',
+        canActivate: [permissionGuard([Permissions.Wir.Manage])],
+        loadComponent: () => import('./features/project-management/pages/wir-checklist-management/wir-checklist-management.component')
+          .then(m => m.WirChecklistManagementComponent)
+      },
+      {
         path: 'materials',
         canActivate: [permissionGuard([Permissions.Materials.View, Permissions.Materials.Manage])],
         loadComponent: () => import('./features/material/pages/material-management/material-management.component')

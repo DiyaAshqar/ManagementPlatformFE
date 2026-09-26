@@ -270,7 +270,8 @@
       "reportingDemo": "عرض التقارير",
       "feature1": "ميزة 1",
       "feature2": "ميزة 2",
-      "projectReportDemo": "عرض تجريبي للتقرير"
+      "projectReportDemo": "عرض تجريبي للتقرير",
+      "wirChecklist": "بنود فحص WIR"
     },
     "footer": {
       "settings": "الإعدادات",
@@ -1011,6 +1012,62 @@
         "overLimit": "المصاريف المحددة تتجاوز المبلغ المتبقي.",
         "noAvailable": "لا توجد مصاريف متاحة للربط بهذه السلفة.",
         "confirm": "تأكيد التسديد"
+      }
+    },
+    "wir": {
+      "tabTitle": "طلبات الفحص (WIR)",
+      "cardTitle": "طلبات فحص الأعمال (WIR)",
+      "cardSubtitle": "طلبات الفحص ونتائج قائمة التحقق لهذه المرحلة",
+      "total": "عدد الطلبات",
+      "create": "طلب فحص جديد",
+      "addTitle": "طلب فحص أعمال جديد",
+      "editTitle": "تعديل طلب فحص الأعمال",
+      "viewTitle": "طلب فحص الأعمال",
+      "masterTitle": "بيانات الطلب",
+      "detailsTitle": "قائمة التحقق",
+      "addItem": "إضافة بند",
+      "addAllItems": "إضافة كل بنود القائمة",
+      "selectItem": "اختر بند التحقق",
+      "commentPlaceholder": "ملاحظة المفتش",
+      "noItems": "لا توجد بنود تحقق بعد",
+      "empty": "لا توجد طلبات فحص لهذه المرحلة بعد",
+      "newRevision": "مراجعة جديدة",
+      "deleteConfirm": "هل أنت متأكد من حذف طلب الفحص {{no}}؟",
+      "confirmDeleteHeader": "تأكيد الحذف",
+      "fields": {
+        "wirNo": "رقم الطلب",
+        "inspectionDate": "التاريخ",
+        "drawingReference": "المرجع",
+        "revisionNo": "رقم المراجعة",
+        "finalStatus": "الحالة النهائية",
+        "title": "العنوان",
+        "contractor": "المقاول",
+        "discipline": "التخصص",
+        "level": "المستوى",
+        "zone": "المنطقة",
+        "grid": "مرجع الشبكة",
+        "requestedBy": "مقدّم الطلب",
+        "assignedTo": "المسؤول",
+        "submittedDate": "تاريخ التقديم",
+        "approvedDate": "تاريخ الاعتماد",
+        "rejectedDate": "تاريخ الرفض",
+        "description": "الوصف",
+        "checklist": "قائمة التحقق",
+        "checklistItem": "بند التحقق",
+        "itemStatus": "الحالة",
+        "comment": "الملاحظة"
+      },
+      "status": {
+        "draft": "مسودة",
+        "submitted": "مقدّم",
+        "approved": "معتمد",
+        "rejected": "مرفوض",
+        "archived": "مؤرشف"
+      },
+      "itemStatus": {
+        "approved": "معتمد",
+        "approvedWithComment": "معتمد مع ملاحظات",
+        "rejected": "مرفوض"
       }
     }
   },
@@ -1899,5 +1956,21 @@
     "footer": {
       "generated": "تم إصدار هذا التقرير بتاريخ {{date}} بواسطة {{user}}. تم إعداد هذا المستند بواسطة أداة التقارير في منصة إدارة المشاريع."
     }
+  },
+  "wirChecklist": {
+    "title": "بنود قائمة التحقق (WIR)",
+    "subtitle": "القائمة الرئيسية المستخدمة عند تعبئة طلبات فحص الأعمال",
+    "add": "بند جديد",
+    "addTitle": "بند تحقق جديد",
+    "editTitle": "تعديل بند التحقق",
+    "item": "بند التحقق",
+    "order": "الترتيب",
+    "count": "عدد البنود",
+    "searchPlaceholder": "ابحث في بنود التحقق...",
+    "empty": "لا توجد بنود تحقق بعد",
+    "noResults": "لا توجد بنود مطابقة",
+    "moveUp": "نقل للأعلى",
+    "moveDown": "نقل للأسفل",
+    "deleteConfirm": "هل أنت متأكد من حذف \"{{item}}\"؟"
   }
 }

@@ -1,0 +1,85 @@
+.wir-card {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 1.5rem;
+
+  .wir-card-header {
+    margin-bottom: 1rem;
+
+    .wir-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text-color);
+    }
+
+    .wir-card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-color-secondary);
+      margin: 0.2rem 0 0;
+    }
+  }
+
+  .wir-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+
+    .wir-total-label {
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+    }
+  }
+}
+
+.wir-number {
+  font-weight: 700;
+  color: var(--primary-color);
+}
+
+.wir-rev {
+  display: inline-block;
+  min-width: 2.2rem;
+  padding: 0.1rem 0.45rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: var(--surface-hover);
+  color: var(--text-color);
+}
+
+.wir-counts {
+  display: inline-flex;
+  gap: 0.3rem;
+}
+
+.wir-count {
+  min-width: 1.6rem;
+  padding: 0.1rem 0.4rem;
+  border-radius: 999px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+
+  &.ok { background: #22c55e; }
+  &.warn { background: #f59e0b; }
+  &.bad { background: #ef4444; }
+}
+
+.wir-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 2rem 1rem;
+  color: var(--text-color-secondary);
+
+  i { font-size: 2rem; }
+  p { margin: 0; }
+}

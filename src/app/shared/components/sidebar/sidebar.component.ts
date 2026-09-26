@@ -93,6 +93,12 @@ export class SidebarComponent implements OnInit {
           permissions: [Permissions.Materials.View, Permissions.Materials.Manage],
         },
         {
+          label: 'sidebar.items.wirChecklist',
+          icon: 'pi pi-list-check',
+          route: '/wir-checklist',
+          permissions: [Permissions.Wir.Manage],
+        },
+        {
           label: 'sidebar.items.users',
           icon: 'pi pi-user-edit',
           route: '/users',

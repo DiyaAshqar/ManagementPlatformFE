@@ -14,6 +14,7 @@ import { ProjectMainContractorTabComponent } from './tabs/project-main-contracto
 import { ProjectExpenseManagementComponent } from '../project-expense-management/project-expense-management.component';
 import { ProjectAdvanceManagementComponent } from '../project-advance-management/project-advance-management.component';
 import { PaymentClaimTabComponent } from './tabs/payment-claim-tab/payment-claim-tab.component';
+import { WirTabComponent } from './tabs/wir-tab/wir-tab.component';
 import { PreparingStageComponent } from '../preparing-stage/preparing-stage.component';
 import { Permissions } from '../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../core/auth/services/auth.service';
@@ -37,6 +38,7 @@ import { HasPermissionDirective } from '../../../../core/auth/directives/has-per
     ProjectExpenseManagementComponent,
     ProjectAdvanceManagementComponent,
     PaymentClaimTabComponent,
+    WirTabComponent,
     PreparingStageComponent,
     HasPermissionDirective
   ],
@@ -117,6 +119,7 @@ export class MilestoneStageComponent implements OnInit {
       ['7', Permissions.MilestoneTabs.Advances],
       ['8', Permissions.MilestoneTabs.Tasks],
       ['9', Permissions.MilestoneTabs.PaymentClaims],
+      ['10', Permissions.MilestoneTabs.Wir],
     ] as const;
     return tabs.find(([, permission]) => this.canViewTab(permission))?.[0] ?? '0';
   }
