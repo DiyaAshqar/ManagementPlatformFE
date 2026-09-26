@@ -597,7 +597,7 @@
     "printDate": "Date",
     "confirmed": "Confirmed & Locked",
     "back": "Back",
-    "confirmBtn": "Confirm & Lock",
+    "confirmBtn": "Close & Lock Milestone",
     "printBtn": "Print Report",
     "total": "Total",
     "grandTotal": "Grand Total",
@@ -658,12 +658,12 @@
       "notes": "Notes"
     },
     "confirm": {
-      "header": "Confirm Payment Claim",
-      "message": "Are you sure you want to confirm and lock this payment claim? This action cannot be undone.",
-      "accept": "Yes, Confirm",
+      "header": "Close & Lock Milestone",
+      "message": "This will close the milestone and lock all its data. Open advance balances and remaining main-contractor contract amounts will be carried over to the next milestone. Continue?",
+      "accept": "Yes, Close & Lock",
       "reject": "Cancel",
-      "successTitle": "Claim Confirmed",
-      "successMsg": "The financial claim has been confirmed and locked successfully."
+      "successTitle": "Milestone Closed",
+      "successMsg": "The milestone has been closed and locked, and remaining balances were carried over."
     },
     "errors": {
       "loadFailed": "Failed to load claim data. Please try again."
@@ -1976,5 +1976,16 @@
     "moveUp": "Move up",
     "moveDown": "Move down",
     "deleteConfirm": "Are you sure you want to delete \"{{item}}\"?"
+  },
+  "stageLock": {
+    "lockedTitle": "Milestone closed & locked",
+    "lockedMsg": "All changes to this milestone are disabled until it is unlocked.",
+    "migratedAdvances": "Carried-over advances ({{count}})",
+    "migratedContracts": "Carried-over contractor contracts ({{count}})",
+    "noNextStage": "No next milestone was found — nothing was carried over.",
+    "unlock": "Unlock",
+    "unlockHeader": "Unlock Milestone",
+    "unlockMessage": "Unlock this milestone and allow changes again?",
+    "unlockAccept": "Yes, Unlock"
   }
 }

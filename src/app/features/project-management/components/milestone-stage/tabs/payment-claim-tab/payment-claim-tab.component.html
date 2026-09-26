@@ -3,6 +3,34 @@
 <div class="owner-payment-wrap">
 
   <!-- ═══════════════════════════════════════════════════════════ STEP 1: SELECT -->
+  @if (isStageLocked()) {
+    <div class="stage-lock-banner no-print">
+      <i class="pi pi-lock"></i>
+      <div class="stage-lock-text">
+        <p class="stage-lock-title">{{ 'stageLock.lockedTitle' | translate }}</p>
+        <p class="stage-lock-msg">{{ 'stageLock.lockedMsg' | translate }}</p>
+        @if (closeResult(); as result) {
+          <ul class="stage-lock-migration">
+            <li>{{ 'stageLock.migratedAdvances' | translate: { count: result.migratedAdvancesCount ?? 0 } }}: <b>{{ (result.migratedAdvancesAmount ?? 0) | appNumber }}</b></li>
+            <li>{{ 'stageLock.migratedContracts' | translate: { count: result.migratedMainContractorsCount ?? 0 } }}: <b>{{ (result.migratedMainContractorsAmount ?? 0) | appNumber }}</b></li>
+            @if (!result.nextProjectStageId) {
+              <li class="stage-lock-warn">{{ 'stageLock.noNextStage' | translate }}</li>
+            }
+          </ul>
+        }
+      </div>
+      <p-button *appHasPermission="permissions.PaymentClaims.Lock"
+        [label]="'stageLock.unlock' | translate"
+        icon="pi pi-lock-open"
+        severity="warn"
+        [outlined]="true"
+        [loading]="isUnlocking()"
+        (onClick)="unlockStage()"
+        styleClass="ml-auto">
+      </p-button>
+    </div>
+  }
+
   @if (step() === 'select') {
     <div class="op-header">
       <div class="op-header-icon">
@@ -388,13 +416,16 @@
             [outlined]="true"
             (onClick)="printClaim()">
           </p-button>
-          <p-button *appHasPermission="permissions.PaymentClaims.Lock"
-            [label]="'ownerPayment.confirmBtn' | translate"
-            icon="pi pi-check"
-            severity="success"
-            [raised]="true"
-            (onClick)="confirmClaim()">
-          </p-button>
+          @if (!isStageLocked()) {
+            <p-button *appHasPermission="permissions.PaymentClaims.Lock"
+              [label]="'ownerPayment.confirmBtn' | translate"
+              icon="pi pi-lock"
+              severity="success"
+              [raised]="true"
+              [loading]="isClosing()"
+              (onClick)="confirmClaim()">
+            </p-button>
+          }
       </div>
     }
 

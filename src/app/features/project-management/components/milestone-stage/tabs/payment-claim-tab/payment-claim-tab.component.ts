@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, Input, OnInit, signal } from '@angular/core';
+import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { forkJoin, of } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
@@ -35,6 +35,8 @@ import {
 import { Permissions } from '../../../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
 import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
+import { StageLockService } from '../../../../services/stage-lock.service';
+import { CloseProjectStageDto } from '../../../../../../../nswag/api-client';
 import { AppNumberPipe, formatAppNumber } from '../../../../../../shared/pipes/app-number.pipe';
 
 export type ClaimType = 'BOQ' | 'PMC' | 'SV' | 'VO' | 'EXP';
@@ -101,6 +103,14 @@ export class PaymentClaimTabComponent implements OnInit {
   selectedTypes = signal<Set<ClaimType>>(new Set());
   isLoading = signal(false);
   isConfirmed = signal(false);
+
+  private readonly stageLock = inject(StageLockService);
+  /** True when this milestone is closed (from the backend `close` flag or after closing it here). */
+  readonly isStageLocked = computed(() => this.stageLock.isLocked(this.projectStageId));
+  readonly isClosing = signal(false);
+  readonly isUnlocking = signal(false);
+  /** Migration summary returned by POST /api/project-stages/{id}/close. */
+  readonly closeResult = signal<CloseProjectStageDto | null>(null);
   claimDate = new Date();
 
   claimData = signal<ClaimData>({ boq: [], pmc: [], sv: [], vo: [], exp: [] });
@@ -293,8 +303,43 @@ export class PaymentClaimTabComponent implements OnInit {
       acceptLabel: this.translate.instant('ownerPayment.confirm.accept'),
       rejectLabel: this.translate.instant('ownerPayment.confirm.reject'),
       accept: () => {
-        this.isConfirmed.set(true);
-        this.step.set('confirmed');
+        this.isClosing.set(true);
+        this.stageLock.close(this.projectStageId).subscribe({
+          next: (res) => {
+            this.isClosing.set(false);
+            if (res.succeeded) {
+              this.closeResult.set(res.data ?? null);
+              this.isConfirmed.set(true);
+              this.step.set('confirmed');
+            }
+          },
+          error: () => this.isClosing.set(false),
+        });
+      },
+    });
+  }
+
+  unlockStage(): void {
+    if (!this.canLock()) return;
+    this.confirmationService.confirm({
+      message: this.translate.instant('stageLock.unlockMessage'),
+      header: this.translate.instant('stageLock.unlockHeader'),
+      icon: 'pi pi-lock-open',
+      acceptLabel: this.translate.instant('stageLock.unlockAccept'),
+      rejectLabel: this.translate.instant('ownerPayment.confirm.reject'),
+      accept: () => {
+        this.isUnlocking.set(true);
+        this.stageLock.unlock(this.projectStageId).subscribe({
+          next: (res) => {
+            this.isUnlocking.set(false);
+            if (res.succeeded) {
+              this.closeResult.set(null);
+              this.isConfirmed.set(false);
+              if (this.step() === 'confirmed') this.step.set('preview');
+            }
+          },
+          error: () => this.isUnlocking.set(false),
+        });
       },
     });
   }
