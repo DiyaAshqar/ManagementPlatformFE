@@ -372,6 +372,61 @@ export class AdvancesClient {
     }
 
     /**
+     * @param body (optional) 
+     * @return OK
+     */
+    unsettle(id: number, body: UnSettleAdvanceCommand | undefined): Observable<void> {
+        let url_ = this.baseUrl + "/api/advances/{id}/unsettle";
+        if (id === undefined || id === null)
+            throw new globalThis.Error("The parameter 'id' must be defined.");
+        url_ = url_.replace("{id}", encodeURIComponent("" + id));
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processUnsettle(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processUnsettle(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<void>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<void>;
+        }));
+    }
+
+    protected processUnsettle(response: HttpResponseBase): Observable<void> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return _observableOf(null as any);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
+
+    /**
      * @return OK
      */
     getAvailableExpenses(id: number): Observable<AvailableAdvanceExpensesDtoResponse> {
@@ -26023,6 +26078,7 @@ export class ProjectStageDto implements IProjectStageDto {
     id?: number;
     projectId?: number;
     status?: number | undefined;
+    close?: boolean;
     stageType?: ProjectStageType;
     mileStone?: MileStoneDto;
 
@@ -26040,6 +26096,7 @@ export class ProjectStageDto implements IProjectStageDto {
             this.id = _data["id"];
             this.projectId = _data["projectId"];
             this.status = _data["status"];
+            this.close = _data["close"];
             this.stageType = _data["stageType"];
             this.mileStone = _data["mileStone"] ? MileStoneDto.fromJS(_data["mileStone"]) : undefined as any;
         }
@@ -26057,6 +26114,7 @@ export class ProjectStageDto implements IProjectStageDto {
         data["id"] = this.id;
         data["projectId"] = this.projectId;
         data["status"] = this.status;
+        data["close"] = this.close;
         data["stageType"] = this.stageType;
         data["mileStone"] = this.mileStone ? this.mileStone.toJSON() : undefined as any;
         return data;
@@ -26067,6 +26125,7 @@ export interface IProjectStageDto {
     id?: number;
     projectId?: number;
     status?: number | undefined;
+    close?: boolean;
     stageType?: ProjectStageType;
     mileStone?: MileStoneDto;
 }
@@ -30245,6 +30304,54 @@ export class ThirdStepDto implements IThirdStepDto {
 
 export interface IThirdStepDto {
     projectAreaUnitDto?: ProjectAreaUnitDto[] | undefined;
+}
+
+export class UnSettleAdvanceCommand implements IUnSettleAdvanceCommand {
+    id?: number;
+    expenseIds?: number[] | undefined;
+
+    constructor(data?: IUnSettleAdvanceCommand) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            if (Array.isArray(_data["expenseIds"])) {
+                this.expenseIds = [] as any;
+                for (let item of _data["expenseIds"])
+                    this.expenseIds!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): UnSettleAdvanceCommand {
+        data = typeof data === 'object' ? data : {};
+        let result = new UnSettleAdvanceCommand();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        if (Array.isArray(this.expenseIds)) {
+            data["expenseIds"] = [];
+            for (let item of this.expenseIds)
+                data["expenseIds"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IUnSettleAdvanceCommand {
+    id?: number;
+    expenseIds?: number[] | undefined;
 }
 
 export class UnassignProjectUsersCommand implements IUnassignProjectUsersCommand {

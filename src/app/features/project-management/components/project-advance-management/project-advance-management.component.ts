@@ -118,6 +118,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
   selectedExpenses = signal<AdvanceExpenseDto[]>([]);
   isLoadingAvailableExpenses = signal<boolean>(false);
   isSettling = signal<boolean>(false);
+  unsettlingExpenseId = signal<number | null>(null);
 
   // -- Computed -----------------------------------------------------------------
   formTitle = computed(() =>
@@ -329,12 +330,15 @@ export class ProjectAdvanceManagementComponent implements OnInit {
   // -- Settle dialog ---------------------------------------------------------
 
   openSettleDialog(advance: AdvanceListItemDto): void {
-    if (!this.canSettle(advance)) return;
+    if (!this.canOpenSettleDialog()) return;
+    this.loadSettlementData(advance.id);
+  }
 
+  private loadSettlementData(advanceId: number): void {
     this.selectedExpenses.set([]);
     this.isLoadingAvailableExpenses.set(true);
 
-    this.advanceService.getById(advance.id).subscribe({
+    this.advanceService.getById(advanceId).subscribe({
       next: (detailResponse) => {
         if (detailResponse.succeeded && detailResponse.data) {
           this.settlingAdvance.set(detailResponse.data);
@@ -342,7 +346,7 @@ export class ProjectAdvanceManagementComponent implements OnInit {
       },
     });
 
-    this.advanceService.getAvailableExpenses(advance.id).subscribe({
+    this.advanceService.getAvailableExpenses(advanceId).subscribe({
       next: (response) => {
         this.availableExpenses.set(response.succeeded && response.data ? response.data.expenses : []);
         this.isLoadingAvailableExpenses.set(false);
@@ -378,6 +382,34 @@ export class ProjectAdvanceManagementComponent implements OnInit {
       });
   }
 
+  /** Unlinks one already-linked expense from the advance (POST /api/advances/{id}/unsettle). */
+  confirmUnsettle(expense: AdvanceExpenseDto): void {
+    if (!this.authService.hasPermission(Permissions.Advances.Settle)) return;
+    const advance = this.settlingAdvance();
+    if (!advance) return;
+
+    this.confirmationService.confirm({
+      message: this.translate.instant('projectTabs.advances.settle.unlinkMessage', { name: expense.expense_no }),
+      header: this.translate.instant('projectTabs.advances.settle.unlinkHeader'),
+      icon: 'pi pi-exclamation-triangle',
+      acceptButtonProps: { severity: 'danger', label: this.translate.instant('projectTabs.advances.settle.unlink') },
+      rejectButtonProps: { severity: 'secondary', outlined: true, label: this.translate.instant('common.cancel') },
+      accept: () => {
+        this.unsettlingExpenseId.set(expense.id);
+        this.advanceService.unsettle({ id: advance.id, expenseIds: [expense.id] }).subscribe({
+          next: (response) => {
+            this.unsettlingExpenseId.set(null);
+            if (response.succeeded) {
+              this.loadSettlementData(advance.id);
+              this.loadAdvances();
+            }
+          },
+          error: () => this.unsettlingExpenseId.set(null),
+        });
+      },
+    });
+  }
+
   // -- Display helpers -------------------------------------------------------
 
   formatAmount(value: number | undefined, currency?: string): string {
@@ -400,6 +432,11 @@ export class ProjectAdvanceManagementComponent implements OnInit {
 
   canSettle(advance: AdvanceListItemDto): boolean {
     return this.authService.hasPermission(Permissions.Advances.Settle) && advance.status !== 'Settled';
+  }
+
+  /** Settled advances still open the dialog so their linked expenses can be unlinked. */
+  canOpenSettleDialog(): boolean {
+    return this.authService.hasPermission(Permissions.Advances.Settle);
   }
 
   canCreate(): boolean {

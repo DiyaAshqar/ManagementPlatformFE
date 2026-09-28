@@ -1015,6 +1015,9 @@
         "selectedTotal": "Selected Total",
         "overLimit": "Selected expenses exceed the remaining balance.",
         "noAvailable": "No available expenses to link for this advance.",
+        "unlink": "Unlink",
+        "unlinkHeader": "Unlink Expense",
+        "unlinkMessage": "Unlink expense {{name}} from this advance? Its amount will return to the remaining balance.",
         "confirm": "Confirm Settlement"
       }
     },

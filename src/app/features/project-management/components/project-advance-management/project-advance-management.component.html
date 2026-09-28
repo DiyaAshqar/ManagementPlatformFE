@@ -141,7 +141,7 @@
                   [text]="true"
                   severity="success"
                   size="small"
-                  [disabled]="!canSettle(advance)"
+                  [disabled]="!canOpenSettleDialog()"
                   [pTooltip]="'projectTabs.advances.actions.settle' | translate"
                   tooltipPosition="top"
                   (onClick)="openSettleDialog(advance)">
@@ -220,6 +220,7 @@
               <th>{{ 'projectTabs.expenses.columns.expenseNo' | translate }}</th>
               <th>{{ 'projectTabs.advances.columns.date' | translate }}</th>
               <th class="text-right">{{ 'projectTabs.advances.columns.amount' | translate }}</th>
+              <th style="width: 3rem;"></th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-exp>
@@ -227,6 +228,20 @@
               <td>{{ exp.expense_no }}</td>
               <td>{{ exp.date | date: 'yyyy-MM-dd' }}</td>
               <td class="text-right">{{ formatAmount(exp.amount, settlingAdvance()!.currency) }}</td>
+              <td class="text-center">
+                <p-button
+                  icon="pi pi-times-circle"
+                  [rounded]="true"
+                  [text]="true"
+                  severity="danger"
+                  size="small"
+                  [loading]="unsettlingExpenseId() === exp.id"
+                  [disabled]="unsettlingExpenseId() !== null"
+                  [pTooltip]="'projectTabs.advances.settle.unlink' | translate"
+                  tooltipPosition="top"
+                  (onClick)="confirmUnsettle(exp)">
+                </p-button>
+              </td>
             </tr>
           </ng-template>
         </p-table>

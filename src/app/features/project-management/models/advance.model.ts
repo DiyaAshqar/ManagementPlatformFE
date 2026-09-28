@@ -95,6 +95,9 @@ export interface SettleAdvanceCommand {
   expenseIds: number[];
 }
 
+/** Matches `UnSettleAdvanceCommand`. */
+export type UnsettleAdvanceCommand = SettleAdvanceCommand;
+
 /** Engineer lookup option. No backend lookup key exists for this yet — see mock-advances.data.ts. */
 export interface EngineerLookupDto {
   id: number;

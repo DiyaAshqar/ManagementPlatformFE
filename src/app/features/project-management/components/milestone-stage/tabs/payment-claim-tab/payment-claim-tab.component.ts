@@ -98,6 +98,12 @@ export class PaymentClaimTabComponent implements OnInit {
   @Input() projectStageId: number = 0;
   @Input() projectId: string = '';
   @Input() agreementId: number = 0;
+  /** Backend `ProjectStageDto.close` flag — restores the locked state after a reload. */
+  @Input() set stageClosed(closed: boolean | undefined) {
+    this.closedFromApi = closed;
+    if (this.projectStageId) this.stageLock.sync(this.projectStageId, closed);
+  }
+  private closedFromApi: boolean | undefined;
 
   step = signal<'select' | 'preview' | 'confirmed'>('select');
   selectedTypes = signal<Set<ClaimType>>(new Set());
@@ -171,7 +177,9 @@ export class PaymentClaimTabComponent implements OnInit {
     private authService: AuthService
   ) {}
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.stageLock.sync(this.projectStageId, this.closedFromApi);
+  }
 
   // ── Selection Step ──────────────────────────────────────────────────────────
 

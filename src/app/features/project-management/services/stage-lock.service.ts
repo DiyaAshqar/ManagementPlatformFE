@@ -22,6 +22,11 @@ export class StageLockService {
     return this.stageClient.unlock(stageId).pipe(tap((res) => res.succeeded && this.set(stageId, false)));
   }
 
+  /** Seeds the lock state from the backend `ProjectStageDto.close` flag. */
+  sync(stageId: number, closed: boolean | undefined): void {
+    if (this.isLocked(stageId) !== !!closed) this.set(stageId, !!closed);
+  }
+
   private set(stageId: number, locked: boolean): void {
     this.lockedIds.update((current) => {
       const next = new Set(current);

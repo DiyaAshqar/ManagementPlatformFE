@@ -8,6 +8,7 @@ import {
   AdvancesClient,
   CreateAdvanceCommand as ApiCreateAdvanceCommand,
   SettleAdvanceCommand as ApiSettleAdvanceCommand,
+  UnSettleAdvanceCommand as ApiUnSettleAdvanceCommand,
   UpdateAdvanceCommand as ApiUpdateAdvanceCommand,
 } from '../../../../nswag/api-client';
 import {
@@ -21,6 +22,7 @@ import {
   CreateAdvanceCommand,
   EngineerLookupDto,
   SettleAdvanceCommand,
+  UnsettleAdvanceCommand,
   UpdateAdvanceCommand,
 } from '../models/advance.model';
 import { advanceStatusSeverity, summarizeAdvances } from './mock-advances.data';
@@ -137,6 +139,13 @@ export class AdvanceApiService {
   settle(command: SettleAdvanceCommand): Observable<ApiEnvelope<boolean>> {
     return this.advancesClient
       .settle(command.id, new ApiSettleAdvanceCommand({ id: command.id, expenseIds: command.expenseIds }))
+      .pipe(map(() => ({ succeeded: true, data: true })));
+  }
+
+  /** POST /api/advances/{id}/unsettle — unlinks the given expenses from the advance. */
+  unsettle(command: UnsettleAdvanceCommand): Observable<ApiEnvelope<boolean>> {
+    return this.advancesClient
+      .unsettle(command.id, new ApiUnSettleAdvanceCommand({ id: command.id, expenseIds: command.expenseIds }))
       .pipe(map(() => ({ succeeded: true, data: true })));
   }
 
