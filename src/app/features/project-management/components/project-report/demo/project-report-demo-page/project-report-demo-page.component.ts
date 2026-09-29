@@ -417,7 +417,7 @@ export class ProjectReportDemoPageComponent {
         variationOrdersApprovedTotal: number(variationOrders.filter((order) => String(order.status) === 'approved').map((order) => order.subTotal)),
         variationOrdersPendingTotal: number(variationOrders.filter((order) => String(order.status) === 'pending').map((order) => order.subTotal)),
         variationOrdersRejectedTotal: number(variationOrders.filter((order) => String(order.status) === 'rejected').map((order) => order.subTotal)),
-        paymentClaimAuthorized: false, paymentClaimEstimateTotal: null, notes: ['بنود التوفير ومساحات الاهتمام ما زالت بيانات ثابتة مؤقتًا.'],
+        paymentClaimAuthorized: false, paymentClaimEstimateTotal: null, notes: [],
       },
       schedule: {
         plannedStart: startDate ?? null, plannedEnd: endDate ?? null, asOfDate: now, daysElapsed: elapsed, daysRemaining: remaining,

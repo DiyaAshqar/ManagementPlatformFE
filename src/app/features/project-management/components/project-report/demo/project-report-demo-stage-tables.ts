@@ -1,4 +1,4 @@
-import { ProjectPaymentFlowDetailsDto, ProjectStageDetailsDto } from '../../../../../../nswag/api-client';
+import { ProjectPaymentFlowDetailsDto, ProjectStageDetailsDto, TaskDetailsDto } from '../../../../../../nswag/api-client';
 import { escapeHtml } from '../../../../reporting/utilities/report-html.utils';
 import { formatReportDate, formatReportNumber } from '../utilities/project-report-calculations.util';
 
@@ -429,296 +429,6 @@ const TASK_RESPONSIBILITY_LABELS: Record<string, string> = {
   contractor: 'مقاول',
 };
 
-function buildTask(): string {
-  interface TaskRow {
-    id: number;
-    title: string;
-    description: string;
-    responsibility: string | null;
-    assignTo: number | null;
-    taskPoint: number;
-    startDate: Date;
-    endDate: Date;
-    priority: number;
-    status: string;
-  }
-
-  const tasks: TaskRow[] = [
-    {
-      id: 5,
-      title: 'test',
-      description: 'test',
-      responsibility: 'supplier',
-      assignTo: 5,
-      taskPoint: 2,
-      startDate: new Date('2026-07-20T21:00:00'),
-      endDate: new Date('2026-07-27T21:00:00'),
-      priority: 1,
-      status: 'inProgress',
-    },
-    {
-      id: 6,
-      title: 'Dolorum labore rerum',
-      description: 'Earum aut ipsam ut r',
-      responsibility: null,
-      assignTo: null,
-      taskPoint: 3,
-      startDate: new Date('2026-07-08T21:00:00'),
-      endDate: new Date('2026-07-07T21:00:00'),
-      priority: 0,
-      status: 'review',
-    },
-  ];
-
-  const rows = tasks.map((task, index) => [
-    String(index + 1),
-    esc(task.title),
-    esc(task.description),
-    task.responsibility ? esc(TASK_RESPONSIBILITY_LABELS[task.responsibility] ?? task.responsibility) : '—',
-    task.assignTo === null ? '—' : String(task.assignTo),
-    n(task.taskPoint, 0),
-    d(task.startDate),
-    d(task.endDate),
-    esc(TASK_PRIORITY_LABELS[task.priority] ?? String(task.priority)),
-    esc(TASK_STATUS_LABELS[task.status] ?? task.status),
-  ]);
-
-  return tableBlock(
-    '#0d9488',
-    'TASK',
-    'المهام — Tasks',
-    'مهام هذه المرحلة المسجّلة في النظام (2 عنصر)',
-    [
-      { text: '#', align: 'center' },
-      { text: 'العنوان' },
-      { text: 'الوصف' },
-      { text: 'المسؤولية' },
-      { text: 'المكلّف' },
-      { text: 'نقاط المهمة', align: 'center' },
-      { text: 'تاريخ البدء' },
-      { text: 'تاريخ الانتهاء' },
-      { text: 'الأولوية' },
-      { text: 'الحالة' },
-    ],
-    rows,
-    'إجمالي المهام',
-    String(tasks.length)
-  );
-}
-
-/**
- * "مساحات الاهتمام" — a flat list of scope-of-interest items agreed on with
- * contractors/suppliers at the agreement stage. Each numbered item in the
- * source document is one row; the columns below are the shape this data
- * will take once it is wired to a real backend endpoint: start/end dates,
- * title, description, the assignee's name, the task-type name, the
- * responsibility side, and the main contractor's name.
- */
-function buildScopeOfWork(): string {
-  interface ScopeOfWorkRow {
-    title: string;
-    description: string;
-    assignedToName: string | null;
-    taskTypeName: string;
-    responsibility: string | null;
-    mainContractorName: string | null;
-    startDate: Date;
-    endDate: Date;
-  }
-
-  const items: ScopeOfWorkRow[] = [
-    {
-      title: 'تجهيزات لوجستية',
-      description: 'تجهيزات لوجستية للمشروع, كرفان, غرفة عمال وحارس, تنكات مياه, كهرباء للمشروع..الخ.',
-      assignedToName: 'Eng. Rami Salameh',
-      taskTypeName: 'تجهيزات',
-      responsibility: 'contractor',
-      mainContractorName: 'شركة محمد ثلجي وشركاؤه',
-      startDate: new Date(2026, 4, 4),
-      endDate: new Date(2026, 4, 9),
-    },
-    {
-      title: 'رخصة المساح',
-      description: 'الاتفاق مع مساح مرخص لتنزيل حدود البناء والحفر والقواعد ومحاور الأعمدة وكل ما يلزم لإنجاز أعمال العظم بدقة.',
-      assignedToName: 'ibrahim',
-      taskTypeName: 'مساحة',
-      responsibility: 'consultant',
-      mainContractorName: null,
-      startDate: new Date(2026, 4, 9),
-      endDate: new Date(2026, 4, 10),
-    },
-    {
-      title: 'اتفاق مقاول الحفر',
-      description: 'اتفاق الحفر مع مقاول الحفر.',
-      assignedToName: null,
-      taskTypeName: 'حفر',
-      responsibility: 'contractor',
-      mainContractorName: 'شركة محمد ثلجي وشركاؤه',
-      startDate: new Date(2026, 4, 10),
-      endDate: new Date(2026, 4, 17),
-    },
-    {
-      title: 'عقد مقاول العظم الرئيسي',
-      description: 'الاتفاق مع مقاول العظم الرئيسي (مصانعة), وقيمة عقده الأولية 80,000 دينار أردني.',
-      assignedToName: 'Eng. Rami Salameh',
-      taskTypeName: 'عقد مقاولة',
-      responsibility: 'contractor',
-      mainContractorName: 'شركة محمد ثلجي وشركاؤه',
-      startDate: new Date(2026, 4, 17),
-      endDate: new Date(2027, 2, 1),
-    },
-    {
-      title: 'عقد حفر المبنى الخارجي',
-      description: 'الاتفاق مع مقاول حفر لأعمال المبنى الخارجية وقيمة عقده 2000 دينار أردني.',
-      assignedToName: null,
-      taskTypeName: 'حفر',
-      responsibility: 'contractor',
-      mainContractorName: 'جهاد الشويكي.',
-      startDate: new Date(2026, 5, 24),
-      endDate: new Date(2026, 5, 23),
-    },
-    {
-      title: 'عقد أعمال العزل',
-      description: 'الاتفاق مع مقاول أعمال العزل للمشروع.',
-      assignedToName: null,
-      taskTypeName: 'عزل',
-      responsibility: 'contractor',
-      mainContractorName: null,
-      startDate: new Date(2026, 6, 1),
-      endDate: new Date(2026, 6, 15),
-    },
-    {
-      title: 'تأسيس وتنفيذ MEP للسباحة',
-      description: 'الاتفاق مع مقاول لتنفيذ وتأسيس اعمال MEP لبركة السباحة وقيمة عقده 2100 دينار أردني.',
-      assignedToName: 'werwe',
-      taskTypeName: 'MEP',
-      responsibility: 'contractor',
-      mainContractorName: null,
-      startDate: new Date(2026, 6, 20),
-      endDate: new Date(2026, 7, 10),
-    },
-    {
-      title: 'توريد الباطون الجاهز',
-      description: 'اتفاق مع مورد الباطون: شركة المملكة للباطون الجاهز, على سعر المتر المكعب الواحد كسر 150 بسعر 46 دينار, وكسر 210 بسعر 48 دينار أردني, وكسر 250 بسعر 50 دينار, وكسر 300 بسعر 53 دينار.',
-      assignedToName: null,
-      taskTypeName: 'توريد مواد',
-      responsibility: 'supplier',
-      mainContractorName: null,
-      startDate: new Date(2026, 4, 9),
-      endDate: new Date(2027, 2, 1),
-    },
-    {
-      title: 'توريد الحديد',
-      description: 'الاتفاق مع مورد الحديد " شركة الدميسي ".',
-      assignedToName: null,
-      taskTypeName: 'توريد مواد',
-      responsibility: 'supplier',
-      mainContractorName: null,
-      startDate: new Date(2026, 4, 9),
-      endDate: new Date(2027, 2, 1),
-    },
-    {
-      title: 'توريد الطوب',
-      description: 'الاتفاق مع شركة المتأهب للطوب الحديث لتوريد كميات الطوب للفيلا كاملة.',
-      assignedToName: null,
-      taskTypeName: 'توريد مواد',
-      responsibility: 'supplier',
-      mainContractorName: null,
-      startDate: new Date(2026, 4, 14),
-      endDate: new Date(2027, 2, 1),
-    },
-    {
-      title: 'عقد MEP الكامل',
-      description: 'الاتفاق مع شركة ريتال للمقاولات لتنفيذ اعمال MEP للفيلا كاملة بقيمة تعاقدية أولية 108265 دينار أردني.',
-      assignedToName: 'Eng. Rami Salameh',
-      taskTypeName: 'عقد مقاولة',
-      responsibility: 'contractor',
-      mainContractorName: 'ريتال للمقاولات',
-      startDate: new Date(2026, 6, 8),
-      endDate: new Date(2027, 5, 1),
-    },
-    {
-      title: 'توريد حجر المحسيري',
-      description: 'الاتفاق مع مورد الحجر لتوريد حجر "نشأت المحسيري" معان نخب أول معدل تربيعه ارتفاع 51,5سم نوع مطبة خشن+كرانيش حجر معان نخب أول لكامل الفيلا وبقيمة تعاقدية أولية للمبنى: 116000 دينار, على أن تكيف الأعمال للمبنى على الراكب كل نهاية عقدة.',
-      assignedToName: null,
-      taskTypeName: 'توريد مواد',
-      responsibility: 'supplier',
-      mainContractorName: null,
-      startDate: new Date(2026, 6, 21),
-      endDate: new Date(2027, 5, 30),
-    },
-  ];
-
-  const rows = items.map((item, index) => [
-    String(index + 1),
-    esc(item.title),
-    esc(item.description),
-    item.assignedToName ? esc(item.assignedToName) : '—',
-    esc(item.taskTypeName),
-    item.responsibility ? esc(TASK_RESPONSIBILITY_LABELS[item.responsibility] ?? item.responsibility) : '—',
-    item.mainContractorName ? esc(item.mainContractorName) : '—',
-    `${d(item.startDate)} → ${d(item.endDate)}`,
-  ]);
-
-  return sharedSectionHeaderBlock(
-    'SOW',
-    'مساحات الاهتمام - Scope of Work',
-    `(بيانات ثابتة مؤقتًا) - ${items.length} عنصر`,
-    [
-      { text: '#', align: 'center' },
-      { text: 'العنوان' },
-      { text: 'الوصف' },
-      { text: 'المكلّف' },
-      { text: 'نوع البند' },
-      { text: 'المسؤولية' },
-      { text: 'المقاول الرئيسي' },
-      { text: 'الفترة' },
-    ],
-    rows,
-    'إجمالي مساحات الاهتمام',
-    String(items.length)
-  );
-}
-
-/**
- * "بند التوفير" — savings/cost-avoidance line items recorded at the
- * agreement stage (e.g. work the client no longer needs to pay for because
- * it was avoided). Each bullet in the source document is one row: an item
- * description paired with its saved amount.
- */
-function buildSavingsItems(): string {
-  interface SavingsRow {
-    description: string;
-    amount: number;
-  }
-
-  const items: SavingsRow[] = [
-    { description: 'توفير عدم ازالة الطمم', amount: 3000 },
-    { description: 'توفير عدم جلب طمم جديد', amount: 2400 },
-  ];
-
-  const rows = items.map((item, index) => [String(index + 1), esc(item.description), `المبلغ الموفَّر: <b>${n(item.amount)}</b>`, '—', '—', '—', '—', '—']);
-
-  return sharedSectionHeaderBlock(
-    'SAVE',
-    'بند التوفير - Savings Items',
-    `(بيانات ثابتة مؤقتًا) - ${items.length} عنصر`,
-    [
-      { text: '#', align: 'center' },
-      { text: 'العنوان' },
-      { text: 'الوصف' },
-      { text: 'المكلّف' },
-      { text: 'نوع البند' },
-      { text: 'المسؤولية' },
-      { text: 'المقاول الرئيسي' },
-      { text: 'الفترة' },
-    ],
-    rows,
-    'إجمالي التوفير',
-    n(items.reduce((total, item) => total + item.amount, 0))
-  );
-}
-
 /** Renders actual owner payments returned by `data.project.paymentFlows`. */
 function buildOwnerPayments(items: readonly ProjectPaymentFlowDetailsDto[]): string {
   const rows = items.map((item, index) => [
@@ -800,9 +510,9 @@ export const STAGE_DATA_TABLE_OPTIONS: StageDataTableOption[] = [
   { key: 'vo', badge: 'VO', color: '#db2777', icon: 'pi-file-edit', titleAr: 'أوامر التغيير', subtitleAr: 'Variation Orders', descriptionAr: 'أوامر التغيير المعتمدة' },
   { key: 'exp', badge: 'EXP', color: '#dc2626', icon: 'pi-wallet', titleAr: 'المصروفات', subtitleAr: 'Expenses', descriptionAr: 'مصروفات المشروع' },
   { key: 'task', badge: 'TASK', color: '#0d9488', icon: 'pi-check-square', titleAr: 'المهام', subtitleAr: 'Tasks', descriptionAr: 'مهام المرحلة' },
-  { key: 'scopeOfWork', badge: 'SOW', color: '#0891b2', icon: 'pi-star', titleAr: 'مساحات الاهتمام', subtitleAr: 'Scope of Work', descriptionAr: 'بيانات ثابتة مؤقتًا' },
-  { key: 'save', badge: 'SAVE', color: '#65a30d', icon: 'pi-percentage', titleAr: 'بند التوفير', subtitleAr: 'Savings Items', descriptionAr: 'بيانات ثابتة مؤقتًا' },
-  { key: 'ownerPayment', badge: 'OWN', color: '#7c3aed', icon: 'pi-wallet', titleAr: 'دفعات المالك', subtitleAr: 'Owner Payment', descriptionAr: 'بيانات ثابتة مؤقتًا' },
+  { key: 'scopeOfWork', badge: 'SOW', color: '#0891b2', icon: 'pi-star', titleAr: 'مساحات الاهتمام', subtitleAr: 'Scope of Work', descriptionAr: 'مساحات الاهتمام المرتبطة بالمرحلة' },
+  { key: 'save', badge: 'SAVE', color: '#65a30d', icon: 'pi-percentage', titleAr: 'بند التوفير', subtitleAr: 'Savings Items', descriptionAr: 'بنود التوفير المرتبطة بالمرحلة' },
+  { key: 'ownerPayment', badge: 'OWN', color: '#7c3aed', icon: 'pi-wallet', titleAr: 'دفعات المالك', subtitleAr: 'Owner Payment', descriptionAr: 'دفعات المالك للمشروع' },
   { key: 'wir', badge: 'WIR', color: '#7c3aed', icon: 'pi-verified', titleAr: 'طلبات التفتيش', subtitleAr: 'Work Inspection Request', descriptionAr: 'طلبات التفتيش' },
 ];
 
@@ -860,13 +570,29 @@ function buildDynamicExpenses(stage: ProjectStageDetailsDto): string {
     'الإجمالي', n(total(items.map((item) => item.totalAmount))));
 }
 
+const TASK_COLUMNS: Column[] = [{ text: '#' }, { text: 'العنوان' }, { text: 'الوصف' }, { text: 'المكلّف' }, { text: 'نوع البند' }, { text: 'المسؤولية' }, { text: 'المقاول الرئيسي' }, { text: 'الفترة' }];
+
+function taskRows(items: readonly TaskDetailsDto[]): string[][] {
+  return items.map((item, index) => [String(index + 1), value(item.title), value(item.description), value(item.assignToName), value(item.taskTypeName), value(item.responsibility), value(item.projectMainContractorName), periodValue(item.startDate, item.endDate)]);
+}
+
+function stageLabel(stage: ProjectStageDetailsDto): string {
+  return stage.milestone?.name ?? `المرحلة ${stage.id ?? '—'}`;
+}
+
 function buildDynamicTasks(stage: ProjectStageDetailsDto): string {
   const items = stage.tasks ?? [];
-  const stageName = stage.milestone?.name ?? `المرحلة ${stage.id ?? '—'}`;
-  return sharedSectionHeaderBlock('TASK', 'المهام - Tasks', `(${stageName}) - ${items.length} مهمة`,
-    [{ text: '#' }, { text: 'العنوان' }, { text: 'الوصف' }, { text: 'المكلّف' }, { text: 'نوع البند' }, { text: 'المسؤولية' }, { text: 'المقاول الرئيسي' }, { text: 'الفترة' }],
-    items.map((item, index) => [String(index + 1), value(item.title), value(item.description), value(item.assignToName), value(item.taskTypeName), value(item.responsibility), value(item.projectMainContractorName), periodValue(item.startDate, item.endDate)]),
-    'إجمالي المهام', String(items.length));
+  return sharedSectionHeaderBlock('TASK', 'المهام - Tasks', `(${stageLabel(stage)}) - ${items.length} مهمة`, TASK_COLUMNS, taskRows(items), 'إجمالي المهام', String(items.length));
+}
+
+function buildDynamicScopeOfWork(stage: ProjectStageDetailsDto): string {
+  const items = stage.scopeOfWorkTasks ?? [];
+  return sharedSectionHeaderBlock('SOW', 'مساحات الاهتمام - Scope of Work', `(${stageLabel(stage)}) - ${items.length} عنصر`, TASK_COLUMNS, taskRows(items), 'إجمالي مساحات الاهتمام', String(items.length));
+}
+
+function buildDynamicSavingItems(stage: ProjectStageDetailsDto): string {
+  const items = stage.savingItemTasks ?? [];
+  return sharedSectionHeaderBlock('SAVE', 'بند التوفير - Savings Items', `(${stageLabel(stage)}) - ${items.length} عنصر`, TASK_COLUMNS, taskRows(items), 'إجمالي بنود التوفير', String(items.length));
 }
 
 function buildDynamicWirs(stage: ProjectStageDetailsDto): string {
@@ -880,14 +606,11 @@ function buildDynamicWirs(stage: ProjectStageDetailsDto): string {
 const DYNAMIC_BUILDERS: Record<StageDataTableKey, (stage: ProjectStageDetailsDto, ownerPayments: readonly ProjectPaymentFlowDetailsDto[]) => string> = {
   boq: buildDynamicBoq, pmc: buildDynamicContractors, po: buildDynamicPurchaseOrders, sv: buildDynamicVisits,
   vo: buildDynamicVariations, exp: buildDynamicExpenses, task: buildDynamicTasks,
-  scopeOfWork: buildScopeOfWork, save: buildSavingsItems, ownerPayment: (_stage, ownerPayments) => buildOwnerPayments(ownerPayments), wir: buildDynamicWirs,
+  scopeOfWork: buildDynamicScopeOfWork, save: buildDynamicSavingItems, ownerPayment: (_stage, ownerPayments) => buildOwnerPayments(ownerPayments), wir: buildDynamicWirs,
 };
 
 export function buildStageDataTablesHtml(stage: ProjectStageDetailsDto, enabledKeys: ReadonlySet<StageDataTableKey>, ownerPayments: readonly ProjectPaymentFlowDetailsDto[] = []): string {
   const stageName = stage.milestone?.name ?? `المرحلة رقم ${stage.id ?? '—'}`;
   const blocks = STAGE_DATA_TABLE_OPTIONS.filter((option) => enabledKeys.has(option.key)).map((option) => DYNAMIC_BUILDERS[option.key](stage, ownerPayments)).join('');
-  const staticNotice = ['scopeOfWork', 'save', 'ownerPayment'].some((key) => enabledKeys.has(key as StageDataTableKey))
-    ? '<p class="sdt-wrap-subtitle" style="color:#b45309;font-weight:700">تنبيه: أقسام مساحات الاهتمام، بند التوفير، ودفعات المالك تعرض بيانات ثابتة مؤقتًا لحين توفيرها من الـAPI.</p>'
-    : '';
-  return `<style>${STYLES}</style><div class="sdt-wrap"><h1>بيانات مرحلة "${esc(stageName)}" — كل الأقسام</h1><p class="sdt-wrap-subtitle">بيانات مباشرة من واجهة المشروع، معروضة حسب كل قسم.</p>${staticNotice}${blocks}</div>`;
+  return `<style>${STYLES}</style><div class="sdt-wrap"><h1>بيانات مرحلة "${esc(stageName)}" — كل الأقسام</h1><p class="sdt-wrap-subtitle">بيانات مباشرة من واجهة المشروع، معروضة حسب كل قسم.</p>${blocks}</div>`;
 }
