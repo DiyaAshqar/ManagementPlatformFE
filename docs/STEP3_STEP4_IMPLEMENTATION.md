@@ -3,7 +3,7 @@
 ## Overview
 Steps 3 and 4 of the Agreement Wizard have been fully implemented with API integration, proper navigation, and form validation.
 
-## ✅ Step 3 - Material & Quality Specifications
+## ✅ Step 3 - Project areas
 
 ### Features Implemented
 - **Project Area Units Management**

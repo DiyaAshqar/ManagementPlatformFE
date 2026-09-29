@@ -10,7 +10,12 @@ import { Step4Component } from './steps/step4/step4.component';
 import { Step5Component } from './steps/step5/step5.component';
 import { Step6Component } from './steps/step6/step6.component';
 import { Step7Component } from './steps/step7/step7.component';
+import { StepMilestonesComponent } from './steps/step-milestones/step-milestones.component';
 import { TranslateModule } from '@ngx-translate/core';
+import { LanguageService } from '../../../core/services/language.service';
+import { Permissions } from '../../../core/auth/models/auth.models';
+import { AuthService } from '../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../core/auth/directives/has-permission.directive';
 
 @Component({
   selector: 'app-agreement-wizard',
@@ -26,13 +31,21 @@ import { TranslateModule } from '@ngx-translate/core';
     Step4Component,
     Step5Component,
     Step6Component,
-    Step7Component
+    Step7Component,
+    StepMilestonesComponent,
+    HasPermissionDirective
   ],
-  templateUrl: './agreement-wizard.component.html'
+  templateUrl: './agreement-wizard.component.html',
+  styleUrls: ['./agreement-wizard.component.scss']
 })
 export class AgreementWizardComponent implements OnInit {
+  readonly permissions = Permissions;
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private languageService = inject(LanguageService);
+  private authService = inject(AuthService);
+
+  isRTL = this.languageService.isRTL;
   
   currentStep = signal(1);
   agreementId = signal(0);
@@ -41,6 +54,7 @@ export class AgreementWizardComponent implements OnInit {
   // Store data from each step
   step1Data = signal<any>(null);
   step2Data = signal<any>(null);
+  stepMilestonesData = signal<any>(null);
   step3Data = signal<any>(null);
   step4Data = signal<any>(null);
   step5Data = signal<any>(null);
@@ -56,29 +70,40 @@ export class AgreementWizardComponent implements OnInit {
       case 2:
         return this.step2Data() !== null;
       case 3:
-        return this.step3Data() !== null;
+        return this.stepMilestonesData() !== null;
       case 4:
-        return this.step4Data() !== null;
+        return this.step3Data() !== null;
       case 5:
-        return this.step5Data() !== null;
+        return this.step4Data() !== null;
       case 6:
-        return this.step6Data() !== null;
+        return this.step5Data() !== null;
       case 7:
+        return this.step6Data() !== null;
+      case 8:
         return this.step7Data() !== null;
       default:
         return false;
     }
   });
 
-  stepLabels = [
-    'wizard.step1.title',
-    'wizard.step2.title',
-    'wizard.step3.title',
-    'wizard.step4.title',
-    'wizard.step5.title',
-    'wizard.step6.title',
-    'wizard.step7.title'
+  readonly stepDefinitions = [
+    { value: 1, label: 'wizard.step1.title' },
+    { value: 2, label: 'wizard.step2.title' },
+    { value: 3, label: 'wizard.stepMilestones.title' },
+    { value: 4, label: 'wizard.step3.title' },
+    { value: 5, label: 'wizard.step4.title' },
+    { value: 6, label: 'wizard.step5.title' },
+    { value: 7, label: 'wizard.step6.title' },
+    { value: 8, label: 'wizard.step7.title' },
   ];
+
+  readonly canViewPaymentDetails = computed(() =>
+    this.authService.hasPermission(Permissions.Agreements.ViewPaymentDetails)
+  );
+
+  readonly visibleSteps = computed(() =>
+    this.stepDefinitions.filter((step) => step.value !== 2 || this.canViewPaymentDetails())
+  );
 
   ngOnInit(): void {
     // Subscribe to both params and queryParams
@@ -105,7 +130,7 @@ export class AgreementWizardComponent implements OnInit {
       const step = queryParams['step'];
       if (step) {
         const parsedStep = parseInt(step, 10);
-        if (!isNaN(parsedStep) && parsedStep >= 1 && parsedStep <= 7) {
+        if (!isNaN(parsedStep) && parsedStep >= 1 && parsedStep <= 8 && this.canAccessStep(parsedStep)) {
           this.currentStep.set(parsedStep);
         } else {
           // Invalid step, default to step 1
@@ -132,7 +157,7 @@ export class AgreementWizardComponent implements OnInit {
   onStep1Data(data: any) {
     this.step1Data.set(data);
     // Move to next step after successful submission
-    this.goToStep(2);
+    this.goToStep(this.canViewPaymentDetails() ? 2 : 3);
   }
 
   onAgreementIdUpdate(newAgreementId: number) {
@@ -157,28 +182,34 @@ export class AgreementWizardComponent implements OnInit {
     this.goToStep(3);
   }
 
+  onStepMilestonesData(data: any) {
+    this.stepMilestonesData.set(data);
+    // Move to next step after successful submission
+    this.goToStep(4);
+  }
+
   onStep3Data(data: any) {
     this.step3Data.set(data);
     // Move to next step after successful submission
-    this.goToStep(4);
+    this.goToStep(5);
   }
 
   onStep4Data(data: any) {
     this.step4Data.set(data);
     // Move to next step after successful submission
-    this.goToStep(5);
+    this.goToStep(6);
   }
 
   onStep5Data(data: any) {
     this.step5Data.set(data);
     // Move to next step after successful submission
-    this.goToStep(6);
+    this.goToStep(7);
   }
 
   onStep6Data(data: any) {
     this.step6Data.set(data);
     // Move to next step after successful submission
-    this.goToStep(7);
+    this.goToStep(8);
   }
 
   onStep7Data(data: any) {
@@ -186,8 +217,18 @@ export class AgreementWizardComponent implements OnInit {
   }
 
   goToStep(step: number) {
+    if (!this.canAccessStep(step)) return;
     this.currentStep.set(step);
     this.updateUrlStep(step);
+  }
+
+  previousStep(step: number): number {
+    if (step === 3 && !this.canViewPaymentDetails()) return 1;
+    return Math.max(1, step - 1);
+  }
+
+  private canAccessStep(step: number): boolean {
+    return step !== 2 || this.canViewPaymentDetails();
   }
 
   private updateUrlStep(step: number): void {

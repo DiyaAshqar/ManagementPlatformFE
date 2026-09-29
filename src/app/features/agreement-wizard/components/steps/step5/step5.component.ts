@@ -13,6 +13,8 @@ import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 import { AgreementWizardService } from '../../../services/agreement-wizard.service';
+import { MaterialSelectComponent } from '../../../../../shared/components/material-select/material-select.component';
+import { MaterialCatalogService } from '../../../../../shared/services/material-catalog.service';
 import { LookupDto, SupplierServiceDto, FifthStepDto, FullAgreementDto } from '../../../../../../nswag/api-client';
 
 @Component({
@@ -28,7 +30,8 @@ import { LookupDto, SupplierServiceDto, FifthStepDto, FullAgreementDto } from '.
     TranslateModule,
     FloatLabelModule,
     TableModule,
-    TooltipModule
+    TooltipModule,
+    MaterialSelectComponent
   ],
   templateUrl: './step5.component.html'
 })
@@ -41,19 +44,20 @@ export class Step5Component implements OnInit, OnDestroy {
 
   step5Form!: FormGroup;
   supplierServices = signal<SupplierServiceDto[]>([]);
-  materials = signal<LookupDto[]>([]);
   suppliers = signal<LookupDto[]>([]);
   isLoading = signal(false);
   
   // Editing state
   editingIndex = signal<number | null>(null);
 
+  private pristineSnapshot: string = '';
   private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
-    private agreementWizardService: AgreementWizardService
+    private agreementWizardService: AgreementWizardService,
+    private materialCatalog: MaterialCatalogService
   ) {}
 
   ngOnInit(): void {
@@ -91,7 +95,6 @@ export class Step5Component implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          this.materials.set(response.materials || []);
           this.suppliers.set(response.suppliers || []);
           this.isLoading.set(false);
         },
@@ -106,7 +109,7 @@ export class Step5Component implements OnInit, OnDestroy {
     // Only load data in edit mode (when agreementId > 0)
     if (this.agreementId() > 0) {
       this.isLoading.set(true);
-      this.agreementWizardService.getAgreementById(this.agreementId(), 5)
+      this.agreementWizardService.getAgreementById(this.agreementId(), 6)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
@@ -127,6 +130,10 @@ export class Step5Component implements OnInit, OnDestroy {
     if (data.supplierServiceDto && Array.isArray(data.supplierServiceDto)) {
       // Map the existing DTO objects directly since they already have the correct structure
       this.supplierServices.set([...data.supplierServiceDto]);
+      this.pristineSnapshot = JSON.stringify(data.supplierServiceDto);
+      this.materialCatalog.ensureByIds(data.supplierServiceDto.map((entry) => entry.materialId))
+        .pipe(takeUntil(this.destroy$))
+        .subscribe();
     }
   }
 
@@ -135,6 +142,12 @@ export class Step5Component implements OnInit, OnDestroy {
     
     if (activeEntries.length === 0) {
       // No entries to submit
+      return;
+    }
+
+    // Edit mode with no changes — skip API and go to next step
+    if (this.agreementId() > 0 && this.pristineSnapshot && JSON.stringify(this.supplierServices()) === this.pristineSnapshot) {
+      this.stepData.emit(this.buildFormData());
       return;
     }
 
@@ -167,7 +180,7 @@ export class Step5Component implements OnInit, OnDestroy {
 
   private prepareFullAgreementDto(): FullAgreementDto {
     const fullAgreementDto = new FullAgreementDto();
-    fullAgreementDto.step = 5;
+    fullAgreementDto.step = 6;
     fullAgreementDto.agreementId = this.agreementId();
     
     const fifthStepDto = new FifthStepDto();
@@ -335,8 +348,7 @@ export class Step5Component implements OnInit, OnDestroy {
 
   // Helper methods to get names
   getMaterialName(materialId: number): string {
-    const material = this.materials().find(m => m.id === materialId);
-    return material ? (material.name || 'Unknown') : 'Unknown';
+    return this.materialCatalog.getName(materialId);
   }
 
   getSupplierName(supplierId: number): string {

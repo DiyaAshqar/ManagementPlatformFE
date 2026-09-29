@@ -3,21 +3,29 @@ import { Component, input, OnDestroy, OnInit, output, signal, effect } from '@an
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
+import { CheckboxModule } from 'primeng/checkbox';
 import { DialogModule } from 'primeng/dialog';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputNumberModule } from 'primeng/inputnumber';
+import { InputTextModule } from 'primeng/inputtext';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { SelectModule } from 'primeng/select';
+import { SelectFilterEvent, SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
-import { Subject } from 'rxjs';
-import { takeUntil } from 'rxjs/operators';
+import { catchError, of, Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, startWith, switchMap, takeUntil } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 import { AgreementWizardService } from '../../../../services/agreement-wizard.service';
-import { 
+import { MaterialSelectComponent } from '../../../../../../shared/components/material-select/material-select.component';
+import { NumberInputComponent } from '../../../../../../shared/components/number-input/number-input.component';
+import { AppNumberPipe } from '../../../../../../shared/pipes/app-number.pipe';
+import {
   ContractorDutyDto,
+  CreateProjectMainContractorDutyCommand,
   LookupDto,
-  MainContractDto
+  MainContractDto,
+  ProjectMainContractorDutyClient,
+  Supplier,
+  SupplierClient
 } from '../../../../../../../nswag/api-client';
 
 @Component({
@@ -29,44 +37,55 @@ import {
     DialogModule,
     SelectModule,
     ProgressSpinnerModule,
-    InputNumberModule,
+    InputTextModule,
+    CheckboxModule,
     ButtonModule,
     TranslateModule,
     FloatLabelModule,
     TableModule,
-    TooltipModule
+    TooltipModule,
+    MaterialSelectComponent,
+    NumberInputComponent,
+    AppNumberPipe
   ],
+  providers: [SupplierClient, ProjectMainContractorDutyClient],
   templateUrl: './contractor-duties-dialog.component.html'
 })
 export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
-  // Angular 19 signals for inputs/outputs
   visible = input.required<boolean>();
   agreementId = input.required<number>();
   mainContractId = input.required<number>();
   existingContractorDuties = input<ContractorDutyDto[]>([]);
   isViewMode = input<boolean>(false);
-  
+  allowEmpty = input<boolean>(false);
+  persistImmediately = input<boolean>(false);
+
   closeDialog = output<void>();
   contractorDutyData = output<ContractorDutyDto[]>();
+  contractorDutiesChanged = output<void>();
 
   contractorDutyForm!: FormGroup;
   units = signal<LookupDto[]>([]);
   dutyTypes = signal<LookupDto[]>([]);
   dutyResponsibilities = signal<LookupDto[]>([]);
   contractorDuties = signal<ContractorDutyDto[]>([]);
+  suppliers = signal<{ label: string; value: number }[]>([]);
   isLoading = signal(false);
-  
-  // Editing state
+  isSaving = signal(false);
+  isLoadingSuppliers = signal(false);
+
   editingIndex = signal<number | null>(null);
 
   private destroy$ = new Subject<void>();
+  private supplierFilter$ = new Subject<string>();
 
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
-    private agreementWizardService: AgreementWizardService
+    private agreementWizardService: AgreementWizardService,
+    private supplierClient: SupplierClient,
+    private contractorDutyClient: ProjectMainContractorDutyClient
   ) {
-    // Watch for changes in existingContractorDuties and reload when dialog opens
     effect(() => {
       if (this.visible() && this.existingContractorDuties()) {
         this.loadExistingContractorDuties();
@@ -77,6 +96,7 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookups();
+    this.initializeSupplierSearch();
   }
 
   ngOnDestroy(): void {
@@ -87,29 +107,54 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
   private initializeForm(): void {
     this.contractorDutyForm = this.fb.group({
       id: [0],
-      subTotal: [0], // Calculated field
+      subTotal: [0],
       quantity: [0, [Validators.required, Validators.min(0.01)]],
       price: [0, [Validators.required, Validators.min(0.01)]],
       unitId: [0, [Validators.required, Validators.min(1)]],
       dutyTypeId: [0, [Validators.required, Validators.min(1)]],
       dutyResponsibilityId: [0, [Validators.required, Validators.min(1)]],
+      // TODO: add Validators.required once BE is ready
+      materialId: [null],
+      generateExpense: [false],
+      supplierId: [null],
+      expenseNo: [null],
       mainContractId: [this.mainContractId()],
       isDeleted: [false]
     });
 
-    // Auto-calculate subtotal when quantity or price changes
     this.contractorDutyForm.get('quantity')?.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.calculateSubTotal());
-    
+
     this.contractorDutyForm.get('price')?.valueChanges
       .pipe(takeUntil(this.destroy$))
       .subscribe(() => this.calculateSubTotal());
+
+    // Toggle required validators on supplierId / expenseNo when generateExpense changes
+    this.contractorDutyForm.get('generateExpense')?.valueChanges
+      .pipe(takeUntil(this.destroy$))
+      .subscribe((checked: boolean) => this.onGenerateExpenseChange(checked));
+  }
+
+  private onGenerateExpenseChange(checked: boolean): void {
+    const supplierCtrl = this.contractorDutyForm.get('supplierId')!;
+    const expenseNoCtrl = this.contractorDutyForm.get('expenseNo')!;
+
+    if (checked) {
+      supplierCtrl.setValidators([Validators.required]);
+      expenseNoCtrl.setValidators([Validators.required]);
+    } else {
+      supplierCtrl.clearValidators();
+      expenseNoCtrl.clearValidators();
+    }
+
+    supplierCtrl.updateValueAndValidity();
+    expenseNoCtrl.updateValueAndValidity();
   }
 
   private loadLookups(): void {
     this.isLoading.set(true);
-    
+
     this.agreementWizardService.getStep4Lookups()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
@@ -119,17 +164,41 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
           this.dutyResponsibilities.set(lookups.dutyResponsibilities);
           this.isLoading.set(false);
         },
-        error: (error) => {
-          console.error('Error loading lookups:', error);
-          this.messageService.add({
-            severity: 'error',
-            summary: 'Error',
-            detail: 'Failed to load lookups',
-            life: 5000
-          });
+        error: () => {
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to load lookups', life: 5000 });
           this.isLoading.set(false);
         }
       });
+  }
+
+  private initializeSupplierSearch(): void {
+    this.supplierFilter$
+      .pipe(
+        startWith(''),
+        debounceTime(300),
+        distinctUntilChanged(),
+        switchMap(filter => {
+          this.isLoadingSuppliers.set(true);
+          return this.supplierClient.getAllSuppliers(1, 100, filter || undefined).pipe(
+            catchError(error => {
+              console.error('Error loading suppliers:', error);
+              return of(null);
+            })
+          );
+        }),
+        takeUntil(this.destroy$)
+      )
+      .subscribe(res => {
+        const data: Supplier[] = res?.data?.data ?? [];
+        this.suppliers.set(
+          data.filter(s => s.id != null && s.name).map(s => ({ label: s.name!, value: s.id! }))
+        );
+        this.isLoadingSuppliers.set(false);
+      });
+  }
+
+  onSupplierFilter(event: SelectFilterEvent): void {
+    this.supplierFilter$.next((event.filter || '').trim());
   }
 
   private loadExistingContractorDuties(): void {
@@ -143,20 +212,23 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
       contractorDuty.unitId = duty.unitId ?? 0;
       contractorDuty.dutyTypeId = duty.dutyTypeId ?? 0;
       contractorDuty.dutyResponsibilityId = duty.dutyResponsibilityId ?? 0;
+      // TODO: remove cast once BE adds materialId, supplierId, expenseNo, generateExpense to ContractorDutyDto
+      (contractorDuty as any).materialId = (duty as any).materialId ?? null;
+      (contractorDuty as any).generateExpense = (duty as any).generateExpense ?? false;
+      (contractorDuty as any).supplierId = (duty as any).supplierId ?? null;
+      (contractorDuty as any).expenseNo = (duty as any).expenseNo ?? null;
       contractorDuty.mainContractId = duty.mainContractId ?? this.mainContractId();
       contractorDuty.isDeleted = duty.isDeleted ?? false;
       return contractorDuty;
     });
-    
+
     this.contractorDuties.set(duties);
   }
 
   calculateSubTotal(): void {
     const quantity = this.contractorDutyForm.get('quantity')?.value || 0;
     const price = this.contractorDutyForm.get('price')?.value || 0;
-    const subTotal = quantity * price;
-    
-    this.contractorDutyForm.patchValue({ subTotal }, { emitEvent: false });
+    this.contractorDutyForm.patchValue({ subTotal: quantity * price }, { emitEvent: false });
   }
 
   addContractorDuty(): void {
@@ -180,21 +252,27 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
     dutyData.unitId = formValue.unitId;
     dutyData.dutyTypeId = formValue.dutyTypeId;
     dutyData.dutyResponsibilityId = formValue.dutyResponsibilityId;
+    // TODO: remove casts once BE adds these fields to ContractorDutyDto
+    (dutyData as any).materialId = formValue.materialId ?? null;
+    (dutyData as any).generateExpense = formValue.generateExpense ?? false;
+    (dutyData as any).supplierId = formValue.generateExpense ? formValue.supplierId : null;
+    (dutyData as any).expenseNo = formValue.generateExpense ? formValue.expenseNo : null;
     dutyData.mainContractId = this.mainContractId();
     dutyData.isDeleted = false;
 
+    if (this.persistImmediately()) {
+      this.persistContractorDuty(dutyData);
+      return;
+    }
+
     const editIndex = this.editingIndex();
     if (editIndex !== null) {
-      // Update existing duty
       const duties = [...this.contractorDuties()];
       duties[editIndex] = dutyData;
       this.contractorDuties.set(duties);
       this.editingIndex.set(null);
-      
     } else {
-      // Add new duty
       this.contractorDuties.set([...this.contractorDuties(), dutyData]);
-      
     }
 
     this.clearForm();
@@ -202,7 +280,8 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
 
   editContractorDuty(index: number): void {
     const duty = this.contractorDuties()[index];
-    
+    const generateExpense = (duty as any).generateExpense ?? false;
+
     this.editingIndex.set(index);
     this.contractorDutyForm.patchValue({
       id: duty.id,
@@ -212,21 +291,78 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
       unitId: duty.unitId,
       dutyTypeId: duty.dutyTypeId,
       dutyResponsibilityId: duty.dutyResponsibilityId,
+      materialId: (duty as any).materialId ?? null,
+      generateExpense,
+      supplierId: (duty as any).supplierId ?? null,
+      expenseNo: (duty as any).expenseNo ?? null,
       mainContractId: duty.mainContractId,
       isDeleted: duty.isDeleted
     });
   }
 
   deleteContractorDuty(index: number): void {
+    const duty = this.contractorDuties()[index];
+
+    if (this.persistImmediately() && (duty.id ?? 0) > 0) {
+      this.isSaving.set(true);
+      this.contractorDutyClient.delete(duty.id!).subscribe({
+        next: (response) => {
+          this.isSaving.set(false);
+          if (response.succeeded) {
+            this.contractorDutiesChanged.emit();
+            this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Contractor duty deleted successfully', life: 3000 });
+          }
+        },
+        error: () => {
+          this.isSaving.set(false);
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to delete contractor duty', life: 5000 });
+        }
+      });
+      return;
+    }
+
     const duties = [...this.contractorDuties()];
     duties.splice(index, 1);
     this.contractorDuties.set(duties);
-    
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Success',
-      detail: 'Contractor duty deleted successfully',
-      life: 3000
+
+    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Contractor duty deleted successfully', life: 3000 });
+  }
+
+  private persistContractorDuty(duty: ContractorDutyDto): void {
+    const command = new CreateProjectMainContractorDutyCommand({
+      id: duty.id && duty.id > 0 ? duty.id : undefined,
+      subTotal: duty.subTotal,
+      quantity: duty.quantity,
+      price: duty.price,
+      unitId: duty.unitId,
+      dutyTypeId: duty.dutyTypeId,
+      dutyResponsibilityId: duty.dutyResponsibilityId,
+      projectMainContractorId: this.mainContractId(),
+      supplierId: (duty as any).generateExpense ? ((duty as any).supplierId ?? undefined) : undefined,
+      materialId: (duty as any).materialId ?? undefined,
+      autoPost: (duty as any).generateExpense ?? false,
+      expenseNumber: (duty as any).generateExpense ? ((duty as any).expenseNo ?? undefined) : undefined
+    });
+
+    this.isSaving.set(true);
+    this.contractorDutyClient.createOrUpdate(command).subscribe({
+      next: (response) => {
+        this.isSaving.set(false);
+        if (response.succeeded) {
+          this.clearForm();
+          this.contractorDutiesChanged.emit();
+          this.messageService.add({
+            severity: 'success',
+            summary: 'Success',
+            detail: duty.id && duty.id > 0 ? 'Contractor duty updated successfully' : 'Contractor duty added successfully',
+            life: 3000
+          });
+        }
+      },
+      error: () => {
+        this.isSaving.set(false);
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Failed to save contractor duty', life: 5000 });
+      }
     });
   }
 
@@ -239,6 +375,10 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
       unitId: 0,
       dutyTypeId: 0,
       dutyResponsibilityId: 0,
+      materialId: null,
+      generateExpense: false,
+      supplierId: null,
+      expenseNo: null,
       mainContractId: this.mainContractId(),
       isDeleted: false
     });
@@ -246,38 +386,38 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
   }
 
   saveAllContractorDuties(): void {
-    if (this.contractorDuties().length === 0) {
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Validation Error',
-        detail: 'Please add at least one contractor duty',
-        life: 5000
-      });
+    if (this.contractorDuties().length === 0 && !this.allowEmpty()) {
+      this.messageService.add({ severity: 'error', summary: 'Validation Error', detail: 'Please add at least one contractor duty', life: 5000 });
       return;
     }
-
-    // Emit the contractor duties to parent component
     this.contractorDutyData.emit(this.contractorDuties());
   }
 
-  onDialogHide(): void {
+  onVisibleChange(isVisible: boolean): void {
+    if (!isVisible) {
+      this.closeDialog.emit();
+    }
+  }
+
+  closeContractorDutiesDialog(): void {
     this.closeDialog.emit();
   }
 
-  // Helper methods
   getUnitName(unitId: number): string {
-    const unit = this.units().find(u => u.id === unitId);
-    return unit?.name || 'Unknown';
+    return this.units().find(u => u.id === unitId)?.name || '-';
   }
 
   getDutyTypeName(dutyTypeId: number): string {
-    const dutyType = this.dutyTypes().find(dt => dt.id === dutyTypeId);
-    return dutyType?.name || 'Unknown';
+    return this.dutyTypes().find(dt => dt.id === dutyTypeId)?.name || '-';
   }
 
   getDutyResponsibilityName(dutyResponsibilityId: number): string {
-    const dutyResponsibility = this.dutyResponsibilities().find(dr => dr.id === dutyResponsibilityId);
-    return dutyResponsibility?.name || 'Unknown';
+    return this.dutyResponsibilities().find(dr => dr.id === dutyResponsibilityId)?.name || '-';
+  }
+
+  getSupplierName(supplierId: number | null): string {
+    if (!supplierId) return '-';
+    return this.suppliers().find(s => s.value === supplierId)?.label || '-';
   }
 
   isFieldInvalid(fieldName: string): boolean {
@@ -292,5 +432,9 @@ export class ContractorDutiesDialogComponent implements OnInit, OnDestroy {
       if (field.errors['min']) return 'Value must be greater than 0';
     }
     return '';
+  }
+
+  get generateExpenseChecked(): boolean {
+    return !!this.contractorDutyForm.get('generateExpense')?.value;
   }
 }

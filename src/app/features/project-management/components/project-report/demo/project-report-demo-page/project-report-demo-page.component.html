@@ -1,0 +1,144 @@
+<div class="demo-page p-3" dir="rtl">
+  <p-card>
+    <ng-template pTemplate="title">تقرير المشروع</ng-template>
+    <ng-template pTemplate="subtitle">
+      اختر المشروع ثم مرحلة الإنجاز لعرض التقرير مباشرة من الخادم.
+    </ng-template>
+
+    @if (loadError(); as error) {
+      <p class="text-red-500 mt-2">{{ error }}</p>
+    }
+
+    <div class="demo-grid">
+      <div class="field-block">
+        <label class="block text-sm font-medium mb-2">Project</label>
+        <p-select
+          [(ngModel)]="selectedProjectId"
+          [options]="projectOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="Select a project"
+          [loading]="isLoadingProjects()"
+          styleClass="w-full"
+          (onChange)="onProjectChange()">
+        </p-select>
+      </div>
+<div class="field-block">
+        <label class="block text-sm font-medium mb-2">لغة التقرير</label>
+        <p-select
+          [(ngModel)]="selectedLanguage"
+          [options]="languageOptions"
+          optionLabel="label"
+          optionValue="value"
+          styleClass="w-full"
+          (onChange)="refresh()">
+        </p-select>
+      </div>
+
+      <div class="field-block">
+        <label class="block text-sm font-medium mb-2">مرحلة الإنجاز (Milestone Stage)</label>
+        <p-multiSelect
+          [(ngModel)]="selectedStageIds"
+          [options]="stageOptions"
+          optionLabel="label"
+          optionValue="value"
+          placeholder="اختر مرحلة واحدة أو عدة مراحل"
+          [disabled]="!selectedProjectId || isLoadingStages()"
+          [loading]="isLoadingStages()"
+          [showClear]="true"
+          styleClass="w-full"
+          (onChange)="onStageChange()">
+        </p-multiSelect>
+      </div>
+    </div>
+<div class="toggle-grid mt-3">
+      <div class="toggle-item">
+        <p-checkbox [(ngModel)]="includeCompanyHeader" [binary]="true" inputId="demoCompanyHeader" (onChange)="refresh()"></p-checkbox>
+        <label for="demoCompanyHeader">تضمين ترويسة الشركة والشعار</label>
+      </div>
+      <div class="toggle-item">
+        <p-checkbox [(ngModel)]="includeSignatures" [binary]="true" inputId="demoSignatures" (onChange)="refresh()"></p-checkbox>
+        <label for="demoSignatures">تضمين التوقيعات</label>
+      </div>
+      <div class="toggle-item" *appHasPermission="Permissions.ProjectReport.ViewFinanceDetails">
+        <p-checkbox [(ngModel)]="includePercentageFees" [binary]="true" inputId="demoPercentageFees" (onChange)="refresh()"></p-checkbox>
+        <label for="demoPercentageFees">إظهار نسبة الأتعاب</label>
+      </div>
+      <div class="toggle-item">
+        <p-checkbox [(ngModel)]="confidential" [binary]="true" inputId="demoConfidential" (onChange)="refresh()"></p-checkbox>
+        <label for="demoConfidential">تصنيف كوثيقة سرية</label>
+      </div>
+    </div>
+
+    <div class="actions mt-3">
+      <p-button label="تحديث المعاينة" icon="pi pi-refresh" [outlined]="true" [loading]="isRendering()" (onClick)="refresh()"></p-button>
+      <p-button label="طباعة" icon="pi pi-print" (onClick)="print()"></p-button>
+    </div>
+  </p-card>
+
+  <p-card styleClass="mt-3">
+    <ng-template pTemplate="title">اختر أقسام البيانات المطلوب تضمينها</ng-template>
+    <div class="data-type-grid">
+      @for (card of dataTypeCards; track card.key) {
+        <button
+          type="button"
+          class="data-type-card"
+          [class.selected]="isCardSelected(card.key)"
+          (click)="toggleCard(card.key)">
+          <span class="data-type-icon" [style.background]="card.color + '26'" [style.color]="card.color">
+            <i class="pi" [class]="card.icon"></i>
+          </span>
+          <span class="data-type-badge">{{ card.badge }}</span>
+          <span class="data-type-subtitle">{{ card.subtitleAr }}</span>
+          <span class="data-type-description">{{ card.descriptionAr }}</span>
+        </button>
+      }
+    </div>
+  </p-card>
+
+  <p-card styleClass="mt-3 preview-card">
+    <ng-template pTemplate="title">عرض التقرير</ng-template>
+    <div class="view-switch" role="tablist" aria-label="طريقة عرض التقرير">
+      <button type="button" class="view-switch-button" [class.active]="viewMode === 'detailed'" [disabled]="selectedStageIds.length !== 1" (click)="viewMode = 'detailed'"><i class="pi pi-list"></i> العرض التفصيلي</button>
+      <button type="button" class="view-switch-button" [class.active]="viewMode === 'summary'" (click)="viewMode = 'summary'"><i class="pi pi-chart-bar"></i> عرض الملخص</button>
+    </div>
+    @if (viewMode === 'summary') {
+      @if (hasSelectedMilestones && milestoneSummaries.length) {
+        <div class="milestone-summary-grid">
+          @for (summary of milestoneSummaries; track summary.id) {
+            <section class="milestone-summary-card">
+              <h3>{{ summary.name }}</h3>
+              <dl>
+                <div><dt>BOQ</dt><dd>{{ summary.boq.toFixed(2) }}</dd></div>
+                <div><dt>MC</dt><dd>{{ summary.mc.toFixed(2) }}</dd></div>
+                <div><dt>أوامر الشراء</dt><dd>{{ summary.purchaseOrders.toFixed(2) }}</dd></div>
+                <div><dt>أوامر التعديل</dt><dd>{{ summary.variationOrders.toFixed(2) }}</dd></div>
+                <div><dt>زيارات المساحة</dt><dd>{{ summary.surveyingVisits.toFixed(2) }}</dd></div>
+                <div><dt>بند التوفير</dt><dd>{{ summary.savings.toFixed(2) }}</dd></div>
+                <div><dt>المصروفات</dt><dd>{{ summary.expenses.toFixed(2) }}</dd></div>
+                <div><dt>نسبة الفعلي من الميزانية</dt><dd>{{ ratio(summary.actual, summary.budget) === null ? '—' : ratio(summary.actual, summary.budget)!.toFixed(2) + '%' }}</dd></div>
+              </dl>
+              <div class="milestone-total"><span>Total</span><strong>{{ summary.total.toFixed(2) }}</strong></div>
+            </section>
+          }
+        </div>
+        @if (grandTotal; as total) {
+          <section class="grand-total-card">
+            <div><span>Grand Total / Total Total</span><strong>{{ total.total.toFixed(2) }}</strong></div>
+            <small>BOQ: {{ total.boq.toFixed(2) }} · MC: {{ total.mc.toFixed(2) }} · أوامر التعديل: {{ total.variationOrders.toFixed(2) }} · زيارات المساحة: {{ total.surveyingVisits.toFixed(2) }} · بند التوفير: {{ total.savings.toFixed(2) }} · نسبة الفعلي من إجمالي الميزانية: {{ ratio(total.actual, total.budget) === null ? '—' : ratio(total.actual, total.budget)!.toFixed(2) + '%' }}</small>
+          </section>
+        }
+      } @else {
+        <p class="preview-empty-state">اختر milestone واحدة أو عدة milestones لعرض الملخص.</p>
+      }
+    } @else {
+      <div class="preview-frame-wrap">
+        @if (previewHtml(); as html) {
+          <iframe class="preview-frame" [srcdoc]="html" title="معاينة تقرير المشروع"></iframe>
+        } @else {
+          <p class="preview-empty-state">اختر milestone واحدة لعرض التقرير التفصيلي.</p>
+        }
+      </div>
+    }
+  </p-card>
+</div>

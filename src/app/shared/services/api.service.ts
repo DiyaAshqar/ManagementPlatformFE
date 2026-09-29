@@ -15,7 +15,9 @@ export interface ApiRequestOptions {
   providedIn: 'root'
 })
 export class ApiService {
-  private baseUrl = environment.apiUrl;
+  private get baseUrl(): string {
+    return environment.apiUrl;
+  }
 
   constructor(private http: HttpClient) {}
 

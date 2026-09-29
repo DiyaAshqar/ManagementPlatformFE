@@ -1,23 +1,26 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { 
-  AgreementClient, 
-  AttachmentClient, 
-  LookupClient,
+import {
+  AgreementClient,
+  AttachmentClient,
+  BooleanResponse,
+  ConstructorClient,
+  FourthStepDto,
   FullAgreementDto,
   FullAgreementDtoResponse,
-  Int32Response,
   GetAllAgreementDtoListPagedResponseResponse,
-  GetAttachmentMetaDataResponse,
   GetAttachmentMetaDataListResponse,
-  BooleanResponse,
-  StringLookupDtoListDictionaryResponse,
+  GetAttachmentMetaDataResponse,
+  GetConstructorDto,
+  Int32Response,
+  LookupClient,
   LookupDto,
-  FourthStepDto,
-  FifthStepDto,
-  SixthStepDto
+  LookupType,
+  MileStonesDto,
+  StringLookupDtoListDictionaryResponse
 } from '../../../../nswag/api-client';
+import { getLookupData } from '../../../shared/utils/lookup.util';
 
 @Injectable({
   providedIn: 'root'
@@ -27,7 +30,8 @@ export class AgreementWizardService {
   constructor(
     private agreementClient: AgreementClient,
     private attachmentClient: AttachmentClient,
-    private lookupClient: LookupClient
+    private lookupClient: LookupClient,
+    private constructorClient: ConstructorClient
   ) { }
 
   // Agreement methods
@@ -53,7 +57,7 @@ export class AgreementWizardService {
   }
 
   getAttachmentsByAgreementId(agreementId: number): Observable<GetAttachmentMetaDataListResponse> {
-    return this.attachmentClient.getAttachmentsByAgreementId(agreementId);
+    return this.attachmentClient.getAttachmentsByAgreementId(agreementId, undefined);
   }
 
   downloadAttachment(id: number): Observable<void> {
@@ -61,16 +65,16 @@ export class AgreementWizardService {
   }
 
   // Lookup methods
-  getAllLookups(lookupTypes?: string[]): Observable<StringLookupDtoListDictionaryResponse> {
+  getAllLookups(lookupTypes?: LookupType[]): Observable<StringLookupDtoListDictionaryResponse> {
     return this.lookupClient.getAllLookups(lookupTypes);
   }
 
   // Helper methods to get specific lookups
   getCountries(): Observable<LookupDto[]> {
-    return this.getAllLookups(['country']).pipe(
+    return this.getAllLookups([LookupType.Country]).pipe(
       map(response => {
-        if (response.succeeded && response.data && response.data['country']) {
-          return response.data['country'];
+        if (response.succeeded) {
+          return getLookupData(response.data, LookupType.Country) ?? [];
         }
         return [];
       })
@@ -78,10 +82,10 @@ export class AgreementWizardService {
   }
 
   getCities(): Observable<LookupDto[]> {
-    return this.getAllLookups(['city']).pipe(
+    return this.getAllLookups([LookupType.City]).pipe(
       map(response => {
-        if (response.succeeded && response.data && response.data['city']) {
-          return response.data['city'];
+        if (response.succeeded) {
+          return getLookupData(response.data, LookupType.City) ?? [];
         }
         return [];
       })
@@ -89,10 +93,10 @@ export class AgreementWizardService {
   }
 
   getAgreementTypes(): Observable<LookupDto[]> {
-    return this.getAllLookups(['agreementtype']).pipe(
+    return this.getAllLookups([LookupType.AgreementType]).pipe(
       map(response => {
-        if (response.succeeded && response.data && response.data['agreementtype']) {
-          return response.data['agreementtype'];
+        if (response.succeeded) {
+          return getLookupData(response.data, LookupType.AgreementType) ?? [];
         }
         return [];
       })
@@ -101,13 +105,13 @@ export class AgreementWizardService {
 
   // Get all required lookups for step 1 at once
   getStep1Lookups(): Observable<{ countries: LookupDto[], cities: LookupDto[], agreementTypes: LookupDto[] }> {
-    return this.getAllLookups(['country', 'city', 'agreementtype']).pipe(
+    return this.getAllLookups([LookupType.Country, LookupType.City, LookupType.AgreementType]).pipe(
       map(response => {
         if (response.succeeded && response.data) {
           return {
-            countries: response.data['country'] || [],
-            cities: response.data['city'] || [],
-            agreementTypes: response.data['agreementtype'] || []
+            countries: getLookupData(response.data, LookupType.Country) ?? [],
+            cities: getLookupData(response.data, LookupType.City) ?? [],
+            agreementTypes: getLookupData(response.data, LookupType.AgreementType) ?? []
           };
         }
         return { countries: [], cities: [], agreementTypes: [] };
@@ -122,14 +126,14 @@ export class AgreementWizardService {
     paymentMethods: LookupDto[],
     services: LookupDto[]
   }> {
-    return this.getAllLookups(['contracttype', 'contractmodel', 'paymentmethod', 'service']).pipe(
+    return this.getAllLookups([LookupType.ContractType, LookupType.ContractModel, LookupType.PaymentMethod, LookupType.Service]).pipe(
       map(response => {
         if (response.succeeded && response.data) {
           return {
-            contractTypes: response.data['contracttype'] || [],
-            contractModels: response.data['contractmodel'] || [],
-            paymentMethods: response.data['paymentmethod'] || [],
-            services: response.data['service'] || []
+            contractTypes: getLookupData(response.data, LookupType.ContractType) ?? [],
+            contractModels: getLookupData(response.data, LookupType.ContractModel) ?? [],
+            paymentMethods: getLookupData(response.data, LookupType.PaymentMethod) ?? [],
+            services: getLookupData(response.data, LookupType.Service) ?? []
           };
         }
         return { contractTypes: [], contractModels: [], paymentMethods: [], services: [] };
@@ -139,12 +143,12 @@ export class AgreementWizardService {
 
   // Get lookups for Step 3
   getStep3Lookups(): Observable<{ units: LookupDto[], annexes: LookupDto[] }> {
-    return this.getAllLookups(['unit', 'annex']).pipe(
+    return this.getAllLookups([LookupType.Unit, LookupType.Annex]).pipe(
       map(response => {
         if (response.succeeded && response.data) {
           return {
-            units: response.data['unit'] || [],
-            annexes: response.data['annex'] || []
+            units: getLookupData(response.data, LookupType.Unit) ?? [],
+            annexes: getLookupData(response.data, LookupType.Annex) ?? []
           };
         }
         return { units: [], annexes: [] };
@@ -158,51 +162,53 @@ export class AgreementWizardService {
     constructors: LookupDto[],
     units: LookupDto[],
     dutyTypes: LookupDto[],
-    dutyResponsibilities: LookupDto[]
+    dutyResponsibilities: LookupDto[],
+    milestones: LookupDto[]
   }> {
-    return this.getAllLookups(['maincontracttype', 'constructor', 'unit', 'dutytype', 'dutyresponsibility']).pipe(
+    return this.getAllLookups([LookupType.MainContractType, LookupType.Constructor, LookupType.Unit, LookupType.DutyType, LookupType.DutyResponsibility, LookupType.MileStones]).pipe(
       map(response => {
         if (response.succeeded && response.data) {
           return {
-            mainContractTypes: response.data['maincontracttype'] || [],
-            constructors: response.data['constructor'] || [],
-            units: response.data['unit'] || [],
-            dutyTypes: response.data['dutytype'] || [],
-            dutyResponsibilities: response.data['dutyresponsibility'] || []
+            mainContractTypes: getLookupData(response.data, LookupType.MainContractType) ?? [],
+            constructors: getLookupData(response.data, LookupType.Constructor) ?? [],
+            units: getLookupData(response.data, LookupType.Unit) ?? [],
+            dutyTypes: getLookupData(response.data, LookupType.DutyType) ?? [],
+            dutyResponsibilities: getLookupData(response.data, LookupType.DutyResponsibility) ?? [],
+            milestones: getLookupData(response.data, LookupType.MileStones) ?? []
           };
         }
-        return { mainContractTypes: [], constructors: [], units: [], dutyTypes: [], dutyResponsibilities: [] };
+        return { mainContractTypes: [], constructors: [], units: [], dutyTypes: [], dutyResponsibilities: [], milestones: [] };
       })
     );
   }
 
   // Get lookups for Step 5
-  getStep5Lookups(): Observable<{ materials: LookupDto[], suppliers: LookupDto[] }> {
-    return this.getAllLookups(['material', 'supplier']).pipe(
+  getStep5Lookups(): Observable<{ suppliers: LookupDto[] }> {
+    return this.getAllLookups([LookupType.Supplier]).pipe(
       map(response => {
         if (response.succeeded && response.data) {
           return {
-            materials: response.data['material'] || [],
-            suppliers: response.data['supplier'] || []
+            suppliers: getLookupData(response.data, LookupType.Supplier) ?? []
           };
         }
-        return { materials: [], suppliers: [] };
+        return { suppliers: [] };
       })
     );
   }
 
   // Get lookups for Step 6
-  getStep6Lookups(): Observable<{ materials: LookupDto[], units: LookupDto[], milestones: LookupDto[] }> {
-    return this.getAllLookups(['material', 'unit', 'milestones']).pipe(
+  getStep6Lookups(): Observable<{ units: LookupDto[], milestones: LookupDto[], constructors: LookupDto[], suppliers: LookupDto[] }> {
+    return this.getAllLookups([LookupType.Unit, LookupType.MileStones, LookupType.Constructor, LookupType.Supplier]).pipe(
       map(response => {
         if (response.succeeded && response.data) {
           return {
-            materials: response.data['material'] || [],
-            units: response.data['unit'] || [],
-            milestones: response.data['milestones'] || []
+            units: getLookupData(response.data, LookupType.Unit) ?? [],
+            milestones: getLookupData(response.data, LookupType.MileStones) ?? [],
+            constructors: getLookupData(response.data, LookupType.Constructor) ?? [],
+            suppliers: getLookupData(response.data, LookupType.Supplier) ?? []
           };
         }
-        return { materials: [], units: [], milestones: [] };
+        return { units: [], milestones: [], constructors: [], suppliers: [] };
       })
     );
   }
@@ -210,7 +216,7 @@ export class AgreementWizardService {
   // Create individual main contract for Step 4
   createMainContract(agreementId: number, mainContractData: any): Observable<Int32Response> {
     const fourthStepDto = new FullAgreementDto();
-    fourthStepDto.step = 4;
+    fourthStepDto.step = 5;
     fourthStepDto.agreementId = agreementId;
     
     const fourthStep = new FourthStepDto();
@@ -218,5 +224,29 @@ export class AgreementWizardService {
     fourthStepDto.fourthStepDto = fourthStep;
     
     return this.agreementClient.createAgreement(fourthStepDto);
+  }
+
+  // Get contractors filtered by main contract type
+  getConstructorsByTypeId(typeId: number): Observable<GetConstructorDto[]> {
+    return this.constructorClient.getByTypeId(typeId, undefined, undefined, undefined).pipe(
+      map(response => {
+        if (response.succeeded && response.data?.data) {
+          return response.data.data;
+        }
+        return [];
+      })
+    );
+  }
+
+  // Get milestones from a specific step of an agreement (defaults to step 3)
+  getMilestonesFromStep3(agreementId: number, step: number = 3): Observable<MileStonesDto[]> {
+    return this.agreementClient.getAgreementById(agreementId, step).pipe(
+      map(response => {
+        if (response.succeeded && response.data?.mileStonesStepDto?.mileStonesDto) {
+          return response.data.mileStonesStepDto.mileStonesDto.filter(m => !m.isDeleted);
+        }
+        return [];
+      })
+    );
   }
 }

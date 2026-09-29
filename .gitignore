@@ -41,3 +41,9 @@ testem.log
 .DS_Store
 Thumbs.db
 .vscode/settings.json
+.vscode/settings.json
+.claude/launch.json
+
+# NSwag Swagger Basic Auth credentials + downloaded document
+src/nswag/swagger-credentials.ts
+src/nswag/swagger.json

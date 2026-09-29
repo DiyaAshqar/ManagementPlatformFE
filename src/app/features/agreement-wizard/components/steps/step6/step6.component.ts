@@ -4,16 +4,19 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { TranslateModule } from '@ngx-translate/core';
 import { ButtonModule } from 'primeng/button';
 import { FloatLabelModule } from 'primeng/floatlabel';
-import { InputNumberModule } from 'primeng/inputnumber';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { SelectModule } from 'primeng/select';
 import { TableModule } from 'primeng/table';
 import { TooltipModule } from 'primeng/tooltip';
-import { Subject } from 'rxjs';
+import { forkJoin, of, Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
 import { MessageService } from 'primeng/api';
 import { AgreementWizardService } from '../../../services/agreement-wizard.service';
-import { LookupDto, QuantityBillDto, SixthStepDto, FullAgreementDto } from '../../../../../../nswag/api-client';
+import { MaterialSelectComponent } from '../../../../../shared/components/material-select/material-select.component';
+import { MaterialCatalogService } from '../../../../../shared/services/material-catalog.service';
+import { NumberInputComponent } from '../../../../../shared/components/number-input/number-input.component';
+import { AppNumberPipe } from '../../../../../shared/pipes/app-number.pipe';
+import { FullAgreementDto, LookupDto, MileStonesDto, QuantityBillDto, SixthStepDto } from '../../../../../../nswag/api-client';
 
 @Component({
   selector: 'app-step6',
@@ -23,12 +26,14 @@ import { LookupDto, QuantityBillDto, SixthStepDto, FullAgreementDto } from '../.
     ReactiveFormsModule,
     SelectModule,
     ProgressSpinnerModule,
-    InputNumberModule,
     ButtonModule,
     TranslateModule,
     FloatLabelModule,
     TableModule,
-    TooltipModule
+    TooltipModule,
+    MaterialSelectComponent,
+    NumberInputComponent,
+    AppNumberPipe
   ],
   templateUrl: './step6.component.html'
 })
@@ -41,27 +46,30 @@ export class Step6Component implements OnInit, OnDestroy {
 
   step6Form!: FormGroup;
   quantityBills = signal<QuantityBillDto[]>([]);
-  materials = signal<LookupDto[]>([]);
   units = signal<LookupDto[]>([]);
-  milestones = signal<LookupDto[]>([]);
+  milestones = signal<MileStonesDto[]>([]);
+  constructors = signal<LookupDto[]>([]);
+  suppliers = signal<LookupDto[]>([]);
   isLoading = signal(false);
-  
+
   // Editing state
   editingIndex = signal<number | null>(null);
 
+  private pristineSnapshot: string = '';
   private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
     private messageService: MessageService,
-    private agreementWizardService: AgreementWizardService
-  ) {}
+    private agreementWizardService: AgreementWizardService,
+    private materialCatalog: MaterialCatalogService
+  ) { }
 
   ngOnInit(): void {
     this.initializeForm();
     this.loadLookups();
     this.loadAgreementData();
-    
+
     // Disable all fields if in view mode
     if (this.isViewMode()) {
       this.step6Form.disable();
@@ -80,6 +88,8 @@ export class Step6Component implements OnInit, OnDestroy {
         materialId: [null, [Validators.required, Validators.min(1)]],
         unitId: [null, [Validators.required, Validators.min(1)]],
         mileStoneId: [null, [Validators.required, Validators.min(1)]],
+        constructorId: [null, [Validators.required, Validators.min(1)]],
+        supplierId: [null, [Validators.required, Validators.min(1)]],
         ammount: [null, [Validators.required, Validators.min(0)]],
         price: [null, [Validators.required, Validators.min(0)]],
         agreementId: [this.agreementId()]
@@ -89,14 +99,22 @@ export class Step6Component implements OnInit, OnDestroy {
 
   private loadLookups(): void {
     this.isLoading.set(true);
-    
-    this.agreementWizardService.getStep6Lookups()
+
+    const milestonesObs = this.agreementId() > 0
+      ? this.agreementWizardService.getMilestonesFromStep3(this.agreementId(), 3)
+      : of([]);
+
+    forkJoin({
+      lookups: this.agreementWizardService.getStep6Lookups(),
+      milestones: milestonesObs
+    })
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (response) => {
-          this.materials.set(response.materials || []);
-          this.units.set(response.units || []);
-          this.milestones.set(response.milestones || []);
+        next: ({ lookups, milestones }) => {
+          this.units.set(lookups.units || []);
+          this.milestones.set(milestones);
+          this.constructors.set(lookups.constructors || []);
+          this.suppliers.set(lookups.suppliers || []);
           this.isLoading.set(false);
         },
         error: (error) => {
@@ -110,7 +128,7 @@ export class Step6Component implements OnInit, OnDestroy {
     // Only load data in edit mode (when agreementId > 0)
     if (this.agreementId() > 0) {
       this.isLoading.set(true);
-      this.agreementWizardService.getAgreementById(this.agreementId(), 6)
+      this.agreementWizardService.getAgreementById(this.agreementId(), 7)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: (response) => {
@@ -131,22 +149,32 @@ export class Step6Component implements OnInit, OnDestroy {
     if (data.quantityBillDto && Array.isArray(data.quantityBillDto)) {
       // Map the existing DTO objects directly since they already have the correct structure
       this.quantityBills.set([...data.quantityBillDto]);
+      this.pristineSnapshot = JSON.stringify(data.quantityBillDto);
+      this.materialCatalog.ensureByIds(data.quantityBillDto.map((entry) => entry.materialId))
+        .pipe(takeUntil(this.destroy$))
+        .subscribe();
     }
   }
 
   onSubmit(): void {
     const activeEntries = this.getActiveEntries();
-    
+
     if (activeEntries.length === 0) {
       // No entries to submit
       return;
     }
 
+    // Edit mode with no changes — skip API and go to next step
+    if (this.agreementId() > 0 && this.pristineSnapshot && JSON.stringify(this.quantityBills()) === this.pristineSnapshot) {
+      this.stepData.emit(this.buildFormData());
+      return;
+    }
+
     this.isLoading.set(true);
-    
+
     // Prepare the FullAgreementDto payload
     const fullAgreementDto = this.prepareFullAgreementDto();
-    
+
     // Call the API
     this.agreementWizardService.createAgreement(fullAgreementDto)
       .pipe(takeUntil(this.destroy$))
@@ -171,9 +199,9 @@ export class Step6Component implements OnInit, OnDestroy {
 
   private prepareFullAgreementDto(): FullAgreementDto {
     const fullAgreementDto = new FullAgreementDto();
-    fullAgreementDto.step = 6;
+    fullAgreementDto.step = 7;
     fullAgreementDto.agreementId = this.agreementId();
-    
+
     const sixthStepDto = new SixthStepDto();
     // Map to match the expected payload structure
     sixthStepDto.quantityBillDto = this.quantityBills().map(entry => {
@@ -182,15 +210,17 @@ export class Step6Component implements OnInit, OnDestroy {
       dto.materialId = entry.materialId;
       dto.unitId = entry.unitId;
       dto.mileStoneId = entry.mileStoneId;
-      dto.ammount = entry.ammount;
+      dto.constructorId = entry.constructorId;
+      dto.supplierId = entry.supplierId;
+      dto.quantity = entry.quantity;
       dto.price = entry.price;
       dto.agreementId = this.agreementId();
       dto.isDeleted = entry.isDeleted || false;
       return dto;
     });
-    
+
     fullAgreementDto.sixthStepDto = sixthStepDto;
-    
+
     return fullAgreementDto;
   }
 
@@ -200,8 +230,8 @@ export class Step6Component implements OnInit, OnDestroy {
         id: entry.id,
         materialId: entry.materialId,
         unitId: entry.unitId,
-        mileStoneId: entry.mileStoneId,
-        ammount: entry.ammount,
+        mileStoneId: entry.mileStoneId, constructorId: entry.constructorId, supplierId: entry.supplierId,
+        quantity: entry.quantity,
         price: entry.price,
         agreementId: this.agreementId(),
         isDeleted: entry.isDeleted || false
@@ -217,13 +247,15 @@ export class Step6Component implements OnInit, OnDestroy {
 
     const formValue = this.step6Form.get('quantityBillDto')?.value;
     const editIndex = this.editingIndex();
-    
+
     const entryData = new QuantityBillDto();
     entryData.id = formValue.id || 0;
     entryData.materialId = formValue.materialId;
     entryData.unitId = formValue.unitId;
     entryData.mileStoneId = formValue.mileStoneId;
-    entryData.ammount = formValue.ammount;
+    entryData.constructorId = formValue.constructorId;
+    entryData.supplierId = formValue.supplierId;
+    entryData.quantity = formValue.ammount;
     entryData.price = formValue.price;
     entryData.agreementId = this.agreementId();
     entryData.isDeleted = false;
@@ -245,17 +277,19 @@ export class Step6Component implements OnInit, OnDestroy {
   editEntry(index: number): void {
     const activeEntries = this.getActiveEntries();
     const entry = activeEntries[index];
-    
+
     // Find the actual index in the full array
-    const actualIndex = this.quantityBills().findIndex(e => 
-      e.id === entry.id && 
+    const actualIndex = this.quantityBills().findIndex(e =>
+      e.id === entry.id &&
       e.materialId === entry.materialId &&
-      e.unitId === entry.unitId && 
+      e.unitId === entry.unitId &&
       e.mileStoneId === entry.mileStoneId &&
-      e.ammount === entry.ammount &&
+      e.constructorId === entry.constructorId &&
+      e.supplierId === entry.supplierId &&
+      e.quantity === entry.quantity &&
       e.price === entry.price
     );
-    
+
     this.editingIndex.set(actualIndex);
     this.step6Form.patchValue({
       quantityBillDto: {
@@ -263,9 +297,11 @@ export class Step6Component implements OnInit, OnDestroy {
         materialId: entry.materialId,
         unitId: entry.unitId,
         mileStoneId: entry.mileStoneId,
-        ammount: entry.ammount,
+        constructorId: entry.constructorId,
+        supplierId: entry.supplierId,
+        ammount: entry.quantity,
         price: entry.price,
-        agreementId: entry.agreementId
+        agreementId: entry.agreementId,
       }
     });
   }
@@ -274,14 +310,16 @@ export class Step6Component implements OnInit, OnDestroy {
     const activeEntries = this.getActiveEntries();
     const entry = activeEntries[index];
     const entries = [...this.quantityBills()];
-    
+
     // Find the actual index in the full array
-    const actualIndex = entries.findIndex(e => 
-      e.id === entry.id && 
+    const actualIndex = entries.findIndex(e =>
+      e.id === entry.id &&
       e.materialId === entry.materialId &&
-      e.unitId === entry.unitId && 
+      e.unitId === entry.unitId &&
       e.mileStoneId === entry.mileStoneId &&
-      e.ammount === entry.ammount &&
+      e.constructorId === entry.constructorId &&
+      e.supplierId === entry.supplierId &&
+      e.quantity === entry.quantity &&
       e.price === entry.price
     );
 
@@ -306,6 +344,8 @@ export class Step6Component implements OnInit, OnDestroy {
         materialId: null,
         unitId: null,
         mileStoneId: null,
+        constructorId: null,
+        supplierId: null,
         ammount: null,
         price: null,
         agreementId: this.agreementId()
@@ -321,13 +361,12 @@ export class Step6Component implements OnInit, OnDestroy {
 
   // Calculate total for display
   calculateTotal(entry: QuantityBillDto): number {
-    return entry.ammount * entry.price;
+    return (entry.quantity ?? 0) * (entry.price ?? 0);
   }
 
   // Helper methods to get names
   getMaterialName(materialId: number): string {
-    const material = this.materials().find(m => m.id === materialId);
-    return material ? (material.name || 'Unknown') : 'Unknown';
+    return this.materialCatalog.getName(materialId);
   }
 
   getUnitName(unitId: number): string {
@@ -338,6 +377,16 @@ export class Step6Component implements OnInit, OnDestroy {
   getMilestoneName(milestoneId: number): string {
     const milestone = this.milestones().find(m => m.id === milestoneId);
     return milestone ? (milestone.name || 'Unknown') : 'Unknown';
+  }
+
+  getConstructorName(constructorId: number): string {
+    const constructor = this.constructors().find(c => c.id === constructorId);
+    return constructor ? (constructor.name || 'Unknown') : 'Unknown';
+  }
+
+  getSupplierName(supplierId: number): string {
+    const supplier = this.suppliers().find(s => s.id === supplierId);
+    return supplier ? (supplier.name || 'Unknown') : 'Unknown';
   }
 
   // Validation methods
@@ -352,6 +401,8 @@ export class Step6Component implements OnInit, OnDestroy {
       if (field.errors['required']) return 'This field is required';
       if (field.errors['min']) {
         if (fieldName === 'mileStoneId') return 'Please select a valid milestone';
+        if (fieldName === 'constructorId') return 'Please select a valid constructor';
+        if (fieldName === 'supplierId') return 'Please select a valid supplier';
         return 'Value must be greater than 0';
       }
     }

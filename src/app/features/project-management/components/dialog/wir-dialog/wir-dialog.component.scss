@@ -1,0 +1,97 @@
+.wir-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.wir-section {
+  border: 1px solid var(--surface-border);
+  border-radius: 10px;
+  padding: 1rem;
+
+  .field {
+    margin-bottom: 0;
+
+    label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+      color: var(--text-color-secondary);
+    }
+  }
+}
+
+.wir-section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+
+  h4 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-color);
+  }
+}
+
+.wir-rev-badge {
+  font-size: 0.75rem;
+  font-weight: 600;
+  padding: 0.2rem 0.6rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--primary-color) 15%, transparent);
+  color: var(--primary-color);
+}
+
+.wir-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.wir-item {
+  display: grid;
+  grid-template-columns: 2rem minmax(14rem, 2fr) minmax(12rem, 1fr) minmax(12rem, 2fr) 2.5rem;
+  align-items: center;
+  gap: 0.5rem;
+
+  &.wir-item-head {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--text-color-secondary);
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid var(--surface-border);
+  }
+
+  .wir-item-index {
+    text-align: center;
+    color: var(--text-color-secondary);
+    font-weight: 600;
+  }
+}
+
+.wir-items-empty {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  color: var(--text-color-secondary);
+}
+
+@media (max-width: 768px) {
+  .wir-item {
+    grid-template-columns: 1.5rem 1fr 2.5rem;
+
+    &.wir-item-head { display: none; }
+
+    > :nth-child(3),
+    > :nth-child(4) {
+      grid-column: 2 / 3;
+    }
+  }
+}

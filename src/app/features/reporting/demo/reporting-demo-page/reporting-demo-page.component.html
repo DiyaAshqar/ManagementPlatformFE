@@ -1,0 +1,143 @@
+<div class="demo-page">
+  <div class="demo-page__header">
+    <div>
+      <h1 class="demo-page__title">{{ 'reporting.demo.pageTitle' | translate }}</h1>
+      <p class="demo-page__subtitle">{{ 'reporting.demo.pageSubtitle' | translate }}</p>
+    </div>
+    <div class="demo-page__lang">
+      <p-button
+        label="EN"
+        size="small"
+        [outlined]="isArabic"
+        (onClick)="setLanguage('en')">
+      </p-button>
+      <p-button
+        label="AR"
+        size="small"
+        [outlined]="!isArabic"
+        (onClick)="setLanguage('ar')">
+      </p-button>
+    </div>
+  </div>
+
+  <p-card styleClass="demo-controls">
+    <div class="demo-controls__grid">
+      <!-- Data / formatting -->
+      <div class="control">
+        <label>{{ 'reporting.demo.controls.mode' | translate }}</label>
+        <p-select [options]="modeOptions" optionValue="value" [ngModel]="options().dataMode"
+          (ngModelChange)="setOption('dataMode', $event)" appendTo="body" styleClass="w-full">
+          <ng-template let-opt pTemplate="selectedItem">{{ opt.label | translate }}</ng-template>
+          <ng-template let-opt pTemplate="item">{{ opt.label | translate }}</ng-template>
+        </p-select>
+      </div>
+      <div class="control">
+        <label>{{ 'reporting.demo.controls.currency' | translate }}</label>
+        <p-select [options]="currencyOptions" optionLabel="label" optionValue="value"
+          [ngModel]="options().currencyCode" (ngModelChange)="setOption('currencyCode', $event)"
+          appendTo="body" styleClass="w-full"></p-select>
+      </div>
+      <div class="control">
+        <label>{{ 'reporting.demo.controls.pageSize' | translate }}</label>
+        <p-select [options]="pageSizeOptions" optionLabel="label" optionValue="value"
+          [ngModel]="options().pageSize" (ngModelChange)="setOption('pageSize', $event)"
+          appendTo="body" styleClass="w-full"></p-select>
+      </div>
+      <div class="control">
+        <label>{{ 'reporting.demo.controls.orientation' | translate }}</label>
+        <p-select [options]="orientationOptions" optionValue="value" [ngModel]="options().orientation"
+          (ngModelChange)="setOption('orientation', $event)" appendTo="body" styleClass="w-full">
+          <ng-template let-opt pTemplate="selectedItem">{{ opt.label | translate }}</ng-template>
+          <ng-template let-opt pTemplate="item">{{ opt.label | translate }}</ng-template>
+        </p-select>
+      </div>
+    </div>
+
+    <div class="demo-controls__toggles">
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="options().search" (ngModelChange)="setOption('search', $event)" inputId="t-search" />
+        <label for="t-search">{{ 'reporting.demo.controls.search' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="options().filters" (ngModelChange)="setOption('filters', $event)" inputId="t-filters" />
+        <label for="t-filters">{{ 'reporting.demo.controls.filters' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="options().pagination" (ngModelChange)="setOption('pagination', $event)" inputId="t-pag" />
+        <label for="t-pag">{{ 'reporting.demo.controls.pagination' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="options().grouping" (ngModelChange)="setOption('grouping', $event)" inputId="t-group" />
+        <label for="t-group">{{ 'reporting.demo.controls.grouping' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="options().summaries" (ngModelChange)="setOption('summaries', $event)" inputId="t-sum" />
+        <label for="t-sum">{{ 'reporting.demo.controls.summaries' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="options().rowSelection" (ngModelChange)="setOption('rowSelection', $event)" inputId="t-sel" />
+        <label for="t-sel">{{ 'reporting.demo.controls.rowSelection' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="options().columnSelection" (ngModelChange)="setOption('columnSelection', $event)" inputId="t-cols" />
+        <label for="t-cols">{{ 'reporting.demo.controls.columnSelection' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="options().exportExcel" (ngModelChange)="setOption('exportExcel', $event)" inputId="t-xls" />
+        <label for="t-xls">{{ 'reporting.demo.controls.excel' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="options().exportCsv" (ngModelChange)="setOption('exportCsv', $event)" inputId="t-csv" />
+        <label for="t-csv">{{ 'reporting.demo.controls.csv' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="options().exportPdf" (ngModelChange)="setOption('exportPdf', $event)" inputId="t-pdf" />
+        <label for="t-pdf">{{ 'reporting.demo.controls.pdf' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="options().print" (ngModelChange)="setOption('print', $event)" inputId="t-print" />
+        <label for="t-print">{{ 'reporting.demo.controls.print' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="options().persistPreferences" (ngModelChange)="setOption('persistPreferences', $event)" inputId="t-persist" />
+        <label for="t-persist">{{ 'reporting.demo.controls.persist' | translate }}</label>
+      </div>
+    </div>
+
+    <div class="demo-controls__sim">
+      <span class="demo-controls__sim-title">{{ 'reporting.demo.controls.simulate' | translate }}:</span>
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="simulateLoading()" (ngModelChange)="simulateLoading.set($event)" inputId="s-load" />
+        <label for="s-load">{{ 'reporting.demo.controls.loading' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="simulateEmpty()" (ngModelChange)="simulateEmpty.set($event)" inputId="s-empty" />
+        <label for="s-empty">{{ 'reporting.demo.controls.empty' | translate }}</label>
+      </div>
+      <div class="toggle">
+        <p-toggleswitch [ngModel]="simulateError()" (ngModelChange)="simulateError.set($event)" inputId="s-error" />
+        <label for="s-error">{{ 'reporting.demo.controls.error' | translate }}</label>
+      </div>
+      <p-button
+        [label]="'reporting.demo.controls.clearPrefs' | translate"
+        icon="pi pi-trash"
+        severity="secondary"
+        size="small"
+        [text]="true"
+        (onClick)="clearSavedPreferences()">
+      </p-button>
+    </div>
+  </p-card>
+
+  <app-report-viewer
+    [config]="config()"
+    [data]="data()"
+    [loading]="loading()"
+    [error]="error()"
+    [totalRecordsInput]="serverTotal()"
+    [serverSummaries]="serverSummaries()"
+    generatedBy="Omar Altamimi"
+    (filtersChanged)="loadReport($event)"
+    (exportRequested)="handleExport($event)">
+  </app-report-viewer>
+</div>

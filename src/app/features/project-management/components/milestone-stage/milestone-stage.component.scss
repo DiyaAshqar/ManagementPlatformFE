@@ -1,0 +1,96 @@
+// ── Page header ─────────────────────────────────────────────────────────────
+.ms-header {
+  .ms-title {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--text-color);
+  }
+
+  .ms-subtitle {
+    font-size: 0.875rem;
+    color: var(--text-color-secondary);
+    margin: 0.25rem 0 0;
+  }
+}
+
+// ── Accordion active state ───────────────────────────────────────────────────
+:host ::ng-deep {
+  .p-accordionpanel {
+    margin-bottom: 0.5rem;
+    border-radius: var(--border-radius, 6px);
+    overflow: hidden;
+    border: 1px solid var(--surface-border);
+    transition: box-shadow 0.2s ease;
+
+    &.p-accordionpanel-active {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 1px var(--primary-color), 0 4px 16px rgba(0, 0, 0, 0.08);
+
+      > .p-accordionheader,
+      > .p-accordionheader[data-p-active="true"] {
+        background: var(--primary-color) !important;
+        color: #ffffff !important;
+        border-radius: 0 !important;
+
+        .p-accordionheader-toggle-icon,
+        .p-accordion-header-action,
+        [data-pc-section="toggleicon"],
+        [data-pc-section="headeraction"] {
+          color: #ffffff !important;
+        }
+
+        span, a, button {
+          color: #ffffff !important;
+        }
+      }
+    }
+
+    &:not(.p-accordionpanel-active) > .p-accordionheader {
+      background: var(--surface-card);
+      color: var(--text-color);
+
+      &:hover {
+        background: var(--surface-hover);
+      }
+    }
+
+    // Ensure tabs inside accordion content always use correct text color
+    .p-accordioncontent {
+      .p-tab {
+        color: var(--p-tabs-tab-color, var(--text-color-secondary));
+
+        &.p-tab-active {
+          color: var(--p-tabs-tab-active-color, var(--primary-color));
+        }
+      }
+    }
+  }
+
+  // ── Responsive tablist: scroll horizontally instead of overflowing ──────
+  .p-tablist {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    scrollbar-color: var(--surface-border) transparent;
+    flex-wrap: nowrap !important;
+
+    &::-webkit-scrollbar {
+      height: 4px;
+    }
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    &::-webkit-scrollbar-thumb {
+      background: var(--surface-border);
+      border-radius: 2px;
+    }
+  }
+
+  // Prevent the tabs component from pushing the page wider
+  .p-tabs {
+    min-width: 0;
+    overflow: hidden;
+  }
+}
+

@@ -1,0 +1,31 @@
+.report-dialog-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.9rem 1.2rem;
+}
+
+.toggle-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.5rem 1.2rem;
+}
+
+.toggle-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  label {
+    font-size: 0.85rem;
+  }
+}
+
+.report-dialog-error {
+  color: var(--red-600, #dc2626);
+  font-size: 0.85rem;
+}
+
+.report-dialog-warning {
+  color: var(--yellow-700, #a16207);
+  font-size: 0.85rem;
+}

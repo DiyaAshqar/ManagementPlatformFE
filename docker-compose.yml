@@ -1,0 +1,17 @@
+services:
+  frontend:
+    build:
+      context: .
+      args:
+        API_URL: ${API_URL:-https://api.dev.iconic.neurocodejo.com}
+    environment:
+      API_URL: ${API_URL:-https://api.dev.iconic.neurocodejo.com}
+    ports:
+      - "127.0.0.1:${FRONTEND_PORT:-8080}:8080"
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/healthz >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

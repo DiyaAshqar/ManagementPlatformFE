@@ -298,7 +298,7 @@ private dateRangeValidator(group: any) {
 ```html
 @else {
   <div class="border-2 border-dashed border-surface-200 border-round p-6 text-center">
-    <i class="pi pi-inbox text-4xl text-color-secondary mb-3"></i>
+    <i class="pi pi-inbox text-4xl text-color-secondary mb-1"></i>
     <p class="text-color-secondary m-0">{{ 'wizard.step4.noContracts' | translate }}</p>
   </div>
 }

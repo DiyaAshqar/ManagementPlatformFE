@@ -1,7 +1,4 @@
 <div class="agreement-list-container">
-  <p-toast />
-  <p-confirmDialog />
-
   <p-card>
     <ng-template pTemplate="header">
       <div class="card-header">
@@ -12,12 +9,12 @@
             <p class="subtitle">{{ 'agreements.subtitle' | translate }}</p>
           </div>
         </div>
-        <p-button 
-          [label]="'agreements.addNew' | translate"
-          icon="pi pi-plus" 
-          severity="primary"
-          (onClick)="addNewAgreement()"
-        />
+          <p-button *appHasPermission="permissions.Agreements.Create"
+            [label]="'agreements.addNew' | translate"
+            icon="pi pi-plus"
+            severity="primary"
+            (onClick)="addNewAgreement()"
+          />
       </div>
     </ng-template>
 
@@ -35,7 +32,7 @@
         currentPageReportTemplate="{{ 'agreements.pagination' | translate }}"
         [rowsPerPageOptions]="[5, 10, 25, 50]"
         [globalFilterFields]="['projectNumber', 'projectName']"
-        styleClass="p-datatable-gridlines"
+        styleClass="p-datatable-gridlines agreement-table"
         [tableStyle]="{ 'min-width': '50rem' }"
         responsiveLayout="scroll"
       >
@@ -81,13 +78,13 @@
 
         <ng-template pTemplate="body" let-agreement let-rowIndex="rowIndex">
           <tr>
-            <td>{{ first + rowIndex + 1 }}</td>
-            <td>
+            <td class="agreement-index">{{ first + rowIndex + 1 }}</td>
+            <td [attr.data-label]="'agreements.columns.projectNumber' | translate">
               <span class="font-semibold">{{ agreement.projectNumber || '-' }}</span>
             </td>
-            <td>{{ agreement.projectName || '-' }}</td>
-            <td>{{ formatDate(agreement.agreementDate) }}</td>
-            <td>
+            <td [attr.data-label]="'agreements.columns.projectName' | translate">{{ agreement.projectName || '-' }}</td>
+            <td [attr.data-label]="'agreements.columns.agreementDate' | translate">{{ formatDate(agreement.agreementDate) }}</td>
+            <td class="agreement-actions" [attr.data-label]="'agreements.columns.actions' | translate">
               <div class="action-buttons">
                 <p-button 
                   icon="pi pi-eye" 
@@ -98,24 +95,24 @@
                   tooltipPosition="top"
                   (onClick)="viewAgreement(agreement)"
                 />
-                <p-button 
-                  icon="pi pi-pencil" 
-                  [rounded]="true"
-                  [text]="true"
-                  severity="success"
-                  [pTooltip]="'agreements.actions.edit' | translate"
-                  tooltipPosition="top"
-                  (onClick)="editAgreement(agreement)"
-                />
-                <p-button 
-                  icon="pi pi-trash" 
-                  [rounded]="true"
-                  [text]="true"
-                  severity="danger"
-                  [pTooltip]="'agreements.actions.delete' | translate"
-                  tooltipPosition="top"
-                  (onClick)="deleteAgreement(agreement)"
-                />
+                  <p-button *appHasPermission="permissions.Agreements.Edit"
+                    icon="pi pi-pencil"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="success"
+                    [pTooltip]="'agreements.actions.edit' | translate"
+                    tooltipPosition="top"
+                    (onClick)="editAgreement(agreement)"
+                  />
+                  <p-button *appHasPermission="permissions.Agreements.Delete"
+                    icon="pi pi-trash"
+                    [rounded]="true"
+                    [text]="true"
+                    severity="danger"
+                    [pTooltip]="'agreements.actions.delete' | translate"
+                    tooltipPosition="top"
+                    (onClick)="deleteAgreement(agreement)"
+                  />
               </div>
             </td>
           </tr>
@@ -127,13 +124,13 @@
               <div class="empty-state">
                 <i class="pi pi-inbox"></i>
                 <p>{{ 'agreements.noData' | translate }}</p>
-                <p-button 
-                  [label]="'agreements.addFirst' | translate"
-                  icon="pi pi-plus" 
-                  severity="primary"
-                  [text]="true"
-                  (onClick)="addNewAgreement()"
-                />
+                  <p-button *appHasPermission="permissions.Agreements.Create"
+                    [label]="'agreements.addFirst' | translate"
+                    icon="pi pi-plus"
+                    severity="primary"
+                    [text]="true"
+                    (onClick)="addNewAgreement()"
+                  />
               </div>
             </td>
           </tr>

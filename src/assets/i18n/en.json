@@ -7,10 +7,19 @@
     "login": "Login",
     "logout": "Logout",
     "register": "Register",
-    "email": "Email",
+    "username": "Email or Username",
     "password": "Password",
     "forgotPassword": "Forgot Password?",
-    "rememberMe": "Remember Me"
+    "rememberMe": "Remember Me",
+    "signInSubtitle": "Sign in to your account",
+    "usernamePlaceholder": "Enter your email or username",
+    "passwordPlaceholder": "Enter your password",
+    "errors": {
+      "usernameRequired": "Email or username is required",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "invalidCredentials": "Invalid email or password"
+    }
   },
   "common": {
     "save": "Save",
@@ -28,7 +37,33 @@
     "loading": "Loading...",
     "success": "Success",
     "error": "Error",
-    "warning": "Warning"
+    "warning": "Warning",
+    "info": "Info",
+    "view": "View",
+    "status": "Status",
+    "clearFilters": "Clear Filters",
+    "attachments": "Attachments",
+    "total": "Total",
+    "close": "Close"
+  },
+  "breadcrumb": {
+    "home": "Home",
+    "management": "Management",
+    "dashboard": "Dashboard",
+    "agreementWizard": "Agreement Wizard",
+    "agreements": "Agreements",
+    "createAgreement": "Create Agreement",
+    "editAgreement": "Edit Agreement",
+    "viewAgreement": "View Agreement",
+    "projects": "Projects",
+    "projectDetails": "Project Details",
+    "constructor": "Constructors",
+    "newConstructor": "New Constructor",
+    "editConstructor": "Edit Constructor",
+    "supplier": "Suppliers",
+    "newSupplier": "New Supplier",
+    "editSupplier": "Edit Supplier",
+    "materials": "Materials"
   },
   "agreements": {
     "title": "Agreements",
@@ -49,6 +84,105 @@
       "view": "View Agreement",
       "edit": "Edit Agreement",
       "delete": "Delete Agreement"
+    },
+    "confirmDelete": {
+      "header": "Confirm Delete",
+      "message": "Are you sure you want to delete \"{{name}}\"?",
+      "notImplemented": "Delete functionality to be implemented"
+    }
+  },
+  "projects": {
+    "title": "Project Management",
+    "subtitle": "Manage all construction projects and track progress",
+    "createNew": "Create New Project",
+    "edit": "Edit Project",
+    "noProjects": "No projects found",
+    "searchPlaceholder": "Search projects...",
+    "pagination": "Showing {first} to {last} of {totalRecords} projects",
+    "stats": {
+      "total": "Total Projects",
+      "totalSub": "All projects",
+      "active": "Active Projects",
+      "activeSub": "In progress",
+      "completed": "Completed Projects",
+      "completedSub": "Finished",
+      "upcoming": "Upcoming",
+      "upcomingSub": "Planning phase",
+      "budget": "Total Budget"
+    },
+    "overallProgress": "Overall Progress",
+    "createFirst": "Create your first project to get started",
+    "filters": {
+      "status": "Status",
+      "priority": "Priority",
+      "selectStatus": "Select Status",
+      "selectPriority": "Select Priority",
+      "all": "All",
+      "active": "Active",
+      "done": "Done",
+      "planning": "Planning"
+    },
+    "columns": {
+      "name": "Project Name",
+      "client": "Client",
+      "status": "Status",
+      "priority": "Priority",
+      "progress": "Progress",
+      "budget": "Budget",
+      "endDate": "End Date"
+    },
+    "status": {
+      "planning": "Planning",
+      "in_progress": "In Progress",
+      "on_hold": "On Hold",
+      "completed": "Completed",
+      "cancelled": "Cancelled"
+    },
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    },
+    "menu": {
+      "viewDetails": "View Details",
+      "editProject": "Edit Project"
+    },
+    "form": {
+      "name": "Project Name",
+      "description": "Description",
+      "clientName": "Client Name",
+      "agreement": "Agreement",
+      "selectAgreement": "Select an agreement",
+      "searchAgreements": "Search agreements",
+      "projectManager": "Project Manager",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "budget": "Budget",
+      "priority": "Priority",
+      "milestoneCount": "Milestone Count",
+      "assignedUsers": "Assigned Users"
+    },
+    "stages": {
+      "title": "Stages",
+      "preparing": "Preparing",
+      "excavation": "Excavation",
+      "foundation": "Foundation",
+      "structure": "Structure",
+      "finishing": "Finishing",
+      "milestone": "Milestone",
+      "completed": "Completed"
+    },
+    "tasks": {
+      "title": "Tasks",
+      "addNew": "Add Task",
+      "status": {
+        "todo": "To Do",
+        "in_progress": "In Progress",
+        "review": "Review",
+        "blocked": "Blocked",
+        "completed": "Completed"
+      }
     }
   },
   "validation": {
@@ -59,6 +193,9 @@
   },
   "dashboard": {
     "title": "Dashboard",
+    "subtitle": "Welcome back! Here's an overview of your management platform.",
+    "newProject": "New Project",
+    "newAgreement": "New Agreement",
     "multiSelectDemo": "MultiSelect Demo",
     "selectItems": "Select Items",
     "selectItemsPlaceholder": "Select items",
@@ -73,7 +210,77 @@
     "salaryDeposit": "Salary Deposit",
     "rentPayment": "Rent Payment",
     "groceries": "Groceries",
-    "freelanceIncome": "Freelance Income"
+    "freelanceIncome": "Freelance Income",
+    "stats": {
+      "totalProjects": "Total Projects",
+      "activeAgreements": "Active Agreements",
+      "totalSuppliers": "Total Suppliers",
+      "constructors": "Constructors",
+      "vsLastMonth": "vs last month",
+      "newThisMonth": "new this month"
+    },
+    "charts": {
+      "projectStatus": "Project Status",
+      "monthlyProgress": "Monthly Progress",
+      "projectsStarted": "Projects Started",
+      "projectsCompleted": "Projects Completed"
+    },
+    "tables": {
+      "recentProjects": "Recent Projects",
+      "recentAgreements": "Recent Agreements",
+      "viewAll": "View All",
+      "upcomingTasks": "Upcoming Tasks",
+      "tasks": "tasks"
+    },
+    "quickActions": {
+      "title": "Quick Actions",
+      "viewProjects": "View Projects",
+      "agreements": "Agreements",
+      "suppliers": "Suppliers",
+      "constructors": "Constructors"
+    },
+    "statusLabels": {
+      "completed": "Completed",
+      "approved": "Approved",
+      "inProgress": "In Progress",
+      "pending": "Pending",
+      "planning": "Planning",
+      "draft": "Draft",
+      "onHold": "On Hold",
+      "rejected": "Rejected"
+    },
+    "priorityLabels": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    }
+  },
+  "sidebar": {
+    "sections": {
+      "overview": "Overview",
+      "additionalFeatures": "Additional Features",
+      "extendedModules": "Extended Modules"
+    },
+    "items": {
+      "dashboard": "Dashboard",
+      "projectManagement": "Project Management",
+      "agreementWizard": "Agreement Wizard",
+      "constructors": "Constructors",
+      "suppliers": "Suppliers",
+      "materials": "Materials",
+      "users": "Users",
+      "rolesPermissions": "Roles & Permissions",
+      "reportingDemo": "Reporting Demo",
+      "feature1": "Feature 1",
+      "feature2": "Feature 2",
+      "projectReportDemo": "Report Demo",
+      "wirChecklist": "WIR Checklist"
+    },
+    "footer": {
+      "settings": "Settings",
+      "help": "Help"
+    }
   },
   "wizard": {
     "next": "Next",
@@ -86,7 +293,7 @@
       "createNew": "Create New Agreement"
     },
     "step1": {
-      "title": "Agreement Details",
+      "title": "Main info",
       "agreementDetails": "Agreement Information",
       "clientInfo": "Client Information",
       "landInfo": "Land Information",
@@ -105,6 +312,7 @@
       "selectAgreementType": "Select Agreement Type",
       "projectArea": "Project Area",
       "drillingQuantity": "Excavation Quantity",
+      "description": "Description",
       "contactPerson": "Contact Person",
       "contactPersonNumber": "Contact Person Number",
       "representerName": "Representative Name",
@@ -117,7 +325,7 @@
       "floorNumber": "Floor Number"
     },
     "step2": {
-      "title": "Contract & Payment Details",
+      "title": "Payment Details",
       "contractDetails": "Contract Information",
       "paymentDetails": "Payment Information",
       "services": "Services",
@@ -126,13 +334,34 @@
       "paymentMethod": "Payment Method",
       "monthlyPayment": "Monthly Payment Value",
       "monthlyPaymentHint": "Only activated when Monthly Fees payment method is selected",
+      "percentageValue": "Percentage Value",
+      "amountValue": "Amount Value",
+      "contractingValue": "Contracting Value",
       "selectServices": "Select Services",
       "description": "This is step 2 - Content to be implemented",
       "placeholder": "Step 2 content will be added here",
       "validate": "Validate Step 2"
     },
+    "stepMilestones": {
+      "estimatedStartDate": "Estimated Start Date",
+      "estimatedEndDate": "Estimated End Date",
+      "endBeforeStart": "End date must be on or after the start date",
+      "title": "Milestones",
+      "name": "Name",
+      "orderNo": "Order No",
+      "description": "Description",
+      "cancel": "Cancel",
+      "add": "Add",
+      "update": "Update",
+      "entriesList": "Milestones List",
+      "actions": "Actions",
+      "edit": "Edit",
+      "delete": "Delete",
+      "noData": "No milestones added yet. Add entries using the form above.",
+      "showingEntries": "Showing {first} to {last} of {totalRecords} entries"
+    },
     "step3": {
-      "title": "Material & Quality Specifications",
+      "title": "Project areas",
       "projectAreaUnits": "Project Area Units",
       "annexName": "Floor/Annex Name",
       "selectAnnex": "Select an annex",
@@ -170,29 +399,38 @@
       "subTotal": "Sub Total",
       "unit": "Unit",
       "dutyType": "Duty Type",
-      "dutyResponsibility": "Duty Responsibility"
+      "dutyResponsibility": "Duty Responsibility",
+      "milestone": "Milestone"
     },
     "step5": {
-      "title": "Supplier Services",
+      "title": "Supplier",
       "material": "Material",
       "selectMaterial": "Select a material",
       "supplier": "Supplier",
       "selectSupplier": "Select a supplier",
       "representativeName": "Representative Name",
       "enterRepresentativeName": "Enter representative name",
-      "entriesList": "Supplier Services List",
-      "noData": "No supplier services added yet. Add your first entry above.",
+      "entriesList": "Supplier List",
+      "noData": "No Supplier added yet. Add your first entry above.",
       "showingEntries": "Showing {first} to {last} of {totalRecords} entries"
     },
     "step6": {
-      "title": "Quantity Bill of Materials",
+      "title": "BOQ",
       "material": "Material",
       "selectMaterial": "Select a material",
+      "searchMaterial": "Search material...",
+      "noMaterialsFound": "No materials found",
+      "showAllMaterials": "Show all materials",
       "quantity": "Quantity",
       "unit": "Unit",
       "selectUnit": "Select a unit",
       "milestone": "Milestone",
       "selectMilestone": "Select a milestone",
+      "constructor": "Constructor",
+      "selectConstructor": "Select a constructor",
+      "supplier": "Supplier",
+      "selectSupplier": "Select a supplier",
+      "searchSupplier": "Search supplier...",
       "price": "Unit Price",
       "total": "Total",
       "entriesList": "Quantity Bill List",
@@ -205,7 +443,7 @@
       "file": "File",
       "chooseFile": "Choose File",
       "attachmentName": "Attachment Name",
-      "attachmentNamePlaceholder": "e.g., Site Plan, Construction Drawings",
+      "attachmentNamePlaceholder": "Optional — defaults to the file name",
       "uploading": "Uploading",
       "uploadSuccess": "File uploaded successfully!",
       "attachmentsList": "Attachments List",
@@ -214,5 +452,1549 @@
       "view": "View",
       "download": "Download"
     }
+  },
+  "constructor": {
+    "title": "Constructors",
+    "subtitle": "Manage main contractors and construction companies",
+    "create": "Create Constructor",
+    "createFirst": "Create First Constructor",
+    "searchPlaceholder": "Search constructors...",
+    "pagination": "Showing {first} to {last} of {totalRecords} constructors",
+    "columns": {
+      "name": "Name",
+      "contractorType": "Contractor Type",
+      "actions": "Actions"
+    },
+    "noData": "No constructors found",
+    "tooltips": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "form": {
+      "createTitle": "Create Constructor",
+      "editTitle": "Edit Constructor",
+      "createSubtitle": "Add a new main contractor",
+      "editSubtitle": "Update constructor information",
+      "name": "Name",
+      "contractorType": "Contractor Type",
+      "namePlaceholder": "Enter constructor name",
+      "contractorTypePlaceholder": "Select contractor type",
+      "nameRequired": "Name is required",
+      "nameMinLength": "Name must be at least 2 characters",
+      "contractorTypeRequired": "Contractor type is required",
+      "cancel": "Cancel",
+      "create": "Create",
+      "update": "Update"
+    }
+  },
+  "supplier": {
+    "title": "Suppliers",
+    "subtitle": "Manage suppliers and vendors",
+    "create": "Create Supplier",
+    "createFirst": "Create First Supplier",
+    "searchPlaceholder": "Search suppliers...",
+    "pagination": "Showing {first} to {last} of {totalRecords} suppliers",
+    "columns": {
+      "name": "Name",
+      "phoneNumber": "Phone Number",
+      "email": "Email",
+      "actions": "Actions"
+    },
+    "noData": "No suppliers found",
+    "tooltips": {
+      "edit": "Edit",
+      "delete": "Delete"
+    },
+    "form": {
+      "createTitle": "Create Supplier",
+      "editTitle": "Edit Supplier",
+      "createSubtitle": "Add a new supplier",
+      "editSubtitle": "Update supplier information",
+      "name": "Name",
+      "phoneNumber": "Phone Number",
+      "email": "Email",
+      "namePlaceholder": "Enter supplier name",
+      "phoneNumberPlaceholder": "Enter phone number",
+      "emailPlaceholder": "Enter email address",
+      "nameRequired": "Name is required",
+      "nameMinLength": "Name must be at least 2 characters",
+      "phoneNumberRequired": "Phone number is required",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Invalid email format",
+      "cancel": "Cancel",
+      "create": "Create",
+      "update": "Update"
+    }
+  },
+  "projectDetail": {
+    "backToProjects": "Back to projects",
+    "printReport": "Print Report",
+    "overallProgress": "Overall Progress",
+    "budget": "Budget",
+    "spent": "spent",
+    "startDate": "Start Date",
+    "projectDescription": "Project Description",
+    "overviewDetails": "Overview and key details",
+    "tabs": {
+      "overview": "Overview",
+      "preparing": "Preparing",
+      "excavation": "Excavation",
+      "milestones": "Milestones",
+      "documents": "Documents",
+      "expenses": "Expenses",
+      "advances": "Advances",
+      "tasks": "Task",
+      "ownerPayment": "Owner Payment",
+      "timeframe": "Timeframe"
+    },
+    "printDialog": {
+      "header": "Print Project Report",
+      "description": "Customize and print a comprehensive project report",
+      "reportType": "Report Type",
+      "selectReportType": "Select report type",
+      "cancel": "Cancel",
+      "downloadPdf": "Download PDF",
+      "print": "Print",
+      "reportTypes": {
+        "full": "Full Project Report",
+        "summary": "Executive Summary",
+        "progress": "Progress Report",
+        "financial": "Financial Report",
+        "custom": "Custom Report"
+      },
+      "asOfDate": "As of date",
+      "language": "Report language",
+      "languageEnglish": "English",
+      "languageArabic": "Arabic",
+      "includeCompanyHeader": "Include company header & logo",
+      "includeFinancial": "Include financial information",
+      "includeDocuments": "Include documents",
+      "includePhotos": "Include progress photos",
+      "includeSignatures": "Include signatures",
+      "includePercentageFees": "Show percentage fees",
+      "confidential": "Mark as confidential",
+      "customSections": "Sections to include",
+      "generating": "Generating report…",
+      "loadFailed": "Failed to generate the report. Please try again.",
+      "partialDataWarning": "Some data could not be loaded and was excluded from the report.",
+      "pdfHint": "Opens the print dialog — choose \"Save as PDF\" as the destination."
+    },
+    "milestoneStages": {
+      "title": "Milestone Stages",
+      "subtitle": "Manage all milestone stages and their details",
+      "noStages": "No milestone stages found for this project",
+      "milestone": "Milestone"
+    }
+  },
+  "ownerPayment": {
+    "tabTitle": "Payment Claim",
+    "title": "Payment Claim",
+    "subtitle": "Generate a comprehensive financial claim report for the owner",
+    "selectInstruction": "Select the data types to include in this financial claim:",
+    "generateBtn": "Generate Claim",
+    "previewTitle": "Payment Claim Preview",
+    "printHeader": "Payment Claim Report",
+    "printDate": "Date",
+    "confirmed": "Confirmed & Locked",
+    "back": "Back",
+    "confirmBtn": "Close & Lock Milestone",
+    "printBtn": "Print Report",
+    "total": "Total",
+    "grandTotal": "Grand Total",
+    "items": "items",
+    "noData": "No data available",
+    "engineeringOfficeFees": {
+      "title": "Engineering Office Fees",
+      "feeType": "Fee Type",
+      "agreedValue": "Agreed Fee",
+      "calculationBase": "Expenses + Contractor Contracts + VOs + Surveying Visits",
+      "feeAmount": "Engineering Office Fee",
+      "types": {
+        "percentage": "Percentage",
+        "fixed": "Fixed Amount",
+        "monthly": "Monthly Fee"
+      }
+    },
+    "types": {
+      "boq": {
+        "label": "Bill of Quantities",
+        "desc": "Materials & quantities"
+      },
+      "pmc": {
+        "label": "Main Contractor",
+        "desc": "Project main contracts"
+      },
+      "sv": {
+        "label": "Surveying Visits",
+        "desc": "Site visit records"
+      },
+      "vo": {
+        "label": "Voucher Orders",
+        "desc": "Variation orders"
+      },
+      "exp": {
+        "label": "Expenses",
+        "desc": "Project expenses"
+      }
+    },
+    "cols": {
+      "material": "Material",
+      "description": "Description",
+      "unit": "Unit",
+      "contractor": "Contractor",
+      "qty": "Quantity",
+      "unitPrice": "Unit Price",
+      "subtotal": "Subtotal",
+      "amount": "Amount",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "visitDate": "Visit Date",
+      "surveyor": "Surveyor",
+      "purpose": "Purpose",
+      "voNumber": "VO No.",
+      "expenseNo": "Expense No.",
+      "supplier": "Supplier",
+      "date": "Date",
+      "notes": "Notes"
+    },
+    "confirm": {
+      "header": "Close & Lock Milestone",
+      "message": "This will close the milestone and lock all its data. Open advance balances and remaining main-contractor contract amounts will be carried over to the next milestone. Continue?",
+      "accept": "Yes, Close & Lock",
+      "reject": "Cancel",
+      "successTitle": "Milestone Closed",
+      "successMsg": "The milestone has been closed and locked, and remaining balances were carried over."
+    },
+    "errors": {
+      "loadFailed": "Failed to load claim data. Please try again."
+    }
+  },
+  "ownerPaymentEntry": {
+    "title": "Owner Payment",
+    "subtitle": "Record owner payments for this project",
+    "formTitle": "Payment Details",
+    "createdAt": "Created Date",
+    "amount": "Amount",
+    "amountPlaceholder": "Enter amount",
+    "amountRequired": "Amount is required and must be positive.",
+    "currency": "Currency",
+    "paymentType": "Payment Type",
+    "referenceNumber": "Reference Number",
+    "referencePlaceholder": "Cheque or transfer number",
+    "notes": "Notes",
+    "notesPlaceholder": "Notes",
+    "savePayment": "Save Payment",
+    "totalPaid": "Total Paid",
+    "records": "Records",
+    "recordsTitle": "Owner Payment Records",
+    "emptyRecords": "No owner payments recorded yet.",
+    "printReceipt": "Print Payment Receipt",
+    "paymentTypes": {
+      "cash": "Cash",
+      "cheque": "Cheque",
+      "transfer": "Bank Transfer"
+    },
+    "messages": {
+      "saved": "Owner payment saved successfully.",
+      "deleted": "Owner payment deleted successfully.",
+      "confirmDelete": "Are you sure you want to delete this owner payment?",
+      "confirmDeleteHeader": "Delete Owner Payment"
+    }
+  },
+  "projectTabs": {
+    "boq": {
+      "title": "BOQ",
+      "titleAbbr": "Bill of Quantities (BoQ)",
+      "subtitle": "Manage construction materials and quantities",
+      "totalItems": "Total Items",
+      "addItem": "Add BoQ Item",
+      "grandTotal": "Grand Total",
+      "loading": "Loading...",
+      "columns": {
+        "material": "Material",
+        "description": "Description",
+        "unit": "Unit",
+        "constructor": "Constructor",
+        "supplier": "Supplier",
+        "actualQty": "Actual Qty",
+        "unitPrice": "Unit Price",
+        "amount": "Amount",
+        "subtotal": "Subtotal",
+        "actions": "Actions"
+      },
+      "tooltips": {
+        "edit": "Edit",
+        "delete": "Delete"
+      },
+      "confirmDelete": {
+        "header": "Delete BoQ Item",
+        "message": "Are you sure you want to delete \"{{name}}\"?"
+      },
+      "dialog": {
+        "addTitle": "Add BoQ Item",
+        "editTitle": "Edit BoQ Item",
+        "material": "Material",
+        "unit": "Unit",
+        "constructor": "Constructor",
+        "description": "Description",
+        "actualQuantity": "Actual Quantity",
+        "unitPrice": "Unit Price",
+        "subtotal": "Subtotal",
+        "searchMaterial": "Search material...",
+        "searchConstructor": "Search constructor...",
+        "supplier": "Supplier",
+        "searchSupplier": "Search supplier...",
+        "materialRequired": "Material is required.",
+        "unitRequired": "Unit is required.",
+        "constructorRequired": "Constructor is required.",
+        "descriptionRequired": "Description is required.",
+        "quantityRequired": "Quantity is required.",
+        "priceRequired": "Unit price is required.",
+        "cancel": "Cancel",
+        "addItem": "Add Item",
+        "update": "Update"
+      }
+    },
+    "milestoneDocuments": {
+      "title": "Documents",
+      "subtitle": "Manage project documents and attachments"
+    },
+    "voucherOrders": {
+      "title": "V.O s",
+      "subtitle": "Manage voucher orders and approvals",
+      "totalLabel": "Total Voucher Orders",
+      "createButton": "Create Voucher Order",
+      "voNumber": "VO Number",
+      "voItem": "VO Item",
+      "description": "Description",
+      "quantity": "Quantity",
+      "unit": "Unit",
+      "amount": "Amount",
+      "subtotal": "Subtotal",
+      "isEffected": "Is Effected",
+      "effectedDateStart": "Effected Date Start",
+      "effectedDateEnd": "Effected Date End",
+      "approvalStatus": "Approval Status",
+      "actions": "Actions",
+      "yes": "Yes",
+      "no": "No",
+      "editTooltip": "Edit",
+      "deleteTooltip": "Delete",
+      "emptyMessage": "No voucher orders found. Click \"Create Voucher Order\" to add one.",
+      "totalVOValue": "Total VO Value"
+    },
+    "surveyingVisits": {
+      "title": "Surveying",
+      "subtitle": "Schedule and track site surveys",
+      "totalLabel": "Total Surveying Visits",
+      "scheduleButton": "Schedule Visit",
+      "visitDate": "Visit Date",
+      "surveyor": "Surveyor",
+      "purpose": "Purpose",
+      "unit": "Unit",
+      "quantity": "Quantity",
+      "unitPrice": "Unit Price",
+      "amount": "Amount",
+      "subtotal": "Subtotal",
+      "status": "Status",
+      "actions": "Actions",
+      "editTooltip": "Edit",
+      "deleteTooltip": "Delete",
+      "emptyMessage": "No surveying visits found. Click \"Schedule Visit\" to add one.",
+      "totalSurveyValue": "Total Survey Value"
+    },
+    "purchaseOrders": {
+      "title": "Purchase Orders",
+      "subtitle": "Manage material and service purchase orders",
+      "cardTitle": "Purchase Orders",
+      "cardSubtitle": "Create and manage purchase orders",
+      "totalPO": "Total Purchase Orders",
+      "createPO": "Create Purchase Order",
+      "columnPoNumber": "PO Number",
+      "columnSupplier": "Supplier",
+      "columnDescription": "Description",
+      "columnUnit": "Unit",
+      "columnUnitPrice": "Unit Price",
+      "columnAmount": "Amount",
+      "columnSubtotal": "Subtotal",
+      "totalValue": "Total PO Value",
+      "emptyMessage": "No purchase orders found. Click \"Create Purchase Order\" to add one.",
+      "statusApproved": "Approved",
+      "statusPending": "Pending",
+      "statusRejected": "Rejected"
+    },
+    "projectMainContractor": {
+      "title": "Main Contractors",
+      "subtitle": "Manage main contractor information and contracts",
+      "cardTitle": "Project Main Contractor",
+      "cardSubtitle": "Manage main contractor information for this stage",
+      "totalContractors": "Total Contractors",
+      "totalValue": "Total Value",
+      "addContractor": "Add Contractor",
+      "columnId": "ID",
+      "columnName": "Contractor Name",
+      "columnClassification": "Classification",
+      "columnAmount": "Contract Amount",
+      "columnTotalPayments": "Total Payments",
+      "columnStartDate": "Start Date",
+      "columnEndDate": "End Date",
+      "emptyMessage": "No contractors found for this stage",
+      "emptySubMessage": "Click \"Add Contractor\" to get started"
+    },
+    "contractorPayment": {
+      "cardTitle": "Contractor Payments",
+      "cardSubtitle": "Manage payment records for this contractor",
+      "totalPayments": "Total Payments",
+      "totalPaid": "Total Paid",
+      "remainingBalance": "Remaining Balance",
+      "contractAmount": "Contract Amount",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "addPayment": "Add Payment",
+      "columnId": "ID",
+      "columnDate": "Payment Date",
+      "columnAmount": "Paid Amount",
+      "columnMethod": "Payment Method",
+      "columnReceiptNo": "Receipt No",
+      "columnNotes": "Notes",
+      "emptyMessage": "No payments recorded for this contractor",
+      "emptySubMessage": "Click \"Add Payment\" to record the first payment",
+      "methodCash": "Cash",
+      "methodCheque": "Cheque",
+      "methodBankTransfer": "Bank Transfer",
+      "confirmDelete": {
+        "header": "Delete Payment",
+        "message": "Are you sure you want to delete this payment record?"
+      }
+    },
+    "vo": {
+      "confirmDelete": {
+        "header": "Delete Voucher Order",
+        "message": "Are you sure you want to delete VO \"{{name}}\"?"
+      }
+    },
+    "po": {
+      "statusApproved": "Approved",
+      "statusPending": "Pending",
+      "statusRejected": "Rejected",
+      "confirmDelete": {
+        "header": "Delete Purchase Order",
+        "message": "Are you sure you want to delete PO \"{{name}}\"?"
+      }
+    },
+    "mainContractor": {
+      "confirmDelete": {
+        "header": "Delete Main Contractor",
+        "message": "Are you sure you want to delete \"{{name}}\"?"
+      }
+    },
+    "surveyingVisit": {
+      "confirmDelete": {
+        "header": "Delete Surveying Visit",
+        "message": "Are you sure you want to delete the visit on \"{{name}}\"?"
+      }
+    },
+    "expenses": {
+      "title": "Expense Management",
+      "subtitle": "Create and manage expense records",
+      "columns": {
+        "expenseNo": "Expense No",
+        "supplier": "Supplier",
+        "date": "Date",
+        "total": "Total",
+        "notes": "Notes",
+        "paid": "Paid"
+      },
+      "list": {
+        "newExpense": "New Expense",
+        "totalRecords": "Total Expenses",
+        "totalAmount": "Total Amount",
+        "empty": "No expenses recorded yet. Click \"New Expense\" to add one.",
+        "pagination": "Showing {first} to {last} of {totalRecords} expenses",
+        "autoPostedNoEdit": "Auto-posted expenses cannot be edited",
+        "lockedByAdvance": "This expense is settled against an advance and cannot be edited"
+      },
+      "form": {
+        "newTitle": "New Expense",
+        "editTitle": "Edit Expense",
+        "subtitle": "Fill in the expense details and line items below",
+        "backToList": "Back to list",
+        "expenseNoPlaceholder": "e.g. EXP-2026-001",
+        "selectSupplier": "Select supplier",
+        "duplicateExpenseNo": "This Expense No already exists in this project stage.",
+        "duplicateSupplier": "This supplier already has an expense in this project stage.",
+        "notesPlaceholder": "Optional notes...",
+        "save": "Save Expense"
+      },
+      "lineItems": {
+        "title": "Line Items",
+        "subtitle": "Add items to this expense",
+        "addRow": "Add Row",
+        "total": "Total",
+        "selectItem": "Select item",
+        "selectCurrency": "Select currency",
+        "columns": {
+          "item": "Item",
+          "qty": "Qty",
+          "unitPrice": "Unit Price",
+          "subTotal": "SubTotal",
+          "currency": "Currency"
+        }
+      },
+      "confirmDelete": {
+        "header": "Delete Expense",
+        "message": "Are you sure you want to delete expense \"{{name}}\"?"
+      },
+      "messages": {
+        "saved": "Expense saved successfully.",
+        "deleted": "Expense deleted successfully."
+      },
+      "attachments": {
+        "title": "Attachments",
+        "saveFirst": "Save the expense first to add attachments."
+      },
+      "paid": "Paid",
+      "unpaid": "Unpaid"
+    },
+    "advances": {
+      "title": "Advances Management",
+      "subtitle": "Manage financial advances for the resident engineer",
+      "summary": {
+        "openAdvances": "Open Advances",
+        "remainingAmount": "Remaining Amount",
+        "totalAmount": "Total Amount",
+        "totalAdvances": "Total Advances"
+      },
+      "columns": {
+        "advanceNo": "Advance No",
+        "engineer": "Engineer",
+        "date": "Date",
+        "amount": "Amount",
+        "remaining": "Remaining"
+      },
+      "status": {
+        "all": "All Statuses",
+        "open": "Open",
+        "partiallySettled": "Partially Settled",
+        "settled": "Settled"
+      },
+      "list": {
+        "newAdvance": "New Advance",
+        "searchPlaceholder": "Search by number or engineer...",
+        "empty": "No advances recorded yet. Click \"New Advance\" to add one.",
+        "pagination": "Showing {first} to {last} of {totalRecords} advances",
+        "notOpenNoEdit": "Only open advances can be edited or deleted"
+      },
+      "actions": {
+        "settle": "Settle"
+      },
+      "form": {
+        "newTitle": "New Advance",
+        "editTitle": "Edit Advance",
+        "subtitle": "Fill in the advance details below",
+        "backToList": "Back to list",
+        "advanceNoPlaceholder": "Auto-generated",
+        "selectEngineer": "Select engineer",
+        "currency": "Currency",
+        "paymentMethod": "Payment Method",
+        "selectPaymentMethod": "Select payment method",
+        "reference": "Reference",
+        "referencePlaceholder": "Optional reference number...",
+        "notesPlaceholder": "Optional notes...",
+        "save": "Save Advance"
+      },
+      "confirmDelete": {
+        "header": "Delete Advance",
+        "message": "Are you sure you want to delete advance \"{{name}}\"?"
+      },
+      "settle": {
+        "title": "Settle Advance",
+        "remainingBalance": "Remaining Balance",
+        "linkedExpenses": "Already Linked Expenses",
+        "availableExpenses": "Available Expenses",
+        "selectedTotal": "Selected Total",
+        "overLimit": "Selected expenses exceed the remaining balance.",
+        "noAvailable": "No available expenses to link for this advance.",
+        "unlink": "Unlink",
+        "unlinkHeader": "Unlink Expense",
+        "unlinkMessage": "Unlink expense {{name}} from this advance? Its amount will return to the remaining balance.",
+        "confirm": "Confirm Settlement"
+      }
+    },
+    "wir": {
+      "tabTitle": "WIR",
+      "cardTitle": "Work Inspection Requests (WIR)",
+      "cardSubtitle": "Inspection requests and checklist results for this milestone",
+      "total": "Total WIRs",
+      "create": "New WIR",
+      "addTitle": "New Work Inspection Request",
+      "editTitle": "Edit Work Inspection Request",
+      "viewTitle": "Work Inspection Request",
+      "masterTitle": "Request Details",
+      "detailsTitle": "Checklist",
+      "addItem": "Add Item",
+      "addAllItems": "Add All Checklist Items",
+      "selectItem": "Select checklist item",
+      "commentPlaceholder": "Inspector comment",
+      "noItems": "No checklist items yet",
+      "empty": "No inspection requests for this milestone yet",
+      "newRevision": "New Revision",
+      "deleteConfirm": "Are you sure you want to delete WIR {{no}}?",
+      "confirmDeleteHeader": "Confirm Delete",
+      "fields": {
+        "wirNo": "WIR No",
+        "inspectionDate": "Date",
+        "drawingReference": "Ref",
+        "revisionNo": "Rev No",
+        "finalStatus": "Final Status",
+        "title": "Title",
+        "contractor": "Contractor",
+        "discipline": "Discipline",
+        "level": "Level",
+        "zone": "Zone",
+        "grid": "Grid Ref",
+        "requestedBy": "Requested By",
+        "assignedTo": "Assigned To",
+        "submittedDate": "Submitted Date",
+        "approvedDate": "Approved Date",
+        "rejectedDate": "Rejected Date",
+        "description": "Description",
+        "checklist": "Checklist",
+        "checklistItem": "Checklist Item",
+        "itemStatus": "Status",
+        "comment": "Comment"
+      },
+      "status": {
+        "draft": "Draft",
+        "submitted": "Submitted",
+        "approved": "Approved",
+        "rejected": "Rejected",
+        "archived": "Archived"
+      },
+      "itemStatus": {
+        "approved": "Approved",
+        "approvedWithComment": "Approved With Comments",
+        "rejected": "Rejected"
+      }
+    }
+  },
+  "workItemDialog": {
+    "title": "Add Work Item",
+    "editTitle": "Edit Work Item",
+    "fields": {
+      "title": "Title",
+      "titlePlaceholder": "Foundation Excavation - Phase 1",
+      "type": "Type",
+      "typePlaceholder": "Select type",
+      "assignTo": "Assign To",
+      "assignToPlaceholder": "Mike Johnson",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "priority": "Priority",
+      "priorityPlaceholder": "Select priority",
+      "taskPoints": "Task Points",
+      "taskPointsPlaceholder": "8",
+      "location": "Location",
+      "locationPlaceholder": "Grid A1-A5",
+      "depth": "Depth",
+      "depthPlaceholder": "3.5m",
+      "volume": "Volume",
+      "volumePlaceholder": "450 m³",
+      "soilType": "Soil Type",
+      "soilTypePlaceholder": "Clay",
+      "equipment": "Equipment",
+      "equipmentPlaceholder": "Excavator CAT 320",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the excavation task..."
+    },
+    "subtasks": {
+      "title": "Subtasks",
+      "addSubtask": "Add Subtask",
+      "noSubtasks": "No subtasks yet. Click \"Add Subtask\" to create one.",
+      "saveTaskFirst": "Please save the task first before adding subtasks",
+      "columns": {
+        "title": "Title",
+        "dates": "Dates",
+        "type": "Type",
+        "status": "Status",
+        "cost": "Cost",
+        "quantity": "Quantity",
+        "actions": "Actions"
+      }
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save"
+    }
+  },
+  "milestoneTaskDialog": {
+    "title": "Add Task",
+    "fields": {
+      "title": "Title",
+      "titlePlaceholder": "Enter task title",
+      "type": "Type",
+      "typePlaceholder": "Select type",
+      "assignTo": "Assign To",
+      "assignToPlaceholder": "Mike Johnson",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "priority": "Priority",
+      "priorityPlaceholder": "Select priority",
+      "taskPoints": "Task Points",
+      "taskPointsPlaceholder": "8",
+      "responsibilitySection": "Responsibility & Resources",
+      "responsibility": "Responsibility",
+      "responsibilityPlaceholder": "Select responsibility",
+      "mainContractor": "Main Contractor",
+      "mainContractorPlaceholder": "Select main contractor",
+      "suppliers": "Supplier",
+      "suppliersPlaceholder": "Select supplier",
+      "location": "Location",
+      "locationPlaceholder": "Grid A1-A5",
+      "depth": "Depth",
+      "depthPlaceholder": "3.5m",
+      "volume": "Volume",
+      "volumePlaceholder": "450 m³",
+      "soilType": "Soil Type",
+      "soilTypePlaceholder": "Clay",
+      "equipment": "Equipment",
+      "equipmentPlaceholder": "Excavator CAT 320",
+      "description": "Description",
+      "descriptionPlaceholder": "Describe the task..."
+    },
+    "attachments": {
+      "title": "Attachments",
+      "saveTaskFirst": "Save the task first to manage attachments",
+      "noAttachments": "No attachments yet. Save the task first to upload files."
+    },
+    "buttons": {
+      "cancel": "Cancel",
+      "save": "Save"
+    }
+  },
+  "excavationStage": {
+    "title": "Excavation Stage",
+    "subtitle": "Track excavation activities and measurements"
+  },
+  "dialogs": {
+    "voucherOrder": {
+      "createTitle": "Create Voucher Order",
+      "editTitle": "Edit Voucher Order",
+      "voNumber": "VO Number",
+      "voNumberRequired": "VO Number is required.",
+      "voItem": "VO Item",
+      "voItemRequired": "VO Item is required.",
+      "description": "Description",
+      "descriptionRequired": "Description is required.",
+      "quantity": "Quantity",
+      "quantityRequired": "Quantity is required.",
+      "unit": "Unit",
+      "unitRequired": "Unit is required.",
+      "amount": "Amount",
+      "amountRequired": "Amount is required.",
+      "approvalStatus": "Approval Status",
+      "statusRequired": "Status is required.",
+      "statusApproved": "Approved",
+      "statusPending": "Pending",
+      "statusRejected": "Rejected",
+      "isEffected": "Is Effected",
+      "effectedDateStart": "Effected Date Start",
+      "effectedDateStartRequired": "Effected Date Start is required when Is Effected is checked.",
+      "effectedDateEnd": "Effected Date End",
+      "effectedDateEndRequired": "Effected Date End is required when Is Effected is checked.",
+      "subtotal": "Subtotal",
+      "cancel": "Cancel",
+      "create": "Create Order",
+      "update": "Update"
+    },
+    "surveyingVisit": {
+      "createTitle": "Schedule Visit",
+      "editTitle": "Edit Surveying Visit",
+      "visitDate": "Visit Date",
+      "visitDateRequired": "Visit date is required.",
+      "surveyor": "Surveyor",
+      "surveyorRequired": "Surveyor is required.",
+      "purpose": "Purpose",
+      "purposeRequired": "Purpose is required.",
+      "unit": "Unit",
+      "unitRequired": "Unit is required.",
+      "quantity": "Quantity",
+      "quantityRequired": "Quantity is required.",
+      "unitPrice": "Unit Price",
+      "unitPriceRequired": "Unit price is required.",
+      "status": "Status",
+      "statusRequired": "Status is required.",
+      "statusInProgress": "In Progress",
+      "statusScheduled": "Scheduled",
+      "statusCompleted": "Completed",
+      "subtotal": "Subtotal",
+      "cancel": "Cancel",
+      "schedule": "Schedule Visit",
+      "update": "Update"
+    },
+    "purchaseOrder": {
+      "addTitle": "Create Purchase Order",
+      "editTitle": "Edit Purchase Order",
+      "poNumber": "PO Number",
+      "poNumberRequired": "PO Number is required.",
+      "supplier": "Supplier",
+      "supplierRequired": "Supplier is required.",
+      "searchSupplier": "Search supplier...",
+      "description": "Description",
+      "descriptionRequired": "Description is required.",
+      "unit": "Unit",
+      "unitRequired": "Unit is required.",
+      "unitPrice": "Unit Price",
+      "unitPriceRequired": "Unit price is required.",
+      "subtotal": "Subtotal",
+      "statusRequired": "Status is required.",
+      "createOrder": "Create Order"
+    },
+    "contractorPayment": {
+      "addTitle": "Record Payment",
+      "editTitle": "Edit Payment",
+      "paymentDate": "Payment Date",
+      "paymentDateRequired": "Payment date is required.",
+      "paidAmount": "Paid Amount",
+      "paidAmountRequired": "Paid amount is required and must be positive.",
+      "paymentMethod": "Payment Method",
+      "paymentMethodRequired": "Payment method is required.",
+      "receiptNo": "Receipt No",
+      "chequeNo": "Cheque No",
+      "transferRef": "Transfer Reference No",
+      "notes": "Notes",
+      "add": "Record Payment",
+      "update": "Update"
+    },
+    "contractor": {
+      "addTitle": "Add Main Contractor",
+      "editTitle": "Edit Main Contractor",
+      "contractorType": "Contractor Type",
+      "contractorTypeRequired": "Contractor type is required.",
+      "contractor": "Contractor",
+      "contractorRequired": "Contractor is required.",
+      "searchContractor": "Search contractor...",
+      "classification": "Classification",
+      "classificationRequired": "Classification is required.",
+      "classificationUnclassified": "Unclassified",
+      "classificationMain": "Main Contractor",
+      "classificationSub": "Sub Contractor",
+      "contractAmount": "Contract Amount",
+      "amountRequired": "Amount is required and must be positive.",
+      "startDate": "Start Date",
+      "startDateRequired": "Start date is required.",
+      "endDate": "End Date",
+      "endDateRequired": "End date is required.",
+      "add": "Add"
+    }
+  },
+  "documentsTable": {
+    "totalDocuments": "Total Documents",
+    "uploadDocument": "Upload Document",
+    "noDocuments": "No documents yet",
+    "uploadFilesHint": "Upload files and documents",
+    "columnName": "Document Name",
+    "columnType": "Type",
+    "columnUploadDate": "Upload Date",
+    "columnSize": "Size",
+    "columnUploadedBy": "Uploaded By",
+    "columnActions": "Actions",
+    "uploadDialogHeader": "Upload Documents",
+    "uploadDialogHint": "Upload documents, images, and files for",
+    "dropZoneTitle": "Click to upload or drag and drop",
+    "dropZoneHint": "PDF, DOC, JPG, PNG, XLS up to 50 MB each",
+    "selectedFiles": "Selected Files",
+    "noDocumentsFound": "No documents found",
+    "typePdf": "PDF",
+    "typeExcel": "Excel",
+    "typeImages": "Images",
+    "download": "Download",
+    "delete": "Delete",
+    "preview": "Preview",
+    "previewNotAvailable": "Preview is not available for this file type. Please download to view.",
+    "close": "Close",
+    "cancel": "Cancel",
+    "upload": "Upload",
+    "uploading": "Uploading...",
+    "attachmentName": "Attachment name",
+    "attachmentNameHint": "Optional — leave empty to use the file name"
+  },
+  "material": {
+    "title": "Material Management",
+    "subtitle": "Manage material categories, subcategories, and items in a tree structure",
+    "category": {
+      "title": "Categories",
+      "add": "Add Category",
+      "addTitle": "Add Category",
+      "editTitle": "Edit Category",
+      "name": "Category Name",
+      "namePlaceholder": "Enter category name",
+      "noData": "No categories found"
+    },
+    "subCategory": {
+      "title": "Subcategories",
+      "add": "Add Subcategory",
+      "addTitle": "Add Subcategory",
+      "editTitle": "Edit Subcategory",
+      "name": "Subcategory Name",
+      "namePlaceholder": "Enter subcategory name",
+      "noData": "No subcategories found",
+      "selectCategory": "Select a category first"
+    },
+    "item": {
+      "title": "Materials",
+      "add": "Add Material",
+      "addTitle": "Add Material",
+      "editTitle": "Edit Material",
+      "name": "Material Name",
+      "namePlaceholder": "Enter material name",
+      "noData": "No materials found",
+      "selectSubCategory": "Select a subcategory first"
+    }
+  },
+  "timeframe": {
+    "title": "Project Timeframe",
+    "subtitle": "Phases on a timeline based on each contractor's start and end dates",
+    "today": "Today",
+    "summary": {
+      "totalPhases": "Total Phases",
+      "totalContractors": "Contractors",
+      "conflicts": "Conflicts",
+      "overallProgress": "Overall Progress",
+      "delayed": "Delayed Contractors"
+    },
+    "toolbar": {
+      "searchPlaceholder": "Search contractor or type...",
+      "filterPhase": "Filter by phase",
+      "filterContractor": "Filter by contractor",
+      "filterStatus": "Filter by status",
+      "dateRange": "Date range",
+      "clearFilters": "Clear filters",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out",
+      "goToToday": "Go to today",
+      "exportExcel": "Export Excel",
+      "exportPdf": "Export PDF / Print",
+      "fullscreen": "Fullscreen"
+    },
+    "scale": {
+      "day": "Day",
+      "week": "Week",
+      "month": "Month"
+    },
+    "status": {
+      "not_started": "Not Started",
+      "in_progress": "In Progress",
+      "delayed": "Delayed",
+      "completed": "Completed"
+    },
+    "board": {
+      "phaseAndContractor": "Phase / Contractor",
+      "unassignedTasks": "Tasks without a contractor",
+      "tasks": "tasks",
+      "noDates": "No dates"
+    },
+    "alert": {
+      "conflictsFound": "{{count}} conflict(s) detected between contractors — click to review"
+    },
+    "conflict": {
+      "hasConflict": "Has a scheduling conflict",
+      "tooltip": "Conflict between {{a}} and {{b}}",
+      "panelTitle": "Detected Conflicts",
+      "itemsFound": "items found",
+      "noneFound": "No conflicts currently detected",
+      "reasons": {
+        "date_overlap": "Date overlap",
+        "zone_overlap": "Same-zone overlap",
+        "resource_overlap": "Resource overlap"
+      }
+    },
+    "details": {
+      "startDate": "Start date",
+      "endDate": "End date",
+      "duration": "Duration",
+      "days": "days",
+      "progress": "Progress",
+      "zone": "Zone",
+      "amount": "Contract amount",
+      "payments": "Payments",
+      "dependencies": "Depends on",
+      "detectedConflicts": "Related conflicts",
+      "notes": "Notes"
+    },
+    "empty": {
+      "title": "No timeline data to display",
+      "subtitle": "No contractors with valid dates were found for this project"
+    },
+    "loading": "Loading timeline...",
+    "loadError": "Unable to load the project timeline.",
+    "retry": "Retry"
+  },
+  "topNav": {
+    "profileMenu": {
+      "profile": "Profile",
+      "changePassword": "Change Password",
+      "settings": "Settings",
+      "logout": "Logout"
+    }
+  },
+  "changePassword": {
+    "title": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmNewPassword": "Confirm New Password",
+    "submit": "Change Password",
+    "errors": {
+      "currentPasswordRequired": "Current password is required",
+      "newPasswordRequired": "New password is required",
+      "newPasswordMinLength": "New password must be at least 6 characters",
+      "confirmPasswordRequired": "Please confirm your new password",
+      "passwordMismatch": "Passwords do not match"
+    }
+  },
+  "userManagement": {
+    "title": "Users",
+    "subtitle": "Manage user accounts, roles and access",
+    "searchPlaceholder": "Search users...",
+    "pagination": "Showing {first} to {last} of {totalRecords} users",
+    "columns": {
+      "name": "Name",
+      "email": "Email",
+      "phoneNumber": "Phone Number",
+      "roles": "Roles",
+      "status": "Status",
+      "actions": "Actions"
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "noData": "No users found",
+    "noRoles": "No roles assigned",
+    "tooltips": {
+      "manageRoles": "Manage roles",
+      "activate": "Activate",
+      "deactivate": "Deactivate",
+      "delete": "Delete"
+    },
+    "confirm": {
+      "header": "Please confirm",
+      "activateMessage": "Activate the account for \"{name}\"?",
+      "deactivateMessage": "Deactivate the account for \"{name}\"?",
+      "deleteMessage": "Delete the account for \"{name}\"? This can be reversed by an administrator."
+    },
+    "rolesDialog": {
+      "title": "Manage Roles",
+      "roleIdLabel": "Role",
+      "selectRole": "Select a role",
+      "assign": "Assign",
+      "remove": "Remove",
+      "currentRoles": "Current roles",
+      "addRole": "Add role",
+      "allAssigned": "All available roles are assigned",
+      "failed": "Operation failed"
+    },
+    "roles": {
+      "admin": "Admin",
+      "user": "User"
+    },
+    "create": "Add User",
+    "createDialog": {
+      "title": "Add User",
+      "fullName": "Full Name",
+      "fullNamePlaceholder": "Enter full name",
+      "fullNameRequired": "Full name is required",
+      "arabicFullName": "Full Name (Arabic)",
+      "arabicFullNamePlaceholder": "Enter Arabic full name",
+      "email": "Email",
+      "emailPlaceholder": "Enter email address",
+      "emailRequired": "Email is required",
+      "emailInvalid": "Please enter a valid email",
+      "phoneNumber": "Phone Number",
+      "phoneNumberPlaceholder": "Enter phone number",
+      "password": "Password",
+      "passwordRequired": "Password is required",
+      "passwordMinLength": "Password must be at least 6 characters",
+      "submit": "Create User"
+    }
+  },
+  "rolesPermissions": {
+    "title": "Roles & Permissions",
+    "subtitle": "Manage features, permissions and role access",
+    "confirmHeader": "Please confirm",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "tabs": {
+      "features": "Features",
+      "permissions": "Permissions",
+      "rolePermissions": "Role Permissions"
+    },
+    "features": {
+      "create": "Add Feature",
+      "createDialogTitle": "Add Feature",
+      "editDialogTitle": "Edit Feature",
+      "noData": "No features found",
+      "confirmDelete": "Delete the feature \"{{name}}\"?",
+      "columns": {
+        "name": "Name",
+        "code": "Code",
+        "description": "Description",
+        "status": "Status"
+      },
+      "dialog": {
+        "name": "Name",
+        "namePlaceholder": "Enter feature name",
+        "nameRequired": "Name is required",
+        "code": "Code",
+        "codePlaceholder": "Enter feature code",
+        "codeRequired": "Code is required",
+        "description": "Description",
+        "descriptionPlaceholder": "Enter a short description",
+        "isActive": "Active"
+      }
+    },
+    "permissions": {
+      "create": "Add Permission",
+      "createDialogTitle": "Add Permission",
+      "editDialogTitle": "Edit Permission",
+      "noData": "No permissions found",
+      "confirmDelete": "Delete the permission \"{{name}}\"?",
+      "columns": {
+        "name": "Name",
+        "code": "Code"
+      },
+      "dialog": {
+        "name": "Name",
+        "namePlaceholder": "Enter permission name",
+        "nameRequired": "Name is required",
+        "code": "Code",
+        "codePlaceholder": "Enter permission code",
+        "codeRequired": "Code is required"
+      }
+    },
+    "rolePermissions": {
+      "roleLabel": "Role",
+      "selectRole": "Select a role",
+      "selectRoleHint": "Select a role to view and edit its permissions",
+      "featureColumn": "Feature",
+      "noData": "No features or permissions available yet"
+    }
+  },
+  "profile": {
+    "title": "My Profile",
+    "subtitle": "View your account information",
+    "changePassword": "Change Password",
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "fields": {
+      "phoneNumber": "Phone Number",
+      "username": "Username",
+      "memberSince": "Member Since",
+      "lastLogin": "Last Login"
+    }
+  },
+  "reporting": {
+    "common": {
+      "yes": "Yes",
+      "no": "No"
+    },
+    "actions": {
+      "retry": "Retry",
+      "cancel": "Cancel"
+    },
+    "empty": {
+      "noData": "No records to display.",
+      "error": "Something went wrong while loading this report."
+    },
+    "summary": {
+      "title": "Summary",
+      "scopePage": "Current page totals",
+      "scopeFiltered": "Filtered totals",
+      "scopeAll": "All filtered totals"
+    },
+    "columns": {
+      "title": "Columns",
+      "required": "required",
+      "moveUp": "Move up",
+      "moveDown": "Move down",
+      "selectAll": "Select all",
+      "reset": "Restore defaults"
+    },
+    "filters": {
+      "title": "Filters",
+      "advanced": "Advanced filters",
+      "active": "Active filters: {{count}}",
+      "reset": "Reset",
+      "apply": "Apply",
+      "min": "Min",
+      "max": "Max",
+      "any": "Any",
+      "clearField": "Clear",
+      "invalidRange": "The start value must not be after the end value.",
+      "requiredField": "This filter is required."
+    },
+    "toolbar": {
+      "records": "{{count}} records",
+      "lastUpdated": "Last updated",
+      "searchPlaceholder": "Search…",
+      "filters": "Filters",
+      "export": "Export",
+      "print": "Print",
+      "refresh": "Refresh",
+      "fullscreen": "Fullscreen",
+      "resetSettings": "Reset report settings"
+    },
+    "table": {
+      "actions": "Actions",
+      "pageReport": "Showing {first} to {last} of {totalRecords}",
+      "selectAll": "Select all rows",
+      "selectRow": "Select row",
+      "toggleGroup": "Toggle group"
+    },
+    "grouping": {
+      "none": "None",
+      "groupBy": "Group by"
+    },
+    "export": {
+      "dialogTitle": "Export report",
+      "formatLabel": "Format",
+      "scopeLabel": "Records",
+      "columnsLabel": "Columns",
+      "columnsPlaceholder": "All exportable columns",
+      "fileNameLabel": "File name",
+      "orientationLabel": "Orientation",
+      "includeFilters": "Include applied filters",
+      "includeSummaries": "Include summary totals",
+      "includeCompany": "Include company header",
+      "includeDate": "Include generated date",
+      "confirm": "Export",
+      "emptyTitle": "Nothing to export",
+      "emptyDetail": "There are no records matching the current filters.",
+      "errorTitle": "Export failed",
+      "errorDetail": "The report could not be generated. Please try again.",
+      "successTitle": "Export ready",
+      "successDetail": "Your {{format}} file has been downloaded.",
+      "format": {
+        "excel": "Excel (.xlsx)",
+        "csv": "CSV (.csv)",
+        "pdf": "PDF",
+        "print": "Print"
+      },
+      "scope": {
+        "currentPage": "Current page",
+        "filtered": "All filtered records",
+        "selected": "Selected rows"
+      },
+      "orientation": {
+        "portrait": "Portrait",
+        "landscape": "Landscape"
+      }
+    },
+    "demo": {
+      "pageTitle": "Reporting Module Demo",
+      "pageSubtitle": "A configurable, reusable reporting component — toggle options below to explore every feature.",
+      "title": "Invoice Report",
+      "description": "A detailed report of customer invoices and payments.",
+      "empty": "No invoices match the selected filters.",
+      "columns": {
+        "invoiceNumber": "Invoice #",
+        "customer": "Customer",
+        "customerType": "Type",
+        "branch": "Branch",
+        "invoiceDate": "Invoice Date",
+        "dueDate": "Due Date",
+        "subtotal": "Subtotal",
+        "discount": "Discount",
+        "tax": "Tax",
+        "total": "Total",
+        "paid": "Paid",
+        "remaining": "Remaining",
+        "currency": "Currency",
+        "paymentMethod": "Payment",
+        "status": "Status",
+        "createdBy": "Created By",
+        "notes": "Notes"
+      },
+      "filters": {
+        "invoiceNumber": "Invoice #",
+        "customer": "Customer",
+        "customerType": "Customer Type",
+        "branch": "Branch",
+        "invoiceDate": "Invoice Date",
+        "dueDate": "Due Date",
+        "amount": "Amount",
+        "paymentMethod": "Payment Method",
+        "status": "Status",
+        "fullyPaid": "Fully Paid"
+      },
+      "status": {
+        "draft": "Draft",
+        "pending": "Pending",
+        "paid": "Paid",
+        "partiallyPaid": "Partially Paid",
+        "overdue": "Overdue",
+        "cancelled": "Cancelled"
+      },
+      "customerType": {
+        "individual": "Individual",
+        "company": "Company"
+      },
+      "paymentMethod": {
+        "cash": "Cash",
+        "card": "Card",
+        "bankTransfer": "Bank Transfer"
+      },
+      "summary": {
+        "count": "Total Invoices",
+        "total": "Total Amount",
+        "paid": "Paid Amount",
+        "remaining": "Remaining Amount",
+        "average": "Average Invoice"
+      },
+      "groups": {
+        "customer": "Customer",
+        "status": "Status",
+        "month": "Month"
+      },
+      "controls": {
+        "mode": "Data mode",
+        "client": "Client-side",
+        "server": "Server-side (simulated)",
+        "currency": "Currency",
+        "pageSize": "Page size",
+        "orientation": "PDF orientation",
+        "search": "Search",
+        "filters": "Filters",
+        "pagination": "Pagination",
+        "grouping": "Grouping",
+        "summaries": "Summaries",
+        "rowSelection": "Row selection",
+        "columnSelection": "Column selector",
+        "excel": "Excel export",
+        "csv": "CSV export",
+        "pdf": "PDF export",
+        "print": "Print",
+        "persist": "Persist preferences",
+        "simulate": "Simulate",
+        "loading": "Loading",
+        "empty": "Empty data",
+        "error": "API error",
+        "clearPrefs": "Clear saved preferences"
+      }
+    }
+  },
+  "projectReport": {
+    "sections": {
+      "cover": "Cover Page",
+      "executiveSummary": "Executive Summary",
+      "agreement": "Agreement Details",
+      "financial": "Financial Report",
+      "documents": "Documents & Progress Photos",
+      "signatures": "Final Summary & Signatures"
+    },
+    "cover": {
+      "title": "Project Report",
+      "companyName": "Construction Management Platform",
+      "projectNumber": "Project Number",
+      "client": "Client / Owner",
+      "location": "Project Location",
+      "asOf": "Reporting Period (As of)",
+      "generatedAt": "Generated On",
+      "generatedBy": "Generated By",
+      "confidential": "Confidential"
+    },
+    "reportTypes": {
+      "full": "Full Report",
+      "summary": "Summary Report",
+      "progress": "Progress Report",
+      "financial": "Financial Report",
+      "custom": "Custom Report"
+    },
+    "summary": {
+      "status": "Status",
+      "progress": "Overall Progress",
+      "startDate": "Start Date",
+      "endDate": "End Date",
+      "daysElapsed": "Days Elapsed",
+      "daysRemaining": "Days Remaining",
+      "budget": "Budget",
+      "contractValue": "Contract Value",
+      "actualExpenditure": "Actual Expenditure",
+      "committedAmount": "Committed Amount",
+      "milestonesTotal": "Total Milestones",
+      "milestonesCompleted": "Milestones Completed"
+    },
+    "agreement": {
+      "projectNumber": "Project Number",
+      "projectName": "Project Name",
+      "agreementDate": "Agreement Date",
+      "agreementType": "Agreement Type",
+      "businessSector": "Business Sector",
+      "estimatedStartDate": "Estimated Start Date",
+      "estimatedEndDate": "Estimated End Date",
+      "country": "Country",
+      "city": "City",
+      "projectArea": "Project Area",
+      "drillingQuantity": "Excavation Quantity",
+      "description": "Description",
+      "client": {
+        "title": "Client Information",
+        "contactPerson": "Contact Person",
+        "contactPersonPhone": "Contact Person Phone",
+        "representerName": "Representative Name",
+        "representerPhone": "Representative Phone"
+      },
+      "land": {
+        "title": "Land Information",
+        "plotNumber": "Plot Number",
+        "directorate": "Directorate",
+        "village": "Village",
+        "basinName": "Basin Name",
+        "basinNumber": "Basin Number",
+        "floorNumber": "Floor Number"
+      },
+      "contract": {
+        "title": "Contract & Payment",
+        "contractType": "Contract Type",
+        "contractModel": "Type of Contracting",
+        "monthlyFees": "Monthly Fees",
+        "percentageFees": "Percentage Fees"
+      },
+      "services": "Services",
+      "areas": "Project Areas",
+      "noAreas": "No project areas are recorded for this agreement.",
+      "areaColumns": {
+        "annex": "Floor / Annex",
+        "amount": "Amount",
+        "unit": "Unit"
+      },
+      "milestones": "Milestones",
+      "noMilestones": "No milestones are recorded for this agreement.",
+      "milestoneColumns": {
+        "order": "#",
+        "name": "Name",
+        "description": "Description"
+      }
+    },
+    "financial": {
+      "contractAndBudget": "Contract & Budget",
+      "contractValue": "Contract Value",
+      "budget": "Project Budget",
+      "procurementAndWork": "Procurement & Work",
+      "boqTotal": "BOQ Total",
+      "contractorCommitments": "Contractor Commitments",
+      "contractorPaid": "Contractor Paid",
+      "contractorRemaining": "Contractor Remaining",
+      "purchaseOrdersTotal": "Purchase Orders Total",
+      "cashAndAdvances": "Cash & Advances",
+      "expensesTotal": "Expenses Total",
+      "advancesTotal": "Advances Total",
+      "advancesRemaining": "Advances Remaining",
+      "ownerPaymentsTotal": "Owner Payments Received",
+      "variationOrders": "Variation / Change Orders",
+      "voApproved": "Approved",
+      "voPending": "Pending",
+      "voRejected": "Rejected",
+      "paymentClaimEstimate": "Payment Claim Estimate",
+      "paymentClaimEstimateTotal": "Estimated Claimable Amount",
+      "paymentClaimEstimateNote": "A computed estimate for reference only — not a stored payment-claim record.",
+      "notes": {
+        "engineeringFeeExcluded": "The agreement's engineering office fee is expressed as a percentage or monthly fee and is not included in this estimate.",
+        "ledgersAreSeparate": "Each figure above is an independent ledger and is not summed into the others — treat them as distinct totals, not a single running balance."
+      }
+    },
+    "documents": {
+      "photos": "Progress Photos",
+      "noPhotos": "No progress photos are available for this project.",
+      "morePhotosOmitted": "{{count}} additional photo(s) are recorded but not shown here."
+    },
+    "signatures": {
+      "preparedBy": "Prepared By",
+      "reviewedBy": "Reviewed By",
+      "approvedBy": "Approved By",
+      "date": "Date: ____________"
+    },
+    "responsibility": {
+      "internal": "Internal",
+      "contractor": "Contractor",
+      "supplier": "Supplier",
+      "client": "Client",
+      "consultant": "Consultant"
+    },
+    "stageType": {
+      "preparing": "Preparing",
+      "excavation": "Excavation",
+      "milestones": "Milestone"
+    },
+    "status": {
+      "toDO": "To Do",
+      "inProgress": "In Progress",
+      "review": "Review",
+      "completed": "Completed"
+    },
+    "taskStatus": {
+      "toDO": "To Do",
+      "inProgress": "In Progress",
+      "review": "Review",
+      "completed": "Completed"
+    },
+    "attachmentType": {
+      "agreement": "Agreement",
+      "project": "Project",
+      "milestone": "Milestone",
+      "task": "Task",
+      "projectPO": "Purchase Order",
+      "surveyingVisit": "Surveying Visit",
+      "projectMainContractorPayment": "Contractor Payment",
+      "constructor": "Contractor",
+      "supplier": "Supplier",
+      "other": "Other"
+    },
+    "missingData": {
+      "noAgreement": "This project is not linked to an agreement, or the agreement could not be loaded — agreement-derived sections are unavailable.",
+      "milestoneStatus": "Per-milestone execution status is not currently exposed by the system; only milestone names and order are shown.",
+      "blockedTasks": "\"Blocked\" task/status tracking is not currently available in the system.",
+      "domainFailed": "{{domain}} data could not be loaded for this report."
+    },
+    "common": {
+      "notAvailable": "Not available",
+      "noData": "No data available.",
+      "noDataOrRestricted": "No data available, or you do not have permission to view this information.",
+      "restricted": "You do not have permission to view this section."
+    },
+    "footer": {
+      "generated": "Generated on {{date}} by {{user}}. This document was produced by the Management Platform reporting tool."
+    }
+  },
+  "wirChecklist": {
+    "title": "WIR Checklist Items",
+    "subtitle": "Master checklist used when filling Work Inspection Requests",
+    "add": "New Item",
+    "addTitle": "New Checklist Item",
+    "editTitle": "Edit Checklist Item",
+    "item": "Checklist Item",
+    "order": "Order",
+    "count": "Items",
+    "searchPlaceholder": "Search checklist items...",
+    "empty": "No checklist items yet",
+    "noResults": "No matching items",
+    "moveUp": "Move up",
+    "moveDown": "Move down",
+    "deleteConfirm": "Are you sure you want to delete \"{{item}}\"?"
+  },
+  "stageLock": {
+    "lockedTitle": "Milestone closed & locked",
+    "lockedMsg": "All changes to this milestone are disabled until it is unlocked.",
+    "migratedAdvances": "Carried-over advances ({{count}})",
+    "migratedContracts": "Carried-over contractor contracts ({{count}})",
+    "noNextStage": "No next milestone was found — nothing was carried over.",
+    "unlock": "Unlock",
+    "unlockHeader": "Unlock Milestone",
+    "unlockMessage": "Unlock this milestone and allow changes again?",
+    "unlockAccept": "Yes, Unlock"
   }
 }

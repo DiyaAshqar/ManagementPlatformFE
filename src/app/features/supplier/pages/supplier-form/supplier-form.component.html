@@ -1,0 +1,127 @@
+<div class="supplier-form-container p-2">
+  <!-- Header -->
+  <div class="mb-2">
+    <div class="flex align-items-center gap-2 mb-2">
+      <p-button 
+        icon="pi pi-arrow-left"
+        [rounded]="true"
+        [text]="true"
+        (onClick)="onCancel()"
+        severity="secondary">
+      </p-button>
+      <h1 class="text-3xl font-bold m-0">
+        {{ (isEditMode ? 'supplier.form.editTitle' : 'supplier.form.createTitle') | translate }}
+      </h1>
+    </div>
+    <p class="text-color-secondary ml-6">
+      {{ (isEditMode ? 'supplier.form.editSubtitle' : 'supplier.form.createSubtitle') | translate }}
+    </p>
+  </div>
+
+  <!-- Form Card -->
+  <p-card>
+    <form [formGroup]="supplierForm" (ngSubmit)="onSubmit()" *ngIf="!isLoading">
+      <div class="grid">
+        <!-- Name Field -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="name" class="block font-medium mb-2">
+              {{ 'supplier.form.name' | translate }} <span class="text-red-500">*</span>
+            </label>
+            <input 
+              id="name"
+              type="text" 
+              pInputText 
+              formControlName="name"
+              [placeholder]="'supplier.form.namePlaceholder' | translate"
+              class="w-full"
+              [class.ng-invalid]="name?.invalid && name?.touched"
+              [class.ng-dirty]="name?.touched" />
+            <small 
+              *ngIf="name?.invalid && name?.touched" 
+              class="p-error block mt-1">
+              <span *ngIf="name?.errors?.['required']">{{ 'supplier.form.nameRequired' | translate }}</span>
+              <span *ngIf="name?.errors?.['minlength']">{{ 'supplier.form.nameMinLength' | translate }}</span>
+            </small>
+          </div>
+        </div>
+
+        <!-- Phone Number Field -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="phoneNumber" class="block font-medium mb-2">
+              {{ 'supplier.form.phoneNumber' | translate }} <span class="text-red-500">*</span>
+            </label>
+            <input 
+              id="phoneNumber"
+              type="text" 
+              pInputText 
+              formControlName="phoneNumber"
+              [placeholder]="'supplier.form.phoneNumberPlaceholder' | translate"
+              class="w-full"
+              [class.ng-invalid]="phoneNumber?.invalid && phoneNumber?.touched"
+              [class.ng-dirty]="phoneNumber?.touched" />
+            <small 
+              *ngIf="phoneNumber?.invalid && phoneNumber?.touched" 
+              class="p-error block mt-1">
+              {{ 'supplier.form.phoneNumberRequired' | translate }}
+            </small>
+          </div>
+        </div>
+
+        <!-- Email Field -->
+        <div class="col-12 md:col-6">
+          <div class="field">
+            <label for="email" class="block font-medium mb-2">
+              {{ 'supplier.form.email' | translate }} <span class="text-red-500">*</span>
+            </label>
+            <input 
+              id="email"
+              type="email" 
+              pInputText 
+              formControlName="email"
+              [placeholder]="'supplier.form.emailPlaceholder' | translate"
+              class="w-full"
+              [class.ng-invalid]="email?.invalid && email?.touched"
+              [class.ng-dirty]="email?.touched" />
+            <small 
+              *ngIf="email?.invalid && email?.touched" 
+              class="p-error block mt-1">
+              <span *ngIf="email?.errors?.['required']">{{ 'supplier.form.emailRequired' | translate }}</span>
+              <span *ngIf="email?.errors?.['email']">{{ 'supplier.form.emailInvalid' | translate }}</span>
+            </small>
+          </div>
+        </div>
+      </div>
+
+      <!-- Form Actions -->
+      <div class="flex justify-content-end gap-2 mt-4 pt-4 border-top-1 surface-border">
+        <p-button 
+          [label]="'supplier.form.cancel' | translate"
+          icon="pi pi-times"
+          (onClick)="onCancel()"
+          severity="secondary"
+          [outlined]="true"
+          [disabled]="isSaving">
+        </p-button>
+        <p-button 
+          [label]="(isEditMode ? 'supplier.form.update' : 'supplier.form.create') | translate"
+          icon="pi pi-check"
+          type="submit"
+          severity="primary"
+          [loading]="isSaving"
+          [disabled]="supplierForm.invalid">
+        </p-button>
+      </div>
+    </form>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="p-2">
+      <div class="flex flex-column gap-3">
+        <p-skeleton height="2rem"></p-skeleton>
+        <p-skeleton height="2rem"></p-skeleton>
+        <p-skeleton height="2rem"></p-skeleton>
+      </div>
+    </div>
+  </p-card>
+</div>

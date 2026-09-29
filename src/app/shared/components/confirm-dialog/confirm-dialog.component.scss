@@ -1,0 +1,191 @@
+// ============================================
+// Custom Confirm Dialog Styles
+// ============================================
+.confirm-dialog-custom {
+  padding: 0;
+  
+  // RTL Support
+  [dir="rtl"] & {
+    direction: rtl;
+  }
+  
+  .confirm-dialog-header {
+    padding: 2rem;
+    display: flex;
+    gap: 1.5rem;
+    align-items: flex-start;
+    
+    // RTL Support
+    [dir="rtl"] & {
+      direction: rtl;
+    }
+  }
+
+  .confirm-icon {
+    flex-shrink: 0;
+    width: 3.5rem;
+    height: 3.5rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    
+    &.confirm-icon-danger {
+      background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%);
+      
+      .confirm-icon-svg {
+        color: #ef4444;
+        font-size: 2rem;
+      }
+    }
+    
+    &.confirm-icon-info {
+      background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(37, 99, 235, 0.1) 100%);
+      
+      .confirm-icon-svg {
+        color: #3b82f6;
+        font-size: 2rem;
+      }
+    }
+    
+    &.confirm-icon-warn {
+      background: linear-gradient(135deg, rgba(251, 191, 36, 0.1) 0%, rgba(245, 158, 11, 0.1) 100%);
+      
+      .confirm-icon-svg {
+        color: #f59e0b;
+        font-size: 2rem;
+      }
+    }
+  }
+
+  .confirm-dialog-content {
+    flex: 1;
+    min-width: 0;
+    
+    // RTL Support
+    [dir="rtl"] & {
+      text-align: right;
+    }
+    
+    .confirm-title {
+      margin: 0 0 0.75rem 0;
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: var(--text-color);
+      line-height: 1.4;
+    }
+    
+    .confirm-message {
+      margin: 0;
+      font-size: 0.9375rem;
+      color: var(--text-color-secondary);
+      line-height: 1.6;
+    }
+  }
+
+  .confirm-dialog-footer {
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    border-top: 1px solid var(--surface-border);
+    background: var(--surface-50);
+    
+    // RTL Support - reverse button order
+    [dir="rtl"] & {
+      flex-direction: row-reverse;
+      justify-content: flex-start;
+    }
+  }
+
+  .confirm-btn {
+    padding: 0.625rem 1.5rem;
+    border: none;
+    border-radius: 0.5rem;
+    font-size: 0.9375rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: inherit;
+    
+    i {
+      font-size: 1rem;
+    }
+    
+    // RTL Support - reverse icon and text order
+    [dir="rtl"] & {
+      flex-direction: row-reverse;
+    }
+    
+    &:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(var(--primary-500), 0.2);
+    }
+
+    &.confirm-btn-cancel {
+      background: var(--surface-100);
+      color: var(--text-color);
+      border: 1px solid var(--surface-border);
+      
+      &:hover {
+        background: var(--surface-200);
+        border-color: var(--surface-300);
+      }
+
+      &:active {
+        background: var(--surface-300);
+      }
+    }
+
+    &.confirm-btn-confirm {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+      color: white;
+      box-shadow: 0 2px 8px rgba(239, 68, 68, 0.3);
+      
+      &:hover {
+        background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 2px 6px rgba(239, 68, 68, 0.3);
+      }
+    }
+  }
+}
+
+// Override PrimeNG confirm dialog default styles
+:host ::ng-deep {
+  .p-dialog.p-confirm-dialog {
+    .p-dialog-content {
+      padding: 0 !important;
+    }
+  }
+}
+
+// Dark theme adjustments
+:host-context(.dark-theme) {
+  .confirm-dialog-custom {
+    .confirm-dialog-footer {
+      background: var(--surface-900);
+    }
+    
+    .confirm-btn-cancel {
+      background: var(--surface-800);
+      
+      &:hover {
+        background: var(--surface-700);
+      }
+
+      &:active {
+        background: var(--surface-600);
+      }
+    }
+  }
+}

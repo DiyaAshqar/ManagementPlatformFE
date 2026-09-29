@@ -1,0 +1,64 @@
+<p-select
+  [inputId]="inputId()"
+  [ngModel]="value()"
+  (ngModelChange)="selectMaterial($event)"
+  [ngModelOptions]="{ standalone: true }"
+  [options]="materialGroups()"
+  [group]="true"
+  optionGroupLabel="label"
+  optionGroupChildren="items"
+  optionLabel="name"
+  optionValue="id"
+  dataKey="id"
+  [appendTo]="appendTo()"
+  [showClear]="showClear()"
+  [filter]="true"
+  filterBy="name,subCategoryName"
+  [filterPlaceholder]="filterPlaceholder()"
+  [resetFilterOnHide]="resetFilterOnHide()"
+  [loading]="loading()"
+  [disabled]="isDisabled()"
+  [placeholder]="placeholder()"
+  [class]="selectClass()"
+  [class.ng-dirty]="invalid()"
+  [class.ng-invalid]="invalid()"
+  (onFilter)="handleFilter($event)"
+  (onHide)="handleHide()"
+  (onBlur)="markTouched()">
+
+  <ng-template pTemplate="group" let-group>
+    <div class="flex align-items-center gap-2 font-semibold">
+      <i class="pi pi-folder text-primary"></i>
+      <span>{{ group.label }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="item" let-material>
+    <div class="flex flex-column">
+      <span>{{ material.name?.trim() }}</span>
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="emptyfilter">
+    <div class="text-center p-2 text-color-secondary">
+      {{ loading() ? loadingMessage() : emptyMessage() }}
+    </div>
+  </ng-template>
+
+  <ng-template pTemplate="footer">
+    @if (hasMore) {
+      <div class="p-2 border-top-1 surface-border">
+        <p-button
+          type="button"
+          [label]="loadMoreLabel()"
+          icon="pi pi-angle-down"
+          severity="secondary"
+          [text]="true"
+          [loading]="loading()"
+          styleClass="w-full"
+          (onClick)="loadMore($event)">
+        </p-button>
+      </div>
+    }
+  </ng-template>
+</p-select>

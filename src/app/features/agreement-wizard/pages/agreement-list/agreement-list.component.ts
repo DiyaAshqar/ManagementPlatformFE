@@ -1,7 +1,7 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { TranslateModule } from '@ngx-translate/core';
+import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 // PrimeNG Imports
 import { TableModule } from 'primeng/table';
@@ -9,13 +9,14 @@ import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
 import { InputTextModule } from 'primeng/inputtext';
 import { TooltipModule } from 'primeng/tooltip';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
-import { ToastModule } from 'primeng/toast';
 
 // Services
 import { AgreementWizardService } from '../../services/agreement-wizard.service';
 import { GetAllAgreementDto } from '../../../../../nswag/api-client';
 import { ConfirmationService, MessageService } from 'primeng/api';
+import { Permissions } from '../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../core/auth/services/auth.service';
+import { HasPermissionDirective } from '../../../../core/auth/directives/has-permission.directive';
 
 @Component({
     selector: 'app-agreement-list',
@@ -28,14 +29,13 @@ import { ConfirmationService, MessageService } from 'primeng/api';
         CardModule,
         InputTextModule,
         TooltipModule,
-        ConfirmDialogModule,
-        ToastModule
+        HasPermissionDirective,
     ],
-    providers: [ConfirmationService, MessageService],
     templateUrl: './agreement-list.component.html',
     styleUrls: ['./agreement-list.component.scss']
 })
 export class AgreementListComponent {
+    readonly permissions = Permissions;
     agreements = signal<GetAllAgreementDto[]>([]);
     loading = signal<boolean>(false);
     totalRecords = signal<number>(0);
@@ -48,7 +48,9 @@ export class AgreementListComponent {
         private agreementService: AgreementWizardService,
         private router: Router,
         private confirmationService: ConfirmationService,
-        private messageService: MessageService
+        private messageService: MessageService,
+        private translate: TranslateService,
+        private authService: AuthService
     ) { }
 
 
@@ -86,28 +88,30 @@ export class AgreementListComponent {
     }
 
     addNewAgreement(): void {
+        if (!this.canCreate()) return;
         this.router.navigate(['/agreement-wizard/create']);
     }
 
     editAgreement(agreement: GetAllAgreementDto): void {
+        if (!this.canEdit()) return;
         if (agreement.id) {
             this.router.navigate(['/agreement-wizard/edit', agreement.id]);
         }
     }
 
     deleteAgreement(agreement: GetAllAgreementDto): void {
+        if (!this.canDelete()) return;
         this.confirmationService.confirm({
-            message: `Are you sure you want to delete agreement "${agreement.projectName}"?`,
-            header: 'Delete Confirmation',
+            message: this.translate.instant('agreements.confirmDelete.message', { name: agreement.projectName }),
+            header: this.translate.instant('agreements.confirmDelete.header'),
             icon: 'pi pi-exclamation-triangle',
-            acceptButtonStyleClass: 'p-button-danger',
             accept: () => {
                 // TODO: Implement delete API call when available
                 console.log('Delete agreement:', agreement.id);
                 this.messageService.add({
                     severity: 'info',
-                    summary: 'Info',
-                    detail: 'Delete functionality to be implemented'
+                    summary: this.translate.instant('common.info'),
+                    detail: this.translate.instant('agreements.confirmDelete.notImplemented')
                 });
 
                 // After successful deletion, reload the list
@@ -117,6 +121,7 @@ export class AgreementListComponent {
     }
 
     viewAgreement(agreement: GetAllAgreementDto): void {
+        if (!this.authService.hasPermission(Permissions.Agreements.View)) return;
         if (agreement.id) {
             this.router.navigate(['/agreement-wizard/view', agreement.id]);
         }
@@ -125,5 +130,17 @@ export class AgreementListComponent {
     formatDate(date: Date | undefined): string {
         if (!date) return '-';
         return new Date(date).toLocaleDateString();
+    }
+
+    canCreate(): boolean {
+        return this.authService.hasPermission(Permissions.Agreements.Create);
+    }
+
+    canEdit(): boolean {
+        return this.authService.hasPermission(Permissions.Agreements.Edit);
+    }
+
+    canDelete(): boolean {
+        return this.authService.hasPermission(Permissions.Agreements.Delete);
     }
 }

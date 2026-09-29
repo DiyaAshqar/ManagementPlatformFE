@@ -1,0 +1,115 @@
+<div class="wcl-page">
+  <div class="wcl-card">
+
+    <!-- Header -->
+    <div class="wcl-header">
+      <div>
+        <h2 class="wcl-title">{{ 'wirChecklist.title' | translate }}</h2>
+        <p class="wcl-subtitle">{{ 'wirChecklist.subtitle' | translate }}</p>
+      </div>
+      <p-button *appHasPermission="permissions.Wir.Manage"
+        [label]="'wirChecklist.add' | translate"
+        icon="pi pi-plus"
+        severity="contrast"
+        [raised]="true"
+        (onClick)="openAdd()">
+      </p-button>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="wcl-toolbar">
+      <p-iconfield iconPosition="left">
+        <p-inputicon class="pi pi-search"></p-inputicon>
+        <input type="text" pInputText [value]="search()" (input)="search.set($any($event.target).value)"
+          [placeholder]="'wirChecklist.searchPlaceholder' | translate" />
+      </p-iconfield>
+      <span class="wcl-count">{{ 'wirChecklist.count' | translate }}: {{ items().length }}</span>
+    </div>
+
+    <!-- Table -->
+    <p-table
+      [value]="filteredItems()"
+      [loading]="isLoading()"
+      [paginator]="filteredItems().length > 20"
+      [rows]="20"
+      styleClass="p-datatable-gridlines wcl-table"
+      [tableStyle]="{ 'min-width': '40rem' }">
+
+      <ng-template pTemplate="header">
+        <tr>
+          <th style="width: 7rem;" class="text-center">{{ 'wirChecklist.order' | translate }}</th>
+          <th>{{ 'wirChecklist.item' | translate }}</th>
+          <th *appHasPermission="permissions.Wir.Manage" style="width: 12rem;" class="text-center">{{ 'common.actions' | translate }}</th>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="body" let-item let-i="rowIndex">
+        <tr>
+          <td class="text-center" [attr.data-label]="'wirChecklist.order' | translate">
+            <span class="wcl-order">{{ item.displayOrder }}</span>
+          </td>
+          <td [attr.data-label]="'wirChecklist.item' | translate">{{ item.checklistItem }}</td>
+          <td *appHasPermission="permissions.Wir.Manage" class="text-center" [attr.data-label]="'common.actions' | translate">
+            <div class="flex align-items-center justify-content-center gap-1">
+              <p-button icon="pi pi-arrow-up" [rounded]="true" [text]="true" severity="secondary" size="small"
+                [disabled]="!!search() || isReordering() || i === 0"
+                [pTooltip]="'wirChecklist.moveUp' | translate" tooltipPosition="top" (onClick)="move(item, -1)"></p-button>
+              <p-button icon="pi pi-arrow-down" [rounded]="true" [text]="true" severity="secondary" size="small"
+                [disabled]="!!search() || isReordering() || i === filteredItems().length - 1"
+                [pTooltip]="'wirChecklist.moveDown' | translate" tooltipPosition="top" (onClick)="move(item, 1)"></p-button>
+              <p-button icon="pi pi-pencil" [rounded]="true" [text]="true" severity="secondary" size="small"
+                [pTooltip]="'common.edit' | translate" tooltipPosition="top" (onClick)="openEdit(item)"></p-button>
+              <p-button icon="pi pi-trash" [rounded]="true" [text]="true" severity="danger" size="small"
+                [pTooltip]="'common.delete' | translate" tooltipPosition="top" (onClick)="confirmDelete(item)"></p-button>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+
+      <ng-template pTemplate="emptymessage">
+        <tr>
+          <td colspan="3">
+            <div class="wcl-empty">
+              <i class="pi pi-list-check"></i>
+              <p>{{ (search() ? 'wirChecklist.noResults' : 'wirChecklist.empty') | translate }}</p>
+            </div>
+          </td>
+        </tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<!-- Add / edit dialog -->
+<p-dialog
+  [visible]="dialogVisible()"
+  (visibleChange)="dialogVisible.set($event)"
+  [header]="(editingId() ? 'wirChecklist.editTitle' : 'wirChecklist.addTitle') | translate"
+  [modal]="true"
+  [draggable]="false"
+  appendTo="body"
+  [style]="{ width: '36rem' }"
+  [breakpoints]="{ '640px': '95vw' }">
+
+  <form [formGroup]="form" class="flex flex-column gap-3 pt-1" (ngSubmit)="save()">
+    <div>
+      <label for="checklistItem" class="wcl-label">{{ 'wirChecklist.item' | translate }} <span class="required-asterisk">*</span></label>
+      <input pInputText id="checklistItem" formControlName="checklistItem" class="w-full"
+        [class.ng-invalid]="isFieldInvalid('checklistItem')" [class.ng-dirty]="isFieldInvalid('checklistItem')" />
+      @if (isFieldInvalid('checklistItem')) {
+        <small class="p-error">{{ 'validation.required' | translate }}</small>
+      }
+    </div>
+    <div>
+      <label for="displayOrder" class="wcl-label">{{ 'wirChecklist.order' | translate }} <span class="required-asterisk">*</span></label>
+      <p-inputnumber inputId="displayOrder" formControlName="displayOrder" [min]="1" [useGrouping]="false"
+        styleClass="w-full" inputStyleClass="w-full"></p-inputnumber>
+    </div>
+  </form>
+
+  <ng-template pTemplate="footer">
+    <p-button [label]="'common.cancel' | translate" icon="pi pi-times" severity="secondary" [outlined]="true"
+      (onClick)="dialogVisible.set(false)"></p-button>
+    <p-button [label]="'common.save' | translate" icon="pi pi-check" [loading]="isSaving()" (onClick)="save()"></p-button>
+  </ng-template>
+</p-dialog>

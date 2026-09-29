@@ -1,0 +1,82 @@
+// Document stage styles
+
+:host {
+  display: block;
+}
+
+.project-documents-card {
+  :deep(.p-card-body) {
+    padding: 0;
+  }
+
+  :deep(.p-card-content) {
+    padding: 1.25rem;
+    padding-top: 0;
+  }
+}
+
+// Table styles
+:deep(.p-datatable) {
+  .p-datatable-header {
+    background: transparent;
+    border: none;
+    padding: 0;
+  }
+
+  .p-datatable-thead > tr > th {
+    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .p-datatable-tbody > tr > td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--surface-border);
+    vertical-align: middle;
+  }
+
+  .p-datatable-tbody > tr:last-child > td {
+    border-bottom: none;
+  }
+
+  .p-datatable-tbody > tr:hover {
+    background: var(--surface-hover);
+  }
+}
+
+// File icons
+.pi-file-pdf {
+  color: var(--red-500);
+}
+
+.pi-file-excel {
+  color: var(--green-600);
+}
+
+.pi-file-word {
+  color: var(--blue-600);
+}
+
+.pi-image {
+  color: var(--blue-500);
+}
+
+// Drop zone hover state
+.border-primary {
+  border-color: var(--primary-color) !important;
+  background-color: var(--primary-50) !important;
+}
+
+// Upload dialog file list
+.max-h-15rem {
+  max-height: 15rem;
+}
+
+// Responsive adjustments
+@media screen and (max-width: 960px) {
+  :deep(.p-datatable) {
+    .p-datatable-thead > tr > th,
+    .p-datatable-tbody > tr > td {
+      padding: 0.5rem 0.75rem;
+    }
+  }
+}

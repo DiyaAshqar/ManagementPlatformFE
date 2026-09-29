@@ -1,0 +1,143 @@
+:host {
+  display: block;
+}
+
+.col-num {
+  width: 3.5rem;
+  text-align: center;
+}
+
+.col-select {
+  width: 3rem;
+  text-align: center;
+}
+
+.col-actions {
+  width: 8rem;
+  text-align: center;
+}
+
+.th-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.report-row--selected {
+  background: var(--highlight-bg, #eff6ff) !important;
+}
+
+.sticky-col {
+  position: sticky;
+  inset-inline-start: 0;
+  z-index: 1;
+  background: var(--surface-card, #fff);
+}
+
+.bool-cell {
+  color: var(--red-400, #f87171);
+
+  &--true {
+    color: var(--green-500, #22c55e);
+  }
+
+  .sr-text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+}
+
+/* Grouped (custom) grid ---------------------------------------------------- */
+.report-grid-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--surface-border, #e2e8f0);
+  border-radius: 0.5rem;
+}
+
+.report-grid {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+
+  th,
+  td {
+    padding: 0.5rem 0.75rem;
+    border-bottom: 1px solid var(--surface-border, #e2e8f0);
+  }
+
+  thead th {
+    background: var(--surface-100, #f1f5f9);
+    font-weight: 700;
+    text-align: start;
+    position: relative;
+
+    &.sortable {
+      cursor: pointer;
+      user-select: none;
+    }
+  }
+
+  &--sticky thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+  }
+
+  .sort-ico {
+    font-size: 0.75rem;
+    opacity: 0.7;
+  }
+}
+
+.report-grid__group-header td {
+  background: var(--surface-200, #e2e8f0);
+  font-weight: 600;
+}
+
+.group-toggle {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: inherit;
+  padding: 0 0.4rem 0 0;
+}
+
+.group-title {
+  font-weight: 700;
+}
+
+.group-count {
+  color: var(--text-color-secondary, #64748b);
+  margin-inline-start: 0.35rem;
+}
+
+.group-summaries {
+  margin-inline-start: 1rem;
+  display: inline-flex;
+  flex-wrap: wrap;
+  gap: 0.15rem 1rem;
+  font-weight: 500;
+}
+
+.group-summary {
+  color: var(--text-color-secondary, #475569);
+  font-size: 0.8rem;
+}
+
+.report-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.5rem 0;
+
+  .report-skeleton__row {
+    width: 100%;
+  }
+}

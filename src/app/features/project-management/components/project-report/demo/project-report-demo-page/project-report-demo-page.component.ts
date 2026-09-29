@@ -1,0 +1,443 @@
+import { HttpClient } from '@angular/common/http';
+import { Component, inject, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { forkJoin } from 'rxjs';
+
+import { ButtonModule } from 'primeng/button';
+import { CardModule } from 'primeng/card';
+import { CheckboxModule } from 'primeng/checkbox';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { SelectModule } from 'primeng/select';
+
+import { AgreementDetailsDto, ProjectClient, ProjectStageDetailsDto, ProjectStageDto, ReportClient } from '../../../../../../../nswag/api-client';
+import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
+import { Permissions } from '../../../../../../core/auth/models/auth.models';
+import { AuthService } from '../../../../../../core/auth/services/auth.service';
+import { PrintService } from '../../../../../../shared/services/print.service';
+import { buildProjectReportHtml } from '../../builders/project-report.builder';
+import {
+  ProjectReportConfig,
+  ProjectReportLanguage,
+  ProjectReportSectionKey,
+  ProjectReportSnapshot,
+  ProjectReportType,
+  PROJECT_REPORT_SECTION_KEYS,
+} from '../../models/project-report.model';
+import { resolveReportSections } from '../../utilities/project-report-sections.util';
+import { resolveTranslationKey } from '../../utilities/project-report-translate.util';
+import { buildStageDataTablesHtml, StageDataTableKey, STAGE_DATA_TABLE_OPTIONS } from '../project-report-demo-stage-tables';
+
+interface Option<V> {
+  label: string;
+  value: V;
+}
+
+type DataTypeCardKey = StageDataTableKey | 'photos';
+
+interface DataTypeCard {
+  key: DataTypeCardKey;
+  badge: string;
+  color: string;
+  icon: string;
+  titleAr: string;
+  subtitleAr: string;
+  descriptionAr: string;
+}
+interface LoadedStageReport {
+  details: AgreementDetailsDto;
+  stage: ProjectStageDetailsDto;
+}
+
+interface MilestoneSummary {
+  id: number;
+  name: string;
+  boq: number;
+  mc: number;
+  purchaseOrders: number;
+  variationOrders: number;
+  surveyingVisits: number;
+  savings: number;
+  expenses: number;
+  budget: number;
+  actual: number;
+  total: number;
+}
+const PHOTOS_CARD: DataTypeCard = {
+  key: 'photos', badge: 'IMG', color: '#e11d48', icon: 'pi-images',
+  titleAr: 'صور سير العمل', subtitleAr: 'Progress Photos', descriptionAr: 'صور توثيق تنفيذ الأعمال',
+};
+
+const REPORT_TYPE_LABELS_AR: Record<ProjectReportType, string> = {
+  full: 'تقرير كامل', summary: 'تقرير ملخص', progress: 'تقرير التقدم', financial: 'تقرير مالي', custom: 'تقرير مخصص',
+};
+
+const SECTION_LABELS_AR: Record<ProjectReportSectionKey, string> = {
+  cover: 'صفحة الغلاف', executiveSummary: 'الملخص التنفيذي', agreement: 'تفاصيل الاتفاقية',
+  financial: 'التقرير المالي', documents: 'المستندات وصور سير العمل', signatures: 'الملخص الختامي والتوقيعات',
+};
+
+const STATUS_LABELS: Record<string, string> = {
+  toDO: 'لم تبدأ', inProgress: 'قيد التنفيذ', review: 'قيد المراجعة', completed: 'مكتملة', approved: 'معتمد', pending: 'قيد الانتظار', rejected: 'مرفوض',
+};
+
+@Component({
+  selector: 'app-project-report-demo-page',
+  standalone: true,
+  imports: [FormsModule, ButtonModule, CardModule, SelectModule, CheckboxModule, MultiSelectModule, HasPermissionDirective],
+  templateUrl: './project-report-demo-page.component.html',
+  styleUrl: './project-report-demo-page.component.scss',
+})
+export class ProjectReportDemoPageComponent {
+  private readonly http = inject(HttpClient);
+  private readonly projectClient = inject(ProjectClient);
+  private readonly reportClient = inject(ReportClient);
+  private readonly sanitizer = inject(DomSanitizer);
+  private readonly printService = inject(PrintService);
+  private readonly authService = inject(AuthService);
+  readonly Permissions = Permissions;
+
+  get canViewFinanceDetails(): boolean {
+    return this.authService.hasPermission(Permissions.ProjectReport.ViewFinanceDetails);
+  }
+
+  readonly reportTypeOptions: Option<ProjectReportType>[] = (['full', 'summary', 'progress', 'financial', 'custom'] as ProjectReportType[])
+    .map((value) => ({ label: REPORT_TYPE_LABELS_AR[value], value }));
+  readonly languageOptions: Option<ProjectReportLanguage>[] = [{ label: 'العربية', value: 'ar' }, { label: 'الإنجليزية', value: 'en' }];
+  readonly sectionOptions: Option<ProjectReportSectionKey>[] = PROJECT_REPORT_SECTION_KEYS.map((value) => ({ label: SECTION_LABELS_AR[value], value }));
+  readonly dataTypeCards: DataTypeCard[] = [...STAGE_DATA_TABLE_OPTIONS, PHOTOS_CARD];
+  enabledStageTables = new Set<StageDataTableKey>(STAGE_DATA_TABLE_OPTIONS.map((option) => option.key));
+
+  projectOptions: Option<number>[] = [];
+  stageOptions: Option<number>[] = [];
+  selectedProjectId: number | null = null;
+  selectedStageIds: number[] = [];
+  viewMode: 'detailed' | 'summary' = 'detailed';
+  selectedType: ProjectReportType = 'full';
+  asOfDate = new Date();
+  selectedLanguage: ProjectReportLanguage = 'ar';
+  includeCompanyHeader = true;
+  includeFinancial = true;
+  includeDocuments = true;
+  includePhotos = true;
+  includeSignatures = true;
+  includePercentageFees = true;
+  confidential = false;
+  customSections: ProjectReportSectionKey[] = [...PROJECT_REPORT_SECTION_KEYS];
+
+  readonly isRendering = signal(false);
+  readonly isLoadingProjects = signal(false);
+  readonly isLoadingStages = signal(false);
+  readonly loadError = signal<string | null>(null);
+  readonly previewHtml = signal<SafeHtml | null>(null);
+  private details: AgreementDetailsDto | null = null;
+  private stage: ProjectStageDetailsDto | null = null;
+  private loadedStageReports: LoadedStageReport[] = [];
+  private lastGeneratedHtml = '';
+  private stageLoadVersion = 0;
+  private reportLoadVersion = 0;
+
+  constructor() {
+    this.loadProjects();
+  }
+
+  get isCustom(): boolean {
+    return this.selectedType === 'custom';
+  }
+
+  get hasSelectedMilestones(): boolean {
+    return this.selectedStageIds.length > 0;
+  }
+
+  get milestoneSummaries(): MilestoneSummary[] {
+    return this.loadedStageReports.map(({ details, stage }) => this.createMilestoneSummary(details, stage));
+  }
+
+  get grandTotal(): MilestoneSummary | null {
+    const summaries = this.milestoneSummaries;
+    if (!summaries.length) return null;
+    const sum = (key: keyof Omit<MilestoneSummary, 'id' | 'name'>) => summaries.reduce((total, item) => total + (item[key] as number), 0);
+    const budget = sum('budget');
+    const actual = sum('actual');
+    return { id: 0, name: 'الإجمالي العام', boq: sum('boq'), mc: sum('mc'), purchaseOrders: sum('purchaseOrders'), variationOrders: sum('variationOrders'), surveyingVisits: sum('surveyingVisits'), savings: sum('savings'), expenses: sum('expenses'), budget, actual, total: sum('total') };
+  }
+
+  ratio(actual: number, budget: number): number | null {
+    return budget > 0 ? (actual / budget) * 100 : null;
+  }
+
+  isCardSelected(key: DataTypeCardKey): boolean {
+    return key === 'photos' ? this.includePhotos : this.enabledStageTables.has(key);
+  }
+
+  toggleCard(key: DataTypeCardKey): void {
+    if (key === 'photos') {
+      this.includePhotos = !this.includePhotos;
+    } else if (this.enabledStageTables.has(key)) {
+      this.enabledStageTables.delete(key);
+    } else {
+      this.enabledStageTables.add(key);
+    }
+    this.refresh();
+  }
+
+  refresh(): void {
+    if (!this.details || !this.stage || this.isRendering()) {
+      return;
+    }
+    this.isRendering.set(true);
+    const config: ProjectReportConfig = {
+      type: this.selectedType, asOfDate: this.asOfDate, language: this.selectedLanguage,
+      includeCompanyHeader: this.includeCompanyHeader, includeFinancial: this.includeFinancial,
+      includeDocuments: this.includeDocuments, includePhotos: this.includePhotos,
+      includeSignatures: this.includeSignatures, includePercentageFees: this.includePercentageFees && this.canViewFinanceDetails,
+      confidential: this.confidential, customSections: this.customSections, companyLogoDataUrl: undefined,
+    };
+
+    this.http.get<Record<string, unknown>>(`/assets/i18n/${this.selectedLanguage}.json`).subscribe({
+      next: (translations) => {
+        const translate = (key: string, params?: Record<string, unknown>) => resolveTranslationKey(translations, key, params);
+        const sections = resolveReportSections(config);
+        if (!config.includeSignatures) {
+          sections.delete('signatures');
+        }
+        const reportHtml = buildProjectReportHtml(this.buildSnapshot(), config, sections, translate);
+        this.lastGeneratedHtml = this.injectStageDataTables(reportHtml);
+        this.previewHtml.set(this.sanitizer.bypassSecurityTrustHtml(this.lastGeneratedHtml));
+        this.isRendering.set(false);
+      },
+      error: () => {
+        this.loadError.set('تعذّر تحميل ترجمات التقرير.');
+        this.isRendering.set(false);
+      },
+    });
+  }
+
+  print(): void {
+    if (this.lastGeneratedHtml) {
+      this.printService.openAndPrint(this.lastGeneratedHtml);
+    }
+  }
+
+  onProjectChange(): void {
+    const projectId = this.selectedProjectId;
+    this.selectedStageIds = [];
+    this.stageOptions = [];
+    this.clearReport();
+    if (!projectId) return;
+
+    const requestVersion = ++this.stageLoadVersion;
+    this.isLoadingStages.set(true);
+    this.projectClient.getProjectById(projectId).subscribe({
+      next: (response) => {
+        if (requestVersion !== this.stageLoadVersion) return;
+        this.stageOptions = (response.data?.projectStages ?? [])
+          .filter((stage) => stage.id != null && stage.mileStone != null)
+          .map((stage) => ({ label: this.getStageLabel(stage), value: stage.id! }));
+        this.isLoadingStages.set(false);
+        if (!this.stageOptions.length) this.loadError.set('No milestone stages are available for the selected project.');
+      },
+      error: () => {
+        if (requestVersion !== this.stageLoadVersion) return;
+        this.isLoadingStages.set(false);
+        this.loadError.set('Unable to load the selected project stages.');
+      },
+    });
+  }
+
+  onStageChange(): void {
+    if (!this.selectedStageIds.length) {
+      this.clearReport();
+      return;
+    }
+    this.viewMode = this.selectedStageIds.length === 1 ? 'detailed' : 'summary';
+    if (this.selectedProjectId) this.loadReport();
+  }
+
+  private loadReport(): void {
+    const projectId = this.selectedProjectId;
+    const projectStageIds = [...this.selectedStageIds];
+    if (!projectId || !projectStageIds.length) return;
+    const requestVersion = ++this.reportLoadVersion;
+    this.isRendering.set(true);
+    forkJoin(projectStageIds.map((stageId) => this.reportClient.getProjectStageDetails(projectId, stageId))).subscribe({
+      next: (responses) => {
+        if (requestVersion !== this.reportLoadVersion) return;
+        const reports = responses.map((response) => ({ details: response.data, stage: response.data?.project?.stage }));
+        const invalid = reports.find((report, index) => !responses[index].succeeded || !report.details || !report.stage);
+        if (invalid) {
+          this.loadError.set('لم تُرجع الواجهة بيانات إحدى المراحل المطلوبة.');
+          this.isRendering.set(false);
+          return;
+        }
+        this.loadedStageReports = reports as LoadedStageReport[];
+        this.details = this.loadedStageReports[0].details;
+        this.stage = this.loadedStageReports[0].stage;
+        this.loadError.set(null);
+        this.isRendering.set(false);
+        this.refresh();
+      },
+      error: () => {
+        if (requestVersion !== this.reportLoadVersion) return;
+        this.loadError.set('تعذّر تحميل بيانات التقرير من الخادم.');
+        this.isRendering.set(false);
+      },
+    });
+  }
+  private loadProjects(): void {
+    this.isLoadingProjects.set(true);
+    this.projectClient.getAllProjects(1, 100, undefined).subscribe({
+      next: (response) => {
+        this.projectOptions = (response.data?.data ?? [])
+          .filter((project) => project.id != null)
+          .map((project) => ({ label: project.title || `Project #${project.id}`, value: project.id! }));
+        this.isLoadingProjects.set(false);
+        if (!this.projectOptions.length) this.loadError.set('No projects are available.');
+      },
+      error: () => {
+        this.isLoadingProjects.set(false);
+        this.loadError.set('Unable to load projects.');
+      },
+    });
+  }
+
+  private clearReport(): void {
+    this.reportLoadVersion++;
+    this.details = null;
+    this.stage = null;
+    this.loadedStageReports = [];
+    this.lastGeneratedHtml = '';
+    this.previewHtml.set(null);
+    this.loadError.set(null);
+  }
+
+  private getStageLabel(stage: ProjectStageDto): string {
+    return stage.mileStone?.name || `Milestone stage #${stage.id}`;
+  }
+
+  private createMilestoneSummary(details: AgreementDetailsDto, stage: ProjectStageDetailsDto): MilestoneSummary {
+    const sum = (items: Array<number | undefined>): number => items.reduce<number>((total, value) => total + (value ?? 0), 0);
+    const boq = sum((stage.boqs ?? []).map((item) => item.subTotal));
+    const mc = sum((stage.mainContractors ?? []).map((item) => item.amount));
+    const purchaseOrders = sum((stage.purchaseOrders ?? []).map((item) => item.subTotal));
+    const paidMc = sum((stage.mainContractors ?? []).map((item) =>
+      item.totalPayments ?? sum((item.payments ?? []).map((payment) => payment.paidAmount))));
+    const variationOrders = sum((stage.variationOrders ?? []).map((item) => item.subTotal));
+    const surveyingVisits = sum((stage.surveyingVisits ?? []).map((item) => item.subTotal));
+    // Savings = planned BOQ cost minus actual BOQ cost (no dedicated backend field yet).
+    const savings = sum((stage.boqs ?? []).map((item) =>
+      (item.expectedQuantity ?? 0) * (item.expectedPrice ?? 0) - (item.actualQuantity ?? 0) * (item.actualPrice ?? 0)));
+    const expenses = sum((stage.expenses ?? []).map((item) => item.totalAmount));
+    // BOQ is the stage-level budget basis; this keeps each percentage scoped to its own milestone.
+    const budget = boq;
+    return { id: stage.id ?? 0, name: stage.milestone?.name ?? 'المرحلة رقم ' + (stage.id ?? '—'), boq, mc, purchaseOrders, variationOrders, surveyingVisits, savings, expenses, budget, actual: expenses, total: paidMc + expenses + variationOrders + surveyingVisits };
+  }
+
+  private buildSnapshot(): ProjectReportSnapshot {
+    const data = this.details!;
+    const stage = this.stage!;
+    const project = data.project;
+    const tasks = stage.tasks ?? [];
+    const mainContractors = stage.mainContractors ?? [];
+    const variationOrders = stage.variationOrders ?? [];
+    const advances = stage.advances ?? [];
+    const images = [
+      ...(data.images ?? []), ...(project?.images ?? []), ...(stage.images ?? []),
+      ...tasks.flatMap((task) => task.images ?? []),
+    ].filter((image) => !!image.fileUrl);
+    const number = (items: Array<number | undefined>) => items.reduce<number>((sum, item) => sum + (item ?? 0), 0);
+    const now = this.asOfDate;
+    const startDate = project?.startDate ?? data.estimatedStartDate;
+    const endDate = project?.endDate ?? data.estimatedEndDate;
+    const elapsed = startDate ? Math.max(0, Math.floor((now.getTime() - startDate.getTime()) / 86_400_000)) : null;
+    const remaining = endDate ? Math.max(0, Math.ceil((endDate.getTime() - now.getTime()) / 86_400_000)) : null;
+    const taskCounts = {
+      todo: tasks.filter((task) => String(task.status) === 'toDO').length,
+      inProgress: tasks.filter((task) => String(task.status) === 'inProgress').length,
+      review: tasks.filter((task) => String(task.status) === 'review').length,
+      completed: tasks.filter((task) => String(task.status) === 'completed').length,
+    };
+    const currency = advances.find((advance) => advance.currency)?.currency ?? null;
+    const monthlyPayment = data.agreementPayment?.monthlyPayment;
+    const milestoneOrders = (data.milestones ?? [])
+      .map((milestone) => milestone.order ?? 0)
+      .filter((order) => order > 0);
+    const currentMilestoneOrder = stage.milestone?.order ?? 0;
+    const lastMilestoneOrder = Math.max(0, ...milestoneOrders);
+    const milestoneProgressPercent = lastMilestoneOrder > 0 && currentMilestoneOrder > 0
+      ? Math.min(100, (currentMilestoneOrder / lastMilestoneOrder) * 100)
+      : 0;
+
+    return {
+      meta: { generatedAt: new Date(), generatedByName: 'System Administrator', failedSections: [], warnings: [] },
+      cover: {
+        projectName: project?.title ?? data.projectName ?? '—', projectNumber: project?.projectNumber ?? data.projectNumber ?? null,
+        clientName: data.client?.contactPerson ?? null, location: [data.cityName, data.countryName].filter(Boolean).join(', ') || null,
+        reportingPeriodLabel: stage.milestone?.name ?? `المرحلة رقم ${stage.id ?? '—'}`, asOfDate: now,
+      },
+      executiveSummary: {
+        statusLabel: STATUS_LABELS[String(project?.status)] ?? String(project?.status ?? '—'), progressPercent: milestoneProgressPercent,
+        startDate: startDate ?? null, endDate: endDate ?? null, daysElapsed: elapsed, daysRemaining: remaining,
+        budget: project?.budget ?? null, contractValue: monthlyPayment?.amount ?? null,
+        actualExpenditure: number((stage.expenses ?? []).map((expense) => expense.totalAmount)),
+        committedAmount: number(mainContractors.map((contractor) => contractor.amount)),
+        milestonesTotal: data.milestones?.length ?? 0, milestonesCompleted: null, risks: [],
+      },
+      agreement: {
+        projectNumber: data.projectNumber ?? null, projectName: data.projectName ?? null, agreementDate: data.agreementDate ?? null,
+        agreementTypeLabel: data.agreementTypeName ?? null, businessSector: data.businessSector ?? null,
+        estimatedStartDate: data.estimatedStartDate ?? null, estimatedEndDate: data.estimatedEndDate ?? null,
+        country: data.countryName ?? null, city: data.cityName ?? null, projectArea: data.projectArea ?? null,
+        description: data.description ?? null, drillingQuantity: data.drillingQuantity ?? null,
+        client: {
+          contactPerson: data.client?.contactPerson ?? null, contactPersonPhone: data.client?.contactPersonNumber?.toString() ?? null,
+          representerName: data.client?.representerName ?? null, representerPhone: data.client?.representerNameNumber?.toString() ?? null,
+        },
+        land: {
+          plotNumber: data.landInformation?.plotNumber ?? null, directorate: data.landInformation?.directorate ?? null,
+          village: data.landInformation?.village ?? null, basinName: data.landInformation?.basinName ?? null,
+          basinNumber: data.landInformation?.basinNumber ?? null, floorNumber: data.landInformation?.floorNumber ?? null,
+        },
+        contract: {
+          contractTypeLabel: data.agreementPayment?.contractTypeName ?? null, contractModelLabel: data.agreementPayment?.contractModelName ?? null,
+          monthlyFees: monthlyPayment?.monthlyFees ?? null, percentageFees: monthlyPayment?.percentageFees ?? null,
+        },
+        services: (data.services ?? []).map((service) => service.serviceName).filter((name): name is string => !!name),
+      },
+      scope: {
+        areas: (data.projectAreaUnits ?? []).map((area) => ({ annexName: area.annexName ?? '—', amount: area.amount ?? 0, unitName: area.unitName ?? null })),
+        milestones: (data.milestones ?? []).map((milestone) => ({ order: milestone.order ?? 0, name: milestone.name ?? '—', description: milestone.description ?? null, statusLabel: null, stageLinked: milestone.id === stage.milestoneId })),
+      },
+      financial: {
+        authorized: true, currencyLabel: currency, contractValue: monthlyPayment?.amount ?? null, budget: project?.budget ?? null,
+        boqTotal: number((stage.boqs ?? []).map((boq) => boq.subTotal)), contractorCommitments: number(mainContractors.map((contractor) => contractor.amount)),
+        contractorPaid: number(mainContractors.map((contractor) => contractor.totalPayments)), contractorRemaining: number(mainContractors.map((contractor) => (contractor.amount ?? 0) - (contractor.totalPayments ?? 0))),
+        purchaseOrdersTotal: number((stage.purchaseOrders ?? []).map((order) => order.subTotal)), expensesTotal: number((stage.expenses ?? []).map((expense) => expense.totalAmount)),
+        advancesTotal: number(advances.map((advance) => advance.amount)), advancesRemaining: number(advances.map((advance) => advance.remainingBalance)), ownerPaymentsTotal: number((project?.paymentFlows ?? []).map((payment) => payment.cash)),
+        variationOrdersApprovedTotal: number(variationOrders.filter((order) => String(order.status) === 'approved').map((order) => order.subTotal)),
+        variationOrdersPendingTotal: number(variationOrders.filter((order) => String(order.status) === 'pending').map((order) => order.subTotal)),
+        variationOrdersRejectedTotal: number(variationOrders.filter((order) => String(order.status) === 'rejected').map((order) => order.subTotal)),
+        paymentClaimAuthorized: false, paymentClaimEstimateTotal: null, notes: ['بنود التوفير ومساحات الاهتمام ما زالت بيانات ثابتة مؤقتًا.'],
+      },
+      schedule: {
+        plannedStart: startDate ?? null, plannedEnd: endDate ?? null, asOfDate: now, daysElapsed: elapsed, daysRemaining: remaining,
+        taskCounts, stages: [{ name: stage.milestone?.name ?? `المرحلة رقم ${stage.id ?? '—'}`, typeLabel: String(stage.stageType ?? '—') }],
+        inProgressWork: tasks.filter((task) => String(task.status) === 'inProgress').map((task) => task.title ?? '—'),
+        upcomingWork: tasks.filter((task) => String(task.status) === 'toDO').map((task) => task.title ?? '—'),
+      },
+      siteActivities: {
+        tasks: tasks.map((task) => ({ title: task.title ?? '—', statusLabel: STATUS_LABELS[String(task.status)] ?? String(task.status ?? '—'), typeLabel: task.taskTypeName ?? null, responsibility: task.responsibility ? String(task.responsibility) : null, startDate: task.startDate ?? null, endDate: task.endDate ?? null, subtaskCount: task.subTasks?.length ?? 0 })),
+        surveyingVisits: (stage.surveyingVisits ?? []).map((visit) => ({ date: visit.visitDate ?? null, surveyor: visit.surveyor ?? null, purpose: visit.purpose ?? null, subTotal: visit.subTotal ?? null })),
+      },
+      documents: { photos: images.map((image) => ({ fileName: image.originalName ?? image.fileName ?? 'صورة', dataUrl: image.fileUrl ?? null, relatedTo: stage.milestone?.name ?? null })), photosOmittedCount: 0 },
+      signatures: { preparedByLabel: 'إعداد التقرير', reviewedByLabel: 'مراجعة التقرير', approvedByLabel: 'اعتماد التقرير' },
+    };
+  }
+
+  private injectStageDataTables(html: string): string {
+    const fragment = `<div style="margin-top:36px;padding-top:22px;">${buildStageDataTablesHtml(this.stage!, this.enabledStageTables, this.details?.project?.paymentFlows ?? [])}</div>`;
+    const candidates = [html.indexOf('<section class="report-section" id="signatures"'), html.indexOf('<section class="report-section" id="documents"')].filter((index) => index !== -1);
+    const insertAt = candidates.length ? Math.min(...candidates) : html.indexOf('<div class="report-footer">');
+    return insertAt === -1 ? html.replace('</body>', `${fragment}</body>`) : `${html.slice(0, insertAt)}${fragment}${html.slice(insertAt)}`;
+  }
+}

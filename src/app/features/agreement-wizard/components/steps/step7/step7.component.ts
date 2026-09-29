@@ -12,6 +12,8 @@ import { finalize, Subject, takeUntil } from 'rxjs';
 import { MessageService } from 'primeng/api';
 import { FileUploadModule } from 'primeng/fileupload';
 import { AgreementClient, AttachmentClient, AttachmentDto, SeventhStepDto, FullAgreementDto } from '../../../../../../nswag/api-client';
+import { AttachmentType } from '../../../../../../nswag/api-client';
+import { AttachmentTypeMap } from '../../../../../shared/services/attachment.service';
 
 interface Attachment {
   id?: number;
@@ -72,7 +74,7 @@ export class Step7Component implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.initializeForm();
     this.loadExistingAttachments();
-    
+
     // Disable all fields if in view mode
     if (this.isViewMode()) {
       this.attachmentForm.disable();
@@ -86,7 +88,7 @@ export class Step7Component implements OnInit, OnDestroy {
 
   private initializeForm(): void {
     this.attachmentForm = this.fb.group({
-      attachmentName: ['', [Validators.required, Validators.maxLength(200)]],
+      attachmentName: ['', [Validators.maxLength(200)]],
       file: [null, [Validators.required]]
     });
   }
@@ -102,7 +104,7 @@ export class Step7Component implements OnInit, OnDestroy {
       this.selectedFile.set(file);
       this.attachmentForm.patchValue({ file });
       this.attachmentForm.get('file')?.markAsTouched();
-      
+
       // Simulate upload progress
       this.simulateFileUpload();
     }
@@ -124,7 +126,7 @@ export class Step7Component implements OnInit, OnDestroy {
           this.isUploading.set(false);
           this.uploadSuccess.set(true);
           this.uploadProgress.set(0);
-          
+
           setTimeout(() => {
             this.uploadSuccess.set(false);
           }, 3000);
@@ -139,7 +141,7 @@ export class Step7Component implements OnInit, OnDestroy {
       this.messageService.add({
         severity: 'error',
         summary: 'Validation Error',
-        detail: 'Please select a file and enter an attachment name',
+        detail: 'Please select a file',
         life: 5000
       });
       return;
@@ -147,7 +149,7 @@ export class Step7Component implements OnInit, OnDestroy {
 
     const file = this.selectedFile()!;
     const newAttachment: Attachment = {
-      name: this.attachmentForm.value.attachmentName,
+      name: this.attachmentForm.value.attachmentName?.trim() || file.name,
       type: this.getFileExtension(file.name),
       file: file,
       fileName: file.name,
@@ -156,7 +158,7 @@ export class Step7Component implements OnInit, OnDestroy {
     };
 
     this.attachments.set([...this.attachments(), newAttachment]);
-    
+
     this.messageService.add({
       severity: 'success',
       summary: 'Success',
@@ -177,7 +179,7 @@ export class Step7Component implements OnInit, OnDestroy {
 
   viewAttachment(attachment: Attachment): void {
     const isPdf = this.isPdfFile(attachment);
-    
+
     if (!isPdf) {
       this.messageService.add({
         severity: 'error',
@@ -251,21 +253,35 @@ export class Step7Component implements OnInit, OnDestroy {
       return;
     }
 
+    // Edit mode with no new attachments — skip API and proceed
+    const newAttachments = this.attachments().filter(att => !att.isFromServer);
+    if (this.agreementId() > 0 && newAttachments.length === 0) {
+      this.stepData.emit({ attachments: this.attachments() });
+      this.router.navigate(['/agreement-wizard/success']);
+      return;
+    }
+
     this.submitStep();
   }
 
   private async submitStep(): Promise<void> {
     this.isLoading.set(true);
-    
+
     try {
+
+
+
       const attachmentDto = await Promise.all(
         this.attachments()
           .filter(att => !att.isFromServer)
           .map(async att => {
             const dto = new AttachmentDto();
             dto.id = 0;
-            dto.fileName = att.name || att.file?.name || '';
+            dto.fileName = att.file?.name || att.name || '';
             dto.filePath = '';
+            dto.originalName = att.name?.trim() || att.file?.name || '';
+            dto.relationshipId = this.agreementId();
+            dto.attachmentType = AttachmentTypeMap.Agreement;
             dto.base64Data = att.file ? await this.convertFileToBase64(att.file) : '';
             dto.contentType = this.toMimeType(att.type || att.file?.type || att.file?.name || '');
             return dto;
@@ -279,7 +295,7 @@ export class Step7Component implements OnInit, OnDestroy {
 
       // Create FullAgreementDto with step 7 data
       const fullAgreementDto = new FullAgreementDto();
-      fullAgreementDto.step = 7;
+      fullAgreementDto.step = 8;
       fullAgreementDto.agreementId = this.agreementId();
       fullAgreementDto.seventhStepDto = stepDataValue;
 
@@ -342,7 +358,7 @@ export class Step7Component implements OnInit, OnDestroy {
 
     this.isLoading.set(true);
     this.attachmentClient
-      .getAttachmentsByAgreementId(agreementId)
+      .getAttachmentsByAgreementId(agreementId, AttachmentTypeMap.Agreement)
       .pipe(
         takeUntil(this.destroy$),
         finalize(() => this.isLoading.set(false))
@@ -352,16 +368,16 @@ export class Step7Component implements OnInit, OnDestroy {
           if (response.succeeded && response.data) {
             const loadedAttachments: Attachment[] = response.data.map(att => ({
               id: att.id,
-              name: att.fileName || '',
+              name: att.originalName || att.fileName || '',
               type: this.getFileExtension(att.fileName || ''),
               fileName: att.fileName,
               filePath: att.filePath,
               contentType: this.toMimeType(att.fileName || ''),
               isFromServer: true
             }));
-            
+
             this.attachments.set(loadedAttachments);
-            
+
             if (loadedAttachments.length > 0) {
               this.messageService.add({
                 severity: 'success',
@@ -401,7 +417,7 @@ export class Step7Component implements OnInit, OnDestroy {
             if (response.succeeded) {
               attachmentsList.splice(index, 1);
               this.attachments.set(attachmentsList);
-              
+
               this.messageService.add({
                 severity: 'success',
                 summary: 'Success',
@@ -430,7 +446,7 @@ export class Step7Component implements OnInit, OnDestroy {
       // Local attachment, just remove from array
       attachmentsList.splice(index, 1);
       this.attachments.set(attachmentsList);
-      
+
       this.messageService.add({
         severity: 'success',
         summary: 'Success',
@@ -456,15 +472,15 @@ export class Step7Component implements OnInit, OnDestroy {
 
   getFileSize(file: File | null): string {
     if (!file) return '';
-    
+
     const bytes = file.size;
     const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-    
+
     if (bytes === 0) return '0 Bytes';
-    
+
     const i = Math.floor(Math.log(bytes) / Math.log(1024));
     const size = (bytes / Math.pow(1024, i)).toFixed(2);
-    
+
     return `${size} ${sizes[i]}`;
   }
 
@@ -475,14 +491,14 @@ export class Step7Component implements OnInit, OnDestroy {
   private toMimeType(filenameOrType: string): string {
     if (!filenameOrType) return 'application/octet-stream';
     const lower = filenameOrType.toLowerCase();
-    
+
     if (lower.includes('/')) return lower;
     if (lower.endsWith('.pdf') || lower === 'pdf') return 'application/pdf';
     if (lower.endsWith('.jpg') || lower.endsWith('.jpeg') || lower === 'jpg' || lower === 'jpeg') return 'image/jpeg';
     if (lower.endsWith('.png') || lower === 'png') return 'image/png';
     if (lower.endsWith('.doc') || lower === 'doc') return 'application/msword';
     if (lower.endsWith('.docx') || lower === 'docx') return 'application/vnd.openxmlformats-officedocument.wordprocessingml.document';
-    
+
     return 'application/octet-stream';
   }
 

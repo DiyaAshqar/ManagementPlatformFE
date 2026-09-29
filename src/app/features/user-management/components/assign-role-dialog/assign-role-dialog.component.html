@@ -1,0 +1,77 @@
+@if (user(); as u) {
+  <div class="assign-role-dialog">
+
+    <!-- User -->
+    <div class="ard-user">
+      <div class="ard-avatar">{{ (u.fullName || u.email || '?').charAt(0).toUpperCase() }}</div>
+      <div class="min-w-0">
+        <div class="ard-user-name">{{ u.fullName || u.email }}</div>
+        @if (u.fullName && u.email) {
+          <div class="ard-user-email">{{ u.email }}</div>
+        }
+      </div>
+    </div>
+
+    <!-- Current roles -->
+    <section>
+      <div class="ard-section-title">{{ 'userManagement.rolesDialog.currentRoles' | translate }}</div>
+      <div class="ard-roles">
+        @for (role of assignedRoles(); track role.name) {
+          <span class="ard-role-chip">
+            <i class="pi pi-shield"></i>
+            <span>{{ role.name }}</span>
+            @if (role.id != null) {
+              <button type="button" class="ard-role-remove"
+                [disabled]="isBusy()"
+                [pTooltip]="'userManagement.rolesDialog.remove' | translate" tooltipPosition="top"
+                (click)="removeRole(role)">
+                <i class="pi" [class.pi-spin]="removingRoleId() === role.id" [class.pi-spinner]="removingRoleId() === role.id"
+                  [class.pi-times]="removingRoleId() !== role.id"></i>
+              </button>
+            }
+          </span>
+        } @empty {
+          <div class="ard-empty">
+            <i class="pi pi-info-circle"></i>
+            {{ 'userManagement.noRoles' | translate }}
+          </div>
+        }
+      </div>
+    </section>
+
+    <!-- Add role -->
+    <section>
+      <label class="ard-section-title" for="roleId">{{ 'userManagement.rolesDialog.addRole' | translate }}</label>
+      <div class="ard-add">
+        <p-select
+          inputId="roleId"
+          class="flex-1"
+          styleClass="w-full"
+          appendTo="body"
+          [options]="availableRoles()"
+          optionLabel="label"
+          optionValue="value"
+          [ngModel]="selectedRoleId()"
+          (ngModelChange)="selectedRoleId.set($event)"
+          [disabled]="isBusy() || !availableRoles().length"
+          [placeholder]="(availableRoles().length ? 'userManagement.rolesDialog.selectRole' : 'userManagement.rolesDialog.allAssigned') | translate">
+        </p-select>
+        <p-button
+          [label]="'userManagement.rolesDialog.assign' | translate"
+          icon="pi pi-plus"
+          [loading]="isAssigning()"
+          [disabled]="selectedRoleId() == null || isBusy()"
+          (onClick)="assignRole()">
+        </p-button>
+      </div>
+    </section>
+
+    @if (errorMessage()) {
+      <p-message severity="error" [text]="errorMessage()!" styleClass="w-full"></p-message>
+    }
+
+    <div class="ard-footer">
+      <p-button [label]="'common.close' | translate" severity="secondary" [outlined]="true" (onClick)="close()"></p-button>
+    </div>
+  </div>
+}

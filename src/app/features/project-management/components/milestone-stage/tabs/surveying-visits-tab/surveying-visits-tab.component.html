@@ -1,0 +1,166 @@
+<div class="sv-card">
+
+  <!-- Header -->
+  <div class="sv-card-header">
+    <div>
+      <h3 class="sv-card-title">{{ 'projectTabs.surveyingVisits.title' | translate }}</h3>
+      <p class="sv-card-subtitle">{{ 'projectTabs.surveyingVisits.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="sv-toolbar">
+    <span class="sv-total-label">{{ 'projectTabs.surveyingVisits.totalLabel' | translate }}: {{ visitItems().length }}</span>
+      <p-button *appHasPermission="permissions.SurveyingVisits.Manage"
+        [label]="'projectTabs.surveyingVisits.scheduleButton' | translate"
+        icon="pi pi-plus"
+        (onClick)="openAddDialog()"
+        severity="contrast"
+        [raised]="true">
+      </p-button>
+  </div>
+
+  <!-- Table -->
+  <p-table
+    [value]="visitItems()"
+    [tableStyle]="{ 'min-width': '62rem' }"
+    styleClass="p-datatable-gridlines sv-table"
+    responsiveLayout="scroll">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>{{ 'projectTabs.surveyingVisits.visitDate' | translate }}</th>
+        <th>{{ 'projectTabs.surveyingVisits.surveyor' | translate }}</th>
+        <th>{{ 'projectTabs.surveyingVisits.purpose' | translate }}</th>
+        <th>{{ 'projectTabs.surveyingVisits.unit' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.surveyingVisits.quantity' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.surveyingVisits.unitPrice' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.surveyingVisits.amount' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.surveyingVisits.subtotal' | translate }}</th>
+        <th>{{ 'projectTabs.surveyingVisits.status' | translate }}</th>
+        <th class="text-center">{{ 'projectTabs.surveyingVisits.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <td [attr.data-label]="'projectTabs.surveyingVisits.visitDate' | translate">{{ item.visitDate | date:'yyyy-MM-dd' }}</td>
+        <td [attr.data-label]="'projectTabs.surveyingVisits.surveyor' | translate">{{ item.surveyor }}</td>
+        <td [attr.data-label]="'projectTabs.surveyingVisits.purpose' | translate">{{ item.purpose }}</td>
+        <td [attr.data-label]="'projectTabs.surveyingVisits.unit' | translate"><span class="sv-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
+        <td class="text-right" [attr.data-label]="'projectTabs.surveyingVisits.quantity' | translate">{{ item.quantity | appNumber }}</td>
+        <td class="text-right" [attr.data-label]="'projectTabs.surveyingVisits.unitPrice' | translate">{{ item.price | appNumber }}</td>
+        <td class="text-right" [attr.data-label]="'projectTabs.surveyingVisits.amount' | translate">{{ getAmount(item) | appNumber }}</td>
+        <td class="text-right sv-subtotal" [attr.data-label]="'projectTabs.surveyingVisits.subtotal' | translate">{{ item.subTotal | appNumber }}</td>
+        <td [attr.data-label]="'projectTabs.surveyingVisits.status' | translate">
+          <p-badge
+            [value]="getStatusLabel(item.status)"
+            [severity]="getStatusSeverity(item.status)">
+          </p-badge>
+        </td>
+        <td class="text-center sv-actions-cell" [attr.data-label]="'projectTabs.surveyingVisits.actions' | translate">
+          <div class="flex align-items-center justify-content-center gap-1">
+            <p-button
+              icon="pi pi-paperclip"
+              [rounded]="true"
+              [text]="true"
+              severity="info"
+              size="small"
+              [pTooltip]="'common.attachments' | translate"
+              tooltipPosition="top"
+              (onClick)="openAttachments(item)">
+            </p-button>
+            <div *appHasPermission="permissions.SurveyingVisits.Manage" class="sv-actions">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              [text]="true"
+              severity="secondary"
+              [pTooltip]="'projectTabs.surveyingVisits.editTooltip' | translate"
+              tooltipPosition="top"
+              (onClick)="openEditDialog(item)">
+            </p-button>
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              [text]="true"
+              severity="danger"
+              [pTooltip]="'projectTabs.surveyingVisits.deleteTooltip' | translate"
+              tooltipPosition="top"
+              (onClick)="confirmDelete(item)">
+            </p-button>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="10" class="text-center">
+          @if (isLoading()) {
+            <div class="flex flex-column gap-2 py-4">
+              <p-skeleton width="100%" height="2rem"></p-skeleton>
+              <p-skeleton width="100%" height="2rem"></p-skeleton>
+              <p-skeleton width="100%" height="2rem"></p-skeleton>
+            </div>
+          } @else {
+            <div class="py-4">
+              <i class="pi pi-map-marker" style="font-size: 2rem; color: var(--text-color-secondary); opacity: 0.5;"></i>
+              <p style="margin-top: 1rem; color: var(--text-color-secondary);">{{ 'projectTabs.surveyingVisits.emptyMessage' | translate }}</p>
+            </div>
+          }
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      @if (!isLoading()) {
+        <tr class="sv-grand-total-row">
+          <td colspan="7" class="text-right">
+            <span class="sv-grand-total-label">{{ 'projectTabs.surveyingVisits.totalSurveyValue' | translate }}:</span>
+          </td>
+          <td class="text-right sv-grand-total-value">
+            {{ totalSurveyValue | appNumber }}
+          </td>
+          <td colspan="2"></td>
+        </tr>
+      }
+    </ng-template>
+
+  </p-table>
+
+</div>
+
+<!-- Add / Edit Dialog -->
+@if (showDialog()) {
+  <app-add-surveying-visit-dialog *appHasPermission="permissions.SurveyingVisits.Manage"
+    [visible]="showDialog()"
+    (visibleChange)="showDialog.set($event)"
+    [projectStageId]="projectStageId"
+    [editItem]="editItem()"
+    [unitOptions]="unitOptions"
+    (saved)="onDialogSaved($event)">
+  </app-add-surveying-visit-dialog>
+}
+
+<!-- Attachments viewer (opened from the list) -->
+<p-dialog
+  [visible]="!!attachmentsItem"
+  (visibleChange)="!$event && closeAttachments()"
+  [header]="'common.attachments' | translate"
+  [modal]="true"
+  [closable]="true"
+  [dismissableMask]="true"
+  appendTo="body"
+  [style]="{ width: '98vw', 'max-width': '1600px', height: '90vh' }"
+  [breakpoints]="{ '960px': '98vw' }"
+  [contentStyle]="{ overflow: 'auto', height: 'calc(90vh - 60px)' }"
+  [maximizable]="true">
+  @if (attachmentsItem && (attachmentsItem.id ?? 0) > 0) {
+    <app-documents-table
+      [attachmentType]="attachmentType"
+      [relationshipId]="attachmentsItem.id!">
+    </app-documents-table>
+  }
+</p-dialog>

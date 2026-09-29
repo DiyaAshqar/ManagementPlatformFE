@@ -1,0 +1,118 @@
+<div class="report-toolbar">
+  <div class="report-toolbar__titles">
+    <h2 class="report-toolbar__title">{{ title }}</h2>
+    @if (description) {
+      <p class="report-toolbar__desc">{{ description }}</p>
+    }
+    <div class="report-toolbar__meta">
+      <span>{{ 'reporting.toolbar.records' | translate: { count: totalRecords } }}</span>
+      @if (lastUpdated) {
+        <span class="dot">•</span>
+        <span>
+          {{ 'reporting.toolbar.lastUpdated' | translate }}:
+          {{ lastUpdated | date: 'medium' : undefined : locale }}
+        </span>
+      }
+    </div>
+  </div>
+
+  <div class="report-toolbar__actions">
+    @if (features.search) {
+      <p-iconfield iconPosition="left" class="report-toolbar__search">
+        <p-inputicon styleClass="pi pi-search" />
+        <input
+          type="text"
+          pInputText
+          [ngModel]="searchTerm"
+          (ngModelChange)="onSearch($event)"
+          [placeholder]="'reporting.toolbar.searchPlaceholder' | translate"
+          [attr.aria-label]="'reporting.toolbar.searchPlaceholder' | translate"
+          class="w-full" />
+      </p-iconfield>
+    }
+
+    @if (features.filters) {
+      <div class="report-toolbar__filter-btn">
+        <p-button
+          icon="pi pi-filter"
+          [severity]="filtersVisible ? 'primary' : 'secondary'"
+          [text]="!filtersVisible"
+          [attr.aria-pressed]="filtersVisible"
+          [pTooltip]="'reporting.toolbar.filters' | translate"
+          tooltipPosition="bottom"
+          [attr.aria-label]="'reporting.toolbar.filters' | translate"
+          (onClick)="toggleFilters.emit()">
+        </p-button>
+        @if (activeFilterCount > 0) {
+          <p-badge [value]="activeFilterCount" severity="danger" class="report-toolbar__filter-badge"></p-badge>
+        }
+      </div>
+    }
+
+    @if (features.columnSelection) {
+      <app-report-column-selector
+        [items]="columnToggles"
+        (change)="columnsChange.emit($event)"
+        (reset)="columnsReset.emit()">
+      </app-report-column-selector>
+    }
+
+    @if (hasExportMenu) {
+      <p-button
+        icon="pi pi-download"
+        [label]="'reporting.toolbar.export' | translate"
+        severity="secondary"
+        [outlined]="true"
+        (onClick)="exportMenu.toggle($event)"
+        [attr.aria-label]="'reporting.toolbar.export' | translate">
+      </p-button>
+      <p-menu #exportMenu [model]="exportMenuItems" [popup]="true" appendTo="body"></p-menu>
+    }
+
+    @if (features.print && exportFlags.print) {
+      <p-button
+        icon="pi pi-print"
+        severity="secondary"
+        [text]="true"
+        [pTooltip]="'reporting.toolbar.print' | translate"
+        tooltipPosition="bottom"
+        [attr.aria-label]="'reporting.toolbar.print' | translate"
+        (onClick)="print.emit()">
+      </p-button>
+    }
+
+    @if (features.refresh) {
+      <p-button
+        icon="pi pi-refresh"
+        severity="secondary"
+        [text]="true"
+        [pTooltip]="'reporting.toolbar.refresh' | translate"
+        tooltipPosition="bottom"
+        [attr.aria-label]="'reporting.toolbar.refresh' | translate"
+        (onClick)="refresh.emit()">
+      </p-button>
+    }
+
+    @if (features.fullscreen) {
+      <p-button
+        [icon]="isFullscreen ? 'pi pi-window-minimize' : 'pi pi-window-maximize'"
+        severity="secondary"
+        [text]="true"
+        [pTooltip]="'reporting.toolbar.fullscreen' | translate"
+        tooltipPosition="bottom"
+        [attr.aria-label]="'reporting.toolbar.fullscreen' | translate"
+        (onClick)="toggleFullscreen.emit()">
+      </p-button>
+    }
+
+    <p-button
+      icon="pi pi-cog"
+      severity="secondary"
+      [text]="true"
+      [pTooltip]="'reporting.toolbar.resetSettings' | translate"
+      tooltipPosition="bottom"
+      [attr.aria-label]="'reporting.toolbar.resetSettings' | translate"
+      (onClick)="resetSettings.emit()">
+    </p-button>
+  </div>
+</div>

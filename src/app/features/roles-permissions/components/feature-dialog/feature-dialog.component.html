@@ -1,0 +1,64 @@
+<form [formGroup]="form" (ngSubmit)="onSubmit()" class="feature-dialog flex flex-column gap-3">
+  @if (errorMessage()) {
+    <p-message severity="error" [text]="errorMessage()!" styleClass="w-full"></p-message>
+  }
+
+  <div class="field">
+    <label for="name">{{ 'rolesPermissions.features.dialog.name' | translate }}</label>
+    <input
+      pInputText
+      id="name"
+      formControlName="name"
+      class="w-full"
+      [placeholder]="'rolesPermissions.features.dialog.namePlaceholder' | translate" />
+    @if (name.invalid && name.touched) {
+      <small class="p-error block mt-1">{{ 'rolesPermissions.features.dialog.nameRequired' | translate }}</small>
+    }
+  </div>
+
+  <div class="field">
+    <label for="code">{{ 'rolesPermissions.features.dialog.code' | translate }}</label>
+    <input
+      pInputText
+      id="code"
+      formControlName="code"
+      class="w-full"
+      [placeholder]="'rolesPermissions.features.dialog.codePlaceholder' | translate" />
+    @if (code.invalid && code.touched) {
+      <small class="p-error block mt-1">{{ 'rolesPermissions.features.dialog.codeRequired' | translate }}</small>
+    }
+  </div>
+
+  <div class="field">
+    <label for="description">{{ 'rolesPermissions.features.dialog.description' | translate }}</label>
+    <textarea
+      pTextarea
+      id="description"
+      formControlName="description"
+      rows="3"
+      class="w-full"
+      [placeholder]="'rolesPermissions.features.dialog.descriptionPlaceholder' | translate">
+    </textarea>
+  </div>
+
+  <div class="field flex align-items-center gap-2">
+    <p-toggleswitch inputId="isActive" formControlName="isActive"></p-toggleswitch>
+    <label for="isActive">{{ 'rolesPermissions.features.dialog.isActive' | translate }}</label>
+  </div>
+
+  <div class="flex justify-content-end gap-2 mt-2">
+    <p-button
+      type="button"
+      [label]="'common.cancel' | translate"
+      [text]="true"
+      (onClick)="onCancel()">
+    </p-button>
+    <p-button
+      type="submit"
+      [label]="(isEditMode ? 'common.update' : 'common.save') | translate"
+      icon="pi pi-check"
+      [loading]="loading()"
+      [disabled]="loading()">
+    </p-button>
+  </div>
+</form>

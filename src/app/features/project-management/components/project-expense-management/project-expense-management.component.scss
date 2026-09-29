@@ -1,0 +1,48 @@
+:host {
+  display: block;
+}
+
+@media (max-width: 576px) {
+  :host ::ng-deep .expense-list-table {
+    .p-datatable-wrapper { overflow: visible; }
+    .p-datatable-table, .p-datatable-tbody, .p-datatable-tbody > tr, .p-datatable-tbody > tr > td { display: block; width: 100% !important; min-width: 0 !important; }
+    .p-datatable-thead { display: none; }
+    .p-datatable-tbody > tr { margin: 0.75rem 0; padding: 0.25rem 0; border: 1px solid var(--surface-border); border-radius: 0.75rem; overflow: hidden; }
+    .p-datatable-tbody > tr > td { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.625rem 0.75rem; border: 0; border-bottom: 1px solid var(--surface-border); text-align: end; white-space: normal; &::before { content: attr(data-label); flex: 0 0 42%; color: var(--text-color-secondary); font-size: 0.75rem; font-weight: 600; text-align: start; } &:last-child { border-bottom: 0; } }
+    .expense-index { display: none !important; }
+    .expense-actions { align-items: flex-start !important; flex-direction: column; &::before { flex-basis: auto !important; } > div { display: grid !important; grid-template-columns: repeat(3, minmax(0, 1fr)); width: 100%; } .p-button { justify-self: center; } }
+  }
+
+  :host ::ng-deep .p-card {
+    .p-card-body { padding: 1rem; }
+  }
+}
+@media (max-width: 576px) {
+  :host ::ng-deep .expense-lines-table {
+    .p-datatable-wrapper { overflow: visible; }
+    .p-datatable-table, .p-datatable-tbody, .p-datatable-tbody > tr, .p-datatable-tbody > tr > td { display: block; width: 100% !important; min-width: 0 !important; }
+    .p-datatable-thead, .p-datatable-tfoot { display: none; }
+    .p-datatable-tbody > tr { margin: 0.75rem 0; padding: 0.25rem 0; border: 1px solid var(--surface-border); border-radius: 0.75rem; overflow: hidden; }
+    .p-datatable-tbody > tr > td { display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.625rem 0.75rem; border: 0; border-bottom: 1px solid var(--surface-border); text-align: end; white-space: normal; &::before { content: attr(data-label); flex: 0 0 42%; color: var(--text-color-secondary); font-size: 0.75rem; font-weight: 600; text-align: start; } &:last-child { border-bottom: 0; } }
+    .expense-index { display: none !important; }
+    .expense-line-actions { align-items: flex-start !important; flex-direction: column; &::before { flex-basis: auto !important; } }
+  }
+}
+@media (max-width: 576px) {
+  .expense-list-toolbar {
+    align-items: stretch !important;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    > div {
+      align-items: flex-start !important;
+      flex-direction: column;
+      gap: 0.5rem !important;
+    }
+
+    ::ng-deep .p-button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}

@@ -1,0 +1,193 @@
+<div class="vo-card">
+
+  <!-- Header -->
+  <div class="vo-card-header">
+    <div>
+      <h3 class="vo-card-title">{{ 'projectTabs.voucherOrders.title' | translate }}</h3>
+      <p class="vo-card-subtitle">{{ 'projectTabs.voucherOrders.subtitle' | translate }}</p>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="vo-toolbar">
+    <span class="vo-total-label">{{ 'projectTabs.voucherOrders.totalLabel' | translate }}: {{ voItems().length }}</span>
+      <p-button *appHasPermission="permissions.VoucherOrders.Manage"
+        [label]="'projectTabs.voucherOrders.createButton' | translate"
+        icon="pi pi-plus"
+        (onClick)="openAddDialog()"
+        severity="contrast"
+        [raised]="true">
+      </p-button>
+  </div>
+
+  <!-- Table -->
+  <p-table
+    [value]="voItems()"
+    [tableStyle]="{ 'min-width': '80rem' }"
+    styleClass="p-datatable-gridlines vo-table"
+    responsiveLayout="scroll">
+
+    <ng-template pTemplate="header">
+      <tr>
+        <th>{{ 'projectTabs.voucherOrders.voNumber' | translate }}</th>
+        <th>{{ 'projectTabs.voucherOrders.voItem' | translate }}</th>
+        <th>{{ 'projectTabs.voucherOrders.description' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.voucherOrders.quantity' | translate }}</th>
+        <th>{{ 'projectTabs.voucherOrders.unit' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.voucherOrders.amount' | translate }}</th>
+        <th class="text-right">{{ 'projectTabs.voucherOrders.subtotal' | translate }}</th>
+        <th class="text-center">{{ 'projectTabs.voucherOrders.isEffected' | translate }}</th>
+        <th>{{ 'projectTabs.voucherOrders.effectedDateStart' | translate }}</th>
+        <th>{{ 'projectTabs.voucherOrders.effectedDateEnd' | translate }}</th>
+        <th>{{ 'projectTabs.voucherOrders.approvalStatus' | translate }}</th>
+        <th class="text-center">{{ 'projectTabs.voucherOrders.actions' | translate }}</th>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="body" let-item>
+      <tr>
+        <td [attr.data-label]="'projectTabs.voucherOrders.voNumber' | translate"><span class="vo-number">{{ item.voNumber }}</span></td>
+        <td [attr.data-label]="'projectTabs.voucherOrders.voItem' | translate">{{ item.item }}</td>
+        <td [attr.data-label]="'projectTabs.voucherOrders.description' | translate">{{ item.description }}</td>
+        <td class="text-right" [attr.data-label]="'projectTabs.voucherOrders.quantity' | translate">{{ item.quantity }}</td>
+        <td [attr.data-label]="'projectTabs.voucherOrders.unit' | translate"><span class="vo-unit-badge">{{ unitMap[item.unitId ?? 0] || '—' }}</span></td>
+        <td class="text-right" [attr.data-label]="'projectTabs.voucherOrders.amount' | translate">{{ item.price | appNumber }}</td>
+        <td class="text-right vo-subtotal" [attr.data-label]="'projectTabs.voucherOrders.subtotal' | translate">{{ item.subTotal | appNumber }}</td>
+        <td class="text-center" [attr.data-label]="'projectTabs.voucherOrders.isEffected' | translate">
+          <p-badge 
+            [value]="item.isEffected ? ('projectTabs.voucherOrders.yes' | translate) : ('projectTabs.voucherOrders.no' | translate)" 
+            [severity]="item.isEffected ? 'success' : 'secondary'">
+          </p-badge>
+        </td>
+        <td [attr.data-label]="'projectTabs.voucherOrders.effectedDateStart' | translate">
+          @if (item.effectedDateStart) {
+            {{ formatDate(item.effectedDateStart) }}
+          } @else {
+            <span class="text-muted-color">—</span>
+          }
+        </td>
+        <td [attr.data-label]="'projectTabs.voucherOrders.effectedDateEnd' | translate">
+          @if (item.effectedDateEnd) {
+            {{ formatDate(item.effectedDateEnd) }}
+          } @else {
+            <span class="text-muted-color">—</span>
+          }
+        </td>
+        <td [attr.data-label]="'projectTabs.voucherOrders.approvalStatus' | translate">
+          <p-badge 
+            [value]="getStatusLabel(item.status)" 
+            [severity]="getStatusSeverity(item.status)">
+          </p-badge>
+        </td>
+        <td class="text-center vo-actions-cell" [attr.data-label]="'projectTabs.voucherOrders.actions' | translate">
+          <div class="flex align-items-center justify-content-center gap-1">
+            @if (attachmentType) {
+              <p-button
+                icon="pi pi-paperclip"
+                [rounded]="true"
+                [text]="true"
+                severity="info"
+                size="small"
+                [pTooltip]="'common.attachments' | translate"
+                tooltipPosition="top"
+                (onClick)="openAttachments(item)">
+              </p-button>
+            }
+            <div *appHasPermission="permissions.VoucherOrders.Manage" class="vo-actions">
+            <p-button
+              icon="pi pi-pencil"
+              [rounded]="true"
+              severity="secondary"
+              [text]="true"
+              size="small"
+              [pTooltip]="'projectTabs.voucherOrders.editTooltip' | translate"
+              tooltipPosition="top"
+              (onClick)="openEditDialog(item)">
+            </p-button>
+            <p-button
+              icon="pi pi-trash"
+              [rounded]="true"
+              severity="danger"
+              [text]="true"
+              size="small"
+              [pTooltip]="'projectTabs.voucherOrders.deleteTooltip' | translate"
+              tooltipPosition="top"
+              (onClick)="confirmDelete(item)">
+            </p-button>
+            </div>
+          </div>
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="emptymessage">
+      <tr>
+        <td colspan="12" class="text-center">
+          @if (isLoading()) {
+            <div class="flex flex-column gap-2 py-4">
+              <p-skeleton width="100%" height="2rem"></p-skeleton>
+              <p-skeleton width="100%" height="2rem"></p-skeleton>
+              <p-skeleton width="100%" height="2rem"></p-skeleton>
+            </div>
+          } @else {
+            <div class="py-4">
+              <i class="pi pi-receipt" style="font-size: 2rem; color: var(--text-color-secondary); opacity: 0.5;"></i>
+              <p style="margin-top: 1rem; color: var(--text-color-secondary);">{{ 'projectTabs.voucherOrders.emptyMessage' | translate }}</p>
+            </div>
+          }
+        </td>
+      </tr>
+    </ng-template>
+
+    <ng-template pTemplate="footer">
+      @if (!isLoading()) {
+        <tr class="vo-grand-total-row">
+          <td colspan="6" class="text-right">
+            <span class="vo-grand-total-label">{{ 'projectTabs.voucherOrders.totalVOValue' | translate }}:</span>
+          </td>
+          <td class="text-right vo-grand-total-value">
+            {{ totalVOValue | appNumber }}
+          </td>
+          <td colspan="5"></td>
+        </tr>
+      }
+    </ng-template>
+
+  </p-table>
+
+</div>
+
+<!-- Add/Edit Dialog -->
+@if (showVoDialog()) {
+  <app-add-vo-dialog *appHasPermission="permissions.VoucherOrders.Manage"
+    [visible]="showVoDialog()"
+    (visibleChange)="showVoDialog.set($event)"
+    [projectStageId]="projectStageId"
+    [editItem]="editVoItem()"
+    [unitOptions]="unitOptions"
+    (saved)="onDialogSaved($event)">
+  </app-add-vo-dialog>
+}
+
+<!-- Attachments viewer (opened from the list) -->
+@if (attachmentType; as type) {
+  <p-dialog
+    [visible]="!!attachmentsItem"
+    (visibleChange)="!$event && closeAttachments()"
+    [header]="'common.attachments' | translate"
+    [modal]="true"
+    [closable]="true"
+    [dismissableMask]="true"
+    appendTo="body"
+    [style]="{ width: '98vw', 'max-width': '1600px', height: '90vh' }"
+    [breakpoints]="{ '960px': '98vw' }"
+    [contentStyle]="{ overflow: 'auto', height: 'calc(90vh - 60px)' }"
+    [maximizable]="true">
+    @if (attachmentsItem && (attachmentsItem.id ?? 0) > 0) {
+      <app-documents-table
+        [attachmentType]="type"
+        [relationshipId]="attachmentsItem.id!">
+      </app-documents-table>
+    }
+  </p-dialog>
+}

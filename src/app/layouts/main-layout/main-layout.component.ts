@@ -8,6 +8,7 @@ import { ThemeService } from '../../core/services/theme.service';
 import { SidebarService } from '../../core/services/sidebar.service';
 import { SidebarComponent } from '../../shared/components/sidebar/sidebar.component';
 import { TopNavComponent } from '../../shared/components/top-nav/top-nav.component';
+import { ConfirmDialogComponent } from '../../shared/components/confirm-dialog/confirm-dialog.component';
 
 @Component({
   selector: 'app-main-layout',
@@ -17,7 +18,8 @@ import { TopNavComponent } from '../../shared/components/top-nav/top-nav.compone
     RouterOutlet, 
     TranslateModule,
     SidebarComponent,
-    TopNavComponent
+    TopNavComponent,
+    ConfirmDialogComponent
   ],
   templateUrl: './main-layout.component.html',
   styleUrls: ['./main-layout.component.scss']

@@ -1,0 +1,61 @@
+:host {
+  display: block;
+}
+
+.drop-zone {
+  &:hover {
+    background: var(--surface-hover);
+  }
+
+  &--active {
+    border-color: var(--primary-color) !important;
+    background-color: color-mix(in srgb, var(--primary-color) 5%, transparent);
+  }
+}
+
+.selected-files-list {
+  max-height: 15rem;
+}
+
+:deep(.p-datatable) {
+  .p-datatable-thead > tr > th {
+    font-size: 0.875rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .p-datatable-tbody > tr > td {
+    padding: 0.875rem 1rem;
+    border-bottom: 1px solid var(--surface-border);
+    vertical-align: middle;
+  }
+
+  .p-datatable-tbody > tr:last-child > td {
+    border-bottom: none;
+  }
+
+  .p-datatable-tbody > tr:hover {
+    background: var(--surface-hover);
+  }
+}
+
+@media (max-width: 576px) {
+  .documents-toolbar {
+    align-items: stretch !important;
+    flex-direction: column;
+    gap: 0.75rem;
+
+    ::ng-deep .p-button { width: 100%; justify-content: center; }
+  }
+
+  :host ::ng-deep .documents-data-table {
+    .p-datatable-wrapper { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .p-datatable-table { min-width: 42rem !important; }
+    .p-paginator { flex-wrap: wrap; justify-content: center; }
+  }
+
+  .documents-toolbar + .p-datatable + .flex {
+    align-items: flex-start !important;
+    flex-direction: column;
+    gap: 0.5rem !important;
+  }
+}

@@ -1,0 +1,181 @@
+.contractor-card {
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: 12px;
+  overflow-x: auto;
+  overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+  padding: 1.5rem;
+
+  .contractor-card-header {
+    margin-bottom: 1rem;
+
+    .contractor-card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 0;
+      color: var(--text-color);
+    }
+
+    .contractor-card-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-color-secondary);
+      margin: 0.2rem 0 0;
+    }
+  }
+
+  .contractor-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+
+    .contractor-stats {
+      display: flex;
+      gap: 1.5rem;
+      align-items: center;
+    }
+
+    .contractor-total-label {
+      font-size: 0.875rem;
+      color: var(--text-color-secondary);
+    }
+
+    .contractor-value-label {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--primary-color);
+      background: var(--primary-50);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+    }
+  }
+}
+
+.contractor-name {
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.contractor-amount {
+  font-weight: 600;
+  color: var(--green-600, #16a34a);
+}
+
+.contractor-total-payments {
+  font-weight: 600;
+  color: var(--blue-600, #2563eb);
+}
+
+.contractor-actions {
+  display: flex;
+  gap: 0.25rem;
+  justify-content: center;
+}
+
+.empty-state {
+  padding: 3rem 1rem !important;
+  
+  p {
+    margin: 0.5rem 0;
+    color: var(--text-color-secondary);
+  }
+  
+  .text-muted-color {
+    font-size: 0.875rem;
+    opacity: 0.7;
+  }
+}
+
+@media (max-width: 576px) {
+  .contractor-card {
+    overflow: visible;
+    padding: 1rem;
+
+    .contractor-toolbar,
+    .contractor-stats {
+      align-items: stretch;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    ::ng-deep .p-button {
+      justify-content: center;
+    }
+  }
+
+  ::ng-deep .contractor-table {
+    .p-datatable-wrapper {
+      overflow: visible;
+    }
+
+    .p-datatable-table,
+    .p-datatable-tbody,
+    .p-datatable-tbody > tr,
+    .p-datatable-tbody > tr > td {
+      display: block;
+      width: 100% !important;
+      min-width: 0 !important;
+    }
+
+    .p-datatable-thead,
+    .p-datatable-tfoot {
+      display: none;
+    }
+
+    .p-datatable-tbody > tr {
+      margin: 0.75rem 0;
+      padding: 0.25rem 0;
+      border: 1px solid var(--surface-border);
+      border-radius: 0.75rem;
+      overflow: hidden;
+    }
+
+    .p-datatable-tbody > tr > td {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 0.75rem;
+      padding: 0.625rem 0.75rem;
+      border: 0;
+      border-bottom: 1px solid var(--surface-border);
+      text-align: end;
+      white-space: normal;
+
+      &::before {
+        content: attr(data-label);
+        flex: 0 0 42%;
+        color: var(--text-color-secondary);
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-align: start;
+      }
+
+      &:last-child {
+        border-bottom: 0;
+      }
+    }
+
+    .contractor-actions-cell {
+      align-items: flex-start !important;
+      flex-direction: column;
+
+      &::before {
+        flex-basis: auto !important;
+      }
+
+      .contractor-actions {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        width: 100%;
+        gap: 0.25rem;
+      }
+
+      ::ng-deep .p-button {
+        justify-self: center;
+      }
+    }
+  }
+}

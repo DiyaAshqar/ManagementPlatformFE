@@ -1,0 +1,40 @@
+<p-confirmDialog 
+  [style]="{width: '450px'}"
+  [breakpoints]="{'960px': '75vw', '640px': '90vw'}"
+  [baseZIndex]="10000"
+  [closable]="false"
+  [draggable]="false">
+  <ng-template pTemplate="headless" let-message>
+    <div class="confirm-dialog-custom">
+      <div class="confirm-dialog-header">
+        <div class="confirm-icon" [ngClass]="{
+          'confirm-icon-danger': message.icon === 'pi pi-exclamation-triangle',
+          'confirm-icon-info': message.icon === 'pi pi-info-circle',
+          'confirm-icon-warn': message.icon === 'pi pi-exclamation-circle'
+        }">
+          <i [class]="message.icon || 'pi pi-question-circle'" class="confirm-icon-svg"></i>
+        </div>
+        <div class="confirm-dialog-content">
+          <h3 class="confirm-title">{{ message.header }}</h3>
+          <p class="confirm-message">{{ message.message }}</p>
+        </div>
+      </div>
+      <div class="confirm-dialog-footer">
+        <button 
+          type="button" 
+          class="confirm-btn confirm-btn-cancel" 
+          (click)="onReject(message)">
+          <i class="pi pi-times"></i>
+          <span>{{ message.rejectLabel || ('common.no' | translate) }}</span>
+        </button>
+        <button 
+          type="button" 
+          class="confirm-btn confirm-btn-confirm" 
+          (click)="onAccept(message)">
+          <i class="pi pi-check"></i>
+          <span>{{ message.acceptLabel || ('common.yes' | translate) }}</span>
+        </button>
+      </div>
+    </div>
+  </ng-template>
+</p-confirmDialog>

@@ -3,16 +3,14 @@ import { inject } from '@angular/core';
 import { catchError, throwError } from 'rxjs';
 import { Router } from '@angular/router';
 import { MessageService } from 'primeng/api';
-import { AuthService } from '../auth/services/auth.service';
 
 export const ErrorInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const messageService = inject(MessageService);
-  const authService = inject(AuthService);
 
   return next(req).pipe(
     catchError((error: HttpErrorResponse) => {
-      handleError(error, req, router, messageService, authService);
+      handleError(error, req, router, messageService);
       return throwError(() => error);
     })
   );
@@ -22,8 +20,7 @@ function handleError(
   error: HttpErrorResponse,
   req: any,
   router: Router,
-  messageService: MessageService,
-  authService: AuthService
+  messageService: MessageService
 ): void {
   let errorMessage = 'An error occurred';
 
@@ -37,8 +34,9 @@ function handleError(
         errorMessage = error.error?.message || 'Bad Request';
         break;
       case 401:
-        errorMessage = 'Unauthorized. Please login again.';
-        authService.logout();
+        // Token lifecycle (refresh / logout) is owned by AuthInterceptor.
+        // By the time a 401 reaches here, a refresh has already failed.
+        errorMessage = 'Your session has expired. Please login again.';
         break;
       case 403:
         errorMessage = 'Access Forbidden';

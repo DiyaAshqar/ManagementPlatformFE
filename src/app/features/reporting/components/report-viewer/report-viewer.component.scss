@@ -1,0 +1,34 @@
+.report-viewer {
+  display: block;
+
+  &--fullscreen {
+    position: fixed;
+    inset: 0;
+    z-index: 1100;
+    background: var(--surface-ground, #f8fafc);
+    padding: 1rem 1.25rem;
+    overflow: auto;
+  }
+}
+
+.report-viewer__groupby {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-color-secondary, #64748b);
+  }
+}
+
+:host ::ng-deep .report-viewer__groupby-select {
+  min-width: 12rem;
+}
+
+:host ::ng-deep .report-footer td {
+  background: var(--surface-100, #f1f5f9);
+  font-weight: 700;
+}

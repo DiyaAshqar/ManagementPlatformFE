@@ -10,15 +10,25 @@ export const SuccessInterceptor: HttpInterceptorFn = (req, next) => {
   return next(req).pipe(
     switchMap(event => {
       if (event instanceof HttpResponse) {
-        // If body is a Blob, parse it first
+        // If body is a Blob, only try to parse it as JSON if content-type is application/json
         if (event.body instanceof Blob) {
-          return from(parseBlobToJson(event.body)).pipe(
-            tap(parsedBody => {
-              const responseWithParsedBody = event.clone({ body: parsedBody });
-              handleResponse(responseWithParsedBody, req, messageService);
-            }),
-            switchMap(() => of(event))
-          );
+          const contentType = event.body.type || event.headers.get('content-type') || '';
+          const isJson = contentType.includes('application/json') || contentType === '';
+
+          if (isJson) {
+            return from(parseBlobToJson(event.body)).pipe(
+              tap(parsedBody => {
+                if (parsedBody !== null) {
+                  const responseWithParsedBody = event.clone({ body: parsedBody });
+                  handleResponse(responseWithParsedBody, req, messageService);
+                }
+              }),
+              switchMap(() => of(event))
+            );
+          }
+
+          // Binary response (PDF, image, etc.) — skip JSON parsing entirely
+          return of(event);
         }
         
         handleResponse(event, req, messageService);
@@ -31,9 +41,10 @@ export const SuccessInterceptor: HttpInterceptorFn = (req, next) => {
 async function parseBlobToJson(blob: Blob): Promise<any> {
   try {
     const text = await blob.text();
+    if (!text || !text.trim()) return null;
     return JSON.parse(text);
-  } catch (error) {
-    console.error('Failed to parse blob:', error);
+  } catch {
+    // Not JSON — return null silently (e.g. empty body)
     return null;
   }
 }
@@ -107,9 +118,20 @@ function isGetRequest(request: HttpRequest<any>): boolean {
 function isSkippedUrl(request: HttpRequest<any>): boolean {
   const skipUrls = [
     '/api/Lookup',
+    '/api/Auth/login',
+    '/api/Auth/refresh-token',
+    '/api/Auth/logout',
   ];
 
-  return skipUrls.some(url => request.url.includes(url));
+  // Follow-up calls whose parent request already shows the success toast
+  // (e.g. assigning users after saving the project form).
+  const skipUrlPatterns = [/\/api\/project\/\d+\/users(\?|$)/];
+
+  const requestUrl = request.url.toLowerCase();
+  return (
+    skipUrls.some(url => requestUrl.includes(url.toLowerCase())) ||
+    skipUrlPatterns.some(pattern => pattern.test(requestUrl))
+  );
 }
 
 function shouldShowSuccessToast(
