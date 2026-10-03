@@ -241,31 +241,35 @@ export class ProjectReportDemoPageComponent {
       ['المصروفات', (item) => num(item.expenses)],
       ['نسبة الفعلي من الميزانية', (item) => pct(item.budgetPercentage)],
     ];
-    // One row per stage (plus the grand total) so the table width stays fixed however many stages are selected.
-    const header = rows.map(([label]) => `<th>${label}</th>`).join('');
-    const toRow = (item: MilestoneSummary, cls = '') =>
-      `<tr class="${cls}"><th>${escape(item.name)}</th>${rows.map(([, value]) => `<td>${value(item)}</td>`).join('')}<td class="sum">${num(item.total)}</td></tr>`;
-    const body = summaries.map((item) => toRow(item)).join('') + toRow(total, 'total');
+    // Same card layout as the on-screen summary view.
+    const cards = summaries
+      .map((item) => `<section class="card"><h3>${escape(item.name)}</h3><dl>${rows
+        .map(([label, value]) => `<div><dt>${label}</dt><dd>${value(item)}</dd></div>`)
+        .join('')}</dl><div class="card-total"><span>Total</span><strong>${num(item.total)}</strong></div></section>`)
+      .join('');
 
     this.printService.openAndPrint(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>ملخص المراحل</title>
 <style>
-  @page{size:A4 landscape;margin:12mm}
-  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  @page{size:A4;margin:10mm}
+  *{box-sizing:border-box;-webkit-print-color-adjust:exact;print-color-adjust:exact}
   body{font-family:Tahoma,Arial,sans-serif;margin:0;color:#111}
   h1{font-size:18px;margin:0 0 4px} p{margin:0 0 12px;color:#555;font-size:12px}
-  table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px}
-  th,td{border:1px solid #ccc;padding:5px 4px;text-align:center;word-wrap:break-word}
-  thead th{background:#1e3a8a;color:#fff}
-  thead th:first-child,tbody th{width:18%}
-  tbody th{background:#f3f4f6;text-align:right}
-  tr{page-break-inside:avoid}
-  td.sum{font-weight:bold;color:#1e3a8a;background:#eef2ff}
-  tr.total th,tr.total td{font-weight:bold;background:#dbeafe}
-  .note{margin-top:10px;font-size:11px;color:#555}
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .card{border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;break-inside:avoid}
+  .card h3{margin:0 0 8px;font-size:13px;color:#1d4ed8}
+  dl{margin:0} dl div{display:flex;justify-content:space-between;gap:6px;padding:4px 0;border-bottom:1px solid #e5e7eb;font-size:11px}
+  dt{color:#444} dd{margin:0;font-weight:bold;direction:ltr}
+  .card-total{display:flex;justify-content:space-between;margin-top:8px;font-size:12px}
+  .card-total strong{color:#1d4ed8;direction:ltr}
+  .grand{margin-top:12px;border:1.5px solid #1d4ed8;border-radius:8px;padding:10px 14px;background:#eff6ff;break-inside:avoid}
+  .grand-head{display:flex;justify-content:space-between;font-size:14px;font-weight:bold}
+  .grand-head strong{color:#1d4ed8;direction:ltr}
+  .grand small{display:block;margin-top:6px;font-size:11px;color:#444}
 </style></head><body>
 <h1>ملخص المراحل</h1><p>${escape(projectName)} — ${new Date().toLocaleDateString('en-GB')}</p>
-<table><thead><tr><th>المرحلة</th>${header}<th>Total</th></tr></thead><tbody>${body}</tbody></table>
-<div class="note">Total = MC + أوامر التعديل + زيارات المساحة + المصروفات · نسبة الفعلي من إجمالي الميزانية: ${pct(this.ratio(total.actual, total.budget))}</div>
+<div class="grid">${cards}</div>
+<section class="grand"><div class="grand-head"><span>Grand Total / Total Total</span><strong>${num(total.total)}</strong></div>
+<small>BOQ: ${num(total.boq)} · MC: ${num(total.mc)} · أوامر التعديل: ${num(total.variationOrders)} · زيارات المساحة: ${num(total.surveyingVisits)} · المصروفات: ${num(total.expenses)} · نسبة الفعلي من إجمالي الميزانية: ${pct(this.ratio(total.actual, total.budget))}</small></section>
 </body></html>`);
   }
 
