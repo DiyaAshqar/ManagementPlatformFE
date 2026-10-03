@@ -241,26 +241,30 @@ export class ProjectReportDemoPageComponent {
       ['المصروفات', (item) => num(item.expenses)],
       ['نسبة الفعلي من الميزانية', (item) => pct(item.budgetPercentage)],
     ];
-    const columns = [...summaries, total];
-    const header = columns.map((item) => `<th>${escape(item.name)}</th>`).join('');
-    const body = rows
-      .map(([label, value]) => `<tr><th>${label}</th>${columns.map((item) => `<td>${value(item)}</td>`).join('')}</tr>`)
-      .join('');
-    const totalRow = `<tr class="total"><th>Total</th>${columns.map((item) => `<td>${num(item.total)}</td>`).join('')}</tr>`;
+    // One row per stage (plus the grand total) so the table width stays fixed however many stages are selected.
+    const header = rows.map(([label]) => `<th>${label}</th>`).join('');
+    const toRow = (item: MilestoneSummary, cls = '') =>
+      `<tr class="${cls}"><th>${escape(item.name)}</th>${rows.map(([, value]) => `<td>${value(item)}</td>`).join('')}<td class="sum">${num(item.total)}</td></tr>`;
+    const body = summaries.map((item) => toRow(item)).join('') + toRow(total, 'total');
 
     this.printService.openAndPrint(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>ملخص المراحل</title>
 <style>
-  body{font-family:Tahoma,Arial,sans-serif;margin:24px;color:#111}
-  h1{font-size:20px;margin:0 0 4px} p{margin:0 0 16px;color:#555;font-size:13px}
-  table{width:100%;border-collapse:collapse;font-size:13px}
-  th,td{border:1px solid #ccc;padding:6px 8px;text-align:center}
-  thead th{background:#1e3a8a;color:#fff} tbody th{background:#f3f4f6;text-align:right}
-  td:last-child,thead th:last-child{font-weight:bold;background:#eef2ff;color:#1e3a8a}
-  tr.total td,tr.total th{font-weight:bold;background:#dbeafe}
-  .note{margin-top:12px;font-size:12px;color:#555}
+  @page{size:A4 landscape;margin:12mm}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{font-family:Tahoma,Arial,sans-serif;margin:0;color:#111}
+  h1{font-size:18px;margin:0 0 4px} p{margin:0 0 12px;color:#555;font-size:12px}
+  table{width:100%;border-collapse:collapse;table-layout:fixed;font-size:11px}
+  th,td{border:1px solid #ccc;padding:5px 4px;text-align:center;word-wrap:break-word}
+  thead th{background:#1e3a8a;color:#fff}
+  thead th:first-child,tbody th{width:18%}
+  tbody th{background:#f3f4f6;text-align:right}
+  tr{page-break-inside:avoid}
+  td.sum{font-weight:bold;color:#1e3a8a;background:#eef2ff}
+  tr.total th,tr.total td{font-weight:bold;background:#dbeafe}
+  .note{margin-top:10px;font-size:11px;color:#555}
 </style></head><body>
 <h1>ملخص المراحل</h1><p>${escape(projectName)} — ${new Date().toLocaleDateString('en-GB')}</p>
-<table><thead><tr><th></th>${header}</tr></thead><tbody>${body}${totalRow}</tbody></table>
+<table><thead><tr><th>المرحلة</th>${header}<th>Total</th></tr></thead><tbody>${body}</tbody></table>
 <div class="note">Total = MC + أوامر التعديل + زيارات المساحة + المصروفات · نسبة الفعلي من إجمالي الميزانية: ${pct(this.ratio(total.actual, total.budget))}</div>
 </body></html>`);
   }
