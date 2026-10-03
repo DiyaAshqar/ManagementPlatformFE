@@ -10,7 +10,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
 
-import { AgreementDetailsDto, ProjectClient, ProjectStageDetailsDto, ProjectStageDto, ReportClient } from '../../../../../../../nswag/api-client';
+import { AgreementDetailsDto, GetProjectStagesSumaryQuery, ProjectClient, ProjectStagesSummaryDto, ProjectStageDetailsDto, ProjectStageDto, ReportClient } from '../../../../../../../nswag/api-client';
 import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
 import { Permissions } from '../../../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
@@ -62,6 +62,7 @@ interface MilestoneSummary {
   budget: number;
   actual: number;
   total: number;
+  budgetPercentage: number | null;
 }
 const PHOTOS_CARD: DataTypeCard = {
   key: 'photos', badge: 'IMG', color: '#e11d48', icon: 'pi-images',
@@ -133,6 +134,7 @@ export class ProjectReportDemoPageComponent {
   private details: AgreementDetailsDto | null = null;
   private stage: ProjectStageDetailsDto | null = null;
   private loadedStageReports: LoadedStageReport[] = [];
+  private stagesSummary: ProjectStagesSummaryDto[] = [];
   private lastGeneratedHtml = '';
   private stageLoadVersion = 0;
   private reportLoadVersion = 0;
@@ -150,7 +152,7 @@ export class ProjectReportDemoPageComponent {
   }
 
   get milestoneSummaries(): MilestoneSummary[] {
-    return this.loadedStageReports.map(({ details, stage }) => this.createMilestoneSummary(details, stage));
+    return this.stagesSummary.map((item) => this.fromStagesSummary(item));
   }
 
   get grandTotal(): MilestoneSummary | null {
@@ -159,7 +161,7 @@ export class ProjectReportDemoPageComponent {
     const sum = (key: keyof Omit<MilestoneSummary, 'id' | 'name'>) => summaries.reduce((total, item) => total + (item[key] as number), 0);
     const budget = sum('budget');
     const actual = sum('actual');
-    return { id: 0, name: 'الإجمالي العام', boq: sum('boq'), mc: sum('mc'), purchaseOrders: sum('purchaseOrders'), variationOrders: sum('variationOrders'), surveyingVisits: sum('surveyingVisits'), savings: sum('savings'), expenses: sum('expenses'), budget, actual, total: sum('total') };
+    return { id: 0, name: 'الإجمالي العام', boq: sum('boq'), mc: sum('mc'), purchaseOrders: sum('purchaseOrders'), variationOrders: sum('variationOrders'), surveyingVisits: sum('surveyingVisits'), savings: sum('savings'), expenses: sum('expenses'), budget, actual, total: sum('total'), budgetPercentage: this.ratio(actual, budget) };
   }
 
   ratio(actual: number, budget: number): number | null {
@@ -260,8 +262,12 @@ export class ProjectReportDemoPageComponent {
     if (!projectId || !projectStageIds.length) return;
     const requestVersion = ++this.reportLoadVersion;
     this.isRendering.set(true);
-    forkJoin(projectStageIds.map((stageId) => this.reportClient.getProjectStageDetails(projectId, stageId))).subscribe({
-      next: (responses) => {
+    forkJoin({
+      responses: forkJoin(projectStageIds.map((stageId) => this.reportClient.getProjectStageDetails(projectId, stageId))),
+      summary: this.reportClient.getProjectStagesSummary(new GetProjectStagesSumaryQuery({ projectId, projectStageIds })),
+    }).subscribe({
+      next: ({ responses, summary }) => {
+        this.stagesSummary = summary.data?.project?.projectStagesSummary ?? [];
         if (requestVersion !== this.reportLoadVersion) return;
         const reports = responses.map((response) => ({ details: response.data, stage: response.data?.project?.stage }));
         const invalid = reports.find((report, index) => !responses[index].succeeded || !report.details || !report.stage);
@@ -306,6 +312,7 @@ export class ProjectReportDemoPageComponent {
     this.details = null;
     this.stage = null;
     this.loadedStageReports = [];
+    this.stagesSummary = [];
     this.lastGeneratedHtml = '';
     this.previewHtml.set(null);
     this.loadError.set(null);
@@ -315,22 +322,15 @@ export class ProjectReportDemoPageComponent {
     return stage.mileStone?.name || `Milestone stage #${stage.id}`;
   }
 
-  private createMilestoneSummary(details: AgreementDetailsDto, stage: ProjectStageDetailsDto): MilestoneSummary {
-    const sum = (items: Array<number | undefined>): number => items.reduce<number>((total, value) => total + (value ?? 0), 0);
-    const boq = sum((stage.boqs ?? []).map((item) => item.subTotal));
-    const mc = sum((stage.mainContractors ?? []).map((item) => item.amount));
-    const purchaseOrders = sum((stage.purchaseOrders ?? []).map((item) => item.subTotal));
-    const paidMc = sum((stage.mainContractors ?? []).map((item) =>
-      item.totalPayments ?? sum((item.payments ?? []).map((payment) => payment.paidAmount))));
-    const variationOrders = sum((stage.variationOrders ?? []).map((item) => item.subTotal));
-    const surveyingVisits = sum((stage.surveyingVisits ?? []).map((item) => item.subTotal));
-    // Savings = planned BOQ cost minus actual BOQ cost (no dedicated backend field yet).
-    const savings = sum((stage.boqs ?? []).map((item) =>
-      (item.expectedQuantity ?? 0) * (item.expectedPrice ?? 0) - (item.actualQuantity ?? 0) * (item.actualPrice ?? 0)));
-    const expenses = sum((stage.expenses ?? []).map((item) => item.totalAmount));
-    // BOQ is the stage-level budget basis; this keeps each percentage scoped to its own milestone.
-    const budget = boq;
-    return { id: stage.id ?? 0, name: stage.milestone?.name ?? 'المرحلة رقم ' + (stage.id ?? '—'), boq, mc, purchaseOrders, variationOrders, surveyingVisits, savings, expenses, budget, actual: expenses, total: paidMc + expenses + variationOrders + surveyingVisits };
+  private fromStagesSummary(item: ProjectStagesSummaryDto): MilestoneSummary {
+    const boq = item.boqsTotal ?? 0;
+    const expenses = item.expensesTotal ?? 0;
+    return {
+      id: item.id ?? 0, name: item.milestone?.name ?? 'المرحلة رقم ' + (item.id ?? '—'),
+      boq, mc: item.mCsTotal ?? 0, purchaseOrders: item.pOsTotal ?? 0, variationOrders: item.vOsTotal ?? 0,
+      surveyingVisits: item.sVsTotal ?? 0, savings: item.taskSavingsTotal ?? 0, expenses,
+      budget: boq, actual: expenses, total: item.grandTotal ?? 0, budgetPercentage: item.budgetPercentage ?? null,
+    };
   }
 
   private buildSnapshot(): ProjectReportSnapshot {

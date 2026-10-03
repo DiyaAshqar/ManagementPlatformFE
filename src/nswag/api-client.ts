@@ -7309,6 +7309,62 @@ export class ReportClient {
         }
         return _observableOf(null as any);
     }
+
+    /**
+     * @param body (optional) 
+     * @return OK
+     */
+    getProjectStagesSummary(body: GetProjectStagesSumaryQuery | undefined): Observable<AgreementDetailsDtoResponse> {
+        let url_ = this.baseUrl + "/api/Report/project-stages-summary";
+        url_ = url_.replace(/[?&]$/, "");
+
+        const content_ = JSON.stringify(body);
+
+        let options_ : any = {
+            body: content_,
+            observe: "response",
+            responseType: "blob",
+            headers: new HttpHeaders({
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            })
+        };
+
+        return this.http.request("post", url_, options_).pipe(_observableMergeMap((response_ : any) => {
+            return this.processGetProjectStagesSummary(response_);
+        })).pipe(_observableCatch((response_: any) => {
+            if (response_ instanceof HttpResponseBase) {
+                try {
+                    return this.processGetProjectStagesSummary(response_ as any);
+                } catch (e) {
+                    return _observableThrow(e) as any as Observable<AgreementDetailsDtoResponse>;
+                }
+            } else
+                return _observableThrow(response_) as any as Observable<AgreementDetailsDtoResponse>;
+        }));
+    }
+
+    protected processGetProjectStagesSummary(response: HttpResponseBase): Observable<AgreementDetailsDtoResponse> {
+        const status = response.status;
+        const responseBlob =
+            response instanceof HttpResponse ? response.body :
+            (response as any).error instanceof Blob ? (response as any).error : undefined;
+
+        let _headers: any = {}; if (response.headers) { for (let key of response.headers.keys()) { _headers[key] = response.headers.get(key); }}
+        if (status === 200) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            let result200: any = null;
+            let resultData200 = _responseText === "" ? null : JSON.parse(_responseText, this.jsonParseReviver);
+            result200 = AgreementDetailsDtoResponse.fromJS(resultData200);
+            return _observableOf(result200);
+            }));
+        } else if (status !== 200 && status !== 204) {
+            return blobToText(responseBlob).pipe(_observableMergeMap((_responseText: string) => {
+            return throwException("An unexpected server error occurred.", status, _responseText, _headers);
+            }));
+        }
+        return _observableOf(null as any);
+    }
 }
 
 @Injectable()
@@ -20444,6 +20500,54 @@ export interface IGetProjectStagesDetailsQuery {
     projectStageIds?: number[] | undefined;
 }
 
+export class GetProjectStagesSumaryQuery implements IGetProjectStagesSumaryQuery {
+    projectId?: number;
+    projectStageIds?: number[] | undefined;
+
+    constructor(data?: IGetProjectStagesSumaryQuery) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.projectId = _data["projectId"];
+            if (Array.isArray(_data["projectStageIds"])) {
+                this.projectStageIds = [] as any;
+                for (let item of _data["projectStageIds"])
+                    this.projectStageIds!.push(item);
+            }
+        }
+    }
+
+    static fromJS(data: any): GetProjectStagesSumaryQuery {
+        data = typeof data === 'object' ? data : {};
+        let result = new GetProjectStagesSumaryQuery();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["projectId"] = this.projectId;
+        if (Array.isArray(this.projectStageIds)) {
+            data["projectStageIds"] = [];
+            for (let item of this.projectStageIds)
+                data["projectStageIds"].push(item);
+        }
+        return data;
+    }
+}
+
+export interface IGetProjectStagesSumaryQuery {
+    projectId?: number;
+    projectStageIds?: number[] | undefined;
+}
+
 export class GetProjectSurveyingVisitDto implements IGetProjectSurveyingVisitDto {
     id?: number;
     projectStageId?: number;
@@ -23949,6 +24053,7 @@ export class ProjectDetailsDto implements IProjectDetailsDto {
     images?: AttachmentImageDto[] | undefined;
     stage?: ProjectStageDetailsDto;
     stages?: ProjectStageDetailsDto[] | undefined;
+    projectStagesSummary?: ProjectStagesSummaryDto[] | undefined;
 
     constructor(data?: IProjectDetailsDto) {
         if (data) {
@@ -24001,6 +24106,11 @@ export class ProjectDetailsDto implements IProjectDetailsDto {
                 this.stages = [] as any;
                 for (let item of _data["stages"])
                     this.stages!.push(ProjectStageDetailsDto.fromJS(item));
+            }
+            if (Array.isArray(_data["projectStagesSummary"])) {
+                this.projectStagesSummary = [] as any;
+                for (let item of _data["projectStagesSummary"])
+                    this.projectStagesSummary!.push(ProjectStagesSummaryDto.fromJS(item));
             }
         }
     }
@@ -24055,6 +24165,11 @@ export class ProjectDetailsDto implements IProjectDetailsDto {
             for (let item of this.stages)
                 data["stages"].push(item ? item.toJSON() : undefined as any);
         }
+        if (Array.isArray(this.projectStagesSummary)) {
+            data["projectStagesSummary"] = [];
+            for (let item of this.projectStagesSummary)
+                data["projectStagesSummary"].push(item ? item.toJSON() : undefined as any);
+        }
         return data;
     }
 }
@@ -24081,6 +24196,7 @@ export interface IProjectDetailsDto {
     images?: AttachmentImageDto[] | undefined;
     stage?: ProjectStageDetailsDto;
     stages?: ProjectStageDetailsDto[] | undefined;
+    projectStagesSummary?: ProjectStagesSummaryDto[] | undefined;
 }
 
 export class ProjectMainContractor implements IProjectMainContractor {
@@ -26619,6 +26735,98 @@ export interface IProjectStagesSubTask {
     qty?: number | undefined;
     projectStageTask?: ProjectStageTask;
     projectStageTaskId?: number;
+}
+
+export class ProjectStagesSummaryDto implements IProjectStagesSummaryDto {
+    id?: number;
+    projectId?: number;
+    status?: number | undefined;
+    stageType?: ProjectStageType;
+    milestoneId?: number | undefined;
+    milestone?: StageMilestoneDetailsDto;
+    taskSavingsTotal?: number;
+    boqsTotal?: number;
+    mCsTotal?: number;
+    pOsTotal?: number;
+    sVsTotal?: number;
+    vOsTotal?: number;
+    expensesTotal?: number;
+    grandTotal?: number;
+    budgetPercentage?: number;
+
+    constructor(data?: IProjectStagesSummaryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (this as any)[property] = (data as any)[property];
+            }
+        }
+    }
+
+    init(_data?: any) {
+        if (_data) {
+            this.id = _data["id"];
+            this.projectId = _data["projectId"];
+            this.status = _data["status"];
+            this.stageType = _data["stageType"];
+            this.milestoneId = _data["milestoneId"];
+            this.milestone = _data["milestone"] ? StageMilestoneDetailsDto.fromJS(_data["milestone"]) : undefined as any;
+            this.taskSavingsTotal = _data["taskSavingsTotal"];
+            this.boqsTotal = _data["boqsTotal"];
+            this.mCsTotal = _data["mCsTotal"];
+            this.pOsTotal = _data["pOsTotal"];
+            this.sVsTotal = _data["sVsTotal"];
+            this.vOsTotal = _data["vOsTotal"];
+            this.expensesTotal = _data["expensesTotal"];
+            this.grandTotal = _data["grandTotal"];
+            this.budgetPercentage = _data["budgetPercentage"];
+        }
+    }
+
+    static fromJS(data: any): ProjectStagesSummaryDto {
+        data = typeof data === 'object' ? data : {};
+        let result = new ProjectStagesSummaryDto();
+        result.init(data);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["id"] = this.id;
+        data["projectId"] = this.projectId;
+        data["status"] = this.status;
+        data["stageType"] = this.stageType;
+        data["milestoneId"] = this.milestoneId;
+        data["milestone"] = this.milestone ? this.milestone.toJSON() : undefined as any;
+        data["taskSavingsTotal"] = this.taskSavingsTotal;
+        data["boqsTotal"] = this.boqsTotal;
+        data["mCsTotal"] = this.mCsTotal;
+        data["pOsTotal"] = this.pOsTotal;
+        data["sVsTotal"] = this.sVsTotal;
+        data["vOsTotal"] = this.vOsTotal;
+        data["expensesTotal"] = this.expensesTotal;
+        data["grandTotal"] = this.grandTotal;
+        data["budgetPercentage"] = this.budgetPercentage;
+        return data;
+    }
+}
+
+export interface IProjectStagesSummaryDto {
+    id?: number;
+    projectId?: number;
+    status?: number | undefined;
+    stageType?: ProjectStageType;
+    milestoneId?: number | undefined;
+    milestone?: StageMilestoneDetailsDto;
+    taskSavingsTotal?: number;
+    boqsTotal?: number;
+    mCsTotal?: number;
+    pOsTotal?: number;
+    sVsTotal?: number;
+    vOsTotal?: number;
+    expensesTotal?: number;
+    grandTotal?: number;
+    budgetPercentage?: number;
 }
 
 export enum ProjectStatus {

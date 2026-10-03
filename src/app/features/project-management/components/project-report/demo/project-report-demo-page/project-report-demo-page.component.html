@@ -116,7 +116,7 @@
                 <div><dt>زيارات المساحة</dt><dd>{{ summary.surveyingVisits.toFixed(2) }}</dd></div>
                 <div><dt>بند التوفير</dt><dd>{{ summary.savings.toFixed(2) }}</dd></div>
                 <div><dt>المصروفات</dt><dd>{{ summary.expenses.toFixed(2) }}</dd></div>
-                <div><dt>نسبة الفعلي من الميزانية</dt><dd>{{ ratio(summary.actual, summary.budget) === null ? '—' : ratio(summary.actual, summary.budget)!.toFixed(2) + '%' }}</dd></div>
+                <div><dt>نسبة الفعلي من الميزانية</dt><dd>{{ summary.budgetPercentage === null ? '—' : summary.budgetPercentage.toFixed(2) + '%' }}</dd></div>
               </dl>
               <div class="milestone-total"><span>Total</span><strong>{{ summary.total.toFixed(2) }}</strong></div>
             </section>
