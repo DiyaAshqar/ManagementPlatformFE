@@ -12,6 +12,7 @@ import { SelectModule } from 'primeng/select';
 
 import { AgreementDetailsDto, GetProjectStagesSumaryQuery, ProjectClient, ProjectStagesSummaryDto, ProjectStageDetailsDto, ProjectStageDto, ReportClient } from '../../../../../../../nswag/api-client';
 import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
+import { AppNumberPipe, formatAppNumber } from '../../../../../../shared/pipes/app-number.pipe';
 import { Permissions } from '../../../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
 import { PrintService } from '../../../../../../shared/services/print.service';
@@ -85,7 +86,7 @@ const STATUS_LABELS: Record<string, string> = {
 @Component({
   selector: 'app-project-report-demo-page',
   standalone: true,
-  imports: [FormsModule, ButtonModule, CardModule, SelectModule, CheckboxModule, MultiSelectModule, HasPermissionDirective],
+  imports: [FormsModule, ButtonModule, CardModule, SelectModule, CheckboxModule, MultiSelectModule, HasPermissionDirective, AppNumberPipe],
   templateUrl: './project-report-demo-page.component.html',
   styleUrl: './project-report-demo-page.component.scss',
 })
@@ -221,6 +222,49 @@ export class ProjectReportDemoPageComponent {
     }
   }
 
+  printSummary(): void {
+    const summaries = this.milestoneSummaries;
+    const total = this.grandTotal;
+    if (!summaries.length || !total) return;
+
+    const escape = (value: string) => value.replace(/[&<>"']/g, (ch) => `&#${ch.charCodeAt(0)};`);
+    const num = (value: number) => formatAppNumber(value) ?? '0';
+    const pct = (value: number | null) => (value === null ? '—' : value.toFixed(2) + '%');
+    const projectName = this.projectOptions.find((option) => option.value === this.selectedProjectId)?.label ?? '';
+    const rows: [string, (item: MilestoneSummary) => string][] = [
+      ['BOQ', (item) => num(item.boq)],
+      ['MC', (item) => num(item.mc)],
+      ['أوامر الشراء', (item) => num(item.purchaseOrders)],
+      ['أوامر التعديل', (item) => num(item.variationOrders)],
+      ['زيارات المساحة', (item) => num(item.surveyingVisits)],
+      ['بند التوفير', (item) => num(item.savings)],
+      ['المصروفات', (item) => num(item.expenses)],
+      ['نسبة الفعلي من الميزانية', (item) => pct(item.budgetPercentage)],
+    ];
+    const columns = [...summaries, total];
+    const header = columns.map((item) => `<th>${escape(item.name)}</th>`).join('');
+    const body = rows
+      .map(([label, value]) => `<tr><th>${label}</th>${columns.map((item) => `<td>${value(item)}</td>`).join('')}</tr>`)
+      .join('');
+    const totalRow = `<tr class="total"><th>Total</th>${columns.map((item) => `<td>${num(item.total)}</td>`).join('')}</tr>`;
+
+    this.printService.openAndPrint(`<!doctype html><html dir="rtl" lang="ar"><head><meta charset="utf-8"><title>ملخص المراحل</title>
+<style>
+  body{font-family:Tahoma,Arial,sans-serif;margin:24px;color:#111}
+  h1{font-size:20px;margin:0 0 4px} p{margin:0 0 16px;color:#555;font-size:13px}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th,td{border:1px solid #ccc;padding:6px 8px;text-align:center}
+  thead th{background:#1e3a8a;color:#fff} tbody th{background:#f3f4f6;text-align:right}
+  td:last-child,thead th:last-child{font-weight:bold;background:#eef2ff;color:#1e3a8a}
+  tr.total td,tr.total th{font-weight:bold;background:#dbeafe}
+  .note{margin-top:12px;font-size:12px;color:#555}
+</style></head><body>
+<h1>ملخص المراحل</h1><p>${escape(projectName)} — ${new Date().toLocaleDateString('en-GB')}</p>
+<table><thead><tr><th></th>${header}</tr></thead><tbody>${body}${totalRow}</tbody></table>
+<div class="note">Total = MC + أوامر التعديل + زيارات المساحة + المصروفات · نسبة الفعلي من إجمالي الميزانية: ${pct(this.ratio(total.actual, total.budget))}</div>
+</body></html>`);
+  }
+
   onProjectChange(): void {
     const projectId = this.selectedProjectId;
     this.selectedStageIds = [];
@@ -253,13 +297,13 @@ export class ProjectReportDemoPageComponent {
       return;
     }
     this.viewMode = this.selectedStageIds.length === 1 ? 'detailed' : 'summary';
-    if (this.selectedProjectId) this.loadReport();
   }
 
-  private loadReport(): void {
+  // Stage data is fetched only on the "تحديث المعاينة" button, not on every stage pick.
+  loadReport(): void {
     const projectId = this.selectedProjectId;
     const projectStageIds = [...this.selectedStageIds];
-    if (!projectId || !projectStageIds.length) return;
+    if (!projectId || !projectStageIds.length || this.isRendering()) return;
     const requestVersion = ++this.reportLoadVersion;
     this.isRendering.set(true);
     forkJoin({
@@ -325,11 +369,15 @@ export class ProjectReportDemoPageComponent {
   private fromStagesSummary(item: ProjectStagesSummaryDto): MilestoneSummary {
     const boq = item.boqsTotal ?? 0;
     const expenses = item.expensesTotal ?? 0;
+    const mc = item.mCsTotal ?? 0;
+    const variationOrders = item.vOsTotal ?? 0;
+    const surveyingVisits = item.sVsTotal ?? 0;
     return {
       id: item.id ?? 0, name: item.milestone?.name ?? 'المرحلة رقم ' + (item.id ?? '—'),
-      boq, mc: item.mCsTotal ?? 0, purchaseOrders: item.pOsTotal ?? 0, variationOrders: item.vOsTotal ?? 0,
-      surveyingVisits: item.sVsTotal ?? 0, savings: item.taskSavingsTotal ?? 0, expenses,
-      budget: boq, actual: expenses, total: item.grandTotal ?? 0, budgetPercentage: item.budgetPercentage ?? null,
+      boq, mc, purchaseOrders: item.pOsTotal ?? 0, variationOrders,
+      surveyingVisits, savings: item.taskSavingsTotal ?? 0, expenses,
+      // Total = MC + VOs + SV + Expenses (savings are not added)
+      budget: boq, actual: expenses, total: mc + variationOrders + surveyingVisits + expenses, budgetPercentage: item.budgetPercentage ?? null,
     };
   }
 

@@ -121,6 +121,9 @@ function isSkippedUrl(request: HttpRequest<any>): boolean {
     '/api/Auth/login',
     '/api/Auth/refresh-token',
     '/api/Auth/logout',
+    // Read-only report queries sent as POST
+    '/api/Report/project-stages-details',
+    '/api/Report/project-stages-summary',
   ];
 
   // Follow-up calls whose parent request already shows the success toast

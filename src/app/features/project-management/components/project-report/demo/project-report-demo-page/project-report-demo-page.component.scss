@@ -117,6 +117,10 @@
   margin-bottom: 1rem;
 }
 
+.view-switch p-button {
+  margin-inline-start: auto;
+}
+
 .view-switch-button {
   border: 1px solid var(--surface-border, #e2e8f0);
   border-radius: 8px;

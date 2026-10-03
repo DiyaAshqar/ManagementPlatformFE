@@ -71,7 +71,7 @@
     </div>
 
     <div class="actions mt-3">
-      <p-button label="تحديث المعاينة" icon="pi pi-refresh" [outlined]="true" [loading]="isRendering()" (onClick)="refresh()"></p-button>
+      <p-button label="تحديث المعاينة" icon="pi pi-refresh" [outlined]="true" [loading]="isRendering()" [disabled]="!selectedProjectId || !selectedStageIds.length" (onClick)="loadReport()"></p-button>
       <p-button label="طباعة" icon="pi pi-print" (onClick)="print()"></p-button>
     </div>
   </p-card>
@@ -101,6 +101,9 @@
     <div class="view-switch" role="tablist" aria-label="طريقة عرض التقرير">
       <button type="button" class="view-switch-button" [class.active]="viewMode === 'detailed'" [disabled]="selectedStageIds.length !== 1" (click)="viewMode = 'detailed'"><i class="pi pi-list"></i> العرض التفصيلي</button>
       <button type="button" class="view-switch-button" [class.active]="viewMode === 'summary'" (click)="viewMode = 'summary'"><i class="pi pi-chart-bar"></i> عرض الملخص</button>
+      @if (viewMode === 'summary' && hasSelectedMilestones && milestoneSummaries.length) {
+        <p-button icon="pi pi-print" label="طباعة الملخص" size="small" [outlined]="true" styleClass="summary-print-button" (onClick)="printSummary()"></p-button>
+      }
     </div>
     @if (viewMode === 'summary') {
       @if (hasSelectedMilestones && milestoneSummaries.length) {
@@ -109,23 +112,23 @@
             <section class="milestone-summary-card">
               <h3>{{ summary.name }}</h3>
               <dl>
-                <div><dt>BOQ</dt><dd>{{ summary.boq.toFixed(2) }}</dd></div>
-                <div><dt>MC</dt><dd>{{ summary.mc.toFixed(2) }}</dd></div>
-                <div><dt>أوامر الشراء</dt><dd>{{ summary.purchaseOrders.toFixed(2) }}</dd></div>
-                <div><dt>أوامر التعديل</dt><dd>{{ summary.variationOrders.toFixed(2) }}</dd></div>
-                <div><dt>زيارات المساحة</dt><dd>{{ summary.surveyingVisits.toFixed(2) }}</dd></div>
-                <div><dt>بند التوفير</dt><dd>{{ summary.savings.toFixed(2) }}</dd></div>
-                <div><dt>المصروفات</dt><dd>{{ summary.expenses.toFixed(2) }}</dd></div>
+                <div><dt>BOQ</dt><dd>{{ summary.boq | appNumber }}</dd></div>
+                <div><dt>MC</dt><dd>{{ summary.mc | appNumber }}</dd></div>
+                <div><dt>أوامر الشراء</dt><dd>{{ summary.purchaseOrders | appNumber }}</dd></div>
+                <div><dt>أوامر التعديل</dt><dd>{{ summary.variationOrders | appNumber }}</dd></div>
+                <div><dt>زيارات المساحة</dt><dd>{{ summary.surveyingVisits | appNumber }}</dd></div>
+                <div><dt>بند التوفير</dt><dd>{{ summary.savings | appNumber }}</dd></div>
+                <div><dt>المصروفات</dt><dd>{{ summary.expenses | appNumber }}</dd></div>
                 <div><dt>نسبة الفعلي من الميزانية</dt><dd>{{ summary.budgetPercentage === null ? '—' : summary.budgetPercentage.toFixed(2) + '%' }}</dd></div>
               </dl>
-              <div class="milestone-total"><span>Total</span><strong>{{ summary.total.toFixed(2) }}</strong></div>
+              <div class="milestone-total"><span>Total</span><strong>{{ summary.total | appNumber }}</strong></div>
             </section>
           }
         </div>
         @if (grandTotal; as total) {
           <section class="grand-total-card">
-            <div><span>Grand Total / Total Total</span><strong>{{ total.total.toFixed(2) }}</strong></div>
-            <small>BOQ: {{ total.boq.toFixed(2) }} · MC: {{ total.mc.toFixed(2) }} · أوامر التعديل: {{ total.variationOrders.toFixed(2) }} · زيارات المساحة: {{ total.surveyingVisits.toFixed(2) }} · بند التوفير: {{ total.savings.toFixed(2) }} · نسبة الفعلي من إجمالي الميزانية: {{ ratio(total.actual, total.budget) === null ? '—' : ratio(total.actual, total.budget)!.toFixed(2) + '%' }}</small>
+            <div><span>Grand Total / Total Total</span><strong>{{ total.total | appNumber }}</strong></div>
+            <small>BOQ: {{ total.boq | appNumber }} · MC: {{ total.mc | appNumber }} · أوامر التعديل: {{ total.variationOrders | appNumber }} · زيارات المساحة: {{ total.surveyingVisits | appNumber }} · المصروفات: {{ total.expenses | appNumber }} · نسبة الفعلي من إجمالي الميزانية: {{ ratio(total.actual, total.budget) === null ? '—' : ratio(total.actual, total.budget)!.toFixed(2) + '%' }}</small>
           </section>
         }
       } @else {
