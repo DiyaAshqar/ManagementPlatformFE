@@ -107,6 +107,11 @@
     </div>
     @if (viewMode === 'summary') {
       @if (hasSelectedMilestones && milestoneSummaries.length) {
+        <section class="project-info-card">
+          @for (info of projectInfo; track info.label) {
+            <div><span>{{ info.label }}</span><strong>{{ info.value }}</strong></div>
+          }
+        </section>
         <div class="milestone-summary-grid">
           @for (summary of milestoneSummaries; track summary.id) {
             <section class="milestone-summary-card">
@@ -130,6 +135,15 @@
             <div><span>Grand Total / Total Total</span><strong>{{ total.total | appNumber }}</strong></div>
             <small>BOQ: {{ total.boq | appNumber }} · MC: {{ total.mc | appNumber }} · أوامر التعديل: {{ total.variationOrders | appNumber }} · زيارات المساحة: {{ total.surveyingVisits | appNumber }} · المصروفات: {{ total.expenses | appNumber }} · نسبة الفعلي من إجمالي الميزانية: {{ ratio(total.actual, total.budget) === null ? '—' : ratio(total.actual, total.budget)!.toFixed(2) + '%' }}</small>
           </section>
+          @if (engineeringFees !== null) {
+            <table class="claim-table">
+              <tbody>
+                <tr><th>المصاريف (Grand Total)</th><td>{{ total.total | appNumber }}</td></tr>
+                <tr><th>ربح / نسبة المكتب الهندسي ({{ percentageFees }}%)</th><td>{{ engineeringFees | appNumber }}</td></tr>
+                <tr class="claim-total"><th>قيمة المطالبة كاملة</th><td>{{ total.total + engineeringFees | appNumber }}</td></tr>
+              </tbody>
+            </table>
+          }
         }
       } @else {
         <p class="preview-empty-state">اختر milestone واحدة أو عدة milestones لعرض الملخص.</p>

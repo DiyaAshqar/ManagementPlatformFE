@@ -183,3 +183,47 @@
 @media (max-width: 900px) {
   .demo-grid, .toggle-grid { grid-template-columns: 1fr; }
 }
+.project-info-card {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 0.5rem 1.5rem;
+  border: 1px solid var(--surface-border, #e2e8f0);
+  border-radius: 10px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  background: var(--surface-card, #fff);
+
+  > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  span {
+    color: var(--text-color-secondary, #64748b);
+  }
+}
+
+.claim-table {
+  width: 100%;
+  margin-top: 1rem;
+  border-collapse: collapse;
+
+  th,
+  td {
+    border: 1px solid var(--surface-border, #e2e8f0);
+    padding: 0.6rem 1rem;
+    text-align: start;
+  }
+
+  td {
+    width: 35%;
+    font-weight: 700;
+    text-align: end;
+  }
+
+  .claim-total {
+    color: var(--primary-color, #1d4ed8);
+    font-size: 1.05rem;
+  }
+}

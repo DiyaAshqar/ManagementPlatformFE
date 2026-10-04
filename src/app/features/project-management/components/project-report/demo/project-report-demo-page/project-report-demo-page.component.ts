@@ -165,6 +165,33 @@ export class ProjectReportDemoPageComponent {
     return { id: 0, name: 'الإجمالي العام', boq: sum('boq'), mc: sum('mc'), purchaseOrders: sum('purchaseOrders'), variationOrders: sum('variationOrders'), surveyingVisits: sum('surveyingVisits'), savings: sum('savings'), expenses: sum('expenses'), budget, actual, total: sum('total'), budgetPercentage: this.ratio(actual, budget) };
   }
 
+  /** Brief project header shown above the summary (screen + print). */
+  get projectInfo(): { label: string; value: string }[] {
+    const data = this.details;
+    if (!data) return [];
+    const date = (value?: Date) => (value ? value.toLocaleDateString('en-GB') : '—');
+    const ownerPayments = (data.project?.paymentFlows ?? []).reduce((sum, payment) => sum + (payment.cash ?? 0), 0);
+    return [
+      { label: 'اسم المشروع', value: data.project?.title ?? data.projectName ?? '—' },
+      { label: 'رقم المشروع', value: data.project?.projectNumber ?? data.projectNumber ?? '—' },
+      { label: 'المالك', value: data.client?.contactPerson ?? '—' },
+      { label: 'تاريخ البداية', value: date(data.project?.startDate ?? data.estimatedStartDate) },
+      { label: 'تاريخ النهاية', value: date(data.project?.endDate ?? data.estimatedEndDate) },
+      { label: 'دفعات المالك', value: formatAppNumber(ownerPayments) ?? '0' },
+    ];
+  }
+
+  get percentageFees(): number | null {
+    return this.details?.agreementPayment?.monthlyPayment?.percentageFees ?? null;
+  }
+
+  /** Engineering office fees = percentageFees% × grand total. */
+  get engineeringFees(): number | null {
+    const total = this.grandTotal;
+    const pct = this.percentageFees;
+    return total && pct !== null ? (total.total * pct) / 100 : null;
+  }
+
   ratio(actual: number, budget: number): number | null {
     return budget > 0 ? (actual / budget) * 100 : null;
   }
@@ -261,15 +288,21 @@ export class ProjectReportDemoPageComponent {
   dt{color:#444} dd{margin:0;font-weight:bold;direction:ltr}
   .card-total{display:flex;justify-content:space-between;margin-top:8px;font-size:12px}
   .card-total strong{color:#1d4ed8;direction:ltr}
+  .info{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 14px;border:1px solid #cbd5e1;border-radius:8px;padding:10px 12px;margin-bottom:12px;font-size:11px}
+  .info div{display:flex;justify-content:space-between;gap:6px} .info span{color:#555}
+  .claim{width:100%;margin-top:12px;border-collapse:collapse;font-size:12px;break-inside:avoid}
+  .claim th,.claim td{border:1px solid #cbd5e1;padding:6px 10px;text-align:right} .claim td{text-align:left;font-weight:700;width:35%}
+  .claim .sum{background:#eff6ff;color:#1d4ed8}
   .grand{margin-top:12px;border:1.5px solid #1d4ed8;border-radius:8px;padding:10px 14px;background:#eff6ff;break-inside:avoid}
   .grand-head{display:flex;justify-content:space-between;font-size:14px;font-weight:bold}
   .grand-head strong{color:#1d4ed8;direction:ltr}
   .grand small{display:block;margin-top:6px;font-size:11px;color:#444}
 </style></head><body>
 <h1>ملخص المراحل</h1><p>${escape(projectName)} — ${new Date().toLocaleDateString('en-GB')}</p>
+<div class="info">${this.projectInfo.map((info) => `<div><span>${info.label}</span><strong>${escape(info.value)}</strong></div>`).join('')}</div>
 <div class="grid">${cards}</div>
 <section class="grand"><div class="grand-head"><span>Grand Total / Total Total</span><strong>${num(total.total)}</strong></div>
-<small>BOQ: ${num(total.boq)} · MC: ${num(total.mc)} · أوامر التعديل: ${num(total.variationOrders)} · زيارات المساحة: ${num(total.surveyingVisits)} · المصروفات: ${num(total.expenses)} · نسبة الفعلي من إجمالي الميزانية: ${pct(this.ratio(total.actual, total.budget))}</small></section>
+<small>BOQ: ${num(total.boq)} · MC: ${num(total.mc)} · أوامر التعديل: ${num(total.variationOrders)} · زيارات المساحة: ${num(total.surveyingVisits)} · المصروفات: ${num(total.expenses)} · نسبة الفعلي من إجمالي الميزانية: ${pct(this.ratio(total.actual, total.budget))}</small></section>${this.engineeringFees === null ? '' : `<table class="claim"><tr><th>المصاريف (Grand Total)</th><td>${num(total.total)}</td></tr><tr><th>ربح / نسبة المكتب الهندسي (${this.percentageFees}%)</th><td>${num(this.engineeringFees)}</td></tr><tr class="sum"><th>قيمة المطالبة كاملة</th><td>${num(total.total + this.engineeringFees)}</td></tr></table>`}
 </body></html>`);
   }
 
