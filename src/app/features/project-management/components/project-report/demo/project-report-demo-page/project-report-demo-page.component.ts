@@ -136,6 +136,7 @@ export class ProjectReportDemoPageComponent {
   private stage: ProjectStageDetailsDto | null = null;
   private loadedStageReports: LoadedStageReport[] = [];
   private stagesSummary: ProjectStagesSummaryDto[] = [];
+  private summaryOwnerPayments: number | null = null;
   private lastGeneratedHtml = '';
   private stageLoadVersion = 0;
   private reportLoadVersion = 0;
@@ -170,7 +171,7 @@ export class ProjectReportDemoPageComponent {
     const data = this.details;
     if (!data) return [];
     const date = (value?: Date) => (value ? value.toLocaleDateString('en-GB') : '—');
-    const ownerPayments = data.project?.totalOfOwnerPayments ?? 0;
+    const ownerPayments = this.summaryOwnerPayments ?? data.project?.totalOfOwnerPayments ?? 0;
     return [
       { label: 'اسم المشروع', value: data.project?.title ?? data.projectName ?? '—' },
       { label: 'رقم المشروع', value: data.project?.projectNumber ?? data.projectNumber ?? '—' },
@@ -348,7 +349,6 @@ export class ProjectReportDemoPageComponent {
       summary: this.reportClient.getProjectStagesSummary(new GetProjectStagesSummaryQuery({ projectId, projectStageIds })),
     }).subscribe({
       next: ({ responses, summary }) => {
-        this.stagesSummary = summary.data?.project?.projectStagesSummary ?? [];
         if (requestVersion !== this.reportLoadVersion) return;
         const reports = responses.map((response) => ({ details: response.data, stage: response.data?.project?.stage }));
         const invalid = reports.find((report, index) => !responses[index].succeeded || !report.details || !report.stage);
@@ -358,6 +358,8 @@ export class ProjectReportDemoPageComponent {
           return;
         }
         this.loadedStageReports = reports as LoadedStageReport[];
+        this.stagesSummary = summary.data?.project?.projectStagesSummary ?? [];
+        this.summaryOwnerPayments = summary.data?.project?.totalOfOwnerPayments ?? null;
         this.details = this.loadedStageReports[0].details;
         this.stage = this.loadedStageReports[0].stage;
         this.loadError.set(null);
@@ -394,6 +396,7 @@ export class ProjectReportDemoPageComponent {
     this.stage = null;
     this.loadedStageReports = [];
     this.stagesSummary = [];
+    this.summaryOwnerPayments = null;
     this.lastGeneratedHtml = '';
     this.previewHtml.set(null);
     this.loadError.set(null);
