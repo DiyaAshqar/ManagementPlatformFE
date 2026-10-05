@@ -137,7 +137,7 @@
                 <tr><th>زيارات المساحة</th><td>{{ total.surveyingVisits | appNumber }}</td></tr>
                 <tr><th>المصروفات</th><td>{{ total.expenses | appNumber }}</td></tr>
                 <tr><th>نسبة الفعلي من إجمالي الميزانية</th><td>{{ ratio(total.actual, total.budget) === null ? '—' : ratio(total.actual, total.budget)!.toFixed(2) + '%' }}</td></tr>
-                <tr><th>المصاريف (Grand Total)</th><td>{{ total.total | appNumber }}</td></tr>
+                <tr><th>Grand Total</th><td>{{ total.total | appNumber }}</td></tr>
                 @if (includePercentageFees && canViewFinanceDetails && engineeringFees !== null) {
                 <tr><th>أتعاب المكتب الهندسي ({{ percentageFees }}%)</th><td>{{ engineeringFees | appNumber }}</td></tr>
                 <tr class="claim-total"><th>قيمة المطالبة كاملة</th><td>{{ total.total + engineeringFees | appNumber }}</td></tr>
