@@ -10,7 +10,7 @@ import { CheckboxModule } from 'primeng/checkbox';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SelectModule } from 'primeng/select';
 
-import { AgreementDetailsDto, GetProjectStagesSumaryQuery, ProjectClient, ProjectStagesSummaryDto, ProjectStageDetailsDto, ProjectStageDto, ReportClient } from '../../../../../../../nswag/api-client';
+import { AgreementDetailsDto, GetProjectStagesSummaryQuery, ProjectClient, ProjectStagesSummaryDto, ProjectStageDetailsDto, ProjectStageDto, ReportClient } from '../../../../../../../nswag/api-client';
 import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
 import { AppNumberPipe, formatAppNumber } from '../../../../../../shared/pipes/app-number.pipe';
 import { Permissions } from '../../../../../../core/auth/models/auth.models';
@@ -170,7 +170,7 @@ export class ProjectReportDemoPageComponent {
     const data = this.details;
     if (!data) return [];
     const date = (value?: Date) => (value ? value.toLocaleDateString('en-GB') : '—');
-    const ownerPayments = (data.project?.paymentFlows ?? []).reduce((sum, payment) => sum + (payment.cash ?? 0), 0);
+    const ownerPayments = data.project?.totalOfOwnerPayments ?? 0;
     return [
       { label: 'اسم المشروع', value: data.project?.title ?? data.projectName ?? '—' },
       { label: 'رقم المشروع', value: data.project?.projectNumber ?? data.projectNumber ?? '—' },
@@ -187,6 +187,7 @@ export class ProjectReportDemoPageComponent {
 
   /** Engineering office fees = percentageFees% × grand total. */
   get engineeringFees(): number | null {
+    if (!this.includePercentageFees || !this.canViewFinanceDetails) return null;
     const total = this.grandTotal;
     const pct = this.percentageFees;
     return total && pct !== null ? (total.total * pct) / 100 : null;
@@ -293,16 +294,11 @@ export class ProjectReportDemoPageComponent {
   .claim{width:100%;margin-top:12px;border-collapse:collapse;font-size:12px;break-inside:avoid}
   .claim th,.claim td{border:1px solid #cbd5e1;padding:6px 10px;text-align:right} .claim td{text-align:left;font-weight:700;width:35%}
   .claim .sum{background:#eff6ff;color:#1d4ed8}
-  .grand{margin-top:12px;border:1.5px solid #1d4ed8;border-radius:8px;padding:10px 14px;background:#eff6ff;break-inside:avoid}
-  .grand-head{display:flex;justify-content:space-between;font-size:14px;font-weight:bold}
-  .grand-head strong{color:#1d4ed8;direction:ltr}
-  .grand small{display:block;margin-top:6px;font-size:11px;color:#444}
 </style></head><body>
 <h1>ملخص المراحل</h1><p>${escape(projectName)} — ${new Date().toLocaleDateString('en-GB')}</p>
 <div class="info">${this.projectInfo.map((info) => `<div><span>${info.label}</span><strong>${escape(info.value)}</strong></div>`).join('')}</div>
 <div class="grid">${cards}</div>
-<section class="grand"><div class="grand-head"><span>Grand Total / Total Total</span><strong>${num(total.total)}</strong></div>
-<small>BOQ: ${num(total.boq)} · MC: ${num(total.mc)} · أوامر التعديل: ${num(total.variationOrders)} · زيارات المساحة: ${num(total.surveyingVisits)} · المصروفات: ${num(total.expenses)} · نسبة الفعلي من إجمالي الميزانية: ${pct(this.ratio(total.actual, total.budget))}</small></section>${this.engineeringFees === null ? '' : `<table class="claim"><tr><th>المصاريف (Grand Total)</th><td>${num(total.total)}</td></tr><tr><th>ربح / نسبة المكتب الهندسي (${this.percentageFees}%)</th><td>${num(this.engineeringFees)}</td></tr><tr class="sum"><th>قيمة المطالبة كاملة</th><td>${num(total.total + this.engineeringFees)}</td></tr></table>`}
+<table class="claim"><tr><th>BOQ</th><td>${num(total.boq)}</td></tr><tr><th>MC</th><td>${num(total.mc)}</td></tr><tr><th>أوامر التعديل</th><td>${num(total.variationOrders)}</td></tr><tr><th>زيارات المساحة</th><td>${num(total.surveyingVisits)}</td></tr><tr><th>المصروفات</th><td>${num(total.expenses)}</td></tr><tr><th>نسبة الفعلي من إجمالي الميزانية</th><td>${pct(this.ratio(total.actual, total.budget))}</td></tr><tr><th>المصاريف (Grand Total)</th><td>${num(total.total)}</td></tr>${!this.includePercentageFees || !this.canViewFinanceDetails || this.engineeringFees === null ? '' : `<tr><th>أتعاب المكتب الهندسي (${this.percentageFees}%)</th><td>${num(this.engineeringFees)}</td></tr><tr class="sum"><th>قيمة المطالبة كاملة</th><td>${num(total.total + this.engineeringFees)}</td></tr>`}</table>
 </body></html>`);
   }
 
@@ -349,7 +345,7 @@ export class ProjectReportDemoPageComponent {
     this.isRendering.set(true);
     forkJoin({
       responses: forkJoin(projectStageIds.map((stageId) => this.reportClient.getProjectStageDetails(projectId, stageId))),
-      summary: this.reportClient.getProjectStagesSummary(new GetProjectStagesSumaryQuery({ projectId, projectStageIds })),
+      summary: this.reportClient.getProjectStagesSummary(new GetProjectStagesSummaryQuery({ projectId, projectStageIds })),
     }).subscribe({
       next: ({ responses, summary }) => {
         this.stagesSummary = summary.data?.project?.projectStagesSummary ?? [];

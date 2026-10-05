@@ -145,8 +145,7 @@
   gap: 1rem;
 }
 
-.milestone-summary-card,
-.grand-total-card {
+.milestone-summary-card {
   border: 1px solid var(--surface-border, #e2e8f0);
   border-radius: 10px;
   padding: 1rem;
@@ -161,8 +160,7 @@
   dd { margin: 0; font-weight: 600; direction: ltr; }
 }
 
-.milestone-total,
-.grand-total-card > div {
+.milestone-total {
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -170,14 +168,6 @@
   font-size: 1.05rem;
 
   strong { color: var(--primary-color, #3b82f6); direction: ltr; }
-}
-
-.grand-total-card {
-  margin-top: 1rem;
-  border-color: var(--primary-color, #3b82f6);
-  background: color-mix(in srgb, var(--primary-color, #3b82f6) 7%, var(--surface-card, #fff));
-
-  small { display: block; margin-top: 0.55rem; color: var(--text-color-secondary, #64748b); }
 }
 
 @media (max-width: 900px) {

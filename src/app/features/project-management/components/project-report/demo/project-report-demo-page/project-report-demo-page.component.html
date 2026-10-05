@@ -72,7 +72,8 @@
 
     <div class="actions mt-3">
       <p-button label="تحديث المعاينة" icon="pi pi-refresh" [outlined]="true" [loading]="isRendering()" [disabled]="!selectedProjectId || !selectedStageIds.length" (onClick)="loadReport()"></p-button>
-      <p-button label="طباعة" icon="pi pi-print" (onClick)="print()"></p-button>
+      <p-button label="طباعة العرض التفصيلي" icon="pi pi-print" (onClick)="print()"></p-button>
+      <p-button label="طباعة الملخص" icon="pi pi-print" [outlined]="true" [disabled]="!hasSelectedMilestones || !milestoneSummaries.length" (onClick)="printSummary()"></p-button>
     </div>
   </p-card>
 
@@ -101,9 +102,6 @@
     <div class="view-switch" role="tablist" aria-label="طريقة عرض التقرير">
       <button type="button" class="view-switch-button" [class.active]="viewMode === 'detailed'" [disabled]="selectedStageIds.length !== 1" (click)="viewMode = 'detailed'"><i class="pi pi-list"></i> العرض التفصيلي</button>
       <button type="button" class="view-switch-button" [class.active]="viewMode === 'summary'" (click)="viewMode = 'summary'"><i class="pi pi-chart-bar"></i> عرض الملخص</button>
-      @if (viewMode === 'summary' && hasSelectedMilestones && milestoneSummaries.length) {
-        <p-button icon="pi pi-print" label="طباعة الملخص" size="small" [outlined]="true" styleClass="summary-print-button" (onClick)="printSummary()"></p-button>
-      }
     </div>
     @if (viewMode === 'summary') {
       @if (hasSelectedMilestones && milestoneSummaries.length) {
@@ -131,19 +129,21 @@
           }
         </div>
         @if (grandTotal; as total) {
-          <section class="grand-total-card">
-            <div><span>Grand Total / Total Total</span><strong>{{ total.total | appNumber }}</strong></div>
-            <small>BOQ: {{ total.boq | appNumber }} · MC: {{ total.mc | appNumber }} · أوامر التعديل: {{ total.variationOrders | appNumber }} · زيارات المساحة: {{ total.surveyingVisits | appNumber }} · المصروفات: {{ total.expenses | appNumber }} · نسبة الفعلي من إجمالي الميزانية: {{ ratio(total.actual, total.budget) === null ? '—' : ratio(total.actual, total.budget)!.toFixed(2) + '%' }}</small>
-          </section>
-          @if (engineeringFees !== null) {
             <table class="claim-table">
               <tbody>
+                <tr><th>BOQ</th><td>{{ total.boq | appNumber }}</td></tr>
+                <tr><th>MC</th><td>{{ total.mc | appNumber }}</td></tr>
+                <tr><th>أوامر التعديل</th><td>{{ total.variationOrders | appNumber }}</td></tr>
+                <tr><th>زيارات المساحة</th><td>{{ total.surveyingVisits | appNumber }}</td></tr>
+                <tr><th>المصروفات</th><td>{{ total.expenses | appNumber }}</td></tr>
+                <tr><th>نسبة الفعلي من إجمالي الميزانية</th><td>{{ ratio(total.actual, total.budget) === null ? '—' : ratio(total.actual, total.budget)!.toFixed(2) + '%' }}</td></tr>
                 <tr><th>المصاريف (Grand Total)</th><td>{{ total.total | appNumber }}</td></tr>
-                <tr><th>ربح / نسبة المكتب الهندسي ({{ percentageFees }}%)</th><td>{{ engineeringFees | appNumber }}</td></tr>
+                @if (includePercentageFees && canViewFinanceDetails && engineeringFees !== null) {
+                <tr><th>أتعاب المكتب الهندسي ({{ percentageFees }}%)</th><td>{{ engineeringFees | appNumber }}</td></tr>
                 <tr class="claim-total"><th>قيمة المطالبة كاملة</th><td>{{ total.total + engineeringFees | appNumber }}</td></tr>
+                }
               </tbody>
             </table>
-          }
         }
       } @else {
         <p class="preview-empty-state">اختر milestone واحدة أو عدة milestones لعرض الملخص.</p>

@@ -7314,7 +7314,7 @@ export class ReportClient {
      * @param body (optional) 
      * @return OK
      */
-    getProjectStagesSummary(body: GetProjectStagesSumaryQuery | undefined): Observable<AgreementDetailsDtoResponse> {
+    getProjectStagesSummary(body: GetProjectStagesSummaryQuery | undefined): Observable<AgreementDetailsDtoResponse> {
         let url_ = this.baseUrl + "/api/Report/project-stages-summary";
         url_ = url_.replace(/[?&]$/, "");
 
@@ -20500,11 +20500,11 @@ export interface IGetProjectStagesDetailsQuery {
     projectStageIds?: number[] | undefined;
 }
 
-export class GetProjectStagesSumaryQuery implements IGetProjectStagesSumaryQuery {
+export class GetProjectStagesSummaryQuery implements IGetProjectStagesSummaryQuery {
     projectId?: number;
     projectStageIds?: number[] | undefined;
 
-    constructor(data?: IGetProjectStagesSumaryQuery) {
+    constructor(data?: IGetProjectStagesSummaryQuery) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -20524,9 +20524,9 @@ export class GetProjectStagesSumaryQuery implements IGetProjectStagesSumaryQuery
         }
     }
 
-    static fromJS(data: any): GetProjectStagesSumaryQuery {
+    static fromJS(data: any): GetProjectStagesSummaryQuery {
         data = typeof data === 'object' ? data : {};
-        let result = new GetProjectStagesSumaryQuery();
+        let result = new GetProjectStagesSummaryQuery();
         result.init(data);
         return result;
     }
@@ -20543,7 +20543,7 @@ export class GetProjectStagesSumaryQuery implements IGetProjectStagesSumaryQuery
     }
 }
 
-export interface IGetProjectStagesSumaryQuery {
+export interface IGetProjectStagesSummaryQuery {
     projectId?: number;
     projectStageIds?: number[] | undefined;
 }
@@ -24048,6 +24048,7 @@ export class ProjectDetailsDto implements IProjectDetailsDto {
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
     paymentFlows?: ProjectPaymentFlowDetailsDto[] | undefined;
+    totalOfOwnerPayments?: number;
     projectUsers?: ProjectUserDto[] | undefined;
     tasks?: TaskDetailsDto[] | undefined;
     images?: AttachmentImageDto[] | undefined;
@@ -24086,6 +24087,7 @@ export class ProjectDetailsDto implements IProjectDetailsDto {
                 for (let item of _data["paymentFlows"])
                     this.paymentFlows!.push(ProjectPaymentFlowDetailsDto.fromJS(item));
             }
+            this.totalOfOwnerPayments = _data["totalOfOwnerPayments"];
             if (Array.isArray(_data["projectUsers"])) {
                 this.projectUsers = [] as any;
                 for (let item of _data["projectUsers"])
@@ -24144,6 +24146,7 @@ export class ProjectDetailsDto implements IProjectDetailsDto {
             for (let item of this.paymentFlows)
                 data["paymentFlows"].push(item ? item.toJSON() : undefined as any);
         }
+        data["totalOfOwnerPayments"] = this.totalOfOwnerPayments;
         if (Array.isArray(this.projectUsers)) {
             data["projectUsers"] = [];
             for (let item of this.projectUsers)
@@ -24191,6 +24194,7 @@ export interface IProjectDetailsDto {
     modifiedById?: string | undefined;
     modifiedDate?: Date | undefined;
     paymentFlows?: ProjectPaymentFlowDetailsDto[] | undefined;
+    totalOfOwnerPayments?: number;
     projectUsers?: ProjectUserDto[] | undefined;
     tasks?: TaskDetailsDto[] | undefined;
     images?: AttachmentImageDto[] | undefined;
