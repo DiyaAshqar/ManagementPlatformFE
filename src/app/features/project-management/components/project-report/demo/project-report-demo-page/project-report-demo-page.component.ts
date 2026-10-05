@@ -2,7 +2,6 @@ import { HttpClient } from '@angular/common/http';
 import { Component, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
-import { forkJoin } from 'rxjs';
 
 import { ButtonModule } from 'primeng/button';
 import { CardModule } from 'primeng/card';
@@ -44,10 +43,6 @@ interface DataTypeCard {
   titleAr: string;
   subtitleAr: string;
   descriptionAr: string;
-}
-interface LoadedStageReport {
-  details: AgreementDetailsDto;
-  stage: ProjectStageDetailsDto;
 }
 
 interface MilestoneSummary {
@@ -134,7 +129,6 @@ export class ProjectReportDemoPageComponent {
   readonly previewHtml = signal<SafeHtml | null>(null);
   private details: AgreementDetailsDto | null = null;
   private stage: ProjectStageDetailsDto | null = null;
-  private loadedStageReports: LoadedStageReport[] = [];
   private stagesSummary: ProjectStagesSummaryDto[] = [];
   private summaryOwnerPayments: number | null = null;
   private lastGeneratedHtml = '';
@@ -154,6 +148,22 @@ export class ProjectReportDemoPageComponent {
   }
 
   get milestoneSummaries(): MilestoneSummary[] {
+    if (!this.stagesSummary.length && this.stage) {
+      const stage = this.stage;
+      const sum = (values: (number | undefined)[]) => values.reduce<number>((total, value) => total + (value ?? 0), 0);
+      const budget = sum((stage.boqs ?? []).map((item) => item.subTotal));
+      const actual = sum((stage.expenses ?? []).map((item) => item.totalAmount));
+      return [this.fromStagesSummary(new ProjectStagesSummaryDto({
+        id: stage.id, milestone: stage.milestone,
+        boqsTotal: budget, expensesTotal: actual,
+        mCsTotal: sum((stage.mainContractors ?? []).map((item) => item.amount)),
+        pOsTotal: sum((stage.purchaseOrders ?? []).map((item) => item.subTotal)),
+        vOsTotal: sum((stage.variationOrders ?? []).map((item) => item.subTotal)),
+        sVsTotal: sum((stage.surveyingVisits ?? []).map((item) => item.subTotal)),
+        taskSavingsTotal: sum((stage.savingItemTasks ?? []).flatMap((item) => (item.subTasks ?? []).map((subtask) => subtask.cost))),
+        budgetPercentage: this.ratio(actual, budget) ?? undefined,
+      }))];
+    }
     return this.stagesSummary.map((item) => this.fromStagesSummary(item));
   }
 
@@ -344,24 +354,25 @@ export class ProjectReportDemoPageComponent {
     if (!projectId || !projectStageIds.length || this.isRendering()) return;
     const requestVersion = ++this.reportLoadVersion;
     this.isRendering.set(true);
-    forkJoin({
-      responses: forkJoin(projectStageIds.map((stageId) => this.reportClient.getProjectStageDetails(projectId, stageId))),
-      summary: this.reportClient.getProjectStagesSummary(new GetProjectStagesSummaryQuery({ projectId, projectStageIds })),
-    }).subscribe({
-      next: ({ responses, summary }) => {
+    const isSingleStage = projectStageIds.length === 1;
+    const request = isSingleStage
+      ? this.reportClient.getProjectStageDetails(projectId, projectStageIds[0])
+      : this.reportClient.getProjectStagesSummary(new GetProjectStagesSummaryQuery({ projectId, projectStageIds }));
+    request.subscribe({
+      next: (response) => {
         if (requestVersion !== this.reportLoadVersion) return;
-        const reports = responses.map((response) => ({ details: response.data, stage: response.data?.project?.stage }));
-        const invalid = reports.find((report, index) => !responses[index].succeeded || !report.details || !report.stage);
-        if (invalid) {
+        if (!response.succeeded || !response.data?.project || (isSingleStage && !response.data.project.stage)) {
           this.loadError.set('لم تُرجع الواجهة بيانات إحدى المراحل المطلوبة.');
           this.isRendering.set(false);
           return;
         }
-        this.loadedStageReports = reports as LoadedStageReport[];
-        this.stagesSummary = summary.data?.project?.projectStagesSummary ?? [];
-        this.summaryOwnerPayments = summary.data?.project?.totalOfOwnerPayments ?? null;
-        this.details = this.loadedStageReports[0].details;
-        this.stage = this.loadedStageReports[0].stage;
+        this.stagesSummary = response.data.project.projectStagesSummary ?? [];
+        this.summaryOwnerPayments = response.data.project.totalOfOwnerPayments ?? null;
+        this.details = response.data;
+        this.stage = isSingleStage ? response.data.project.stage! : null;
+        this.lastGeneratedHtml = '';
+        this.previewHtml.set(null);
+        this.viewMode = isSingleStage ? 'detailed' : 'summary';
         this.loadError.set(null);
         this.isRendering.set(false);
         this.refresh();
@@ -394,7 +405,6 @@ export class ProjectReportDemoPageComponent {
     this.reportLoadVersion++;
     this.details = null;
     this.stage = null;
-    this.loadedStageReports = [];
     this.stagesSummary = [];
     this.summaryOwnerPayments = null;
     this.lastGeneratedHtml = '';
@@ -501,7 +511,7 @@ export class ProjectReportDemoPageComponent {
         boqTotal: number((stage.boqs ?? []).map((boq) => boq.subTotal)), contractorCommitments: number(mainContractors.map((contractor) => contractor.amount)),
         contractorPaid: number(mainContractors.map((contractor) => contractor.totalPayments)), contractorRemaining: number(mainContractors.map((contractor) => (contractor.amount ?? 0) - (contractor.totalPayments ?? 0))),
         purchaseOrdersTotal: number((stage.purchaseOrders ?? []).map((order) => order.subTotal)), expensesTotal: number((stage.expenses ?? []).map((expense) => expense.totalAmount)),
-        advancesTotal: number(advances.map((advance) => advance.amount)), advancesRemaining: number(advances.map((advance) => advance.remainingBalance)), ownerPaymentsTotal: number((project?.paymentFlows ?? []).map((payment) => payment.cash)),
+        advancesTotal: number(advances.map((advance) => advance.amount)), advancesRemaining: number(advances.map((advance) => advance.remainingBalance)), ownerPaymentsTotal: project?.totalOfOwnerPayments ?? 0,
         variationOrdersApprovedTotal: number(variationOrders.filter((order) => String(order.status) === 'approved').map((order) => order.subTotal)),
         variationOrdersPendingTotal: number(variationOrders.filter((order) => String(order.status) === 'pending').map((order) => order.subTotal)),
         variationOrdersRejectedTotal: number(variationOrders.filter((order) => String(order.status) === 'rejected').map((order) => order.subTotal)),
