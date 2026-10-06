@@ -572,6 +572,7 @@
       "includePhotos": "Include progress photos",
       "includeSignatures": "Include signatures",
       "includePercentageFees": "Show percentage fees",
+      "hideOverview": "Hide executive summary and agreement details",
       "confidential": "Mark as confidential",
       "customSections": "Sections to include",
       "generating": "Generating report…",

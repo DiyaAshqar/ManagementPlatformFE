@@ -80,6 +80,7 @@ export class WirDialogComponent implements OnChanges {
 
   private readonly fb = inject(FormBuilder);
   private readonly wirApi = inject(WirApiService);
+  private savedStatusDates: Pick<GetProjectWirDto, 'submittedDate' | 'approvedDate' | 'rejectedDate'> = {};
 
   readonly isLoading = signal(false);
   readonly isSaving = signal(false);
@@ -111,6 +112,7 @@ export class WirDialogComponent implements OnChanges {
   ngOnChanges(changes: SimpleChanges): void {
     if ((changes['visible'] || changes['wirId']) && this.visible) {
       this.form = this.buildForm();
+      this.savedStatusDates = {};
       this.revisionNo.set(0);
       if (this.wirId) {
         this.load(this.wirId);
@@ -171,9 +173,9 @@ export class WirDialogComponent implements OnChanges {
       assignedTo: v.assignedTo ?? undefined,
       inspectionDate: this.toUtcDate(v.inspectionDate),
       status,
-      submittedDate: this.toUtcDate(v.submittedDate) ?? (status === WirStatus.Submitted ? this.toUtcDate(today) : undefined),
-      approvedDate: this.toUtcDate(v.approvedDate) ?? (status === WirStatus.Approved ? this.toUtcDate(today) : undefined),
-      rejectedDate: this.toUtcDate(v.rejectedDate) ?? (status === WirStatus.Rejected ? this.toUtcDate(today) : undefined),
+      submittedDate: this.savedStatusDates.submittedDate ?? (status === WirStatus.Submitted ? this.toUtcDate(today) : undefined),
+      approvedDate: this.savedStatusDates.approvedDate ?? (status === WirStatus.Approved ? this.toUtcDate(today) : undefined),
+      rejectedDate: this.savedStatusDates.rejectedDate ?? (status === WirStatus.Rejected ? this.toUtcDate(today) : undefined),
       revisionNo: this.revisionNo(),
       checklistItems: v.checklistItems.map(
         (item: any, index: number) =>
@@ -219,6 +221,11 @@ export class WirDialogComponent implements OnChanges {
   }
 
   private patch(dto: GetProjectWirDto): void {
+    this.savedStatusDates = {
+      submittedDate: this.toUtcDate(this.toLocalDate(dto.submittedDate)),
+      approvedDate: this.toUtcDate(this.toLocalDate(dto.approvedDate)),
+      rejectedDate: this.toUtcDate(this.toLocalDate(dto.rejectedDate)),
+    };
     this.revisionNo.set(dto.revisionNo ?? 0);
     this.form.patchValue({
       wirNo: dto.wirNo ?? '',
@@ -236,9 +243,6 @@ export class WirDialogComponent implements OnChanges {
       assignedTo: dto.assignedTo ?? null,
       inspectionDate: this.toLocalDate(dto.inspectionDate),
       status: dto.status ?? WirStatus.Draft,
-      submittedDate: this.toLocalDate(dto.submittedDate),
-      approvedDate: this.toLocalDate(dto.approvedDate),
-      rejectedDate: this.toLocalDate(dto.rejectedDate),
     });
     this.items.clear();
     [...(dto.checklistItems ?? [])]
@@ -273,9 +277,6 @@ export class WirDialogComponent implements OnChanges {
       assignedTo: [null as number | null],
       inspectionDate: [new Date() as Date | null, Validators.required],
       status: [WirStatus.Draft as WirStatus, Validators.required],
-      submittedDate: [null as Date | null],
-      approvedDate: [null as Date | null],
-      rejectedDate: [null as Date | null],
       checklistItems: this.fb.array<FormGroup>([]),
     });
   }

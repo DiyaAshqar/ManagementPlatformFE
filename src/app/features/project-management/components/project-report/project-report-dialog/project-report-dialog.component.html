@@ -60,6 +60,10 @@
 
   <div class="toggle-grid mt-3">
     <div class="toggle-item">
+      <p-checkbox [(ngModel)]="hideOverview" [binary]="true" inputId="rptHideOverview"></p-checkbox>
+      <label for="rptHideOverview">{{ 'projectDetail.printDialog.hideOverview' | translate }}</label>
+    </div>
+    <div class="toggle-item">
       <p-checkbox [(ngModel)]="includeCompanyHeader" [binary]="true" inputId="rptCompanyHeader"></p-checkbox>
       <label for="rptCompanyHeader">{{ 'projectDetail.printDialog.includeCompanyHeader' | translate }}</label>
     </div>
