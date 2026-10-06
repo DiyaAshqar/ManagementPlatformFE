@@ -2,9 +2,8 @@ import { ProjectReportConfig, ProjectReportSectionKey } from '../models/project-
 
 /**
  * Per-variant section sets. `cover` and `executiveSummary` are the report's
- * front matter and are always included for the non-custom variants — a
- * document without a cover/summary isn't a usable report. `custom` is the
- * only variant where the caller's selection is authoritative.
+ * front matter included by default for the non-custom variants.
+ * The overview toggle can omit the summary and agreement in any variant.
  */
 const FULL_SECTIONS: ProjectReportSectionKey[] = [
   'cover',
@@ -40,7 +39,16 @@ const FINANCIAL_SECTIONS: ProjectReportSectionKey[] = [
  * Pure function — no data/permission awareness; the builder still omits a
  * section's *content* when the underlying data is unavailable or redacted.
  */
-export function resolveReportSections(config: Pick<ProjectReportConfig, 'type' | 'customSections'>): Set<ProjectReportSectionKey> {
+export function resolveReportSections(config: Pick<ProjectReportConfig, 'type' | 'customSections' | 'hideOverview'>): Set<ProjectReportSectionKey> {
+  const sections = resolveVariantSections(config);
+  if (config.hideOverview) {
+    sections.delete('executiveSummary');
+    sections.delete('agreement');
+  }
+  return sections;
+}
+
+function resolveVariantSections(config: Pick<ProjectReportConfig, 'type' | 'customSections'>): Set<ProjectReportSectionKey> {
   switch (config.type) {
     case 'summary':
       return new Set(SUMMARY_SECTIONS);

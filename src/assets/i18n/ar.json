@@ -568,6 +568,7 @@
       "includePhotos": "تضمين صور سير العمل",
       "includeSignatures": "تضمين التوقيعات",
       "includePercentageFees": "إظهار نسبة الأتعاب",
+      "hideOverview": "إخفاء الملخص التنفيذي وتفاصيل الاتفاقية",
       "confidential": "تصنيف كوثيقة سرية",
       "customSections": "الأقسام المطلوب تضمينها",
       "generating": "جارٍ إعداد التقرير…",

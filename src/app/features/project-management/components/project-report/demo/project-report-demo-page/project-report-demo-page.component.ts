@@ -119,6 +119,7 @@ export class ProjectReportDemoPageComponent {
   includePhotos = true;
   includeSignatures = true;
   includePercentageFees = true;
+  hideOverview = false;
   confidential = false;
   customSections: ProjectReportSectionKey[] = [...PROJECT_REPORT_SECTION_KEYS];
 
@@ -234,6 +235,7 @@ export class ProjectReportDemoPageComponent {
       includeDocuments: this.includeDocuments, includePhotos: this.includePhotos,
       includeSignatures: this.includeSignatures, includePercentageFees: this.includePercentageFees && this.canViewFinanceDetails,
       confidential: this.confidential, customSections: this.customSections, companyLogoDataUrl: undefined,
+      hideOverview: this.hideOverview,
     };
 
     this.http.get<Record<string, unknown>>(`/assets/i18n/${this.selectedLanguage}.json`).subscribe({

@@ -39,6 +39,8 @@ export interface ProjectReportConfig {
   includeSignatures: boolean;
   /** Shows/hides the contract's percentage-fees figure within the Agreement Details section. */
   includePercentageFees: boolean;
+  /** Hides the executive summary and the entire agreement details section. */
+  hideOverview?: boolean;
   confidential: boolean;
   /** Only consulted when `type === 'custom'`. */
   customSections: ProjectReportSectionKey[];
