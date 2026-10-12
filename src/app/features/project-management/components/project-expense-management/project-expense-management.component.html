@@ -205,10 +205,11 @@
               <label class="text-sm font-medium text-color">{{ 'projectTabs.expenses.columns.expenseNo' | translate }}</label>
               <input pInputText type="text"
                 [placeholder]="'projectTabs.expenses.form.expenseNoPlaceholder' | translate"
+                [disabled]="!!editingExpenseId()"
                 [ngModel]="formExpenseNo()" (ngModelChange)="formExpenseNo.set($event)"
-                [class.ng-invalid]="hasDuplicateExpenseNo()"
-                [class.ng-dirty]="hasDuplicateExpenseNo()"
-                [attr.aria-invalid]="hasDuplicateExpenseNo()"
+                [class.ng-invalid]="hasDuplicateExpense()"
+                [class.ng-dirty]="hasDuplicateExpense()"
+                [attr.aria-invalid]="hasDuplicateExpense()"
                 maxlength="50" class="w-full" />
             </div>
           </div>
@@ -227,9 +228,10 @@
               <p-select
                 [ngModel]="formSupplierId()" (ngModelChange)="formSupplierId.set($event)"
                 [options]="suppliers()" optionLabel="name" optionValue="id"
+                [disabled]="!!editingExpenseId()"
                 [placeholder]="'projectTabs.expenses.form.selectSupplier' | translate"
                 [loading]="isLoadingLookups()"
-                [styleClass]="hasDuplicateSupplier() ? 'w-full ng-invalid ng-dirty' : 'w-full'">
+                [styleClass]="hasDuplicateExpense() ? 'w-full ng-invalid ng-dirty' : 'w-full'">
               </p-select>
             </div>
           </div>
@@ -240,20 +242,20 @@
                 class="w-full font-semibold surface-100 text-primary" />
             </div>
           </div>
-          @if (hasDuplicateExpenseNo()) {
+         @if (hasDuplicateExpense()) {
             <div class="col-12 pb-0">
               <small class="text-red-500" role="alert">
-                {{ 'projectTabs.expenses.form.duplicateExpenseNo' | translate }}
+                {{ 'projectTabs.expenses.form.duplicateExpense' | translate }}
               </small>
             </div>
           }
-          @if (hasDuplicateSupplier()) {
+       <!--  @if (hasDuplicateSupplier()) {
             <div class="col-12 pb-0">
               <small class="text-red-500" role="alert">
                 {{ 'projectTabs.expenses.form.duplicateSupplier' | translate }}
               </small>
             </div>
-          }
+          } -->
           <div class="col-12">
             <div class="flex flex-column gap-2">
               <label class="text-sm font-medium text-color">{{ 'projectTabs.expenses.columns.notes' | translate }}</label>
