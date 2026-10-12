@@ -299,8 +299,19 @@ export class ProjectExpenseManagementComponent implements OnInit {
     );
   }
 
-  hasDuplicateExpense(): boolean {
-    return this.hasDuplicateExpenseNo() || this.hasDuplicateSupplier();
+hasDuplicateExpense(): boolean {
+    const expenseNo = this.formExpenseNo().trim().toLocaleLowerCase();
+    const supplierId = this.formSupplierId();
+
+    if (!expenseNo || !supplierId) {
+      return false;
+    }
+
+    return this.expenses().some((expense) =>
+      expense.id !== this.editingExpenseId() &&
+      expense.supplierId === supplierId &&
+      expense.expenseNo?.trim().toLocaleLowerCase() === expenseNo
+    );
   }
 
   // -- Save / Delete -------------------------------------------------------------
