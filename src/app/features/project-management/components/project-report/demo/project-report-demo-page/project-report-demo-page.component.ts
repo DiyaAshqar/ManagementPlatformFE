@@ -120,6 +120,7 @@ export class ProjectReportDemoPageComponent {
   includeSignatures = true;
   includePercentageFees = true;
   hideOverview = false;
+  hideExecutiveSummary = true;
   confidential = false;
   customSections: ProjectReportSectionKey[] = [...PROJECT_REPORT_SECTION_KEYS];
 
@@ -242,6 +243,9 @@ export class ProjectReportDemoPageComponent {
       next: (translations) => {
         const translate = (key: string, params?: Record<string, unknown>) => resolveTranslationKey(translations, key, params);
         const sections = resolveReportSections(config);
+        if (this.hideExecutiveSummary) {
+          sections.delete('executiveSummary');
+        }
         if (!config.includeSignatures) {
           sections.delete('signatures');
         }
