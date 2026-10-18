@@ -242,6 +242,8 @@ export class ProjectReportDemoPageComponent {
       next: (translations) => {
         const translate = (key: string, params?: Record<string, unknown>) => resolveTranslationKey(translations, key, params);
         const sections = resolveReportSections(config);
+        // The demo report has no Executive Summary section.
+        sections.delete('executiveSummary');
         if (!config.includeSignatures) {
           sections.delete('signatures');
         }
