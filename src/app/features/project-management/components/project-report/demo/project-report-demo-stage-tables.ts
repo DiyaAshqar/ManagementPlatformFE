@@ -487,6 +487,14 @@ const STYLES = `
 .sdt-detail-table th { background: #eaf7ee; color: #166534; }
 .sdt-no-details { display: block; padding: 7px 10px; color: #64748b; font-size: 8.5px; }
 .sdt-code { font-family: 'Courier New', monospace; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 4px; padding: 1px 6px; font-size: 9px; }
+.sdt-sum-row { display: flex; flex-wrap: wrap; align-items: stretch; gap: 8px; padding: 10px 12px; }
+.sdt-sum-item { flex: 1 1 120px; display: flex; flex-direction: column; gap: 4px; border: 1px solid #e2e8f0; border-top: 3px solid #e2e8f0; border-radius: 6px; padding: 7px 9px; background: #fff; }
+.sdt-sum-item .sdt-badge { align-self: flex-start; }
+.sdt-sum-label { font-size: 9px; color: #64748b; }
+.sdt-sum-value { font-size: 12px; font-weight: 800; color: #0f172a; }
+.sdt-sum-op { align-self: center; font-size: 14px; font-weight: 800; color: #94a3b8; }
+.sdt-sum-grand { border-color: #0f2f5f; border-top-color: #0f2f5f; background: #0f2f5f0d; }
+.sdt-sum-grand .sdt-sum-value { font-size: 14px; color: #0f2f5f; }
 .sdt-lock { display: inline-block; margin-inline-start: 4px; background: #fee2e2; color: #991b1b; border-radius: 4px; padding: 1px 5px; font-size: 8px; font-weight: 700; }
 `;
 
@@ -603,6 +611,36 @@ function buildDynamicWirs(stage: ProjectStageDetailsDto): string {
     'إجمالي الطلبات', String(items.length));
 }
 
+/** Grand total of the stage's cost tables: MCs (paid) + VOs + SVs + Expenses — each using the same figure as its table header. */
+function buildStageCostSummary(stage: ProjectStageDetailsDto): string {
+  const parts = [
+    { badge: 'PMC', color: '#16a34a', label: 'المقاولون الرئيسيون (المدفوع)', amount: total((stage.mainContractors ?? []).map((item) => item.totalPayments)) },
+    { badge: 'VO', color: '#db2777', label: 'أوامر التغيير', amount: total((stage.variationOrders ?? []).map((item) => item.subTotal)) },
+    { badge: 'SV', color: '#9333ea', label: 'زيارات المساحة', amount: total((stage.surveyingVisits ?? []).map((item) => item.subTotal)) },
+    { badge: 'EXP', color: '#dc2626', label: 'المصروفات', amount: total((stage.expenses ?? []).map((item) => item.totalAmount)) },
+  ];
+  const grandTotal = total(parts.map((part) => part.amount));
+  const cells = parts
+    .map((part) => `<div class="sdt-sum-item" style="border-top-color:${part.color}">
+        <span class="sdt-badge" style="background:${part.color}">${part.badge}</span>
+        <span class="sdt-sum-label">${esc(part.label)}</span>
+        <span class="sdt-sum-value">${n(part.amount)}</span>
+      </div>`)
+    .join('<span class="sdt-sum-op">+</span>');
+
+  return `<div class="sdt-block sdt-summary" style="border-inline-start-color:#0f2f5f">
+    <div class="sdt-head" style="background:#0f2f5f1a">
+      <span class="sdt-badge" style="background:#0f2f5f">SUM</span>
+      <div class="sdt-head-text">
+        <div class="sdt-title" style="color:#0f2f5f">إجمالي تكاليف المرحلة — MCs + VOs + SVs + Expenses</div>
+        <div class="sdt-subtitle">مجموع المدفوع للمقاولين الرئيسيين وأوامر التغيير وزيارات المساحة والمصروفات</div>
+      </div>
+      <div class="sdt-total" style="color:#0f2f5f"><span class="sdt-total-label">الإجمالي الكلي</span><span class="sdt-total-value">${n(grandTotal)}</span></div>
+    </div>
+    <div class="sdt-sum-row">${cells}<span class="sdt-sum-op">=</span><div class="sdt-sum-item sdt-sum-grand"><span class="sdt-sum-label">الإجمالي الكلي</span><span class="sdt-sum-value">${n(grandTotal)}</span></div></div>
+  </div>`;
+}
+
 const DYNAMIC_BUILDERS: Record<StageDataTableKey, (stage: ProjectStageDetailsDto, ownerPayments: readonly ProjectPaymentFlowDetailsDto[]) => string> = {
   boq: buildDynamicBoq, pmc: buildDynamicContractors, po: buildDynamicPurchaseOrders, sv: buildDynamicVisits,
   vo: buildDynamicVariations, exp: buildDynamicExpenses, task: buildDynamicTasks,
@@ -612,5 +650,5 @@ const DYNAMIC_BUILDERS: Record<StageDataTableKey, (stage: ProjectStageDetailsDto
 export function buildStageDataTablesHtml(stage: ProjectStageDetailsDto, enabledKeys: ReadonlySet<StageDataTableKey>, ownerPayments: readonly ProjectPaymentFlowDetailsDto[] = []): string {
   const stageName = stage.milestone?.name ?? `المرحلة رقم ${stage.id ?? '—'}`;
   const blocks = STAGE_DATA_TABLE_OPTIONS.filter((option) => enabledKeys.has(option.key)).map((option) => DYNAMIC_BUILDERS[option.key](stage, ownerPayments)).join('');
-  return `<style>${STYLES}</style><div class="sdt-wrap"><h1>بيانات مرحلة "${esc(stageName)}" — كل الأقسام</h1><p class="sdt-wrap-subtitle">بيانات مباشرة من واجهة المشروع، معروضة حسب كل قسم.</p>${blocks}</div>`;
+  return `<style>${STYLES}</style><div class="sdt-wrap"><h1>بيانات مرحلة "${esc(stageName)}" — كل الأقسام</h1><p class="sdt-wrap-subtitle">بيانات مباشرة من واجهة المشروع، معروضة حسب كل قسم.</p>${blocks}${buildStageCostSummary(stage)}</div>`;
 }
