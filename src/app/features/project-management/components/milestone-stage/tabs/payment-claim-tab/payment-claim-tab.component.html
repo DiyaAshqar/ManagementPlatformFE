@@ -197,7 +197,7 @@
               <th>{{ 'ownerPayment.cols.contractor' | translate }}</th>
               <th>{{ 'ownerPayment.cols.startDate' | translate }}</th>
               <th>{{ 'ownerPayment.cols.endDate' | translate }}</th>
-              <th class="text-right">{{ 'ownerPayment.cols.amount' | translate }}</th>
+              <th class="text-right">{{ 'ownerPayment.cols.totalPaid' | translate }}</th>
             </tr>
           </ng-template>
           <ng-template pTemplate="body" let-item let-ri="rowIndex">
@@ -206,7 +206,7 @@
               <td>{{ getContractorName(item) }}</td>
               <td>{{ formatDate(item.startDate) }}</td>
               <td>{{ formatDate(item.endDate) }}</td>
-              <td class="text-right font-semibold">{{ item.amount | appNumber }}</td>
+              <td class="text-right font-semibold">{{ item.totalPayments | appNumber }}</td>
             </tr>
           </ng-template>
         </p-table>

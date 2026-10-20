@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, computed, inject, signal } from '@angular/core';
 import { forkJoin, of } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, switchMap } from 'rxjs/operators';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 
 import { buildClaimReport, ClaimReportSection } from './payment-claim-report.builder';
@@ -29,9 +29,11 @@ import {
   LookupType,
   ProjectBOQClient,
   ProjectMainContractorClient,
+  ProjectMainContractorPaymentClient,
   ProjectSurveyingVisitClient,
   ProjectVOClient,
 } from '../../../../../../../nswag/api-client';
+import { MainContractorPaidTotalsService } from '../../../../services/main-contractor-paid-totals.service';
 import { Permissions } from '../../../../../../core/auth/models/auth.models';
 import { AuthService } from '../../../../../../core/auth/services/auth.service';
 import { HasPermissionDirective } from '../../../../../../core/auth/directives/has-permission.directive';
@@ -84,6 +86,8 @@ export interface EngineeringOfficeFee {
     ConstructorClient,
     ProjectBOQClient,
     ProjectMainContractorClient,
+    ProjectMainContractorPaymentClient,
+    MainContractorPaidTotalsService,
     ProjectSurveyingVisitClient,
     ProjectVOClient,
     LookupClient,
@@ -172,6 +176,7 @@ export class PaymentClaimTabComponent implements OnInit {
     private lookupClient: LookupClient,
     private constructorClient: ConstructorClient,
     private agreementClient: AgreementClient,
+    private paidTotals: MainContractorPaidTotalsService,
     private confirmationService: ConfirmationService,
     private translate: TranslateService,
     private authService: AuthService
@@ -217,7 +222,7 @@ export class PaymentClaimTabComponent implements OnInit {
 
     const pmc$ = selected.has('PMC')
       ? this.pmcClient.getByStageId(this.projectStageId, undefined, undefined, 1, 500, undefined).pipe(
-          map((r) => r.data?.data ?? []),
+          switchMap((r) => this.paidTotals.withPaidTotals(r.data?.data ?? [])),
           catchError(() => of([]))
         )
       : of([]);
@@ -408,14 +413,14 @@ export class PaymentClaimTabComponent implements OnInit {
           { text: t('ownerPayment.cols.contractor'), align: 'left' },
           { text: t('ownerPayment.cols.startDate'), align: 'left' },
           { text: t('ownerPayment.cols.endDate'),   align: 'left' },
-          { text: t('ownerPayment.cols.amount'),    align: 'right' },
+          { text: t('ownerPayment.cols.totalPaid'), align: 'right' },
         ],
         rows: data.pmc.map((item, i) => row(i,
           `<td class="center">${i + 1}</td>
            <td dir="auto">${this.getContractorName(item)}</td>
            <td>${this.formatDate(item.startDate)}</td>
            <td>${this.formatDate(item.endDate)}</td>
-           <td class="right bold">${fmtN(item.amount)}</td>`
+           <td class="right bold">${fmtN(item.totalPayments)}</td>`
         )).join(''),
       });
     }
@@ -550,7 +555,7 @@ export class PaymentClaimTabComponent implements OnInit {
   }
 
   get pmcTotal(): number {
-    return this.claimData().pmc.reduce((s, i) => s + (i.amount ?? 0), 0);
+    return this.claimData().pmc.reduce((s, i) => s + (i.totalPayments ?? 0), 0);
   }
 
   get svTotal(): number {

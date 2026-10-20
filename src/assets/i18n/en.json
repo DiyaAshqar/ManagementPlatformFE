@@ -647,6 +647,7 @@
       "unitPrice": "Unit Price",
       "subtotal": "Subtotal",
       "amount": "Amount",
+      "totalPaid": "Total Paid",
       "startDate": "Start Date",
       "endDate": "End Date",
       "visitDate": "Visit Date",

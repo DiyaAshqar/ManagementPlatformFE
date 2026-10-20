@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, Input, OnInit, signal } from '@angular/core';
 import { forkJoin } from 'rxjs';
+import { switchMap } from 'rxjs/operators';
 import { TranslateService, TranslateModule } from '@ngx-translate/core';
 
 // PrimeNG
@@ -23,8 +24,10 @@ import {
   LookupClient,
   LookupType,
   ProjectMainContractorClient,
-  ProjectMainContractorDutyClient
+  ProjectMainContractorDutyClient,
+  ProjectMainContractorPaymentClient
 } from '../../../../../../../nswag/api-client';
+import { MainContractorPaidTotalsService } from '../../../../services/main-contractor-paid-totals.service';
 import { getLookupData } from '../../../../../../shared/utils/lookup.util';
 import { AddContractorDialogComponent } from '../../../dialog/add-contractor-dialog/add-contractor-dialog.component';
 import { ContractorDutiesDialogComponent } from '../../../../../agreement-wizard/components/steps/step4/contractor-duties-dialog/contractor-duties-dialog.component';
@@ -52,7 +55,14 @@ import { AppNumberPipe } from '../../../../../../shared/pipes/app-number.pipe';
     HasPermissionDirective,
     AppNumberPipe
   ],
-  providers: [ProjectMainContractorClient, ProjectMainContractorDutyClient, ConstructorClient, LookupClient],
+  providers: [
+    ProjectMainContractorClient,
+    ProjectMainContractorDutyClient,
+    ProjectMainContractorPaymentClient,
+    MainContractorPaidTotalsService,
+    ConstructorClient,
+    LookupClient
+  ],
   templateUrl: './project-main-contractor-tab.component.html',
   styleUrl: './project-main-contractor-tab.component.scss'
 })
@@ -87,6 +97,7 @@ export class ProjectMainContractorTabComponent implements OnInit {
     private contractorDutyClient: ProjectMainContractorDutyClient,
     private constructorClient: ConstructorClient,
     private lookupClient: LookupClient,
+    private paidTotals: MainContractorPaidTotalsService,
     private confirmationService: ConfirmationService,
     private translate: TranslateService,
     private authService: AuthService
@@ -126,13 +137,11 @@ export class ProjectMainContractorTabComponent implements OnInit {
   loadContractorData(): void {
     this.isLoading.set(true);
 
-    this.contractorClient.getByStageId(this.projectStageId, undefined, undefined, 1, 100, undefined).subscribe({
-      next: (res) => {
-        if (res.succeeded && res.data?.data) {
-          this.contractorItems.set(res.data.data);
-        } else {
-          this.contractorItems.set([]);
-        }
+    this.contractorClient.getByStageId(this.projectStageId, undefined, undefined, 1, 100, undefined).pipe(
+      switchMap((res) => this.paidTotals.withPaidTotals(res.succeeded ? res.data?.data ?? [] : []))
+    ).subscribe({
+      next: (items) => {
+        this.contractorItems.set(items);
         this.isLoading.set(false);
       },
       error: (err) => {
@@ -157,6 +166,8 @@ export class ProjectMainContractorTabComponent implements OnInit {
 
   closePaymentsDialog(): void {
     this.selectedContractor.set(null);
+    // Payments may have been added/edited/deleted — refresh the paid totals.
+    this.loadContractorData();
   }
 
   getContractorName(item: IGetProjectMainContractorDto): string {
