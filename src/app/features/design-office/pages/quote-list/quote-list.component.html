@@ -1,0 +1,93 @@
+<div class="of-page">
+  <div class="of-header">
+    <div class="of-header-left">
+      <div class="of-header-icon"><i class="pi pi-file-edit"></i></div>
+      <div>
+        <h1 class="of-title">{{ 'office.quotes.title' | translate }}</h1>
+        <p class="of-subtitle">{{ 'office.quotes.subtitle' | translate }}</p>
+      </div>
+    </div>
+    <p-button [label]="'office.quotes.new' | translate" icon="pi pi-plus" [raised]="true" routerLink="/office/quotes/new" />
+  </div>
+
+  <div class="of-card">
+    <div class="flex flex-column gap-3">
+      <div class="of-pills">
+        @for (t of tabs; track t) {
+          <button type="button" [class.active]="tab() === t" (click)="tab.set(t)">
+            {{ (t === 'all' ? 'office.common.all' : 'office.quoteStatus.' + t) | translate }}
+            <span class="count">{{ counts()[t] || 0 }}</span>
+          </button>
+        }
+      </div>
+
+      <div class="of-toolbar">
+        <div class="of-field of-grow">
+          <label>{{ 'office.common.search' | translate }}</label>
+          <p-iconfield>
+            <p-inputicon styleClass="pi pi-search" />
+            <input pInputText class="w-full" [ngModel]="search()" (ngModelChange)="search.set($event)"
+              [placeholder]="'office.quotes.searchPlaceholder' | translate" />
+          </p-iconfield>
+        </div>
+        <div class="of-field" style="min-width: 240px">
+          <label>{{ 'office.quotes.contractType' | translate }}</label>
+          <p-select [options]="contractTemplates()" optionLabel="title" optionValue="id" [showClear]="true"
+            [ngModel]="contractType()" (ngModelChange)="contractType.set($event)"
+            [placeholder]="'office.common.all' | translate" styleClass="w-full" />
+        </div>
+        <div class="of-field">
+          <label>{{ 'office.common.from' | translate }}</label>
+          <input type="date" pInputText [ngModel]="from()" (ngModelChange)="from.set($event)" />
+        </div>
+        <div class="of-field">
+          <label>{{ 'office.common.to' | translate }}</label>
+          <input type="date" pInputText [ngModel]="to()" (ngModelChange)="to.set($event)" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="of-card flush">
+    <p-table [value]="filtered()" styleClass="of-table" [paginator]="filtered().length > 10" [rows]="10" responsiveLayout="scroll">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'office.quotes.ref' | translate }}</th>
+          <th>{{ 'office.common.client' | translate }}</th>
+          <th>{{ 'office.quotes.contractType' | translate }}</th>
+          <th>{{ 'office.quotes.land' | translate }}</th>
+          <th>{{ 'office.quotes.revision' | translate }}</th>
+          <th>{{ 'office.common.value' | translate }}</th>
+          <th>{{ 'office.common.date' | translate }}</th>
+          <th>{{ 'office.common.status' | translate }}</th>
+          <th></th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-r>
+        <tr class="clickable" (click)="open(r.q)">
+          <td><a class="of-link">{{ r.q.ref }}</a></td>
+          <td>{{ r.client }}</td>
+          <td>{{ r.q.title }}</td>
+          <td class="of-muted">{{ r.land || '—' }}</td>
+          <td><a class="of-link" (click)="preview(r.q, $event)">{{ revLabel(r.q.rev) }}</a></td>
+          <td class="of-num of-strong">{{ r.total | jod }}</td>
+          <td class="of-num">{{ r.q.date | date: 'dd/MM/yyyy' }}</td>
+          <td><p-tag [value]="'office.quoteStatus.' + r.q.status | translate" [severity]="severity[r.q.status]" /></td>
+          <td class="text-right">
+            @if (r.q.status === 'approved') {
+              <p-button size="small" [text]="true"
+                [label]="(r.q.projectId ? 'office.quotes.openProject' : 'office.quotes.createProject') | translate"
+                [icon]="r.q.projectId ? 'pi pi-arrow-right' : 'pi pi-plus'" (onClick)="goProject(r.q, $event)" />
+            } @else {
+              <p-button size="small" [text]="true" icon="pi pi-eye" [rounded]="true" severity="secondary"
+                (onClick)="preview(r.q, $event)" />
+            }
+          </td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr><td colspan="9"><div class="of-empty"><i class="pi pi-inbox"></i>{{ 'office.common.noData' | translate }}</div></td></tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

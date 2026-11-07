@@ -1,0 +1,121 @@
+<div class="of-page">
+  <div class="of-header">
+    <div class="of-header-left">
+      <div class="of-header-icon"><i class="pi pi-chart-bar"></i></div>
+      <div>
+        <h1 class="of-title">{{ 'office.reports.title' | translate }}</h1>
+        <p class="of-subtitle">{{ 'office.reports.desc.' + tab() | translate }}</p>
+      </div>
+    </div>
+    <div class="of-actions no-print align-items-end">
+      <div class="of-field"><label>{{ 'office.common.from' | translate }}</label><input type="date" pInputText [ngModel]="from()" (ngModelChange)="from.set($event)" /></div>
+      <div class="of-field"><label>{{ 'office.common.to' | translate }}</label><input type="date" pInputText [ngModel]="to()" (ngModelChange)="to.set($event)" /></div>
+      <p-button [label]="'office.reports.exportExcel' | translate" icon="pi pi-file-excel" severity="secondary" [outlined]="true" (onClick)="exportExcel()" />
+      <p-button [label]="'office.reports.printPdf' | translate" icon="pi pi-print" (onClick)="print()" />
+    </div>
+  </div>
+
+  <div class="of-pills no-print">
+    @for (t of tabs; track t) {
+      <button type="button" [class.active]="tab() === t" (click)="setTab(t)">{{ 'office.reports.tabs.' + t | translate }}</button>
+    }
+  </div>
+
+  @switch (tab()) {
+    @case ('profit') {
+      <div class="of-stats">
+        <div class="of-stat blue"><div><div class="of-stat-label">{{ 'office.reports.revenue' | translate }}</div><div class="of-stat-value of-num">{{ profitKpis().revenue | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-file"></i></div></div>
+        <div class="of-stat amber"><div><div class="of-stat-label">{{ 'office.reports.projectExpenses' | translate }}</div><div class="of-stat-value of-num">{{ profitKpis().projectCosts | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-shopping-cart"></i></div></div>
+        <div class="of-stat red"><div><div class="of-stat-label">{{ 'office.reports.adminExpenses' | translate }}</div><div class="of-stat-value of-num">{{ profitKpis().admin | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-building"></i></div></div>
+        <div class="of-stat green"><div><div class="of-stat-label">{{ 'office.reports.netProfit' | translate }}</div><div class="of-stat-value of-num">{{ profitKpis().net | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-chart-line"></i></div></div>
+      </div>
+      <div class="of-card flush">
+        <p-table [value]="profitRows()" styleClass="of-table" responsiveLayout="scroll">
+          <ng-template pTemplate="header">
+            <tr><th>{{ 'office.projects.project' | translate }}</th><th>{{ 'office.projects.contractValue' | translate }}</th><th>{{ 'office.projectDetail.claimed' | translate }}</th>
+              <th>{{ 'office.projects.received' | translate }}</th><th>{{ 'office.projectDetail.stepsCost' | translate }}</th><th>{{ 'office.reports.projectExpenses' | translate }}</th>
+              <th>{{ 'office.projectDetail.subcontractors' | translate }}</th><th>{{ 'office.reports.profit' | translate }}</th><th>{{ 'office.reports.margin' | translate }}</th></tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-r>
+            <tr>
+              <td><a class="of-link" [routerLink]="['/office/projects', r.project.id, 'expenses']">{{ r.project.code }} · {{ r.project.name }}</a></td>
+              <td class="of-num">{{ r.contractValue | jod: 0 : true }}</td>
+              <td class="of-num">{{ r.claimed | jod: 0 : true }}</td>
+              <td class="of-num">{{ r.received | jod: 0 : true }}</td>
+              <td class="of-num">{{ r.stepsCost | jod: 0 : true }}</td>
+              <td class="of-num">{{ r.directExpenses | jod: 0 : true }}</td>
+              <td class="of-num">{{ r.subcontractors | jod: 0 : true }}</td>
+              <td class="of-num of-strong">{{ r.profit | jod: 0 : true }}</td>
+              <td [class.of-success]="r.margin >= 50" [class.of-danger]="r.margin < 20">{{ r.margin }}%</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+      <div class="of-note"><i class="pi pi-info-circle"></i><span>{{ 'office.reports.profitNote' | translate }}</span></div>
+    }
+
+    @case ('aging') {
+      <div class="of-stats">
+        <div class="of-stat red"><div><div class="of-stat-label">{{ 'office.reports.totalReceivables' | translate }}</div><div class="of-stat-value of-num">{{ agingKpis().t | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-wallet"></i></div></div>
+        <div class="of-stat green"><div><div class="of-stat-label">0–30 {{ 'office.reports.days' | translate }}</div><div class="of-stat-value of-num">{{ agingKpis().a | jod: 0 : true }}</div></div></div>
+        <div class="of-stat blue"><div><div class="of-stat-label">31–60 {{ 'office.reports.days' | translate }}</div><div class="of-stat-value of-num">{{ agingKpis().b | jod: 0 : true }}</div></div></div>
+        <div class="of-stat amber"><div><div class="of-stat-label">61–90 {{ 'office.reports.days' | translate }}</div><div class="of-stat-value of-num">{{ agingKpis().c | jod: 0 : true }}</div></div></div>
+        <div class="of-stat red"><div><div class="of-stat-label">+90 {{ 'office.reports.days' | translate }}</div><div class="of-stat-value of-num">{{ agingKpis().d | jod: 0 : true }}</div></div></div>
+      </div>
+      <div class="of-card flush">
+        <p-table [value]="agingRows()" styleClass="of-table">
+          <ng-template pTemplate="header">
+            <tr><th>{{ 'office.common.client' | translate }}</th><th>{{ 'office.projects.title' | translate }}</th><th>0–30</th><th>31–60</th><th>61–90</th><th>+90</th><th>{{ 'office.common.total' | translate }}</th><th></th></tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-r>
+            <tr>
+              <td class="of-strong">{{ r.name }}</td>
+              <td class="of-small">{{ r.projectsLabel }}</td>
+              <td class="of-num">{{ r.a | jod: 0 : true }}</td>
+              <td class="of-num">{{ r.b | jod: 0 : true }}</td>
+              <td class="of-num">{{ r.c | jod: 0 : true }}</td>
+              <td class="of-num" [class.of-danger]="r.d > 0">{{ r.d | jod: 0 : true }}</td>
+              <td class="of-num of-strong">{{ r.t | jod }}</td>
+              <td><a class="of-link" [routerLink]="['/office/clients', r.clientId, 'statement']">{{ 'office.reports.statement' | translate }}</a></td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage"><tr><td colspan="8"><div class="of-empty">{{ 'office.reports.noReceivables' | translate }}</div></td></tr></ng-template>
+        </p-table>
+      </div>
+      <div class="of-note"><i class="pi pi-info-circle"></i><span>{{ 'office.reports.agingNote' | translate }}</span></div>
+    }
+
+    @case ('receipts') {
+      <div class="of-stats">
+        <div class="of-stat green"><div><div class="of-stat-label">{{ 'office.reports.totalReceipts' | translate }}</div><div class="of-stat-value of-num">{{ receiptKpis().total | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-wallet"></i></div></div>
+        <div class="of-stat slate"><div><div class="of-stat-label">{{ 'office.methods.cash' | translate }}</div><div class="of-stat-value of-num">{{ receiptKpis().cash | jod: 0 : true }}</div></div></div>
+        <div class="of-stat amber"><div><div class="of-stat-label">{{ 'office.reports.cheques' | translate }}</div><div class="of-stat-value of-num">{{ receiptKpis().cheque | jod: 0 : true }}</div></div></div>
+        <div class="of-stat blue"><div><div class="of-stat-label">{{ 'office.methods.transfer' | translate }}</div><div class="of-stat-value of-num">{{ receiptKpis().transfer | jod: 0 : true }}</div></div></div>
+      </div>
+      <div class="flex align-items-center gap-2 no-print">
+        <span class="of-small of-muted">{{ 'office.reports.groupBy' | translate }}</span>
+        <div class="of-pills">
+          @for (g of ['month', 'project', 'client']; track g) {
+            <button type="button" [class.active]="groupBy() === g" (click)="groupBy.set($any(g))">{{ 'office.reports.group.' + g | translate }}</button>
+          }
+        </div>
+      </div>
+      <div class="of-card flush">
+        <p-table [value]="receiptRows()" styleClass="of-table">
+          <ng-template pTemplate="header">
+            <tr><th>{{ 'office.reports.group.' + groupBy() | translate }}</th><th>{{ 'office.reports.vouchers' | translate }}</th><th>{{ 'office.methods.cash' | translate }}</th>
+              <th>{{ 'office.reports.cheques' | translate }}</th><th>{{ 'office.methods.transfer' | translate }}</th><th>{{ 'office.common.total' | translate }}</th></tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-r>
+            <tr>
+              <td class="of-strong">{{ r.key }}</td><td>{{ r.count }}</td>
+              <td class="of-num">{{ r.cash | jod: 0 : true }}</td><td class="of-num">{{ r.cheque | jod: 0 : true }}</td><td class="of-num">{{ r.transfer | jod: 0 : true }}</td>
+              <td class="of-num of-strong">{{ r.total | jod }}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage"><tr><td colspan="6"><div class="of-empty">{{ 'office.common.noData' | translate }}</div></td></tr></ng-template>
+        </p-table>
+      </div>
+    }
+  }
+</div>

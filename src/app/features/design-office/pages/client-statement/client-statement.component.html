@@ -1,0 +1,88 @@
+<div class="of-page">
+  <div class="of-breadcrumb no-print">
+    <a routerLink="/office/reports">{{ 'office.reports.title' | translate }}</a><span class="sep">/</span>
+    <a routerLink="/office/reports" [queryParams]="{ tab: 'aging' }">{{ 'office.reports.tabs.aging' | translate }}</a><span class="sep">/</span>
+    <span>{{ 'office.statement.title' | translate }}</span>
+  </div>
+
+  <div class="of-header">
+    <div class="of-header-left">
+      <div class="of-header-icon"><i class="pi pi-book"></i></div>
+      <div>
+        <h1 class="of-title">{{ 'office.statement.titleOf' | translate: { name: client()?.name } }}</h1>
+        <p class="of-subtitle">{{ 'office.client.phone' | translate }}: {{ client()?.phone || '—' }} · {{ 'office.projects.title' | translate }}: {{ projectCodes() || '—' }}</p>
+      </div>
+    </div>
+    <div class="of-actions no-print">
+      <p-button [label]="'office.statement.send' | translate" icon="pi pi-send" severity="secondary" [outlined]="true" (onClick)="send()" />
+      <p-button [label]="'office.claimDetail.print' | translate" icon="pi pi-print" (onClick)="print()" />
+    </div>
+  </div>
+
+  <div class="of-card no-print">
+    <div class="of-toolbar">
+      <div class="of-field" style="min-width: 220px">
+        <label>{{ 'office.common.client' | translate }}</label>
+        <p-select [options]="clients()" optionLabel="name" optionValue="id" [filter]="true" [ngModel]="clientId()" (ngModelChange)="setClient($event)" styleClass="w-full" />
+      </div>
+      <div class="of-field" style="min-width: 240px">
+        <label>{{ 'office.projects.project' | translate }}</label>
+        <p-select [options]="projectOptions()" optionLabel="label" optionValue="value" [showClear]="true" [placeholder]="'office.statement.allProjects' | translate"
+          [ngModel]="projectId()" (ngModelChange)="projectId.set($event)" styleClass="w-full" />
+      </div>
+      <div class="of-field"><label>{{ 'office.common.from' | translate }}</label><input type="date" pInputText [ngModel]="from()" (ngModelChange)="from.set($event)" /></div>
+      <div class="of-field"><label>{{ 'office.common.to' | translate }}</label><input type="date" pInputText [ngModel]="to()" (ngModelChange)="to.set($event)" /></div>
+    </div>
+  </div>
+
+  <div class="of-stats">
+    <div class="of-stat blue"><div><div class="of-stat-label">{{ 'office.statement.contracts' | translate }}</div><div class="of-stat-value of-num">{{ contractsValue() | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-file"></i></div></div>
+    <div class="of-stat purple"><div><div class="of-stat-label">{{ 'office.statement.totalDebit' | translate }}</div><div class="of-stat-value of-num">{{ totals().debit | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-arrow-up"></i></div></div>
+    <div class="of-stat green"><div><div class="of-stat-label">{{ 'office.statement.totalCredit' | translate }}</div><div class="of-stat-value of-num">{{ totals().credit | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-arrow-down"></i></div></div>
+    <div class="of-stat red"><div><div class="of-stat-label">{{ 'office.statement.balance' | translate }}</div><div class="of-stat-value of-num">{{ totals().balance | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-wallet"></i></div></div>
+  </div>
+
+  <div class="of-card flush">
+    <p-table [value]="lines()" styleClass="of-table">
+      <ng-template pTemplate="header">
+        <tr><th>{{ 'office.common.date' | translate }}</th><th>{{ 'office.statement.ref' | translate }}</th><th>{{ 'office.common.description' | translate }}</th>
+          <th>{{ 'office.statement.debit' | translate }}</th><th>{{ 'office.statement.credit' | translate }}</th><th>{{ 'office.statement.balance' | translate }}</th></tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-l>
+        <tr>
+          <td class="of-num">{{ l.date | date: 'dd/MM/yyyy' }}</td>
+          <td>@if (l.link && l.ref !== '—') { <a class="of-link" [routerLink]="l.link" [queryParams]="l.query">{{ l.ref }}</a> } @else { <a class="of-link" [routerLink]="l.link">—</a> }</td>
+          <td>{{ l.text }}</td>
+          <td class="of-num">{{ l.debit ? (l.debit | jod: 0 : true) : '—' }}</td>
+          <td class="of-num">{{ l.credit ? (l.credit | jod: 0 : true) : '—' }}</td>
+          <td class="of-num of-strong">{{ l.balance | jod: 0 : true }}</td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <tr><td colspan="3">{{ 'office.common.total' | translate }}</td><td class="of-num">{{ totals().debit | jod: 0 : true }}</td><td class="of-num">{{ totals().credit | jod: 0 : true }}</td><td class="of-num">{{ totals().balance | jod }}</td></tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage"><tr><td colspan="6"><div class="of-empty">{{ 'office.common.noData' | translate }}</div></td></tr></ng-template>
+    </p-table>
+  </div>
+
+  <div class="grid">
+    <div class="col-12 lg:col-6">
+      <div class="of-card h-full">
+        <div class="of-card-head"><h3>{{ 'office.statement.upcoming' | translate }}</h3></div>
+        <div class="of-rows">
+          @for (v of upcoming(); track v.claim.id) {
+            <div class="row">
+              <span><a class="of-link" [routerLink]="['/office/claims', v.claim.id]">{{ v.claim.no }}</a> · {{ v.claim.paymentName }} {{ v.claim.pct ? v.claim.pct + '%' : '' }} · {{ v.claim.condition }}</span>
+              <span class="of-num">{{ v.total | jod }}</span>
+            </div>
+          } @empty {
+            <div class="of-empty">{{ 'office.common.noData' | translate }}</div>
+          }
+        </div>
+      </div>
+    </div>
+    <div class="col-12 lg:col-6">
+      <div class="of-note h-full"><i class="pi pi-info-circle"></i><span>{{ 'office.statement.billableNote' | translate }}</span></div>
+    </div>
+  </div>
+</div>

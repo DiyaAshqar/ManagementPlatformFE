@@ -1,0 +1,126 @@
+<div class="of-page">
+  <div class="of-header">
+    <div class="of-header-left">
+      <div class="of-header-icon"><i class="pi pi-sitemap"></i></div>
+      <div>
+        <h1 class="of-title">{{ 'office.templates.title' | translate }}</h1>
+        <p class="of-subtitle">{{ 'office.templates.subtitle' | translate }}</p>
+      </div>
+    </div>
+    <div class="of-actions">
+      <p-button [label]="'office.templates.new' | translate" icon="pi pi-plus" severity="secondary" [outlined]="true" (onClick)="newTemplate()" />
+      <p-button [label]="'office.templates.save' | translate" icon="pi pi-save" [disabled]="!draft" (onClick)="save()" [badge]="dirty() ? '•' : undefined" />
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Templates -->
+    <div class="col-12 lg:col-3">
+      <div class="of-card">
+        <div class="of-card-head"><h3>{{ 'office.templates.list' | translate }}</h3></div>
+        <div class="flex flex-column gap-2">
+          @for (t of templates(); track t.id) {
+            <button type="button" class="of-option" [class.selected]="selectedId() === t.id" (click)="select(t.id)">
+              <div class="of-option-title">{{ t.name }}</div>
+              <div class="of-option-sub">{{ 'office.templates.stagesCount' | translate: { n: t.stages.length } }}</div>
+            </button>
+          }
+          @if (draft && !isSaved()) {
+            <button type="button" class="of-option selected">
+              <div class="of-option-title">{{ draft.name }}</div>
+              <div class="of-option-sub">{{ 'office.templates.unsaved' | translate }}</div>
+            </button>
+          }
+        </div>
+      </div>
+    </div>
+
+    @if (draft) {
+      <!-- Stages -->
+      <div class="col-12 lg:col-5">
+        <div class="of-card mb-3">
+          <div class="of-form-grid">
+            <div class="of-field"><label>{{ 'office.templates.name' | translate }}</label><input pInputText [(ngModel)]="draft.name" (ngModelChange)="touch()" /></div>
+            <div class="of-field"><label>{{ 'office.templates.scopeName' | translate }}</label><input pInputText [(ngModel)]="draft.scopeName" (ngModelChange)="touch()" /></div>
+          </div>
+        </div>
+        <div class="of-card">
+          <div class="of-card-head">
+            <div>
+              <h3>{{ 'office.templates.stagesOf' | translate: { name: draft.name } }}</h3>
+              <p class="of-card-sub">{{ 'office.templates.stagesHint' | translate }}</p>
+            </div>
+            <span class="of-small" [class.of-danger]="pctSum !== 100" [class.of-success]="pctSum === 100">{{ 'office.quoteForm.pctSum' | translate: { sum: pctSum } }}</span>
+          </div>
+          <div class="flex flex-column gap-2">
+            @for (s of draft.stages; track s.id; let i = $index) {
+              <div class="of-option flex align-items-center gap-2" [class.selected]="selectedStageId() === s.id" (click)="selectedStageId.set(s.id)">
+                <span class="of-section-no" style="background: var(--surface-200); color: var(--text-color)">{{ i + 1 }}</span>
+                <div class="flex-1" style="min-width: 0">
+                  <div class="of-option-title">{{ s.name }}</div>
+                  <div class="of-option-sub">{{ 'office.stageTypes.' + s.type | translate }} · {{ 'office.templates.claim' | translate }}: {{ s.claimPct }}%
+                    @if (s.returnTo.length) { · <i class="pi pi-undo"></i> {{ s.returnTo.length }} }
+                    @if (s.allowRecertify) { · <i class="pi pi-folder-open"></i> }
+                  </div>
+                </div>
+                <p-button icon="pi pi-arrow-up" [text]="true" [rounded]="true" size="small" severity="secondary" [disabled]="i === 0" (onClick)="move(i, -1, $event)" />
+                <p-button icon="pi pi-arrow-down" [text]="true" [rounded]="true" size="small" severity="secondary" [disabled]="i === draft.stages.length - 1" (onClick)="move(i, 1, $event)" />
+              </div>
+            }
+            <p-button [label]="'office.scope.addStage' | translate" icon="pi pi-plus" [text]="true" (onClick)="addStage()" />
+          </div>
+        </div>
+        <div class="of-card mt-3">
+          <div class="of-card-head"><div><h3>{{ 'office.templates.obligations' | translate }}</h3><p class="of-card-sub">{{ 'office.templates.obligationsHint' | translate }}</p></div></div>
+          <app-of-editable-list [(items)]="draft.obligations" (itemsChange)="touch()" />
+        </div>
+      </div>
+
+      <!-- Stage settings -->
+      <div class="col-12 lg:col-4">
+        <div class="of-card of-sticky">
+          <div class="of-card-head">
+            <h3>{{ 'office.templates.stageSettings' | translate }}</h3>
+            @if (stage) { <p-button icon="pi pi-trash" [text]="true" [rounded]="true" severity="danger" size="small" [pTooltip]="'office.common.delete' | translate" (onClick)="removeStage()" /> }
+          </div>
+          @if (stage; as st) {
+            <div class="flex flex-column gap-3">
+              <div class="of-field"><label>{{ 'office.templates.stageName' | translate }}</label><input pInputText [ngModel]="st.name" (ngModelChange)="renameStage($event)" /></div>
+              <div class="of-field"><label>{{ 'office.templates.stageType' | translate }}</label>
+                <p-select [options]="stageTypes" [(ngModel)]="st.type" (ngModelChange)="touch()" styleClass="w-full">
+                  <ng-template let-o pTemplate="item">{{ 'office.stageTypes.' + o | translate }}</ng-template>
+                  <ng-template let-o pTemplate="selectedItem">{{ 'office.stageTypes.' + o | translate }}</ng-template>
+                </p-select></div>
+              <div class="of-field"><label>{{ 'office.templates.claimPct' | translate }}</label>
+                <p-inputnumber [(ngModel)]="st.claimPct" (ngModelChange)="touch()" [min]="0" [max]="100" suffix="%" inputStyleClass="w-full" /></div>
+              <label class="flex justify-content-between align-items-center of-small">{{ 'office.templates.allowSubs' | translate }}<p-toggleswitch [(ngModel)]="st.allowSubcontractors" (ngModelChange)="touch()" /></label>
+              <label class="flex justify-content-between align-items-center of-small">{{ 'office.templates.requireAttachments' | translate }}<p-toggleswitch [(ngModel)]="st.requireAttachments" (ngModelChange)="touch()" /></label>
+              <label class="flex justify-content-between align-items-center of-small">{{ 'office.templates.allowRecertify' | translate }}<p-toggleswitch [(ngModel)]="st.allowRecertify" (ngModelChange)="touch()" /></label>
+              <div class="of-field"><label>{{ 'office.templates.returnTo' | translate }}</label>
+                <p-multiselect [options]="returnOptions" optionLabel="label" optionValue="value" [(ngModel)]="st.returnTo" (ngModelChange)="touch()"
+                  [placeholder]="'office.templates.none' | translate" styleClass="w-full" display="chip" appendTo="body" /></div>
+
+              <div class="of-field"><label>{{ 'office.templates.customFields' | translate }}</label></div>
+              @for (f of st.customFields; track f.id; let i = $index) {
+                <div class="flex gap-2 align-items-center">
+                  <input pInputText class="flex-1" [(ngModel)]="f.label" (ngModelChange)="touch()" [placeholder]="'office.templates.fieldLabel' | translate" />
+                  <p-select [options]="fieldTypes" [(ngModel)]="f.type" (ngModelChange)="touch()" styleClass="w-7rem" appendTo="body">
+                    <ng-template let-o pTemplate="item">{{ 'office.fieldTypes.' + o | translate }}</ng-template>
+                    <ng-template let-o pTemplate="selectedItem">{{ 'office.fieldTypes.' + o | translate }}</ng-template>
+                  </p-select>
+                  <p-button icon="pi pi-times" [text]="true" [rounded]="true" size="small" severity="secondary" (onClick)="removeField(i)" />
+                </div>
+              }
+              <p-button [label]="'office.templates.addField' | translate" icon="pi pi-plus" [text]="true" size="small" (onClick)="addField()" />
+            </div>
+          } @else {
+            <div class="of-empty">{{ 'office.templates.pickStage' | translate }}</div>
+          }
+        </div>
+        @if (isSaved()) {
+          <div class="mt-3"><p-button [label]="'office.templates.delete' | translate" icon="pi pi-trash" severity="danger" [text]="true" (onClick)="remove()" /></div>
+        }
+      </div>
+    }
+  </div>
+</div>

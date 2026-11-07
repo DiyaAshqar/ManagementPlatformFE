@@ -1,0 +1,195 @@
+@if (summary(); as s) {
+  @let p = s.project;
+  <div class="of-page">
+    <div class="of-breadcrumb">
+      <a routerLink="/office/projects">{{ 'office.projects.title' | translate }}</a>
+      <span class="sep">/</span><span>{{ p.name }}</span>
+    </div>
+
+    <div class="of-header">
+      <div class="of-header-left">
+        <div class="of-header-icon"><i class="pi pi-building"></i></div>
+        <div>
+          <h1 class="of-title">
+            {{ p.name }}
+            <p-tag [value]="p.code" severity="secondary" />
+            <p-tag [value]="'office.projectStatus.' + p.status | translate" [severity]="projectSeverity[p.status]" />
+          </h1>
+          <p class="of-subtitle">
+            {{ 'office.common.client' | translate }}:
+            <a class="of-link" [routerLink]="['/office/clients', p.clientId, 'statement']">{{ s.client?.name }}</a>
+            · {{ 'office.project.location' | translate }}: {{ p.location || '—' }}
+            · {{ 'office.project.manager' | translate }}: {{ p.manager }}
+          </p>
+        </div>
+      </div>
+      <div class="of-actions">
+        <p-button [label]="'office.projectDetail.expenses' | translate" icon="pi pi-credit-card" severity="secondary" [outlined]="true" [routerLink]="['/office/projects', p.id, 'expenses']" />
+        <p-button [label]="'office.projectDetail.statement' | translate" icon="pi pi-book" severity="secondary" [outlined]="true" [routerLink]="['/office/clients', p.clientId, 'statement']" [queryParams]="{ project: p.id }" />
+        <p-button [label]="'office.projectDetail.drawings' | translate" icon="pi pi-images" severity="secondary" [outlined]="true" [routerLink]="['/office/projects', p.id, 'drawings']" />
+        <p-button [label]="'office.common.edit' | translate" icon="pi pi-pencil" severity="secondary" [outlined]="true" [routerLink]="['/office/projects', p.id, 'edit']" />
+        <p-button [label]="'office.scope.add' | translate" icon="pi pi-plus" (onClick)="addScopeVisible = true" />
+      </div>
+    </div>
+
+    <div class="of-stats">
+      <div class="of-stat blue"><div><div class="of-stat-label">{{ 'office.projects.contractValue' | translate }}</div><div class="of-stat-value of-num">{{ s.contractValue | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-file"></i></div></div>
+      <div class="of-stat purple"><div><div class="of-stat-label">{{ 'office.projectDetail.claimed' | translate }}</div><div class="of-stat-value of-num">{{ s.claimed | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-send"></i></div></div>
+      <div class="of-stat green"><div><div class="of-stat-label">{{ 'office.projects.received' | translate }}</div><div class="of-stat-value of-num">{{ s.received | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-wallet"></i></div></div>
+      <div class="of-stat amber"><div><div class="of-stat-label">{{ 'office.projectDetail.stepsCost' | translate }}</div><div class="of-stat-value of-num">{{ s.stepsCost | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-calculator"></i></div></div>
+    </div>
+
+    <div class="of-card">
+      <div class="of-card-head">
+        <h3>{{ 'office.projectDetail.contractPath' | translate }}</h3>
+        <a class="of-link" [routerLink]="['/office/projects', p.id, 'contract']">{{ 'office.projectDetail.viewDetails' | translate }} →</a>
+      </div>
+      <div class="of-path">
+        @for (st of path(); track st.key; let i = $index) {
+          <div class="step" [class.done]="st.state === 'done'" [class.current]="st.state === 'current'">
+            <div class="n">@if (st.state === 'done') { <i class="pi pi-check"></i> } @else { {{ i + 1 }} }</div>
+            <div class="t">{{ 'office.path.' + st.key | translate }}</div>
+            <div class="s">{{ st.sub }}</div>
+          </div>
+        }
+      </div>
+    </div>
+
+    <div class="of-layout">
+      <div class="of-col">
+        <div class="of-card">
+          <div class="of-pills mb-3">
+            @for (sc of p.scopes; track sc.id) {
+              <button type="button" [class.active]="scope()?.id === sc.id" (click)="scopeId.set(sc.id)">{{ sc.templateName }}</button>
+            }
+            <button type="button" (click)="addScopeVisible = true"><i class="pi pi-plus"></i> Scope</button>
+          </div>
+
+          @if (scope(); as sc) {
+            <div class="of-card-head">
+              <div>
+                <h3>{{ 'office.projectDetail.scopeStages' | translate: { name: sc.name } }}</h3>
+                <p class="of-card-sub">{{ 'office.projectDetail.fromTemplate' | translate: { name: sc.templateName } }} · {{ sc.engineer }} · {{ sc.value | jod }}</p>
+              </div>
+              <p-button [label]="'office.projectDetail.editStages' | translate" icon="pi pi-sliders-h" [outlined]="true" size="small" (onClick)="openEditStages()" />
+            </div>
+
+            @if (hasLoop()) {
+              <div class="of-note mb-3"><i class="pi pi-sync"></i><span>{{ 'office.projectDetail.loopNote' | translate }}</span></div>
+            }
+
+            <div class="of-stage-list">
+              @for (st of sc.stages; track st.id) {
+                @let c = stageClaim(st);
+                <div class="of-stage" [ngClass]="st.status" (click)="openStage(st)">
+                  <div class="no">@if (st.status === 'completed') { <i class="pi pi-check"></i> } @else { {{ st.n }} }</div>
+                  <div style="min-width: 0">
+                    <div class="title">{{ st.name }}</div>
+                    <div class="meta">
+                      <span>{{ 'office.projectDetail.lastStatus' | translate }}: {{ lastLog(st) }}</span>
+                      <span>{{ 'office.projectDetail.cost' | translate }}: {{ stageCost(st) ? (stageCost(st) | jod) : '—' }}</span>
+                      <span>{{ 'office.projectDetail.claim' | translate }}: {{ c ? ('office.claimStatus.' + c.status | translate) : '—' }}</span>
+                    </div>
+                  </div>
+                  <div class="end">
+                    @if (isDrawingStage(st)) {
+                      <p-button icon="pi pi-images" [text]="true" [rounded]="true" size="small" [pTooltip]="'office.projectDetail.drawings' | translate" (onClick)="openDrawings(st, $event)" />
+                    }
+                    <p-tag [value]="'office.stageStatus.' + st.status | translate" [severity]="stageSeverity[st.status]" />
+                  </div>
+                </div>
+              } @empty {
+                <div class="of-empty"><i class="pi pi-list"></i>{{ 'office.projectDetail.noStages' | translate }}</div>
+              }
+            </div>
+          } @else {
+            <div class="of-empty"><i class="pi pi-sitemap"></i>{{ 'office.projectDetail.noScopes' | translate }}</div>
+          }
+        </div>
+      </div>
+
+      <div class="of-col">
+        <div class="of-card">
+          <div class="of-card-head">
+            <h3>{{ 'office.projectDetail.financialClaims' | translate }}</h3>
+            <a class="of-link of-small" routerLink="/office/claims" [queryParams]="{ project: p.id }">{{ 'office.projectDetail.allClaims' | translate }} →</a>
+          </div>
+          <div class="flex flex-column gap-2">
+            @for (c of claims(); track c.claim.id) {
+              <a class="of-option flex justify-content-between align-items-center gap-2" [routerLink]="['/office/claims', c.claim.id]" style="text-decoration: none">
+                <div style="min-width: 0">
+                  <div class="of-option-title">{{ c.claim.paymentName }} · <span class="of-num">{{ c.total | jod }}</span></div>
+                  <div class="of-option-sub">{{ c.stage ? 'Phase ' + c.stage.n + ' · ' + c.stage.name : c.claim.condition }}</div>
+                </div>
+                <p-tag [value]="'office.claimStatus.' + c.status | translate" [severity]="claimSeverity[c.status]" />
+              </a>
+            } @empty {
+              <div class="of-empty">{{ 'office.projectDetail.noClaims' | translate }}</div>
+            }
+          </div>
+        </div>
+
+        <div class="of-card">
+          <div class="of-card-head"><h3>{{ 'office.projectDetail.subcontractors' | translate }}</h3></div>
+          <div class="flex flex-column gap-2">
+            @for (sub of subcontractors(); track sub.id) {
+              <div class="of-option">
+                <div class="of-option-title">{{ sub.name }}</div>
+                <div class="of-option-sub">{{ sub.specialty }} · Phase {{ sub.stage.n }} · {{ sub.stage.name }} · {{ sub.value | jod }}</div>
+              </div>
+            } @empty {
+              <div class="of-empty">{{ 'office.stage.noSubcontractors' | translate }}</div>
+            }
+          </div>
+        </div>
+
+        <div class="of-card">
+          <div class="of-card-head"><h3>{{ 'office.projectDetail.activity' | translate }}</h3></div>
+          <div class="of-timeline">
+            @for (a of p.activities.slice(0, 8); track a.id) {
+              <div class="ev done">
+                <span class="dot"></span>
+                <div><div class="t" style="font-weight: 500">{{ a.text }}</div><div class="d">{{ a.date | date: 'dd/MM/yyyy' }} · {{ a.by }}</div></div>
+              </div>
+            } @empty {
+              <div class="of-empty">{{ 'office.common.noData' | translate }}</div>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-of-add-scope-dialog [(visible)]="addScopeVisible" [project]="p" (added)="onScopeAdded($event)" />
+
+  <p-dialog [(visible)]="editStagesVisible" [modal]="true" [header]="'office.projectDetail.editStages' | translate" [style]="{ width: '640px' }" [breakpoints]="{ '640px': '95vw' }">
+    <div class="of-note mb-3"><i class="pi pi-info-circle"></i><span>{{ 'office.scope.projectOnlyHint' | translate }}</span></div>
+    <div class="flex flex-column gap-2">
+      @for (st of editStages; track st.id; let i = $index) {
+        <div class="flex gap-2 align-items-center">
+          <span class="of-small of-muted" style="width: 1.5rem">{{ i + 1 }}</span>
+          <input pInputText class="flex-1" [(ngModel)]="st.name" [disabled]="st.status !== 'notStarted'" />
+          <p-select [options]="stageTypes" [(ngModel)]="st.type" appendTo="body" styleClass="w-9rem">
+            <ng-template let-o pTemplate="item">{{ 'office.stageTypes.' + o | translate }}</ng-template>
+            <ng-template let-o pTemplate="selectedItem">{{ 'office.stageTypes.' + o | translate }}</ng-template>
+          </p-select>
+          <p-button icon="pi pi-arrow-up" [text]="true" [rounded]="true" size="small" severity="secondary" [disabled]="i === 0" (onClick)="moveStage(i, -1)" />
+          <p-button icon="pi pi-arrow-down" [text]="true" [rounded]="true" size="small" severity="secondary" [disabled]="i === editStages.length - 1" (onClick)="moveStage(i, 1)" />
+          <p-button icon="pi pi-trash" [text]="true" [rounded]="true" size="small" severity="danger" [disabled]="st.status !== 'notStarted'" (onClick)="removeStage(i)" />
+        </div>
+      }
+      <div class="flex gap-2 mt-2">
+        <input pInputText class="flex-1" [(ngModel)]="newStageName" [placeholder]="'office.scope.extraStagePh' | translate" (keydown.enter)="addStage()" />
+        <p-button icon="pi pi-plus" [label]="'office.scope.addStage' | translate" [outlined]="true" [disabled]="!newStageName.trim()" (onClick)="addStage()" />
+      </div>
+    </div>
+    <ng-template pTemplate="footer">
+      <div class="of-dialog-footer">
+        <p-button [label]="'office.common.cancel' | translate" severity="secondary" [text]="true" (onClick)="editStagesVisible = false" />
+        <p-button [label]="'office.common.save' | translate" icon="pi pi-check" (onClick)="saveStages()" />
+      </div>
+    </ng-template>
+  </p-dialog>
+} @else {
+  <div class="of-page"><div class="of-empty"><i class="pi pi-exclamation-circle"></i>{{ 'office.common.notFound' | translate }}</div></div>
+}

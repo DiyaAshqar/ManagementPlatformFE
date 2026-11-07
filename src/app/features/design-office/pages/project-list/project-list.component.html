@@ -1,0 +1,105 @@
+<div class="of-page">
+  <div class="of-header">
+    <div class="of-header-left">
+      <div class="of-header-icon"><i class="pi pi-th-large"></i></div>
+      <div>
+        <h1 class="of-title">{{ 'office.projects.title' | translate }}</h1>
+        <p class="of-subtitle">{{ 'office.projects.subtitle' | translate }}</p>
+      </div>
+    </div>
+    <div class="of-actions">
+      <p-button icon="pi pi-refresh" severity="secondary" [text]="true" [pTooltip]="'office.demo.reset' | translate" tooltipPosition="bottom" (onClick)="resetDemo()" />
+      <p-button [label]="'office.projects.new' | translate" icon="pi pi-plus" [raised]="true" routerLink="/office/projects/new" />
+    </div>
+  </div>
+
+  <div class="of-stats">
+    <div class="of-stat blue">
+      <div><div class="of-stat-label">{{ 'office.projects.statActive' | translate }}</div><div class="of-stat-value">{{ stats().active }}</div></div>
+      <div class="of-stat-icon"><i class="pi pi-briefcase"></i></div>
+    </div>
+    <div class="of-stat purple" routerLink="/office/quotes" style="cursor: pointer">
+      <div><div class="of-stat-label">{{ 'office.projects.statAwaitingQuote' | translate }}</div><div class="of-stat-value">{{ stats().awaitingQuote }}</div></div>
+      <div class="of-stat-icon"><i class="pi pi-file-edit"></i></div>
+    </div>
+    <div class="of-stat amber">
+      <div><div class="of-stat-label">{{ 'office.projects.statLicensing' | translate }}</div><div class="of-stat-value">{{ stats().licensing }}</div></div>
+      <div class="of-stat-icon"><i class="pi pi-verified"></i></div>
+    </div>
+    <div class="of-stat red" routerLink="/office/claims" style="cursor: pointer">
+      <div><div class="of-stat-label">{{ 'office.projects.statReceivables' | translate }}</div><div class="of-stat-value of-num">{{ stats().receivables | jod }}</div></div>
+      <div class="of-stat-icon"><i class="pi pi-money-bill"></i></div>
+    </div>
+  </div>
+
+  <div class="of-card">
+    <div class="of-toolbar">
+      <div class="of-field of-grow">
+        <label>{{ 'office.common.search' | translate }}</label>
+        <p-iconfield>
+          <p-inputicon styleClass="pi pi-search" />
+          <input pInputText class="w-full" [ngModel]="search()" (ngModelChange)="search.set($event)" [placeholder]="'office.projects.searchPlaceholder' | translate" />
+        </p-iconfield>
+      </div>
+      <div class="of-field" style="min-width: 180px">
+        <label>{{ 'office.projects.scopeType' | translate }}</label>
+        <p-select [options]="templates()" optionLabel="name" optionValue="id" [showClear]="true" [placeholder]="'office.common.all' | translate"
+          [ngModel]="scopeType()" (ngModelChange)="scopeType.set($event)" styleClass="w-full" />
+      </div>
+      <div class="of-field" style="min-width: 220px">
+        <label>{{ 'office.projects.currentStage' | translate }}</label>
+        <p-select [options]="stageNames()" optionLabel="label" optionValue="value" [showClear]="true" [filter]="true" [placeholder]="'office.common.all' | translate"
+          [ngModel]="stageName()" (ngModelChange)="stageName.set($event)" styleClass="w-full" />
+      </div>
+      <div class="of-field" style="min-width: 160px">
+        <label>{{ 'office.projects.status' | translate }}</label>
+        <p-select [options]="statuses" [showClear]="true" [placeholder]="'office.common.all' | translate"
+          [ngModel]="status()" (ngModelChange)="status.set($event)" styleClass="w-full">
+          <ng-template let-o pTemplate="item">{{ 'office.projectStatus.' + o | translate }}</ng-template>
+          <ng-template let-o pTemplate="selectedItem">{{ 'office.projectStatus.' + o | translate }}</ng-template>
+        </p-select>
+      </div>
+    </div>
+  </div>
+
+  <div class="of-card flush">
+    <p-table [value]="filtered()" styleClass="of-table" [paginator]="filtered().length > 10" [rows]="10">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'office.projects.project' | translate }}</th>
+          <th>{{ 'office.common.client' | translate }}</th>
+          <th>{{ 'office.projects.scopes' | translate }}</th>
+          <th>{{ 'office.projects.currentStage' | translate }}</th>
+          <th>{{ 'office.projects.contractValue' | translate }}</th>
+          <th>{{ 'office.projects.received' | translate }}</th>
+          <th>{{ 'office.common.status' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-x>
+        <tr class="clickable" (click)="open(x)">
+          <td>
+            <a class="of-link">{{ x.project.name }}</a>
+            <div class="of-code">{{ x.project.code }}</div>
+          </td>
+          <td>{{ x.client?.name }}</td>
+          <td>{{ scopesLabel(x) }}</td>
+          <td>
+            {{ stageLabel(x) }}
+            @if (x.current?.stage.status === 'onHold') { <span class="of-small" style="color:#d97706"> · {{ 'office.stageStatus.onHold' | translate }}</span> }
+          </td>
+          <td class="of-num">{{ x.contractValue | jod }}</td>
+          <td class="of-num">
+            {{ x.received | jod }}
+            <div class="of-progress-track mt-1" style="width: 90px">
+              <div [style.width.%]="x.contractValue ? (x.received / x.contractValue) * 100 : 0"></div>
+            </div>
+          </td>
+          <td><p-tag [value]="'office.projectStatus.' + x.project.status | translate" [severity]="severity[x.project.status]" /></td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr><td colspan="7"><div class="of-empty"><i class="pi pi-inbox"></i>{{ 'office.common.noData' | translate }}</div></td></tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>

@@ -111,6 +111,106 @@
   gap: 0.75rem;
 }
 
+// ─── Collapsible modules ─────────────────────────────────────────
+.nav-module {
+  .module-header {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    padding: 0.55rem 0.75rem;
+    border: none;
+    background: transparent;
+    border-radius: 0.5rem;
+    font-family: inherit;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-color-secondary);
+    cursor: pointer;
+    text-align: start;
+    transition: background 0.2s, color 0.2s;
+
+    &:hover {
+      background: var(--surface-hover);
+      color: var(--text-color);
+    }
+
+    &.has-active {
+      color: var(--primary-color);
+    }
+
+    .module-icon {
+      font-size: 0.95rem;
+      flex-shrink: 0;
+    }
+
+    .module-label {
+      flex: 1;
+    }
+
+    .module-chevron {
+      font-size: 0.7rem;
+      transition: transform 0.25s ease;
+      transform: rotate(-90deg);
+    }
+  }
+
+  // grid-rows trick animates height without measuring content
+  .module-body {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.25s ease;
+
+    > .nav-items {
+      overflow: hidden;
+      min-height: 0;
+    }
+  }
+
+  &.expanded {
+    .module-header .module-chevron {
+      transform: rotate(0deg);
+    }
+
+    .module-body {
+      grid-template-rows: 1fr;
+
+      > .nav-items {
+        padding-top: 0.25rem;
+      }
+    }
+  }
+
+  .module-body .nav-item {
+    padding-inline-start: 1.25rem;
+  }
+}
+
+:host-context([dir='rtl']) .nav-module .module-header .module-chevron {
+  transform: rotate(90deg);
+}
+
+:host-context([dir='rtl']) .nav-module.expanded .module-header .module-chevron {
+  transform: rotate(0deg);
+}
+
+.sidebar.collapsed .nav-module {
+  @media (min-width: 992px) {
+    .module-header {
+      justify-content: center;
+      padding: 0.6rem 0.5rem;
+      border-bottom: 1px solid var(--surface-border);
+      border-radius: 0;
+    }
+
+    .module-body .nav-item {
+      padding-inline-start: 0.5rem;
+    }
+  }
+}
+
 .nav-section {
   .section-title {
     padding: 0 0.75rem;

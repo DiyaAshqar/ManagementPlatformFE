@@ -1,0 +1,178 @@
+@if (view(); as v) {
+  @let c = v.claim;
+  @let closed = v.status === 'paid' || v.status === 'cancelled';
+  <div class="of-page">
+    <div class="of-breadcrumb no-print">
+      <a routerLink="/office/claims">{{ 'office.claims.title' | translate }}</a><span class="sep">/</span><span>{{ c.no }}</span>
+    </div>
+
+    <div class="of-header">
+      <div class="of-header-left">
+        <div class="of-header-icon"><i class="pi pi-receipt"></i></div>
+        <div>
+          <h1 class="of-title">{{ 'office.claimDetail.title' | translate: { no: c.no } }} <p-tag [value]="'office.claimStatus.' + v.status | translate" [severity]="severity[v.status]" /></h1>
+          <p class="of-subtitle">
+            {{ c.paymentName }} ·
+            <a class="of-link" [routerLink]="['/office/projects', c.projectId]">{{ v.project?.code }} · {{ v.project?.name }}</a>
+            · {{ v.client?.name }}
+          </p>
+        </div>
+      </div>
+      <div class="of-actions no-print">
+        <p-button [label]="'office.claimDetail.print' | translate" icon="pi pi-print" severity="secondary" [outlined]="true" (onClick)="print()" />
+        @if (!closed && v.status !== 'scheduled') {
+          <p-button [label]="((v.status === 'due') ? 'office.claimDetail.send' : 'office.claimDetail.remind') | translate" icon="pi pi-send" severity="secondary" [outlined]="true" (onClick)="send()" />
+          <p-button [label]="'office.claimDetail.recordReceipt' | translate" icon="pi pi-plus" (onClick)="receiptVisible = true" />
+        }
+      </div>
+    </div>
+
+    <div class="of-stats">
+      <div class="of-stat blue"><div><div class="of-stat-label">{{ 'office.claim.value' | translate }}</div><div class="of-stat-value of-num">{{ v.total | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-file"></i></div></div>
+      <div class="of-stat green"><div><div class="of-stat-label">{{ 'office.projects.received' | translate }}</div><div class="of-stat-value of-num">{{ v.paid | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-wallet"></i></div></div>
+      <div class="of-stat red"><div><div class="of-stat-label">{{ 'office.claim.rest' | translate }}</div><div class="of-stat-value of-num">{{ v.rest | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-hourglass"></i></div></div>
+      <div class="of-stat slate"><div><div class="of-stat-label">{{ 'office.claim.dueDate' | translate }}</div><div class="of-stat-value" style="font-size: 1.1rem">{{ c.dueDate ? (c.dueDate | date: 'dd/MM/yyyy') : '—' }}</div></div><div class="of-stat-icon"><i class="pi pi-calendar"></i></div></div>
+    </div>
+
+    <div class="of-layout">
+      <div class="of-col">
+        <div class="of-card">
+          <div class="of-card-head"><h3>{{ 'office.claimDetail.basis' | translate }}</h3></div>
+          <div class="of-kv">
+            <div><div class="k">{{ 'office.claimDetail.contract' | translate }}</div>
+              <div class="v">@if (quote(); as q) { <a class="of-link" [routerLink]="['/office/quotes', q.id]">{{ q.ref }} · Rev {{ q.rev | number: '2.0-0' }}</a> } @else { — }</div></div>
+            <div><div class="k">{{ 'office.claimDetail.paymentInSchedule' | translate }}</div>
+              <div class="v">{{ c.paymentName }}@if (c.pct) { · {{ c.pct }}% }@if (c.manualType) { · {{ 'office.manualTypes.' + c.manualType | translate }} }</div></div>
+            <div><div class="k">{{ 'office.claim.condition' | translate }}</div><div class="v">{{ c.condition || '—' }}</div></div>
+            <div><div class="k">{{ 'office.claimDetail.linkedStage' | translate }}</div>
+              <div class="v">@if (v.stage; as st) { <a class="of-link" [routerLink]="['/office/projects', c.projectId, 'stages', st.id]">Phase {{ st.n }} · {{ st.name }}</a> · {{ 'office.stageStatus.' + st.status | translate }} } @else { — }</div></div>
+          </div>
+        </div>
+
+        <div class="of-card">
+          <div class="of-card-head">
+            <h3>{{ 'office.claimDetail.calculation' | translate }}</h3>
+            @if (!closed) { <p-button [label]="'office.claimDetail.addAdjustment' | translate" icon="pi pi-plus" [text]="true" size="small" (onClick)="openAdj()" /> }
+          </div>
+          <div class="of-rows">
+            @if (c.kind === 'scheduled' || c.pct) {
+              <div class="row"><span>{{ 'office.claimDetail.initialContract' | translate }}</span><span class="of-num">{{ contractValue() | jod }}</span></div>
+              <div class="row"><span>× {{ 'office.claimDetail.paymentPct' | translate }}</span><span>{{ c.pct }}%</span></div>
+            } @else {
+              <div class="row"><span>{{ c.description }}</span><span class="of-num">{{ c.baseAmount | jod }}</span></div>
+            }
+            <div class="row"><span>{{ 'office.claim.areaDiff' | translate }}</span><span class="of-num">{{ adjTotals().area | jod: 2 }}</span></div>
+            <div class="row"><span>{{ 'office.claimDetail.changeOrders' | translate }}</span><span class="of-num">{{ adjTotals().change | jod: 2 }}</span></div>
+            <div class="row"><span>{{ 'office.claimDetail.discount' | translate }}</span><span class="of-num">{{ adjTotals().discount | jod: 2 }}</span></div>
+            @for (a of c.adjustments; track a.id) {
+              <div class="row of-small of-muted" style="padding-inline-start: 1rem"><span>↳ {{ a.label }}</span><span class="of-num">{{ a.amount | jod: 2 }}</span></div>
+            }
+            <div class="row total"><span>{{ 'office.claim.value' | translate }}</span><span class="of-num">{{ v.total | jod }}</span></div>
+          </div>
+        </div>
+
+        <div class="of-card flush">
+          <div class="of-card-head">
+            <h3>{{ 'office.claimDetail.receipts' | translate }}</h3>
+            @if (!closed && v.status !== 'scheduled') { <p-button [label]="'office.claimDetail.recordReceipt' | translate" icon="pi pi-plus" [text]="true" size="small" class="no-print" (onClick)="receiptVisible = true" /> }
+          </div>
+          <p-table [value]="receipts()" styleClass="of-table">
+            <ng-template pTemplate="header">
+              <tr><th>{{ 'office.receipts.no' | translate }}</th><th>{{ 'office.common.date' | translate }}</th><th>{{ 'office.receipts.method' | translate }}</th><th>{{ 'office.common.amount' | translate }}</th></tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-r>
+              <tr>
+                <td><a class="of-link" routerLink="/office/receipts" [queryParams]="{ q: r.no }">{{ r.no }}</a></td>
+                <td class="of-num">{{ r.date | date: 'dd/MM/yyyy' }}</td>
+                <td>{{ 'office.methods.' + r.method | translate }}@if (r.chequeNo) { · {{ r.chequeNo }} }</td>
+                <td class="of-num">{{ r.amount | jod }}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage"><tr><td colspan="4"><div class="of-empty">{{ 'office.claimDetail.noReceipts' | translate }}</div></td></tr></ng-template>
+            <ng-template pTemplate="footer">
+              <tr><td colspan="3">{{ 'office.claim.rest' | translate }}</td><td class="of-num">{{ v.rest | jod }}</td></tr>
+            </ng-template>
+          </p-table>
+        </div>
+      </div>
+
+      <div class="of-col">
+        <div class="of-card">
+          <div class="of-card-head"><h3>{{ 'office.claimDetail.history' | translate }}</h3></div>
+          <div class="of-timeline">
+            @for (e of timeline(); track $index; let last = $last) {
+              <div class="ev" [class.done]="e.state === 'done' && !last" [class.now]="e.state === 'done' && last">
+                <span class="dot"></span>
+                <div>
+                  <div class="t">{{ 'office.claimEvents.' + e.text | translate: e.params }}</div>
+                  <div class="d">{{ e.date ? (e.date | date: 'dd/MM/yyyy') : '' }}@if (e.by) { · {{ e.by }} }</div>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+
+        @if (!closed) {
+          <div class="of-card no-print">
+            <div class="of-card-head"><h3>{{ 'office.claimDetail.actions' | translate }}</h3></div>
+            <div class="flex flex-column gap-2">
+              <p-button [label]="'office.claimDetail.editDue' | translate" icon="pi pi-calendar" [text]="true" styleClass="w-full justify-content-start" (onClick)="openDue()" />
+              <p-button [label]="(c.attachDrawings ? 'office.claimDetail.drawingsAttached' : 'office.claimDetail.attachDrawings') | translate" icon="pi pi-paperclip" [text]="true"
+                styleClass="w-full justify-content-start" [disabled]="!!c.attachDrawings" (onClick)="attachDrawings()" />
+              <p-button [label]="'office.claimDetail.cancel' | translate" icon="pi pi-ban" [text]="true" severity="danger" styleClass="w-full justify-content-start" (onClick)="cancel()" />
+            </div>
+          </div>
+        }
+
+        <div class="of-card">
+          <div class="of-card-head"><h3>{{ 'office.claimDetail.otherPayments' | translate }}</h3></div>
+          <div class="flex flex-column gap-2">
+            @for (s of siblings(); track s.claim.id) {
+              <button type="button" class="of-option flex justify-content-between align-items-center" [class.selected]="s.claim.id === c.id" (click)="goSibling(s.claim.id)">
+                <span class="of-option-title">{{ s.claim.paymentName }}@if (s.claim.pct) { · {{ s.claim.pct }}% }</span>
+                <span class="of-small">@if (s.claim.id === c.id) { {{ 'office.claimDetail.this' | translate }} } @else { {{ 'office.claimStatus.' + s.status | translate }} }</span>
+              </button>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p-dialog [(visible)]="receiptVisible" [modal]="true" [header]="'office.receipts.new' | translate" [style]="{ width: '520px' }" [breakpoints]="{ '640px': '95vw' }">
+    @if (receiptVisible) { <app-of-receipt-form [presetClaimId]="c.id" (saved)="onReceipt()" /> }
+  </p-dialog>
+
+  <p-dialog [(visible)]="adjVisible" [modal]="true" [header]="'office.claimDetail.addAdjustment' | translate" [style]="{ width: '460px' }" [breakpoints]="{ '640px': '95vw' }">
+    <div class="flex flex-column gap-3">
+      <div class="of-options">
+        @for (k of ['areaDiff', 'changeOrder', 'discount']; track k) {
+          <button type="button" class="of-option" [class.selected]="adj.kind === k" (click)="adj.kind = $any(k)">
+            <div class="of-option-title" style="font-size: .8rem">{{ 'office.adjKinds.' + k | translate }}</div>
+          </button>
+        }
+      </div>
+      <div class="of-field"><label>{{ 'office.common.description' | translate }}</label><input pInputText [(ngModel)]="adj.label" /></div>
+      <div class="of-field"><label>{{ 'office.common.amount' | translate }}</label><p-inputnumber [(ngModel)]="adj.amount" [maxFractionDigits]="2" inputStyleClass="w-full" />
+        @if (adj.kind === 'discount') { <span class="of-hint">{{ 'office.claimDetail.discountHint' | translate }}</span> }</div>
+    </div>
+    <ng-template pTemplate="footer">
+      <div class="of-dialog-footer">
+        <p-button [label]="'office.common.cancel' | translate" severity="secondary" [text]="true" (onClick)="adjVisible = false" />
+        <p-button [label]="'office.common.save' | translate" icon="pi pi-check" [disabled]="!adj.amount" (onClick)="saveAdj()" />
+      </div>
+    </ng-template>
+  </p-dialog>
+
+  <p-dialog [(visible)]="dueVisible" [modal]="true" [header]="'office.claimDetail.editDue' | translate" [style]="{ width: '380px' }">
+    <div class="of-field"><label>{{ 'office.claim.dueDate' | translate }}</label><input type="date" pInputText [(ngModel)]="newDue" /></div>
+    <ng-template pTemplate="footer">
+      <div class="of-dialog-footer">
+        <p-button [label]="'office.common.cancel' | translate" severity="secondary" [text]="true" (onClick)="dueVisible = false" />
+        <p-button [label]="'office.common.save' | translate" icon="pi pi-check" [disabled]="!newDue" (onClick)="saveDue()" />
+      </div>
+    </ng-template>
+  </p-dialog>
+} @else {
+  <div class="of-page"><div class="of-empty"><i class="pi pi-exclamation-circle"></i>{{ 'office.common.notFound' | translate }}</div></div>
+}

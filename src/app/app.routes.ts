@@ -184,6 +184,11 @@ export const routes: Routes = [
           .then(m => m.UserListComponent)
       },
       {
+        // Engineering Office module (local prototype data)
+        path: 'office',
+        loadChildren: () => import('./features/design-office/office.routes').then(m => m.OFFICE_ROUTES)
+      },
+      {
         path: 'roles-permissions',
         canActivate: [permissionGuard([Permissions.RolesPermissions.View, Permissions.RolesPermissions.Manage])],
         loadComponent: () => import('./features/roles-permissions/pages/roles-permissions/roles-permissions.component')

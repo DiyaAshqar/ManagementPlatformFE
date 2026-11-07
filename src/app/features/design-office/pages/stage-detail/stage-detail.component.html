@@ -1,0 +1,247 @@
+@if (stage(); as st) {
+  @let p = project()!;
+  @let sc = scope()!;
+  <div class="of-page">
+    <div class="of-breadcrumb">
+      <a routerLink="/office/projects">{{ 'office.projects.title' | translate }}</a><span class="sep">/</span>
+      <a [routerLink]="['/office/projects', p.id]">{{ p.name }}</a><span class="sep">/</span>
+      <span>{{ sc.name }}</span><span class="sep">/</span><span>Phase {{ st.n }}</span>
+    </div>
+
+    <div class="of-header">
+      <div class="of-header-left">
+        <div class="of-header-icon"><i class="pi" [ngClass]="st.type === 'license' ? 'pi-verified' : st.type === 'execution' ? 'pi-wrench' : 'pi-pencil'"></i></div>
+        <div>
+          <h1 class="of-title">{{ st.name }} <p-tag [value]="'office.stageStatus.' + st.status | translate" [severity]="stageSeverity[st.status]" /></h1>
+          <p class="of-subtitle">{{ 'office.stage.phaseOf' | translate: { n: st.n, total: sc.stages.length } }} · Scope: {{ sc.name }} · {{ 'office.stageTypes.' + st.type | translate }}</p>
+        </div>
+      </div>
+      <div class="of-actions">
+        <p-button icon="pi pi-angle-left" [text]="true" [rounded]="true" severity="secondary" [disabled]="!prevStage()" [pTooltip]="prevStage()?.name" (onClick)="goStage(prevStage()?.id)" />
+        <p-button icon="pi pi-angle-right" [text]="true" [rounded]="true" severity="secondary" [disabled]="!nextStage()" [pTooltip]="nextStage()?.name" (onClick)="goStage(nextStage()?.id)" />
+        @if (isDrawingStage()) {
+          <p-button [label]="'office.projectDetail.drawings' | translate" icon="pi pi-images" severity="secondary" [outlined]="true" (onClick)="openDrawings()" />
+        }
+        @if (st.returnTo.length && st.status !== 'completed') {
+          <p-button [label]="'office.stage.return' | translate" icon="pi pi-undo" severity="warn" [outlined]="true" (onClick)="returnVisible = true" />
+        }
+        @if (st.status === 'notStarted') {
+          <p-button [label]="'office.stage.start' | translate" icon="pi pi-play" (onClick)="start()" />
+        }
+        @if (st.status === 'active' || st.status === 'onHold') {
+          <p-button [label]="'office.stage.complete' | translate" icon="pi pi-check" severity="success" (onClick)="complete()" />
+        }
+      </div>
+    </div>
+
+    @if (st.status === 'onHold') {
+      <div class="of-note warn"><i class="pi pi-pause-circle"></i><span>{{ 'office.stage.onHoldNote' | translate }}</span></div>
+    }
+    @if (st.requireAttachments && !st.files.length && st.status !== 'completed') {
+      <div class="of-note"><i class="pi pi-paperclip"></i><span>{{ 'office.stage.needsAttachments' | translate }}</span></div>
+    }
+
+    <div class="of-stats">
+      <div class="of-stat slate"><div><div class="of-stat-label">{{ 'office.stage.owner' | translate }}</div><div class="of-stat-value" style="font-size: 1rem">{{ st.owner }}</div></div><div class="of-stat-icon"><i class="pi pi-user"></i></div></div>
+      <div class="of-stat blue"><div><div class="of-stat-label">{{ 'office.project.startDate' | translate }}</div><div class="of-stat-value" style="font-size: 1rem">{{ st.startDate ? (st.startDate | date: 'dd/MM/yyyy') : '—' }}</div></div><div class="of-stat-icon"><i class="pi pi-calendar"></i></div></div>
+      @if (st.customFields[0]; as f) {
+        <div class="of-stat purple"><div><div class="of-stat-label">{{ f.label }}</div><div class="of-stat-value" style="font-size: 1rem">{{ st.customValues[f.id] || '—' }}</div></div><div class="of-stat-icon"><i class="pi pi-hashtag"></i></div></div>
+      }
+      <div class="of-stat amber"><div><div class="of-stat-label">{{ 'office.stage.totalCost' | translate }}</div><div class="of-stat-value of-num">{{ totalCost() | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-calculator"></i></div></div>
+    </div>
+
+    <div class="of-layout">
+      <div class="of-col">
+        <!-- Status log -->
+        <div class="of-card flush">
+          <div class="of-card-head">
+            <div><h3>{{ 'office.stage.log' | translate }}</h3><p class="of-card-sub">{{ 'office.stage.logHint' | translate }}</p></div>
+          </div>
+          <p-table [value]="st.log" styleClass="of-table">
+            <ng-template pTemplate="header">
+              <tr><th>#</th><th>{{ 'office.stage.step' | translate }}</th>
+                @if (st.allowRecertify) { <th>{{ 'office.stage.file' | translate }}</th> }
+                <th>{{ 'office.common.date' | translate }}</th><th>{{ 'office.stage.by' | translate }}</th><th>{{ 'office.stage.cost' | translate }}</th><th>{{ 'office.stage.attachment' | translate }}</th></tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-l let-i="rowIndex">
+              <tr>
+                <td class="of-muted">{{ i + 1 }}</td>
+                <td><div class="of-strong">{{ l.step }}</div>@if (l.note) { <div class="of-small of-muted">{{ l.note }}</div> }</td>
+                @if (st.allowRecertify) { <td class="of-small">{{ fileLabel(l.fileId) }}</td> }
+                <td class="of-num">{{ l.date | date: 'dd/MM/yyyy' }}</td>
+                <td class="of-small">{{ l.by }}</td>
+                <td class="of-num">{{ l.cost ? (l.cost | jod) : '0.00' }} @if (l.billable) { <i class="pi pi-user-plus of-muted" [pTooltip]="'office.stage.billable' | translate"></i> }</td>
+                <td class="of-small">{{ l.attachment || '—' }}</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="emptymessage">
+              <tr><td [attr.colspan]="7"><div class="of-empty">{{ 'office.stage.noLog' | translate }}</div></td></tr>
+            </ng-template>
+          </p-table>
+          @if (st.status !== 'completed') {
+            <div class="p-3" style="border-top: 1px solid var(--surface-border)">
+              <div class="of-form-grid">
+                <div class="of-field span-2"><label>{{ 'office.stage.newStep' | translate }} <span class="req">*</span></label><input pInputText [(ngModel)]="entry.step" /></div>
+                <div class="of-field"><label>{{ 'office.common.date' | translate }}</label><input type="date" pInputText [(ngModel)]="entry.date" /></div>
+                <div class="of-field"><label>{{ 'office.stage.costJod' | translate }}</label><p-inputnumber [(ngModel)]="entry.cost" [min]="0" [maxFractionDigits]="2" inputStyleClass="w-full" /></div>
+                @if (st.allowRecertify) {
+                  <div class="of-field"><label>{{ 'office.stage.file' | translate }}</label>
+                    <p-select [options]="fileOptions()" optionLabel="label" optionValue="value" [(ngModel)]="entry.fileId" styleClass="w-full" appendTo="body" /></div>
+                }
+                <div class="of-field span-2"><label>{{ 'office.common.notes' | translate }}</label><input pInputText [(ngModel)]="entry.note" /></div>
+              </div>
+              <div class="flex justify-content-between align-items-center flex-wrap gap-2 mt-3">
+                <div class="flex align-items-center gap-3 flex-wrap">
+                  <label class="p-button p-button-text p-button-sm" style="cursor: pointer">
+                    <i class="pi pi-paperclip mr-2"></i>{{ entry.attachment || ('office.stage.attachFile' | translate) }}
+                    <input type="file" hidden (change)="pickEntryFile($event)" />
+                  </label>
+                  <label class="flex gap-2 align-items-center of-small"><p-checkbox [binary]="true" [(ngModel)]="entry.billable" />{{ 'office.stage.billable' | translate }}</label>
+                </div>
+                <p-button [label]="'office.stage.addStatus' | translate" icon="pi pi-plus" [disabled]="!entry.step.trim()" (onClick)="addEntry()" />
+              </div>
+            </div>
+          }
+        </div>
+
+        <!-- Syndicate files -->
+        @if (st.allowRecertify) {
+          <div class="of-card">
+            <div class="of-card-head">
+              <div><h3>{{ 'office.stage.licenseFiles' | translate }}</h3><p class="of-card-sub">{{ 'office.recertify.rule' | translate }}</p></div>
+              <p-button [label]="'office.recertify.openBtn' | translate" icon="pi pi-plus" [outlined]="true" size="small" (onClick)="recertifyVisible = true" />
+            </div>
+            <div class="flex flex-column gap-2">
+              @for (f of st.licenseFiles; track f.id) {
+                @let info = licenseSteps(f);
+                <div class="of-option" [class.selected]="f.open">
+                  <div class="flex justify-content-between align-items-center gap-2">
+                    <div>
+                      <div class="of-option-title">{{ licenseTitle(f) }} · {{ f.number || '—' }}</div>
+                      <div class="of-option-sub">
+                        @if (f.kind === 'recertify') { {{ 'office.recertify.source' | translate }}: {{ 'office.recertifySources.' + f.source | translate }} · }
+                        {{ 'office.stage.stepsCount' | translate: { n: info.count } }} · {{ 'office.stage.cost' | translate }}: {{ info.cost | jod }}
+                      </div>
+                    </div>
+                    <p-tag [value]="(f.open ? 'office.stage.fileOpen' : 'office.stage.fileClosed') | translate" [severity]="f.open ? 'info' : 'secondary'" />
+                  </div>
+                </div>
+              } @empty {
+                <div class="of-empty">{{ 'office.stage.noLicenseFiles' | translate }}</div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Attachments -->
+        <div class="of-card">
+          <div class="of-card-head"><h3>{{ 'office.stage.attachments' | translate }}</h3></div>
+          <label class="of-dropzone block mb-3">
+            <i class="pi pi-cloud-upload"></i>{{ 'office.stage.dropHint' | translate }}
+            <input type="file" multiple hidden (change)="uploadFiles($event)" />
+          </label>
+          <div class="of-files">
+            @for (f of st.files; track f.id) {
+              <div class="file">
+                <span class="kind">{{ f.kind }}</span>
+                <span class="name">{{ f.name }}</span>
+                <span class="of-small of-muted">{{ f.date | date: 'dd/MM/yyyy' }} · {{ f.by }}</span>
+                <p-button icon="pi pi-download" [text]="true" [rounded]="true" size="small" severity="secondary" [pTooltip]="'office.common.download' | translate" />
+                <p-button icon="pi pi-trash" [text]="true" [rounded]="true" size="small" severity="danger" (onClick)="removeFile(f.id)" />
+              </div>
+            } @empty {
+              <div class="of-empty">{{ 'office.stage.noFiles' | translate }}</div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="of-col">
+        <!-- Claim -->
+        <div class="of-card">
+          <div class="of-card-head">
+            <div><h3>{{ 'office.stage.claimTitle' | translate }}</h3><p class="of-card-sub">{{ 'office.stage.claimHint' | translate }}</p></div>
+          </div>
+          @for (c of claims(); track c.claim.id) {
+            <div class="of-rows mb-2">
+              <div class="row"><span>{{ 'office.claim.payment' | translate }}</span><span class="of-strong">{{ c.claim.paymentName }}</span></div>
+              @if (c.claim.pct) { <div class="row"><span>{{ 'office.contract.pctOfContract' | translate }}</span><span>{{ c.claim.pct }}%</span></div> }
+              <div class="row"><span>{{ 'office.claim.value' | translate }}</span><span class="of-num of-strong">{{ c.total | jod }}</span></div>
+              <div class="row"><span>{{ 'office.common.status' | translate }}</span><p-tag [value]="'office.claimStatus.' + c.status | translate" [severity]="claimSeverity[c.status]" /></div>
+            </div>
+            <a class="of-link of-small" [routerLink]="['/office/claims', c.claim.id]">{{ 'office.stage.openClaim' | translate: { no: c.claim.no } }} →</a>
+            <hr style="border: none; border-top: 1px solid var(--surface-border)" />
+          } @empty {
+            <p class="of-muted of-small mt-0">{{ 'office.stage.noLinkedClaim' | translate }}</p>
+          }
+          <p-button [label]="'office.stage.createClaim' | translate" icon="pi pi-plus" styleClass="w-full" [outlined]="!!claims().length" (onClick)="claimVisible = true" />
+        </div>
+
+        <!-- Subcontractors -->
+        @if (st.allowSubcontractors) {
+          <div class="of-card">
+            <div class="of-card-head">
+              <h3>{{ 'office.projectDetail.subcontractors' | translate }}</h3>
+              <p-button icon="pi pi-plus" [text]="true" [rounded]="true" size="small" (onClick)="openSub()" />
+            </div>
+            <div class="flex flex-column gap-2">
+              @for (s of st.subcontractors; track s.id) {
+                <div class="of-option">
+                  <div class="flex justify-content-between align-items-center gap-2">
+                    <div>
+                      <div class="of-option-title">{{ s.name }}</div>
+                      <div class="of-option-sub">{{ s.specialty }} · {{ s.value | jod }}@if (s.attachments.length) { · {{ s.attachments.length }} <i class="pi pi-paperclip"></i> }</div>
+                    </div>
+                    <p-tag class="cursor-pointer" [value]="'office.subStatus.' + s.status | translate" [severity]="s.status === 'delivered' ? 'success' : 'info'" (click)="toggleSubStatus(s)" />
+                  </div>
+                </div>
+              } @empty {
+                <div class="of-empty of-small">{{ 'office.stage.noSubcontractorsHint' | translate }}</div>
+              }
+            </div>
+          </div>
+        }
+
+        <!-- Stage fields -->
+        <div class="of-card">
+          <div class="of-card-head"><div><h3>{{ 'office.stage.fields' | translate }}</h3><p class="of-card-sub">{{ 'office.stage.fieldsHint' | translate }}</p></div></div>
+          <div class="flex flex-column gap-3">
+            <div class="of-field"><label>{{ 'office.stage.owner' | translate }}</label><input pInputText [(ngModel)]="owner" /></div>
+            @for (f of st.customFields; track f.id) {
+              <div class="of-field">
+                <label>{{ f.label }}</label>
+                <input pInputText [type]="f.type === 'date' ? 'date' : f.type === 'number' ? 'number' : 'text'" [(ngModel)]="customValues[f.id]" />
+              </div>
+            }
+            <p-button [label]="'office.common.save' | translate" icon="pi pi-save" [outlined]="true" (onClick)="saveFields()" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <app-of-create-claim-dialog [(visible)]="claimVisible" [projectId]="p.id" [stage]="st" (created)="onClaimCreated($event)" />
+  <app-of-return-stage-dialog [(visible)]="returnVisible" [projectId]="p.id" [scope]="sc" [stage]="st" />
+  <app-of-recertify-dialog [(visible)]="recertifyVisible" [projectId]="p.id" [stage]="st" />
+
+  <p-dialog [(visible)]="subVisible" [modal]="true" [header]="'office.stage.addSubcontractor' | translate" [style]="{ width: '520px' }" [breakpoints]="{ '640px': '95vw' }">
+    <div class="of-form-grid">
+      <div class="of-field span-all"><label>{{ 'office.client.name' | translate }} <span class="req">*</span></label><input pInputText [(ngModel)]="sub.name" /></div>
+      <div class="of-field"><label>{{ 'office.stage.specialty' | translate }}</label><input pInputText [(ngModel)]="sub.specialty" /></div>
+      <div class="of-field"><label>{{ 'office.stage.agreementValue' | translate }}</label><p-inputnumber [(ngModel)]="sub.value" [min]="0" inputStyleClass="w-full" /></div>
+      <label class="of-dropzone span-all block">
+        <i class="pi pi-paperclip"></i>{{ sub.attachments.length ? sub.attachments.join(', ') : ('office.stage.attachFile' | translate) }}
+        <input type="file" multiple hidden (change)="pickSubFile($event)" />
+      </label>
+    </div>
+    <p class="of-small of-muted">{{ 'office.stage.subExpenseHint' | translate }}</p>
+    <ng-template pTemplate="footer">
+      <div class="of-dialog-footer">
+        <p-button [label]="'office.common.cancel' | translate" severity="secondary" [text]="true" (onClick)="subVisible = false" />
+        <p-button [label]="'office.common.save' | translate" icon="pi pi-check" [disabled]="!sub.name.trim()" (onClick)="saveSub()" />
+      </div>
+    </ng-template>
+  </p-dialog>
+} @else {
+  <div class="of-page"><div class="of-empty"><i class="pi pi-exclamation-circle"></i>{{ 'office.common.notFound' | translate }}</div></div>
+}

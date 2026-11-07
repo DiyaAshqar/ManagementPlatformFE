@@ -1,0 +1,142 @@
+@if (quote(); as q) {
+  <div class="of-page">
+    <div class="of-header no-print">
+      <div class="of-header-left">
+        <p-button icon="pi pi-arrow-left" [text]="true" [rounded]="true" [routerLink]="['/office/quotes', q.id]" />
+        <div>
+          <h1 class="of-title">{{ 'office.preview.title' | translate }} · {{ q.ref }}</h1>
+          <p class="of-subtitle">{{ 'office.preview.subtitle' | translate }}</p>
+        </div>
+      </div>
+      <div class="of-actions align-items-center">
+        <span class="of-small of-muted">{{ 'office.quotes.revision' | translate }}</span>
+        <p-select [options]="revOptions()" optionLabel="label" optionValue="value" [ngModel]="rev()" (ngModelChange)="selectedRev.set($event)" />
+        <p-button [label]="'office.preview.backToForm' | translate" icon="pi pi-pencil" severity="secondary" [outlined]="true" [routerLink]="['/office/quotes', q.id]" />
+        <p-button [label]="'office.preview.download' | translate" icon="pi pi-download" (onClick)="print()" />
+      </div>
+    </div>
+
+    @if (diff().length) {
+      <div class="of-note no-print">
+        <i class="pi pi-arrow-right-arrow-left"></i>
+        <div>
+          <strong>{{ 'office.preview.changesFrom' | translate: { rev: revLabel(rev() - 1) } }}</strong>
+          <ul class="of-list-plain mt-1">
+            @for (d of diff(); track d) {
+              @switch (diffParts(d)[0]) {
+                @case ('total') { <li>{{ 'office.preview.diffTotal' | translate: { from: (+diffParts(d)[1] | jod), to: (+diffParts(d)[2] | jod) } }}</li> }
+                @case ('area') { <li>{{ 'office.preview.diffArea' | translate: { from: diffParts(d)[1], to: diffParts(d)[2] } }}</li> }
+                @case ('scopes') { <li>{{ 'office.preview.diffScopes' | translate: { from: diffParts(d)[1], to: diffParts(d)[2] } }}</li> }
+                @default { <li>{{ 'office.preview.diffPayments' | translate }}</li> }
+              }
+            }
+          </ul>
+        </div>
+      </div>
+    }
+
+    @if (content(); as c) {
+      <article class="contract-paper" dir="rtl" lang="ar">
+        <header class="paper-head">
+          <div>
+            <div class="brand">ICONIC</div>
+            <div class="company">{{ settings().companyName }}</div>
+          </div>
+          <div class="ref">
+            <div>{{ q.ref }} · {{ revLabel(rev()) }}</div>
+            <div>{{ c.date | date: 'dd/MM/yyyy' }}</div>
+          </div>
+        </header>
+
+        <h2 class="paper-title">{{ c.title }}</h2>
+
+        <p class="center">بسم الله الرحمن الرحيم</p>
+        <p>وبعد، فقد تم في هذا اليوم الموافق {{ c.date | date: 'dd/MM/yyyy' }}م التوقيع على هذه الاتفاقية بين كل من:</p>
+
+        <div class="parties">
+          <div class="party">
+            <div class="label">الفريق الأول</div>
+            <div class="name">الفاضل: {{ client()?.name }}</div>
+            <div>رقم وطني: {{ client()?.nationalId || '—' }}</div>
+            @if (client()?.representative) { <div>ويمثله: {{ client()?.representative }}</div> }
+            <div>{{ client()?.address }} · هاتف: {{ client()?.phone }}</div>
+          </div>
+          <div class="party">
+            <div class="label">الفريق الثاني</div>
+            <div class="name">{{ settings().companyName }}</div>
+            <div>رقم التسجيل: {{ settings().registrationNo }}</div>
+            <div>ويمثلها: المهندس {{ settings().signatory }}</div>
+            <div>{{ settings().address }} · هاتف: {{ settings().phone }}</div>
+          </div>
+        </div>
+
+        <h3>المقدمة</h3>
+        <p>
+          حيث أن الفريق الأول يمتلك قطعة أرض رقم ( {{ c.land.plotNo || '—' }} ) حوض رقم {{ c.land.basin || '—' }} من أراضي {{ c.land.lands || '—' }}،
+          ويرغب في {{ c.title.replace('عقد ', '') }} عليها
+          @if (c.land.buildArea) { بمساحة بناء أولية {{ c.land.buildArea | number }} م² تقريبًا }
+          @if (c.fees.interiorOn && c.land.interiorArea) {، ومساحة تصميمية للأعمال الداخلية {{ c.land.interiorArea | number }} م² تقريبًا }
+          @if (c.land.subdivision) {، وعلى قطعة أرض ( {{ c.land.subdivision }} ) }
+          @if (c.land.landArea) { بمساحة {{ c.land.landArea | number }} م² تقريبًا }.
+        </p>
+
+        <h3>المادة (1): التمهيد</h3>
+        <p>تعتبر المقدمة السابقة جزءًا لا يتجزأ من هذه الاتفاقية.</p>
+
+        <h3>المادة (2): التزامات ومسؤوليات الفريق الأول</h3>
+        <ol>
+          @for (o of c.clientObligations; track $index) { <li>{{ o }}</li> }
+        </ol>
+
+        <h3>المادة (3): التزامات ومسؤوليات الفريق الثاني</h3>
+        @for (s of c.scopes; track s.id) {
+          <p class="scope-name">* {{ s.name }}:</p>
+          <ol>
+            @for (o of s.obligations; track $index) {
+              <li>{{ o.text }}
+                @if (o.sub?.length) {
+                  <ul>@for (x of o.sub; track $index) { <li>{{ x }}</li> }</ul>
+                }
+              </li>
+            }
+          </ol>
+        }
+
+        <h3>المادة (4): اشتراطات عامة</h3>
+        <ol>
+          @for (g of c.generalTerms; track $index) { <li>{{ g }}</li> }
+        </ol>
+
+        <h3>المادة (5): البند المالي</h3>
+        <p>جميع التعاملات المالية بين الفريقين تتم بعملة الدينار الأردني.</p>
+        @if (totals().ext) {
+          @if (c.fees.extMode === 'perSqm') {
+            <p>الأتعاب على خدمات التصميم الخارجي والترخيص: {{ c.fees.rate }} دينار/م²، بكلفة إجمالية أولية {{ totals().ext | number }} دينار على المساحة الأولية، وتعتمد المساحات النهائية بعد صدور المخططات من نقابة المهندسين الأردنيين.</p>
+          } @else {
+            <p>الأتعاب على خدمات التصميم والترخيص: {{ totals().ext | number }} دينار مبلغ مقطوع.</p>
+          }
+        }
+        @if (totals().interior) {
+          <p>كلفة أعمال التصميم الداخلي: {{ totals().interior | number }} دينار لا غير.</p>
+        }
+        <p><strong>آلية الدفع:</strong> قيمة التعاقد الأولي: {{ totals().total | number }} دينار</p>
+        <table class="pay-table">
+          <thead><tr><th>الدفعة</th><th>النسبة</th><th>تُستحق عند</th><th>المبلغ</th></tr></thead>
+          <tbody>
+            @for (p of c.payments; track p.id) {
+              <tr><td>{{ p.name }}</td><td>{{ p.pct }}%</td><td>{{ p.condition }}</td><td>{{ amount(p.pct) | number }}</td></tr>
+            }
+          </tbody>
+          <tfoot><tr><td colspan="3">الإجمالي</td><td>{{ totals().total | number }}</td></tr></tfoot>
+        </table>
+
+        <div class="signatures">
+          <div><div class="label">الفريق الأول</div><div class="line"></div><div>{{ client()?.name }}</div></div>
+          <div><div class="label">الفريق الثاني</div><div class="line"></div><div>{{ settings().companyName }}</div></div>
+        </div>
+      </article>
+    }
+  </div>
+} @else {
+  <div class="of-page"><div class="of-empty"><i class="pi pi-exclamation-circle"></i>{{ 'office.common.notFound' | translate }}</div></div>
+}

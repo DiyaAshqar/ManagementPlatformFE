@@ -1,14 +1,14 @@
-import { Component, OnInit, effect } from '@angular/core';
+import { Component, OnInit, effect, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { NavigationEnd, Router, RouterModule } from '@angular/router';
 import { TranslateModule } from '@ngx-translate/core';
+import { filter } from 'rxjs/operators';
 
 // PrimeNG Imports
 import { ButtonModule } from 'primeng/button';
 import { SidebarModule } from 'primeng/sidebar';
 import { AvatarModule } from 'primeng/avatar';
 import { MenuModule } from 'primeng/menu';
-import { MenuItem } from 'primeng/api';
 import { TooltipModule } from 'primeng/tooltip';
 
 // Services
@@ -33,10 +33,15 @@ interface NavItem {
   permissions?: string[];
 }
 
-interface NavSection {
+/** A module is a collapsible group in the sidebar; its items are the module's screens. */
+interface NavModule {
+  key: string;
   title: string;
+  icon: string;
   items: NavItem[];
 }
+
+const EXPANDED_MODULES_KEY = 'sidebar_expanded_modules';
 
 @Component({
   selector: 'app-sidebar',
@@ -56,10 +61,12 @@ interface NavSection {
 })
 export class SidebarComponent implements OnInit {
   readonly deploymentStatus = this.getDeploymentStatus();
-  
-  navSections: NavSection[] = [
+
+  navModules: NavModule[] = [
     {
-      title: 'sidebar.sections.overview',
+      key: 'construction',
+      title: 'sidebar.modules.construction',
+      icon: 'pi pi-building',
       items: [
         { label: 'sidebar.items.dashboard', icon: 'pi pi-home', route: '/dashboard' },
         {
@@ -122,8 +129,25 @@ export class SidebarComponent implements OnInit {
         //   route: '/reporting-demo',
         // },
       ]
+    },
+    {
+      key: 'office',
+      title: 'sidebar.modules.office',
+      icon: 'pi pi-compass',
+      items: [
+        { label: 'sidebar.office.projects', icon: 'pi pi-th-large', route: '/office/projects' },
+        { label: 'sidebar.office.quotes', icon: 'pi pi-file-edit', route: '/office/quotes' },
+        { label: 'sidebar.office.stageTemplates', icon: 'pi pi-sitemap', route: '/office/stage-templates' },
+        { label: 'sidebar.office.claims', icon: 'pi pi-money-bill', route: '/office/claims' },
+        { label: 'sidebar.office.receipts', icon: 'pi pi-wallet', route: '/office/receipts' },
+        { label: 'sidebar.office.expenses', icon: 'pi pi-credit-card', route: '/office/expenses' },
+        { label: 'sidebar.office.reports', icon: 'pi pi-chart-bar', route: '/office/reports' },
+      ]
     }
   ];
+
+  /** Which modules are expanded; persisted so the sidebar keeps its shape across reloads. */
+  readonly expandedModules = signal<Record<string, boolean>>(this.loadExpanded());
 
   footerItems: NavItem[] = [
     { label: 'sidebar.footer.settings', icon: 'pi pi-cog', route: '/settings' },
@@ -141,7 +165,7 @@ export class SidebarComponent implements OnInit {
     effect(() => {
       const roles = this.authService.roles();
       const permissions = this.authService.permissions();
-      const allItems = [...this.navSections.flatMap((section) => section.items), ...this.footerItems];
+      const allItems = [...this.navModules.flatMap((module) => module.items), ...this.footerItems];
       const visibility = allItems.map((item) => ({
         label: item.label,
         requiredRoles: item.roles,
@@ -153,7 +177,12 @@ export class SidebarComponent implements OnInit {
     });
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    this.expandActiveModule();
+    this.router.events
+      .pipe(filter((e) => e instanceof NavigationEnd))
+      .subscribe(() => this.expandActiveModule());
+  }
 
   canShow(item: NavItem): boolean {
     const hasRequiredRole = !item.roles?.length || this.authService.hasAnyRole(item.roles);
@@ -162,9 +191,26 @@ export class SidebarComponent implements OnInit {
     return hasRequiredRole && hasRequiredPermission;
   }
 
+  visibleItems(module: NavModule): NavItem[] {
+    return module.items.filter((item) => this.canShow(item));
+  }
+
+  isModuleExpanded(module: NavModule): boolean {
+    return !!this.expandedModules()[module.key];
+  }
+
+  isModuleActive(module: NavModule): boolean {
+    return module.items.some((item) => this.isActiveRoute(item.route));
+  }
+
+  toggleModule(module: NavModule): void {
+    this.expandedModules.update((state) => ({ ...state, [module.key]: !state[module.key] }));
+    this.saveExpanded();
+  }
+
   get logoPath(): string {
-    return this.themeService.isDarkTheme() 
-      ? 'assets/logo/neuro code dark.png' 
+    return this.themeService.isDarkTheme()
+      ? 'assets/logo/neuro code dark.png'
       : 'assets/logo/neuro code light.png';
   }
 
@@ -185,13 +231,40 @@ export class SidebarComponent implements OnInit {
 
   isActiveRoute(route: string | undefined): boolean {
     if (!route) return false;
-    if (route === '/dashboard') return this.router.url === '/dashboard';
-    return this.router.url.startsWith(route);
+    const url = this.router.url.split('?')[0];
+    if (route === '/dashboard') return url === '/dashboard';
+    return url === route || url.startsWith(route + '/');
   }
 
   goHome(): void {
     this.router.navigate(['/dashboard']);
     this.closeMobileMenu();
+  }
+
+  /** Opens the module that owns the current route so the active item is always visible. */
+  private expandActiveModule(): void {
+    const active = this.navModules.find((m) => this.isModuleActive(m));
+    if (active && !this.isModuleExpanded(active)) {
+      this.expandedModules.update((state) => ({ ...state, [active.key]: true }));
+      this.saveExpanded();
+    }
+  }
+
+  private loadExpanded(): Record<string, boolean> {
+    try {
+      const raw = localStorage.getItem(EXPANDED_MODULES_KEY);
+      return raw ? JSON.parse(raw) : {};
+    } catch {
+      return {};
+    }
+  }
+
+  private saveExpanded(): void {
+    try {
+      localStorage.setItem(EXPANDED_MODULES_KEY, JSON.stringify(this.expandedModules()));
+    } catch {
+      /* storage unavailable: the state just won't persist */
+    }
   }
 
   private getDeploymentStatus(): string {

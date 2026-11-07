@@ -1,0 +1,96 @@
+<div class="of-page">
+  <div class="of-header">
+    <div class="of-header-left">
+      <div class="of-header-icon"><i class="pi pi-wallet"></i></div>
+      <div>
+        <h1 class="of-title">{{ 'office.receipts.title' | translate }}</h1>
+        <p class="of-subtitle">{{ 'office.receipts.subtitle' | translate }}</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="of-stats">
+    <div class="of-stat green"><div><div class="of-stat-label">{{ 'office.receipts.statMonth' | translate }}</div><div class="of-stat-value of-num">{{ stats().month | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-wallet"></i></div></div>
+    <div class="of-stat blue" routerLink="/office/claims" style="cursor: pointer"><div><div class="of-stat-label">{{ 'office.receipts.statDue' | translate }}</div><div class="of-stat-value of-num">{{ stats().receivable | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-money-bill"></i></div></div>
+    <div class="of-stat amber"><div><div class="of-stat-label">{{ 'office.receipts.statCheques' | translate }}</div><div class="of-stat-value of-num">{{ stats().cheques | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-clock"></i></div></div>
+  </div>
+
+  <div class="of-layout">
+    <div class="of-col">
+      <div class="of-card">
+        <div class="of-toolbar">
+          <div class="of-field of-grow">
+            <label>{{ 'office.common.search' | translate }}</label>
+            <p-iconfield><p-inputicon styleClass="pi pi-search" />
+              <input pInputText class="w-full" [ngModel]="search()" (ngModelChange)="search.set($event)" [placeholder]="'office.receipts.searchPlaceholder' | translate" /></p-iconfield>
+          </div>
+          <div class="of-field" style="min-width: 150px">
+            <label>{{ 'office.receipts.method' | translate }}</label>
+            <p-select [options]="methods" [showClear]="true" [placeholder]="'office.common.all' | translate" [ngModel]="method()" (ngModelChange)="method.set($event)" styleClass="w-full">
+              <ng-template let-o pTemplate="item">{{ 'office.methods.' + o | translate }}</ng-template>
+              <ng-template let-o pTemplate="selectedItem">{{ 'office.methods.' + o | translate }}</ng-template>
+            </p-select>
+          </div>
+          <div class="of-field"><label>{{ 'office.common.from' | translate }}</label><input type="date" pInputText [ngModel]="from()" (ngModelChange)="from.set($event)" /></div>
+          <div class="of-field"><label>{{ 'office.common.to' | translate }}</label><input type="date" pInputText [ngModel]="to()" (ngModelChange)="to.set($event)" /></div>
+        </div>
+      </div>
+
+      <div class="of-card flush">
+        <p-table [value]="filtered()" styleClass="of-table" [paginator]="filtered().length > 12" [rows]="12">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>{{ 'office.receipts.no' | translate }}</th><th>{{ 'office.common.date' | translate }}</th><th>{{ 'office.receipts.clientProject' | translate }}</th>
+              <th>{{ 'office.receipts.for' | translate }}</th><th>{{ 'office.receipts.method' | translate }}</th><th>{{ 'office.common.amount' | translate }}</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-x>
+            <tr class="clickable" (click)="showVoucher(x.r)">
+              <td><a class="of-link">{{ x.r.no }}</a></td>
+              <td class="of-num">{{ x.r.date | date: 'dd/MM/yyyy' }}</td>
+              <td><div>{{ x.client }}</div><div class="of-small of-muted">{{ x.project?.code }} · {{ x.project?.name }}</div></td>
+              <td>
+                @if (x.claim) { <a class="of-link" [routerLink]="['/office/claims', x.claim.claim.id]" (click)="$event.stopPropagation()">{{ forLabel(x) }}</a> }
+                @else { {{ forLabel(x) }} }
+              </td>
+              <td>{{ 'office.methods.' + x.r.method | translate }}</td>
+              <td class="of-num of-strong">{{ x.r.amount | jod }}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage"><tr><td colspan="6"><div class="of-empty"><i class="pi pi-inbox"></i>{{ 'office.common.noData' | translate }}</div></td></tr></ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <div class="of-col of-sticky">
+      <div class="of-card">
+        <div class="of-card-head"><h3>{{ 'office.receipts.new' | translate }}</h3></div>
+        <app-of-receipt-form (saved)="showVoucher($event)" />
+      </div>
+    </div>
+  </div>
+</div>
+
+<p-dialog [visible]="!!voucher" (visibleChange)="!$event && (voucher = null)" [modal]="true" [header]="'office.receipts.voucher' | translate" [style]="{ width: '560px' }" [breakpoints]="{ '640px': '95vw' }">
+  @if (voucher; as r) {
+    <div class="of-card" style="border-style: dashed">
+      <div class="flex justify-content-between align-items-start mb-3">
+        <div><div class="of-strong" style="letter-spacing: .2em; font-size: 1.1rem">ICONIC</div><div class="of-small of-muted">{{ settings().companyName }}</div></div>
+        <div class="text-right"><div class="of-strong">{{ 'office.receipts.voucher' | translate }}</div><div class="of-num">{{ r.no }}</div><div class="of-small of-muted">{{ r.date | date: 'dd/MM/yyyy' }}</div></div>
+      </div>
+      <div class="of-rows">
+        <div class="row"><span>{{ 'office.receipts.receivedFrom' | translate }}</span><span class="of-strong">{{ voucherClient() }}</span></div>
+        <div class="row"><span>{{ 'office.projects.project' | translate }}</span><span>{{ voucherProject() }}</span></div>
+        <div class="row"><span>{{ 'office.receipts.for' | translate }}</span><span>{{ voucherClaim() }}</span></div>
+        <div class="row"><span>{{ 'office.receipts.method' | translate }}</span><span>{{ 'office.methods.' + r.method | translate }}@if (r.chequeNo) { · {{ r.chequeNo }} }</span></div>
+        <div class="row total"><span>{{ 'office.common.amount' | translate }}</span><span class="of-num">{{ r.amount | jod: 2 }}</span></div>
+      </div>
+    </div>
+  }
+  <ng-template pTemplate="footer">
+    <div class="of-dialog-footer">
+      <p-button [label]="'office.common.close' | translate" severity="secondary" [text]="true" (onClick)="voucher = null" />
+      <p-button [label]="'office.common.print' | translate" icon="pi pi-print" (onClick)="printVoucher()" />
+    </div>
+  </ng-template>
+</p-dialog>

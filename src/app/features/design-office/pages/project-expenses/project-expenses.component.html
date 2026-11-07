@@ -1,0 +1,94 @@
+@if (summary(); as s) {
+  @let p = s.project;
+  <div class="of-page">
+    <div class="of-breadcrumb">
+      <a routerLink="/office/projects">{{ 'office.projects.title' | translate }}</a><span class="sep">/</span>
+      <a [routerLink]="['/office/projects', p.id]">{{ p.code }} · {{ p.name }}</a><span class="sep">/</span>
+      <span>{{ 'office.projectDetail.expenses' | translate }}</span>
+    </div>
+
+    <div class="of-header">
+      <div class="of-header-left">
+        <div class="of-header-icon"><i class="pi pi-credit-card"></i></div>
+        <div>
+          <h1 class="of-title">{{ 'office.projectExpenses.title' | translate }}</h1>
+          <p class="of-subtitle">{{ 'office.projectExpenses.subtitle' | translate }}</p>
+        </div>
+      </div>
+      <p-button [label]="'office.projectDetail.statement' | translate" icon="pi pi-book" severity="secondary" [outlined]="true" [routerLink]="['/office/clients', p.clientId, 'statement']" [queryParams]="{ project: p.id }" />
+    </div>
+
+    <div class="of-stats">
+      <div class="of-stat red"><div><div class="of-stat-label">{{ 'office.projectExpenses.direct' | translate }}</div><div class="of-stat-value of-num">{{ s.directExpenses + s.subcontractors | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-shopping-cart"></i></div></div>
+      <div class="of-stat amber"><div><div class="of-stat-label">{{ 'office.projectDetail.stepsCost' | translate }}</div><div class="of-stat-value of-num">{{ s.stepsCost | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-list"></i></div></div>
+      <div class="of-stat purple"><div><div class="of-stat-label">{{ 'office.projectExpenses.billable' | translate }}</div><div class="of-stat-value of-num">{{ s.billable | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-user-plus"></i></div></div>
+      <div class="of-stat green"><div><div class="of-stat-label">{{ 'office.projectExpenses.profit' | translate }}</div><div class="of-stat-value of-num">{{ s.profit | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-chart-line"></i></div></div>
+    </div>
+
+    <div class="of-layout">
+      <div class="of-col">
+        <div class="of-pills">
+          @for (f of filters; track f) {
+            <button type="button" [class.active]="filter() === f" (click)="filter.set(f)">{{ 'office.projectExpenses.filters.' + f | translate }}</button>
+          }
+        </div>
+        <div class="of-card flush">
+          <p-table [value]="filtered()" styleClass="of-table" [paginator]="filtered().length > 12" [rows]="12">
+            <ng-template pTemplate="header">
+              <tr><th>{{ 'office.common.date' | translate }}</th><th>{{ 'office.expenses.category' | translate }}</th><th>{{ 'office.common.description' | translate }}</th>
+                <th>{{ 'office.projectExpenses.scopeStage' | translate }}</th><th>{{ 'office.projectExpenses.onClient' | translate }}</th><th>{{ 'office.common.amount' | translate }}</th><th></th></tr>
+            </ng-template>
+            <ng-template pTemplate="body" let-r>
+              <tr>
+                <td class="of-num">{{ r.date | date: 'dd/MM/yyyy' }}</td>
+                <td><p-tag [value]="'office.projectCategories.' + r.category | translate" [severity]="r.kind === 'step' ? 'info' : 'secondary'" /></td>
+                <td>{{ r.description }}</td>
+                <td class="of-small">{{ r.where }}</td>
+                <td>{{ (r.billable ? 'office.common.yes' : 'office.common.no') | translate }}</td>
+                <td class="of-num of-strong">{{ r.amount | jod }}</td>
+                <td>@if (r.expense) { <p-button icon="pi pi-trash" [text]="true" [rounded]="true" size="small" severity="danger" (onClick)="remove(r)" /> }</td>
+              </tr>
+            </ng-template>
+            <ng-template pTemplate="footer"><tr><td colspan="5">{{ 'office.common.total' | translate }}</td><td class="of-num">{{ total() | jod }}</td><td></td></tr></ng-template>
+            <ng-template pTemplate="emptymessage"><tr><td colspan="7"><div class="of-empty">{{ 'office.common.noData' | translate }}</div></td></tr></ng-template>
+          </p-table>
+        </div>
+        <div class="of-note"><i class="pi pi-info-circle"></i><span>{{ 'office.projectExpenses.stepsNote' | translate }}</span></div>
+      </div>
+
+      <div class="of-col of-sticky">
+        <div class="of-card">
+          <div class="of-card-head"><h3>{{ 'office.projectExpenses.add' | translate }}</h3></div>
+          <div class="flex flex-column gap-3">
+            <div class="of-field"><label>{{ 'office.projectExpenses.level' | translate }}</label>
+              <div class="of-options">
+                <button type="button" class="of-option" [class.selected]="form.level === 'project'" (click)="setLevel('project')"><div class="of-option-title" style="font-size: .8rem">{{ 'office.projectExpenses.wholeProject' | translate }}</div></button>
+                <button type="button" class="of-option" [class.selected]="form.level === 'stage'" (click)="setLevel('stage')"><div class="of-option-title" style="font-size: .8rem">{{ 'office.projectExpenses.specificStage' | translate }}</div></button>
+              </div></div>
+            @if (form.level === 'stage') {
+              <div class="of-field"><label>Scope</label>
+                <p-select [options]="p.scopes" optionLabel="name" optionValue="id" [(ngModel)]="form.scopeId" (ngModelChange)="form.stageId = undefined" styleClass="w-full" appendTo="body" /></div>
+              <div class="of-field"><label>{{ 'office.projectExpenses.stage' | translate }}</label>
+                <p-select [options]="stagesOfScope" optionLabel="name" optionValue="id" [(ngModel)]="form.stageId" styleClass="w-full" appendTo="body" [filter]="true" /></div>
+            }
+            <div class="of-field"><label>{{ 'office.expenses.category' | translate }}</label>
+              <p-select [options]="categories" [(ngModel)]="form.category" styleClass="w-full" appendTo="body">
+                <ng-template let-o pTemplate="item">{{ 'office.projectCategories.' + o | translate }}</ng-template>
+                <ng-template let-o pTemplate="selectedItem">{{ 'office.projectCategories.' + o | translate }}</ng-template>
+              </p-select></div>
+            <div class="of-field"><label>{{ 'office.common.description' | translate }}</label><input pInputText [(ngModel)]="form.description" /></div>
+            <div class="of-form-grid">
+              <div class="of-field"><label>{{ 'office.common.amount' | translate }} <span class="req">*</span></label><p-inputnumber [(ngModel)]="form.amount" [min]="0" [maxFractionDigits]="2" inputStyleClass="w-full" /></div>
+              <div class="of-field"><label>{{ 'office.common.date' | translate }}</label><input type="date" pInputText [(ngModel)]="form.date" /></div>
+            </div>
+            <label class="flex gap-2 align-items-start of-small"><p-checkbox [binary]="true" [(ngModel)]="form.billable" /><span>{{ 'office.projectExpenses.billableHint' | translate }}</span></label>
+            <label class="of-dropzone block"><i class="pi pi-paperclip"></i>{{ form.attachment || ('office.expenses.attachInvoice' | translate) }}<input type="file" hidden (change)="pickFile($event)" /></label>
+            <p-button [label]="'office.expenses.save' | translate" icon="pi pi-check" styleClass="w-full" [disabled]="!(form.amount > 0) || (form.level === 'stage' && !form.stageId)" (onClick)="save()" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+} @else {
+  <div class="of-page"><div class="of-empty"><i class="pi pi-exclamation-circle"></i>{{ 'office.common.notFound' | translate }}</div></div>
+}

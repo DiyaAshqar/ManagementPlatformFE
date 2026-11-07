@@ -1,0 +1,120 @@
+@if (project(); as p) {
+  <div class="of-page">
+    <div class="of-breadcrumb">
+      <a routerLink="/office/projects">{{ 'office.projects.title' | translate }}</a><span class="sep">/</span>
+      <a [routerLink]="['/office/projects', p.id]">{{ p.name }}</a><span class="sep">/</span>
+      @if (stage(); as st) { <a [routerLink]="['/office/projects', p.id, 'stages', st.id]">Phase {{ st.n }} · {{ st.name }}</a><span class="sep">/</span> }
+      <span>{{ 'office.drawings.title' | translate }}</span>
+    </div>
+
+    <div class="of-header">
+      <div class="of-header-left">
+        <div class="of-header-icon"><i class="pi pi-images"></i></div>
+        <div>
+          <h1 class="of-title">{{ 'office.drawings.title' | translate }}</h1>
+          <p class="of-subtitle">{{ 'office.drawings.subtitle' | translate }}</p>
+        </div>
+      </div>
+      <div class="of-actions">
+        <p-button [label]="'office.drawings.new' | translate" icon="pi pi-plus" severity="secondary" [outlined]="true" (onClick)="openNew()" />
+        <p-button [label]="'office.drawings.transmittal' | translate: { n: checkedIds().length }" icon="pi pi-send" [disabled]="!checkedIds().length" (onClick)="transmittal()" />
+      </div>
+    </div>
+
+    <div class="of-pills">
+      <button type="button" [class.active]="set() === 'ifc'" (click)="setSet('ifc')">IFC</button>
+      <button type="button" [class.active]="set() === 'final'" (click)="setSet('final')">Final Drawing</button>
+    </div>
+
+    <div class="of-layout">
+      <div class="of-card flush">
+        <p-table [value]="drawings()" styleClass="of-table">
+          <ng-template pTemplate="header">
+            <tr><th style="width: 3rem"></th><th>{{ 'office.drawings.no' | translate }}</th><th>{{ 'office.drawings.titleCol' | translate }}</th><th>{{ 'office.drawings.discipline' | translate }}</th>
+              <th>{{ 'office.drawings.lastRev' | translate }}</th><th>{{ 'office.common.status' | translate }}</th><th>{{ 'office.drawings.sent' | translate }}</th></tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-d>
+            <tr class="clickable" [style.background]="selected().id === d.id ? 'var(--highlight-bg)' : null" (click)="selectedId.set(d.id)">
+              <td (click)="$event.stopPropagation()"><p-checkbox [binary]="true" [ngModel]="!!checked()[d.id]" (ngModelChange)="toggleCheck(d.id, $event)" /></td>
+              <td class="of-strong">{{ d.no }}</td>
+              <td>{{ d.title }}</td>
+              <td>{{ 'office.disciplines.' + d.discipline | translate }}</td>
+              <td><p-tag [value]="last(d).rev" severity="secondary" /></td>
+              <td><p-tag [value]="'office.drawings.status.' + status(d) | translate" [severity]="status(d) === 'pend' ? 'warn' : status(d) === 'fin' ? 'contrast' : 'info'" /></td>
+              <td class="of-small">{{ d.transmittal ? (d.transmittal.date | date: 'dd/MM/yyyy') + ' · ' + d.transmittal.no : '—' }}</td>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="emptymessage"><tr><td colspan="7"><div class="of-empty"><i class="pi pi-images"></i>{{ 'office.drawings.empty' | translate }}</div></td></tr></ng-template>
+        </p-table>
+      </div>
+
+      <div class="of-col">
+        @if (selected(); as d) {
+          <div class="of-card">
+            <div class="of-card-head">
+              <div>
+                <h3>{{ d.no }} · {{ d.title }}</h3>
+                <p class="of-card-sub">{{ 'office.disciplines.' + d.discipline | translate }}</p>
+              </div>
+              @if (!d.pending) { <p-button [label]="'office.drawings.markPending' | translate" icon="pi pi-pencil" [text]="true" size="small" (onClick)="markPending()" /> }
+            </div>
+            <div class="of-timeline">
+              @for (h of d.revisions.slice().reverse(); track h.rev; let first = $first) {
+                <div class="ev" [class.now]="first" [class.done]="!first">
+                  <span class="dot"></span>
+                  <div>
+                    <div class="t">
+                      {{ h.rev }} @if (h.superseded) { <span class="of-small of-muted">· {{ 'office.drawings.superseded' | translate }}</span> }
+                      @if (h.reason) { · {{ 'office.revisionReasons.' + h.reason | translate }} }
+                    </div>
+                    <div class="d">{{ h.description }}</div>
+                    <div class="d">{{ h.date | date: 'dd/MM/yyyy' }} · {{ h.by }} · <a class="of-link">PDF</a></div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+
+          <div class="of-card">
+            <div class="of-card-head"><h3>{{ 'office.drawings.uploadRev' | translate: { rev: nextRev(d) } }}</h3></div>
+            <div class="flex flex-column gap-3">
+              <div class="of-field"><label>{{ 'office.drawings.reason' | translate }}</label>
+                <div class="of-options">
+                  @for (r of reasons; track r) {
+                    <button type="button" class="of-option" [class.selected]="rev.reason === r" (click)="rev.reason = r"><div class="of-option-title" style="font-size: .78rem">{{ 'office.revisionReasons.' + r | translate }}</div></button>
+                  }
+                </div></div>
+              <div class="of-field"><label>{{ 'office.drawings.changeDesc' | translate }} <span class="req">*</span></label><input pInputText [(ngModel)]="rev.description" /></div>
+              <label class="of-dropzone block"><i class="pi pi-upload"></i>{{ rev.file || ('office.drawings.pickFile' | translate) }}<input type="file" accept=".pdf,.dwg" hidden (change)="pickRevFile($event)" /></label>
+              @if (rev.reason === 'clientChange') {
+                <div class="of-note warn"><i class="pi pi-info-circle"></i><span>{{ 'office.drawings.changeOrderNote' | translate }}</span></div>
+              }
+              <p-button [label]="'office.drawings.saveRev' | translate: { rev: nextRev(d) }" icon="pi pi-check" [disabled]="!rev.description.trim()" (onClick)="saveRevision()" />
+            </div>
+          </div>
+        }
+      </div>
+    </div>
+  </div>
+
+  <p-dialog [(visible)]="newVisible" [modal]="true" [header]="'office.drawings.new' | translate" [style]="{ width: '480px' }" [breakpoints]="{ '640px': '95vw' }">
+    <div class="of-form-grid">
+      <div class="of-field"><label>{{ 'office.drawings.no' | translate }} <span class="req">*</span></label><input pInputText [(ngModel)]="newDrawing.no" placeholder="A-301" /></div>
+      <div class="of-field"><label>{{ 'office.drawings.discipline' | translate }}</label>
+        <p-select [options]="disciplines" [(ngModel)]="newDrawing.discipline" styleClass="w-full" appendTo="body">
+          <ng-template let-o pTemplate="item">{{ 'office.disciplines.' + o | translate }}</ng-template>
+          <ng-template let-o pTemplate="selectedItem">{{ 'office.disciplines.' + o | translate }}</ng-template>
+        </p-select></div>
+      <div class="of-field span-all"><label>{{ 'office.drawings.titleCol' | translate }} <span class="req">*</span></label><input pInputText [(ngModel)]="newDrawing.title" /></div>
+      <label class="of-dropzone span-all block"><i class="pi pi-upload"></i>{{ newDrawing.file || ('office.drawings.pickFile' | translate) }}<input type="file" accept=".pdf,.dwg" hidden (change)="pickNewFile($event)" /></label>
+    </div>
+    <ng-template pTemplate="footer">
+      <div class="of-dialog-footer">
+        <p-button [label]="'office.common.cancel' | translate" severity="secondary" [text]="true" (onClick)="newVisible = false" />
+        <p-button [label]="'office.common.save' | translate" icon="pi pi-check" [disabled]="!newDrawing.no.trim() || !newDrawing.title.trim()" (onClick)="saveNew()" />
+      </div>
+    </ng-template>
+  </p-dialog>
+} @else {
+  <div class="of-page"><div class="of-empty"><i class="pi pi-exclamation-circle"></i>{{ 'office.common.notFound' | translate }}</div></div>
+}

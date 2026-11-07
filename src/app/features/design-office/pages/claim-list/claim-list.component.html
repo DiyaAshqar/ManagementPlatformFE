@@ -1,0 +1,79 @@
+<div class="of-page">
+  <div class="of-header">
+    <div class="of-header-left">
+      <div class="of-header-icon"><i class="pi pi-money-bill"></i></div>
+      <div>
+        <h1 class="of-title">{{ 'office.claims.title' | translate }}</h1>
+        <p class="of-subtitle">{{ 'office.claims.subtitle' | translate }}</p>
+      </div>
+    </div>
+    <p-button [label]="'office.claims.manual' | translate" icon="pi pi-plus" [raised]="true" (onClick)="manualVisible = true" />
+  </div>
+
+  <div class="of-stats">
+    <div class="of-stat blue" (click)="tab.set('due')" style="cursor: pointer"><div><div class="of-stat-label">{{ 'office.claims.statDue' | translate }}</div><div class="of-stat-value of-num">{{ stats().due | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-bell"></i></div></div>
+    <div class="of-stat purple" (click)="tab.set('sent')" style="cursor: pointer"><div><div class="of-stat-label">{{ 'office.claims.statSent' | translate }}</div><div class="of-stat-value of-num">{{ stats().sent | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-send"></i></div></div>
+    <div class="of-stat red" (click)="tab.set('late')" style="cursor: pointer"><div><div class="of-stat-label">{{ 'office.claims.statLate' | translate }}</div><div class="of-stat-value of-num">{{ stats().late | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-exclamation-triangle"></i></div></div>
+    <div class="of-stat slate" (click)="tab.set('scheduled')" style="cursor: pointer"><div><div class="of-stat-label">{{ 'office.claims.statScheduled' | translate }}</div><div class="of-stat-value of-num">{{ stats().scheduled | jod }}</div></div><div class="of-stat-icon"><i class="pi pi-calendar"></i></div></div>
+  </div>
+
+  <div class="of-card">
+    <div class="flex flex-column gap-3">
+      <div class="of-pills">
+        @for (t of tabs; track t) {
+          <button type="button" [class.active]="tab() === t" (click)="tab.set(t)">
+            {{ (t === 'all' ? 'office.common.all' : 'office.claimStatus.' + t) | translate }}<span class="count">{{ counts()[t] || 0 }}</span>
+          </button>
+        }
+      </div>
+      <div class="of-toolbar">
+        <div class="of-field of-grow">
+          <label>{{ 'office.common.search' | translate }}</label>
+          <p-iconfield><p-inputicon styleClass="pi pi-search" />
+            <input pInputText class="w-full" [ngModel]="search()" (ngModelChange)="search.set($event)" [placeholder]="'office.claims.searchPlaceholder' | translate" /></p-iconfield>
+        </div>
+        <div class="of-field" style="min-width: 240px">
+          <label>{{ 'office.projects.project' | translate }}</label>
+          <p-select [options]="projects()" optionLabel="label" optionValue="value" [showClear]="true" [filter]="true" [placeholder]="'office.common.all' | translate"
+            [ngModel]="project()" (ngModelChange)="project.set($event)" styleClass="w-full" />
+        </div>
+        <div class="of-field"><label>{{ 'office.claims.dueFrom' | translate }}</label><input type="date" pInputText [ngModel]="from()" (ngModelChange)="from.set($event)" /></div>
+        <div class="of-field"><label>{{ 'office.common.to' | translate }}</label><input type="date" pInputText [ngModel]="to()" (ngModelChange)="to.set($event)" /></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="of-card flush">
+    <p-table [value]="filtered()" styleClass="of-table" [paginator]="filtered().length > 12" [rows]="12">
+      <ng-template pTemplate="header">
+        <tr>
+          <th>{{ 'office.claims.claim' | translate }}</th>
+          <th>{{ 'office.claims.projectClient' | translate }}</th>
+          <th>{{ 'office.claims.paymentLinked' | translate }}</th>
+          <th>{{ 'office.claim.dueDate' | translate }}</th>
+          <th>{{ 'office.common.amount' | translate }}</th>
+          <th>{{ 'office.projects.received' | translate }}</th>
+          <th>{{ 'office.claim.rest' | translate }}</th>
+          <th>{{ 'office.common.status' | translate }}</th>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="body" let-v>
+        <tr class="clickable" (click)="open(v)">
+          <td><a class="of-link">{{ v.claim.no }}</a></td>
+          <td><div>{{ v.project?.code }} · {{ v.project?.name }}</div><div class="of-small of-muted">{{ v.client?.name }}</div></td>
+          <td><div class="of-strong">{{ v.claim.paymentName }}@if (v.claim.pct) { · {{ v.claim.pct }}% }</div><div class="of-small of-muted">{{ linkLabel(v) }}</div></td>
+          <td class="of-num">{{ v.claim.dueDate ? (v.claim.dueDate | date: 'dd/MM/yyyy') : '—' }}</td>
+          <td class="of-num">{{ v.total | jod }}</td>
+          <td class="of-num">{{ v.paid | jod }}</td>
+          <td class="of-num of-strong">{{ v.rest | jod }}</td>
+          <td><p-tag [value]="'office.claimStatus.' + v.status | translate" [severity]="severity[$any(v.status)]" /></td>
+        </tr>
+      </ng-template>
+      <ng-template pTemplate="emptymessage">
+        <tr><td colspan="8"><div class="of-empty"><i class="pi pi-inbox"></i>{{ 'office.common.noData' | translate }}</div></td></tr>
+      </ng-template>
+    </p-table>
+  </div>
+</div>
+
+<app-of-create-claim-dialog [(visible)]="manualVisible" [projectId]="project() ?? undefined" (created)="router.navigate(['/office/claims', $event])" />
